@@ -1,0 +1,17 @@
+<div class="view-content main-view-content" scope="true">
+	<table class="app-mainpage-table" cellpadding="0px" cellspacing="0px">
+		<tr>
+			<td class="app-mainpage-left-column">
+				<div>
+					<div>
+						{@personal}
+					</div>
+					<component UserInfo>
+				</div>
+			</td>
+			<td class="app-mainpage-content-column">
+
+			</td>
+		</tr>
+	</table>
+</div>

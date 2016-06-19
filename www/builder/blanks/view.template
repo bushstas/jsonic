@@ -1,0 +1,3 @@
+{template .main}
+	<div class="view-content"></div>
+{/template}

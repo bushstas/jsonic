@@ -1,0 +1,1 @@
+component DataTableTabPanel extends TabPanel

@@ -1,0 +1,67 @@
+{
+	"indexPage"  : "index.html",
+	"title"      : "Page title",
+	"charset"    : "UTF-8",
+	"jsFolder"   : "js",
+	"cssFolder"  : "css",
+	"compiledJs" : "base",
+	"compiledCss": "styles",
+
+	"entry"      : "App",
+	"scope"      : "./sources",
+	"sources"    : "./core",
+	"blanks"     : "./blanks",
+	"container"  : "app-view-container",	
+	"views"      : "views",
+	"pathToApi"  : "api",
+	
+	"router"     : {
+		"routes": [
+			{
+				"name": "main", 
+				"view": "Main",
+				"accessLevel": 10,
+				"title": "Home",
+				"params": {
+					"text": "blablabla",
+					"name": "$2"
+				}
+			},
+			{
+				"name": "search",
+				"view": "Search",
+				"accessLevel": 0,
+				"title": "Поиск",
+				"load": ["Filters"]
+			},
+			{
+				"name": "favorite", 
+				"view": "Favorite",
+				"accessLevel": 0,
+				"title": "Избранное"
+			},
+			{
+				"name": "analytics", 
+				"view": "Analytics",
+				"accessLevel": 0,
+				"title": "Аналитика"
+			}
+		],
+		"menu": "TopMenu",
+		"hash": true,
+		"indexRoute": "main",
+		"defaultRoute": null,
+		"404": "Error404",
+		"401": "Error401",
+		"generateTree": true
+	},
+	
+	"user": {
+		"login": "user/login.php",
+		"logout": "user/logout.php",
+		"save": "user/save.php",
+		"fullAccess": 11
+	},
+
+	"pathToDictionary": "dictionary/get.php"
+}

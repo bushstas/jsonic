@@ -1,0 +1,39 @@
+.main-view-content {
+	position: relative;
+	width: 1350px;
+	margin: auto;
+}
+.main-view-content table {
+	width: 100%;
+}
+.app-mainpage-table td {
+	vertical-align: top;
+}
+.app-mainpage-table .app-mainpage-left-column {
+	width: 354px;    
+    padding: 12px;
+}
+.app-mainpage-left-column > div:first-child {
+	position: relative;
+    padding: 49px 20px 12px 20px;
+    min-height: 180px;
+    box-shadow: 0 0 6px #c1c5d1;
+    border-radius: 3px;
+    font-size: 14px;
+}
+.app-mainpage-left-column > div:first-child > div:first-child {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    line-height: 39px;
+    height: 37px;
+    color: #edf0f4;
+    background-color: #51648d;
+    border-radius: 3px 3px 0 0;
+    padding-left: 43px;
+    background-image: url(../images/mainpage/person-icon.png);
+    background-repeat: no-repeat;
+    background-position: 17px 50%;
+    font-family: ptsansbold;
+}
