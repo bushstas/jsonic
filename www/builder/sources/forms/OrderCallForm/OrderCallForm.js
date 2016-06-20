@@ -18,6 +18,21 @@ initial options = {
 			'name': 'phone',
 			'caption': @contactPhone,
 			'class': 'half-width'
+		},
+		{
+			'cmpid': 'email',
+			'type': 'text',
+			'name': 'email',
+			'caption': @contactEmail,
+			'class': 'half-width'
+		},
+		{
+			'cmpid': 'topic',
+			'type': 'select',
+			'name': 'topic',
+			'options': Dictionary.get('orderCallTopics'),
+			'caption': @callTopic,
+			'class': 'half-width'
 		}
 	],
 	'submit': {
@@ -25,3 +40,14 @@ initial options = {
 		'class': 'standart-button green-button send-button'
 	}
 };
+
+function onRendered() {
+	this.setControlValue('name', User.getAttribute('name'));
+	this.setControlValue('phone', User.getAttribute('phone'));
+
+	var email = User.getAttribute('email');
+	if (email) {
+		this.setControlValue('email', email);
+		this.enableControl('email', false);
+	}
+}

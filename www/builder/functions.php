@@ -1190,7 +1190,7 @@
 				if (isset($propsShortcuts[$propName])) {
 					$propName = $propsShortcuts[$propName];
 				}
-				if (preg_match("/on(\w+)/i", $propName, $match)) {
+				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
 					if ($hasCode) {
 						error('Фигурные скобки внутри аттрибута события <b>'.$propName.'</b>. Ожидается название функции обработчика!');
 					}

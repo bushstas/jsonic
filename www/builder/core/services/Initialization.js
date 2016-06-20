@@ -54,6 +54,9 @@ function Initialization() {
 			}
 		}
 		this.initials = initials;
+		if (props && isString(props['cmpid'])) {
+			this.setId(props['cmpid']);
+		}
 	};
 	var isMethodToInherit = function(method) {
 		return method != __I && method != __GI;

@@ -1,4 +1,7 @@
 function Control() {}
+Control.prototype.getInitials = function() {
+	return {'enabled': true};
+};
 Control.prototype.getName = function() {
 	return this.props.name;
 };
@@ -58,6 +61,12 @@ Control.prototype.setValue = function(value) {
 };
 Control.prototype.setProperValue = function(value) {
 	this.set('value', value);
+};
+Control.prototype.isEnabled = function() {
+	return !!this.get('enabled');
+};
+Control.prototype.setEnabled = function(isEnabled) {
+	this.set('enabled', isEnabled);
 };
 Control.prototype.disposeInternal = function() {
 	this.options = null;

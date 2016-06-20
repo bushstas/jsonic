@@ -70,11 +70,11 @@ Form.prototype.createControl = function(options, parentElement) {
 	var control;
 	switch (options['type']) {
 		case 'select':
-
+			control = this.createSelect(options);
 		break;
 
 		case 'textarea':
-
+			control = this.createTextarea(options);
 		break;
 
 		default:
@@ -85,6 +85,14 @@ Form.prototype.createControl = function(options, parentElement) {
 
 Form.prototype.createInput = function(options) {
 	return new Input(options);
+};
+
+Form.prototype.createSelect = function(options) {
+	return new Select(options);
+};
+
+Form.prototype.createTextarea = function(options) {
+	return new Textarea(options);
 };
 
 Form.prototype.createSubmit = function(parentElement) {
@@ -174,6 +182,24 @@ Form.prototype.onSuccess = function(data) {};
 Form.prototype.onFailure = function(data) {
 	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
 	this.log(error, 'onFailure', data);
+};
+
+Form.prototype.setControlValue = function(name, value) {
+	if (isString(name)) {
+		var child = this.getChildById(name);
+		if (child) {
+			child.setValue(value);
+		}
+	}
+};
+
+Form.prototype.enableControl = function(name, isEnabled) {
+	if (isString(name)) {
+		var child = this.getChildById(name);
+		if (child) {
+			child.setEnabled(isEnabled);
+		}
+	}
 };
 
 Form.prototype.disposeInternal = function() {

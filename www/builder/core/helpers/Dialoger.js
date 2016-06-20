@@ -13,7 +13,7 @@ function Dialoger() {
 		}
 	};
 	var defineDialogId = function(dialogId) {
-		currentDialogId = currentDialogClass.constructor.name + (isString(dialogId) ? '_' + dialogId : '');
+		currentDialogId = currentDialogClass.name + (isString(dialogId) ? '_' + dialogId : '');
 	};
 	var defineDialog = function() {
 		if (isUndefined(dialogs[currentDialogId])) {

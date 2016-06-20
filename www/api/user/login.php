@@ -20,7 +20,10 @@
 	} else {
 		$output = json_encode(array(
 			'accessLevel' => (int)$_SESSION['accessLevel'],
-		 	'type' => 'guest'
+		 	'type' => 'guest',
+		 	'name' => 'Бушмакин Стас',
+		 	'email' => 'bushstas@mail.ru',
+		 	'phone' => '89125954311'
 		));
 	}
 	if (isset($_POST['formKey'])) {

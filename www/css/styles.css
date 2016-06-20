@@ -47,13 +47,27 @@
 .app-search-form-filter-name:before{content:'';border-bottom:1px dashed #a9adb3;position:absolute;bottom:0;left:0;right:20px;}
 /* Input */
 .app-input-container{margin:5px 0;}
-.app-input-container.half-width{display:inline-block;width:49%;}
+.app-input-container.half-width{display:inline-block;width:49%;vertical-align:top;}
 .app-input-container.half-width:nth-child(2n){margin-left:2%;}
 .app-input-caption{color:#6f7b9a;font-size:14px;line-height:14px;margin-bottom:6px;}
 .app-input-container input{padding:10px 10px;box-sizing:border-box;width:100%;background-color:transparent;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;box-shadow:inset 2px 1px 3px #d7deec;border-radius:3px;}
 .app-input-container input:focus{border-color:#38986a;box-shadow:1px 1px 6px #93C7AE;outline:none;}
+/* Select */
+.app-select{position:relative;box-sizing:border-box;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;box-shadow:inset 2px 1px 3px #d7deec;border-radius:3px;cursor:pointer;}
+.app-select:hover{border-color:#68758c;box-shadow:1px 1px 6px #bfc7d8;}
+.app-select.active{z-index:10;}
+.app-select.active:hover{z-index:15;}
+.app-select-value{padding:10px 10px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+.app-select-options{position:absolute;display:none;top:100%;left:-1px;right:-1px;margin-top:2px;max-height:300px;overflow:auto;background-color:#ffffff;border:1px solid #bec8da;border-radius:4px;box-shadow:2px 2px 5px #e4e4e4;padding:6px;}
+.app-select.active .app-select-options{display:block;font-family:ptsans;}
+.app-select-option{line-height:13px;font-size:13px;padding:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;color:#444C61;}
+.app-select-option:hover{color:#5f6b7f;background-color:#e7ecf4;}
 /* Submit */
 .app-submit-container{margin-top:15px;}
+/* OrderCall */
+.standart-button.order-support{position:absolute;bottom:20px;right:20px;width:235px;}
+/* Support */
+.standart-button.order-support{position:absolute;bottom:20px;right:20px;width:235px;}
 /* App */
 *::-webkit-scrollbar{width:10px;height:10px;}
  *::-webkit-scrollbar-button{background-color:#c1c1c1;display:none;}

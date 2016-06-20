@@ -1,3 +1,6 @@
 {template .content}
 	<component OrderCallForm>
+	<div class="standart-button order-support" onClick="onSupportButtonClick">
+		{@toSupport}
+	</div>
 {/template}

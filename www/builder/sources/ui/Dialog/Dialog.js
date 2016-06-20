@@ -1,8 +1,7 @@
 component Dialog
 
 initial args = {
-	'closable': true,
-	'expandable': true
+	'closable': true
 };
 
 initial followers = {
