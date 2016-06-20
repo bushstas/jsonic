@@ -1,0 +1,10 @@
+{template .main}
+	<div class="app-404-container">
+		<div class="app-404-title">
+			404
+		</div>
+		<div class="app-404-text">
+			Запрашиваемой страницы не существует
+		</div>		
+	</div>
+{/template}

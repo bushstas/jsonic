@@ -1,0 +1,6 @@
+view Main
+
+
+function onRendered() {
+
+}

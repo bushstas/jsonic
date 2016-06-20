@@ -1,0 +1,11 @@
+<div class="app-search-form-reset">
+	<div class="hover-label" onClick="onResetButtonClick">
+		{@clearFilter}
+	</div>
+	<div class="confirm-label" onClick="onResetConfirmed">
+		{@sure} <i class="confirm-reset-filter">{@yes}</i>
+	</div>
+</div>
+<div class="app-tender-search-form" scope="1">
+	<component SearchFormFilters>
+</div>

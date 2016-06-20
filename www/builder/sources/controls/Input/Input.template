@@ -1,0 +1,8 @@
+<div class="app-input-container">
+	{if $caption}
+		<div class="app-input-caption">
+			{$caption}
+		</div>
+	{/if}
+	<input type="{$type}" name="{$name}" class="{$class}" placeholder="{$placeholder}" value="{$value}" onInput="onChange"/>
+</div>

@@ -1,0 +1,18 @@
+.app-ui-checkbox {
+	float: left;
+    display: block;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    margin-right: 7px;
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #76849C;
+    background-color: #eaeef3;
+    border-radius: 3px;
+}
+.app-ui-checkbox.checked {
+    background-image: url(../images/ui/checkb.png);
+    border-color: #7E9CCA;
+    background-color: #ffffff;
+}

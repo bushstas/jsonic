@@ -1,0 +1,15 @@
+.app-datatable-outer-container {
+	position: absolute;
+    top: 8px;
+    margin-left: 14px;
+    max-width: 1320px;
+    left: 24px;
+    bottom: 0px;
+    right: 8px;
+    z-index: 1;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+.view-content.form-expanded .app-datatable-outer-container {
+	left: 336px;
+}

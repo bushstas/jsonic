@@ -1,0 +1,7 @@
+{template .main}
+	<div class="app-authform-logo">LOGO</div>
+	<div class="app-authform-text">
+		{@authFormText}
+	</div>
+	<div class="app-authform-inputs"></div>
+{/template}

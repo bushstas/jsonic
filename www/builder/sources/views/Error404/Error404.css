@@ -1,0 +1,19 @@
+.app-404-container {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	width: 500px;
+	margin-left: -250px;
+	margin-top: -160px;
+	text-align: center;
+}
+.app-404-title {
+	font-size: 180px;
+	line-height: 180px;
+	font-weight: bold;
+	color: #AAAAAA;
+}
+.app-404-text {
+	font-size: 18px;
+	margin-top: 10px;
+}

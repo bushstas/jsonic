@@ -1,0 +1,6 @@
+view Favorite
+
+
+function onRendered() {
+
+}

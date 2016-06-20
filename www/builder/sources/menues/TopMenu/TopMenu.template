@@ -1,0 +1,8 @@
+<div class="app-top-menu" scope="true">
+	<a href="#main" class="app-top-menu-logo"></a>
+	<a href="#main" role="main">Главная</a>
+	<a href="#search" role="search">Поиск</a>
+	<a href="#favorite" role="favorite">Избранное</a>
+	<a href="#planzakupok" role="planzakupok">Планы закупок</a>
+	<a href="#analytics" role="analytics">Аналитика</a>
+</div>

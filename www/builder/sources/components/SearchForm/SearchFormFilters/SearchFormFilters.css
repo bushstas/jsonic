@@ -1,0 +1,139 @@
+.app-search-form-filters {
+	position: relative;
+    margin-top: 12px;
+    margin-left: 26px;
+    margin-right: 26px;
+    height: 38px;
+    line-height: 38px;
+    font-size: 14px;
+    z-index: 12;	
+}
+.app-search-form-filters-create-button {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: 55%;
+    top: 0;
+    bottom: 0;
+    background-color: #6e85c5;
+    background-image: url(../images/searchform/button-bg.png);
+    background-position: 0 0;
+    cursor: pointer;
+    color: #fff;
+    border-radius: 4px 0px 0px 4px;
+    -moz-border-radius: 4px 0px 0px 4px;
+    -webkit-border-radius: 4px 0px 0px 4px;
+    text-align: center;
+    transition: right 0.3s;
+    -moz-transition: right 0.3s;
+    -webkit-transition: right 0.3s;
+    border-right: 1px solid #3b4451;
+}
+.app-search-form-filters-create-button:hover {
+    background-position: 0 100%;
+}
+.app-search-form-filters-button {
+    position: absolute;
+    left: 45%;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background-color: #eaeef4;
+    color: #51608b;
+    padding-left: 12px;
+    cursor: pointer;
+    border-radius: 0px 4px 4px 0px;
+}
+.app-search-form-filters-button-inner {
+    width: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+}
+.app-search-form-filters-button-side {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    width: 42px;
+    background-color: #4e6a9b;
+    border-radius: 4px;
+    background-image: url(../images/searchform/button-bg.png);
+    background-position: 0% 12%;
+}
+.app-search-form-filters-button-side:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(../images/searchform/arrow.png);
+    background-position: 85% 50%;
+    background-repeat: no-repeat;
+}
+.app-search-form-filters-button-quantity {
+    font-family: ptsansbold;
+    line-height: 30px;
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    color: #ffffff;
+    box-sizing: border-box;
+    padding-right: 13px;
+}
+.app-search-form-filters-button-plus {
+    display: none;
+}
+.app-search-form-filters.with-plus .app-search-form-filters-button-plus {
+    display: block;
+    height: 30px;
+    background-image: url(../images/searchform/plus.png);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;    
+}
+.app-search-form-filter-save-button {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    height: 26px;
+    padding: 0 6px;
+    line-height: 26px;
+    background-color: #539e64;
+    color: #ffffff;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    font-family: ptsansbold;
+    border-radius: 5px;
+}
+.app-search-form-filter-save-button:hover {
+    background-color: #499059;
+}
+.app-search-form-filter-name {
+    max-width: 170px;
+    position: absolute;
+    top: 52px;
+    left: 0;
+    line-height: 18px;
+    color: #eff1f5;
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    padding-right: 20px;
+}
+.app-search-form-filter-name:before {
+    content: '';
+    border-bottom: 1px dashed #a9adb3;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 20px;
+}

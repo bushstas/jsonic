@@ -1,0 +1,3 @@
+{template .content}
+	<div class="app-ui-checkbox{&args.item.isAutoOpen?' checked':''}" data-value="{&args.item.value}"></div>
+{/template}
