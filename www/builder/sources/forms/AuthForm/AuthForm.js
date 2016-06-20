@@ -1,11 +1,5 @@
 form AuthForm
 
-initial loader = {
-	controller: Filters,
-	async: true,
-	options: {a: this.ass}
-}
-
 initial options = {
 	'action': 'api/user/login.php',
 	'method': 'POST',
@@ -16,19 +10,19 @@ initial options = {
 			'cmpid': 'login',
 			'type': 'text',
 			'name': 'login',
-			'placeholder': 'Введите логин',
-			'caption': 'Логин'
+			'placeholder': @enterLogin,
+			'caption': @login
 		},
 		{
 			'cmpid': 'password',
 			'type': 'password',
 			'name': 'password',
-			'placeholder': 'Введите пароль',
-			'caption': 'Пароль'
+			'placeholder': @enterPassword,
+			'caption': @password
 		}
 	],
 	'submit': {
-		'value': 'Войти',
+		'value': @enter,
 		'class': 'app-submit'
 	}
 };

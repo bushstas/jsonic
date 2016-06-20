@@ -20,7 +20,7 @@
 			{
 				"name": "main", 
 				"view": "Main",
-				"accessLevel": 0,
+				"accessLevel": 10,
 				"title": "Home",
 				"params": {
 					"text": "blablabla",
@@ -59,7 +59,8 @@
 	"user": {
 		"login": "user/login.php",
 		"logout": "user/logout.php",
-		"save": "user/save.php"
+		"save": "user/save.php",
+		"fullAccess": 11
 	},
 
 	"pathToDictionary": "dictionary/get.php"

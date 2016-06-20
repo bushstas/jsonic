@@ -21,7 +21,9 @@
 		'action' => 'a',
 		'name' => 'n',
 		'scope' => 'sc',
-		'role' => 'r'
+		'role' => 'r',
+		'cellpadding' => 'cp',
+		'cellspacing' => 'cs'
 	);
 	$propsShortcutsFlipped = array_flip($propsShortcuts);
 
@@ -39,7 +41,7 @@
 		return array(
 			'div', 'span', 'table', 'tbody', 'thead', 'tr', 'td', 'th', 'ul', 'ol', 'li', 'p', 'a', 'form', 'input', 'img', 'video', 'audio', 'aside',
 			'article', 'b', 'big', 'blockquote', 'button', 'canvas', 'caption', 'center', 'code', 'col', 'colgroup', 'footer', 'font', 'h1', 'h2', 'h3',
-			'h4', 'h5', 'h6', 'header', 'hr', 'i', 'iframe', 'label', 'menu', 'pre', 's', 'section', 'select', 'strong', 'textarea', 'u'
+			'h4', 'h5', 'h6', 'header', 'hr', 'i', 'iframe', 'label', 'menu', 'pre', 's', 'section', 'select', 'strong', 'textarea', 'u', 'small'
 		);
 	}
 
@@ -441,15 +443,15 @@
 		}
 	}
 
-	function validateCallback($callback, $initialValue, $initialType, &$component, $fileld, $name = '', $value = '') {
+	function validateCallback($callback, $initialValue, $initialType, &$component, $field, $name = '', $value = '') {
 		if (empty($callback)) return;
 		if ($callback !== null && $callback !== false && $callback !== '') {
 			$callback = str_replace('__BIND__', '', $callback);
 			if (!preg_match('/^this\.[a-z]\w*$/i', $callback)) {
 				if (!empty($name)) {
-					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$fileld.'</b>, в котором параметр <b>'.$name.'</b> имеет некорректное значение <b>'.$callback.'</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
+					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$field.'</b>, в котором параметр <b>'.$name.'</b> имеет некорректное значение <b>'.$callback.'</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
 				} else {
-					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$fileld.'</b> с некорректным значением <b>'.$value.'</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp>Ожидается функция обработчик вида <b>this.'.($initialType == 'globals' ? 'onChangeGlobalVar' : 'onChangeSomeProp').'</b><br><br><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));					
+					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$field.'</b> с некорректным значением <b>'.$value.'</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp>Ожидается функция обработчик вида <b>this.'.($initialType == 'globals' ? 'onChangeGlobalVar' : 'onChangeSomeProp').'</b><br><br><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));					
 				}
 			}
 		}
@@ -458,13 +460,14 @@
 			foreach ($binds as $bind) {
 				$parts = preg_split('/\s*,\s*/', $bind);
 				if ($parts[0] != 'this' && $parts[0] != 'null') {
-					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$fileld.'</b>, в котором параметр <b>'.$name.'</b> имеет некорректный первый аргумент <b>'.$bind.'</b> вызова bind  для метода <b>'.$callback.'</b><br><br>Ожидается <b>this</b> или <b>null</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));				
+
+					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$field.'</b>, в котором параметр <b>'.$name.'</b> имеет некорректный первый аргумент <b>'.$bind.'</b> вызова bind  для метода <b>'.$callback.'</b><br><br>Ожидается <b>this</b> или <b>null</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
 				}
 			}
 			for ($i = 1; $i < count($parts); $i++) {
 				$part = removeQuotedText($parts[$i]);
 				if (!preg_match('/^@\w+$/', $part) && json_decode("[".$part."]") === null) {
-					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$fileld.'</b>, в котором параметр <b>'.$name.'</b> имеет некорректный аргумент <b>'.$parts[$i].'</b> вызова bind  для метода <b>'.$callback.'</b><br><br>Ожидается JSON валидная запись или текстовая контстанта вида <b>@shortcut</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
+					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет поле <b>'.$field.'</b>, в котором параметр <b>'.$name.'</b> имеет некорректный аргумент <b>'.$parts[$i].'</b> вызова bind  для метода <b>'.$callback.'</b><br><br>Ожидается JSON валидная запись или текстовая контстанта вида <b>@shortcut</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
 				}
 			}
 		}
@@ -543,6 +546,7 @@
 			validateCallback($value, $initialValue, $initialType, $component, $key, '', $value);
 		}
 	}
+
 
 	function validateHelpersInitials($initials, $initialValue, $initialType, &$component) {
 		global $componentLikeClassTypes;
@@ -662,6 +666,7 @@
 	function parseClassFunctions(&$components) {		
 		foreach ($components as &$component) {			
 			$code = 'function(){}'.trim($component['content']);
+			$code = preg_replace("/@(\w+)/", "__.$1", $code);
 			$braces = preg_replace("/[^\{\}]/", "", $code);
 			$parts = preg_split("/[\{\}]/", $code);
 						
@@ -834,6 +839,7 @@
 	function getTemplateFunctions($template, $class, $component) {
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
+		$template = preg_replace('/&nbsp;/', '\u00A0', $template);
 
 		$regexp = "/\{template +\.(\w+) *\}/";
 		preg_match_all($regexp, $template, $matches);
@@ -850,7 +856,7 @@
 		}
 		
 		$templates = array();
-		for ($i = 0; $i < count($templateNames); $i++) {			
+		for ($i = 0; $i < count($templateNames); $i++) {
 			$templates[] = getParsedTemplate($templateContents[$i], $templateNames[$i], $regexp, $component); 
 		}
 
@@ -903,7 +909,7 @@
 		
 		$list = array();
 		for ($j = 0; $j < count($parts); $j++) {
-			$part = trim($parts[$j]);
+			$part = $parts[$j];
 			if (!empty($part)) {
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
@@ -947,6 +953,7 @@
 				if (isSimpleTag($tagName))
 				{
 					$child = array('t' => getTagIndex($tagName));
+					getTagProperties($item['content'], $child, $component);
 				}
 				elseif ($tagName == 'template')
 				{
@@ -1216,6 +1223,7 @@
 			$props[$propName] = $propValue;
 			if ($hasCode) {
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
+				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
 				$regexp = '/\{([^\}]*)\}/';
 				$hasClassVar = hasClassVar($propValue);
 				

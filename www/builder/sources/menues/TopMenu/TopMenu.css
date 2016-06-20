@@ -10,6 +10,13 @@
     border-bottom: 1px solid #B6BFCE;
     box-shadow: 0 1px 6px #D1D8E2;
 }
+.app-top-menu-inner {
+    position: relative;
+}
+body.main-page .app-top-menu-inner {
+    width: 1350px;
+    margin: auto;
+}
 .app-top-menu a {
 	display: block;
     float: left;

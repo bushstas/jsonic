@@ -31,11 +31,15 @@ Component.prototype.processInitials = function() {
 					}
 				} else if (k == 'props') {
 					Objects.merge(this.props, initials[k]);
+				} else if (k == 'options') {
+					this.initOptions(initials[k]);
 				}
 			}
 		}
 	}
 };
+
+Component.prototype.initOptions = function(options) {};
 
 Component.prototype.processPostRenderInitials = function() {
 	var helpers = this.getInitial('helpers');
@@ -104,7 +108,7 @@ Component.prototype.onDataLoad = function(isAsync, data) {
 Component.prototype.onReadyToRender = function() {
 	if (!this.isRendered()) {
 		this.level = new Level();
-		var content = this.getTemplateMain(this.provider, this.getInitial('args') || {});
+		var content = this.getTemplateMain(this.provider, this.getArgs());
 		if (isArray(content)) {
 			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 		}
@@ -117,6 +121,10 @@ Component.prototype.onReadyToRender = function() {
 		}
 		this.processPostRenderInitials();
 	}
+};
+
+Component.prototype.getArgs = function() {
+	return this.getInitial('args') || {};
 };
 
 Component.prototype.instanceOf = function(parent) {

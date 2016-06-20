@@ -357,10 +357,15 @@
 
 		// Checking components
 		$usedComponents = array();
-		foreach ($templates as $file) {
+		$filesOfUsedComponents = array();
+		foreach ($templates as $filename => $file) {
 			preg_match_all("/<component +[\"']*([^\"'\s>]+)/i", $file, $matches);
 			foreach ($matches[1] as $match) {
 				$usedComponents[] = $match;
+				if (!is_array($filesOfUsedComponents[$match])) {
+					$filesOfUsedComponents[$match] = array();
+				}
+				$filesOfUsedComponents[$match][] = $filename;
 			}
 		}
 		foreach ($classes['component'] as $class) {
@@ -382,6 +387,19 @@
 		foreach ($usedComponents as $usedComponent) {
 			if (!preg_match("/^[A-Z][a-zA-Z\d]+$/", $usedComponent)) {
 				error("Название класса <b>".$usedComponent."</b> не валидно. Используйте запись вида <b>ClassName</b>");
+			}
+			$inClasses = '';
+			if (!isset($classNames[$usedComponent])) {
+				if (is_array($filesOfUsedComponents[$usedComponent])) {
+					$ending = count($filesOfUsedComponents[$usedComponent]) > 1 ? 'ов' : 'а';
+					$inClasses = implode(', ', $filesOfUsedComponents[$usedComponent]);
+				}
+				if (!empty($inClasses)) {
+					$error = "Класс <b>".$usedComponent."</b> упомянутый в шаблоне класс".$ending." <b>".$inClasses."</b> не найден";
+				} else {
+					$error = "Класс <b>".$usedComponent."</b> не найден";
+				}
+				error($error);
 			}
 		}
 
@@ -570,7 +588,8 @@
 		$compiledJs[] = "User.load(".$config['entry'].");";
 		$compiledJs[] = "})();";
 
-		array_unshift($compiledJs, "var __T = ".str_replace('"', "'", json_encode($textNodes)).';');
+
+		array_unshift($compiledJs, "var __T = ".preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))).';');
 		array_unshift($compiledJs, ';(function() {');
 		$compiledJs = implode("\n", $compiledJs);
 		$compiledJs = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $compiledJs);
@@ -584,7 +603,11 @@
 				$compiledJs .= $part;
 				if (isset($codes[$i])) {
 					$parts2 = explode('.', $codes[$i]);
-					$compiledJs .= '__['.array_search($parts2[1], $textsIndex).']';
+					$index = array_search($parts2[1], $textsIndex);
+					if (is_bool($index)) {
+						error('Текстовая константа <b>'.$parts2[1].'</b> не найдена');
+					}
+					$compiledJs .= '__['.$index.']';
 				}
 			}
 		}

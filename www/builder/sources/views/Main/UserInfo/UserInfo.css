@@ -1,0 +1,70 @@
+.app-mainpage-user-info {
+	margin-top: 10px;
+}
+.app-mainpage-user-info td {
+    line-height: 14px;
+    padding: 6px 0;
+    vertical-align: middle;
+}
+.app-mainpage-user-info td:first-child {
+    width: 55%;
+    color: #7f828a;
+}
+.app-mainpage-user-info td:last-child {
+    width: 45%;
+    color: #4c546b;
+}
+.app-mainpage-user-info td:last-child.red {
+	color: #cd380a;
+    font-family: ptsansbold;
+}
+.app-mainpage-left-column .standart-button {
+ 	width: 140px;
+    display: inline-block;
+    margin-top: 10px;
+}
+.standart-button.access {
+    margin-right: 10px;
+}
+.mainpage-manager-title {
+	margin-top: 27px;
+	font-size: 16px;
+    color: #4c546b;
+    padding-bottom: 7px;
+}
+.mainpage-manager-name {
+	color: #4c546b;
+    font-size: 14px;
+    padding-top: 5px;
+}
+.mainpage-manager-phone {
+	position: relative;
+    padding-top: 5px;
+    color: #4c546b;
+    font-size: 14px;
+    line-height: 14px;
+    padding-bottom: 5px;
+}
+.mainpage-free-call {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    width: 120px;
+}
+.mainpage-manager-free {
+    font-size: 12px;
+    color: #8b8e97;
+    padding-top: 7px;
+}
+.mainpage-manager-email {
+    font-size: 14px;
+    color: #536b9f;
+    line-height: 14px;
+    margin-bottom: 3px;
+    display: inline-block;
+    border-bottom: 1px solid #c3ccde;
+}
+.mainpage-manager-phone small {
+    color: #8b8e97;
+    font-size: 12px;
+}

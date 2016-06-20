@@ -44,3 +44,61 @@ a {
     right: 0px;
     bottom: 0px;
 }
+.bold {
+  font-family: ptsansbold;
+}
+.standart-button {
+  position: relative;
+  display: block;
+  line-height: 38px;
+  max-height: 38px;
+  min-height: 38px;
+  font-size: 14px;
+  background-color: #5c729e;
+  color: #ffffff;
+  font-family: ptsansbold;
+  border-radius: 3px;
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-image: url(../images/buttons/blue.png);
+  background-position: 0 0;
+}
+.standart-button:hover {
+  background-position: 0 100% !important;
+}
+.standart-button.green-button {
+  background-image: url(../images/buttons/green.png);
+  background-color: #38986a;
+}
+.standart-button.red-button {
+  background-image: url(../images/buttons/red.png);
+  background-color: #b65f5f;
+}
+.standart-button.gray-button {
+  background-image: none !important;
+  background-color: #e1e1e2;
+  color: #40434e;
+  border: 1px solid #b7b6b6;
+  line-height: 36px;
+}
+.standart-button.gray-button:hover {
+  border: 1px solid #919498;
+  background-color: #d3d5dd;
+    color: #2c3b5a;
+}
+.standart-button.white-button {
+  color: #535f77;
+  background-color: #ffffff;
+  border: 1px solid #a6b3cb;
+  line-height: 36px;
+  font-family: ptsans;
+  background-image: none !important;
+}
+.standart-button.white-button:hover {
+  border: 1px solid #677CA7;
+    color: #3D485F;
+}
+.standart-button.disabled {
+  background: #aaa;
+}

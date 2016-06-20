@@ -45,6 +45,11 @@ function User() {
 			}
 		}
 	};
+	this.hasFullAccess = function() {
+		var fullAccess = Objects.get(__USEROPTIONS, 'fullAccess', null);
+		var accessLevel = ~~attributes['accessLevel'];
+		return !isNumber(fullAccess) || accessLevel >= fullAccess;
+	};
 	this.hasAccessLevel = function(accessLevel, isEqual) {
 		if (!isEqual) {
 			return attributes['accessLevel'] >= accessLevel;

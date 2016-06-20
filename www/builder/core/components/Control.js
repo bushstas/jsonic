@@ -1,20 +1,15 @@
 function Control() {}
-Control.prototype.initiateInternal = function() {};
-Control.prototype.checkInitials = function() {
-	var initials = this.getInitials();
-	for (var k in initials) {
-		if (initials[k] && isObject(initials[k])) {
-			if (k == 'options') {
-				this.options = initials[k];
-			}
-		}
-	}	
-};
 Control.prototype.getName = function() {
 	return this.props.name;
 };
 Control.prototype.getValue = function() {
-	var value = (!isUndefined(this.value) ? this.value : this.props.value) || '';
+	var value = this.getControlValue();
+	return this.getCorrectedValue(value);
+}
+Control.prototype.getControlValue = function() {
+	return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+}
+Control.prototype.getCorrectedValue = function(value) {
 	var type = Objects.get(this.options, 'type');
 	switch (type) {
 		case 'array':
@@ -63,9 +58,6 @@ Control.prototype.setValue = function(value) {
 };
 Control.prototype.setProperValue = function(value) {
 	this.set('value', value);
-};
-Control.prototype.onChange = function(e) {
-	this.value = e.target.value;
 };
 Control.prototype.disposeInternal = function() {
 	this.options = null;

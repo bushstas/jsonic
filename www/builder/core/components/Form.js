@@ -1,22 +1,13 @@
 function Form() {}
 
-Form.prototype.checkInitials = function() {
-	var initials = this.getInitials();
-	for (var k in initials) {
-		if (isObject(initials[k])) {
-			if (k == 'globals') {
-
-			} else if (k == 'options') {
-				this.initOptions(initials[k]);
-			}
-		}
-	}	
+Form.prototype.initiate = function() {
+	this.options = {};
 };
 
 Form.prototype.initOptions = function(options) {
 	if (isObject(options)) {
 		this.options = options;
-		if (!options.ajax) {
+		if (!options['ajax']) {
 			this.createFormElement();
 		} else {
 			this.createAjaxRequest();
@@ -28,15 +19,15 @@ Form.prototype.initOptions = function(options) {
 
 Form.prototype.createFormElement = function() {
 	var formElement = document.createElement('form');
-	if (isString(this.options.method)) {
-		formElement.setAttribute('method', this.options.method);
+	if (isString(this.options['method'])) {
+		formElement.setAttribute('method', this.options['method']);
 	}
-	if (isString(this.options.action)) {
-		formElement.setAttribute('action', this.options.action);
+	if (isString(this.options['action'])) {
+		formElement.setAttribute('action', this.options['action']);
 	}
 	this.parentElement.appendChild(formElement);
 	this.parentElement = formElement;
-	if (isBool(this.options.iframe)) {
+	if (isBool(this.options['iframe'])) {
 		var iframeId = generateRandomKey();
 		this.createTargetIframe(iframeId);
 		formElement.setAttribute('target', iframeId);
@@ -45,27 +36,27 @@ Form.prototype.createFormElement = function() {
 };
 
 Form.prototype.onRenderComplete = function() {
-	var controlsContainer = this.options.container;
+	var controlsContainer = this.options['container'];
 	if (controlsContainer && isString(controlsContainer)) {
 		controlsContainer = this.findElement('.' + controlsContainer);
 	}
 	controlsContainer = controlsContainer || this.parentElement;	
-	if (isArray(this.options.controls)) {
+	if (isArray(this.options['controls'])) {
 		var control;
-		for (var i = 0; i < this.options.controls.length; i++) {
-			if (isObject(this.options.controls[i])) {
-				this.createControl(this.options.controls[i], controlsContainer);
+		for (var i = 0; i < this.options['controls'].length; i++) {
+			if (isObject(this.options['controls'][i])) {
+				this.createControl(this.options['controls'][i], controlsContainer);
 			}
 		}
 	}
-	if (isObject(this.options.submit)) {
-		this.createSubmit(this.options.submit, controlsContainer);
+	if (isObject(this.options['submit'])) {
+		this.createSubmit(this.options['submit'], controlsContainer);
 	}
 };
 
 Form.prototype.createControl = function(options, parentElement) {
 	var control;
-	switch (options.type) {
+	switch (options['type']) {
 		case 'select':
 
 		break;
@@ -99,7 +90,7 @@ Form.prototype.createTargetIframe = function(id) {
 };
 
 Form.prototype.createAjaxRequest = function() {
-	this.request = new AjaxRequest(this.options.action, this.onRequestComplete.bind(this));
+	this.request = new AjaxRequest(this.options['action'], this.onRequestComplete.bind(this));
 };
 
 Form.prototype.onSubmit = function() {
@@ -107,7 +98,7 @@ Form.prototype.onSubmit = function() {
 		if (this.formElement) {
 			this.formElement.submit();
 		} else if (this.request) {
-			this.request.send(this.options.method || 'POST', this.getData());
+			this.request.send(this.options['method'] || 'POST', this.getData());
 		}
 	}
 };

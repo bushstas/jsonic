@@ -7,9 +7,9 @@
 	$password = $data['password'];
 
 	if (!empty($login) || !empty($password)) {
-		$_SESSION['accessLevel'] = 100;
+		$_SESSION['accessLevel'] = 30;
 		die(json_encode(array(
-			'accessLevel' => 10,
+			'accessLevel' => 30,
 	 		'type' => 'guest',
 	 		'success' => true
 		)));
