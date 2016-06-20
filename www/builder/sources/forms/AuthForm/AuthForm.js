@@ -1,7 +1,7 @@
 form AuthForm
 
 initial options = {
-	'action': 'api/user/login.php',
+	'action': 'user/login.php',
 	'method': 'POST',
 	'ajax': true,
 	'container': 'app-authform-inputs',

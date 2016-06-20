@@ -1,11 +1,33 @@
 .app-input-container {
 	margin: 5px 0;
 }
+.app-input-container.half-width {
+	display: inline-block;
+	width: 49%;
+}
+.app-input-container.half-width:nth-child(2n) {
+	margin-left: 2%;
+}
 .app-input-caption {
-	margin: 10px 0 5px 0;
+	color: #6f7b9a;
+    font-size: 14px;
+    line-height: 14px;
+    margin-bottom: 6px;
 }
 .app-input-container input {
-	width: 100%;
+	padding: 10px 10px;
 	box-sizing: border-box;
-	padding: 7px 10px;
+    width: 100%;
+    background-color: transparent;
+    color: #6f7b9a;
+    font-family: ptsansbold;
+    font-size: 14px;
+	border: 1px solid #bec8da;
+    box-shadow: inset 2px 1px 3px #d7deec;
+    border-radius: 3px;
+}
+.app-input-container input:focus {
+    border-color: #38986a;
+    box-shadow: 1px 1px 6px #93C7AE;
+    outline: none;
 }

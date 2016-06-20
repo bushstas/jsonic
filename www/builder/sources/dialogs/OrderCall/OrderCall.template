@@ -1,1 +1,3 @@
-<component OrderCallForm>
+{template .content}
+	<component OrderCallForm>
+{/template}
