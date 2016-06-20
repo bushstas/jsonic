@@ -16,6 +16,7 @@ function selectByValue(value) {
 	if (isArray(options)) {
 		for (var i = 0; i < options.length; i++) {
 			if (options[i]['value'] == value) {
+				this.selectedIndex = i;
 				this.set({
 					'value': value,
 					'title': options[i]['title']
@@ -28,6 +29,7 @@ function selectByValue(value) {
 }
 
 function selectByIndex(index) {
+	this.selectedIndex = index;
 	var options = this.get('options');
 	if (isObject(options[index])) {
 		this.set({
@@ -37,9 +39,18 @@ function selectByIndex(index) {
 	}
 }
 
+function enableOption(index, isEnabled) {
+	var optionsContainer = this.findElement('.app-select-options');
+	var optionElement = optionsContainer.getChildAt(index);
+	optionElement.toggleClass('disabled', !isEnabled);
+	if (index == this.selectedIndex) {
+		this.selectByIndex(index == 0 ? index + 1 : 0);
+    }
+}
+
 function onOptionsClick(e) {
 	var target = e.getTarget('.app-select-option');
-	if (target) {
+	if (target && !target.hasClass('disabled')) {
 		var value = target.getData('value');
 		this.selectByValue(value);
 		this.dispatchEvent('change', {'value': value});

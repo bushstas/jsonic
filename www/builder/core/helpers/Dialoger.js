@@ -2,7 +2,6 @@ function Dialoger() {
 	var dialogs = {};
 	var currentDialogId, currentDialogClass, currentDialog,
 		currentDialogOptions;
-
 	this.show = function(dialogClass, options, dialogId) {
 		if (isFunction(dialogClass)) {
 			currentDialogClass = dialogClass;
@@ -28,5 +27,11 @@ function Dialoger() {
 		}
 		currentDialog.show();
 	};
+	var closeAll = function() {
+		for (var k in dialogs) {
+			dialogs[k].hide();
+		}
+	};
+	window.addEventListener('popstate', closeAll);
 }
 Dialoger = new Dialoger();

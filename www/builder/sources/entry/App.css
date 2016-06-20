@@ -35,6 +35,9 @@ a {
 	text-decoration: none;
 	color: #505b6e;
 }
+textarea {
+  resize: none;
+}
 .app-view-container {
 	padding: 0;
     position: absolute;

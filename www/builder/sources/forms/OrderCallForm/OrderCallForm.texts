@@ -2,3 +2,8 @@
 @contactPhone: Контактный телефон
 @contactEmail: Email
 @callTopic: Тема звонка
+@callDate: Удобный день звонка
+@callTime: Удобное время звонка
+@descr: Краткое описание
+@today: сегодня
+@tomorrow: завтра

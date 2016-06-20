@@ -15,6 +15,7 @@
     line-height: 14px;
     margin-bottom: 6px;
 }
+.app-input-container textarea,
 .app-input-container input {
 	padding: 10px 10px;
 	box-sizing: border-box;
@@ -27,6 +28,7 @@
     box-shadow: inset 2px 1px 3px #d7deec;
     border-radius: 3px;
 }
+.app-input-container textarea:focus,
 .app-input-container input:focus {
     border-color: #38986a;
     box-shadow: 1px 1px 6px #93C7AE;

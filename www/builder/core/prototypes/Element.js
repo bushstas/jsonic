@@ -107,3 +107,6 @@ Element.prototype.setStyle = function(style) {
 	   	}
 	}
 };
+Element.prototype.getChildAt = function(index) {
+	return this.childNodes[index];
+};

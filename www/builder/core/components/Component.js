@@ -260,6 +260,10 @@ Component.prototype.registerChildComponent = function(childComponent) {
 	}
 };
 
+Component.prototype.getChildAt = function(index) {
+	return this.children[index];
+};
+
 Component.prototype.getChildById = function(childComponentId) {
 	if (!this.children) return null;
 	for (var i = 0; i < this.children.length; i++) {

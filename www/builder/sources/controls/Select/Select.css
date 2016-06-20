@@ -58,3 +58,10 @@
     color: #5f6b7f;
     background-color: #e7ecf4;
 }
+.app-select-option.disabled {
+    color: #a5aec0;
+    cursor: default;
+}
+.app-select-option.disabled:hover {
+    background-color: #ffffff;
+}

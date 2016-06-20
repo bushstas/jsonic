@@ -50,8 +50,8 @@
 .app-input-container.half-width{display:inline-block;width:49%;vertical-align:top;}
 .app-input-container.half-width:nth-child(2n){margin-left:2%;}
 .app-input-caption{color:#6f7b9a;font-size:14px;line-height:14px;margin-bottom:6px;}
-.app-input-container input{padding:10px 10px;box-sizing:border-box;width:100%;background-color:transparent;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;box-shadow:inset 2px 1px 3px #d7deec;border-radius:3px;}
-.app-input-container input:focus{border-color:#38986a;box-shadow:1px 1px 6px #93C7AE;outline:none;}
+.app-input-container textarea,.app-input-container input{padding:10px 10px;box-sizing:border-box;width:100%;background-color:transparent;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;box-shadow:inset 2px 1px 3px #d7deec;border-radius:3px;}
+.app-input-container textarea:focus,.app-input-container input:focus{border-color:#38986a;box-shadow:1px 1px 6px #93C7AE;outline:none;}
 /* Select */
 .app-select{position:relative;box-sizing:border-box;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;box-shadow:inset 2px 1px 3px #d7deec;border-radius:3px;cursor:pointer;}
 .app-select:hover{border-color:#68758c;box-shadow:1px 1px 6px #bfc7d8;}
@@ -62,6 +62,8 @@
 .app-select.active .app-select-options{display:block;font-family:ptsans;}
 .app-select-option{line-height:13px;font-size:13px;padding:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;color:#444C61;}
 .app-select-option:hover{color:#5f6b7f;background-color:#e7ecf4;}
+.app-select-option.disabled{color:#a5aec0;cursor:default;}
+.app-select-option.disabled:hover{background-color:#ffffff;}
 /* Submit */
 .app-submit-container{margin-top:15px;}
 /* OrderCall */
@@ -82,6 +84,7 @@
 body{padding:0;margin:0;font-family:ptsans;color:#505b6e;}
 h1{font-weight:normal;}
 a{cursor:pointer;text-decoration:none;color:#505b6e;}
+textarea{resize:none;}
 .app-view-container{padding:0;position:absolute;z-index:1;top:43px;left:0px;right:0px;bottom:0px;}
 .bold{font-family:ptsansbold;}
 .standart-button{position:relative;display:block;line-height:38px;max-height:38px;min-height:38px;font-size:14px;background-color:#5c729e;color:#ffffff;font-family:ptsansbold;border-radius:3px;text-align:center;cursor:pointer;box-sizing:border-box;background-image:url(../images/buttons/blue.png);background-position:0 0;}
@@ -98,6 +101,7 @@ a{cursor:pointer;text-decoration:none;color:#505b6e;}
 .app-authform-inputs{margin-top:20px;}
 /* OrderCallForm */
 .app-order-call .send-button{display:inline-block;width:140px;margin-right:12px;}
+.app-order-call textarea{height:100px;}
 /* TopMenu */
 .app-top-menu{position:fixed;top:0px;left:0px;right:0px;z-index:2;height:42px;line-height:42px;background-color:#ffffff;border-bottom:1px solid #B6BFCE;box-shadow:0 1px 6px #D1D8E2;}
 .app-top-menu-inner{position:relative;}
