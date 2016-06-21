@@ -1,8 +1,3 @@
-@name: 
-Bushmakin Stas
-
-@email: 
-bushstas@mail.ru
-
-@authFormText:
-const создаёт новую именованную константу, доступную только для чтения. ... Повторное введение в JavaScript. Структуры данных JavaScript.
+@button: standart-button
+@greenButton: standart-button green-button
+@redButton: standart-button red-button

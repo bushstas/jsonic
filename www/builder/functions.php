@@ -72,7 +72,7 @@
 	}
 
 	function gatherFiles($dir, $list, $getContent = false) {
-		$extensions = array('js', 'css', 'template', 'texts');
+		$extensions = array('js', 'css', 'template', 'texts', 'data');
 		if (is_dir($dir)) {
 			$files = scandir($dir);
 			if (is_array($files)) {
@@ -601,23 +601,12 @@
 		}
 	}
 
-	function getInitialsObject($initialValue, $initialType, &$component) {
-		$originalValue = $initialValue;
-		$initialValue = trim(preg_replace('/[\r\n\t]/', '', $initialValue));
-		if ($initialValue == '{}' || $initialValue == '[]') {
-			return array('initials' => array(), 'binds' => array());
-		}
-		$initialValue = preg_replace('/:\s+/', ':', $initialValue);
-		$regexp = '/\.bind\(([^\)]+)\)/';		
-		preg_match_all($regexp, $initialValue, $binds);
-		$binds = $binds[1];
-		$initialValue = preg_replace($regexp, '__BIND__', $initialValue);
-
+	function transformIntoValidJson($value) {
 		$regexp = '/\s*([\{\}\[\],:])\s*/';
-		preg_match_all($regexp, $initialValue, $signs);
+		preg_match_all($regexp, $value, $signs);
 		$signs = $signs[1];
 		
-		$parts = preg_split($regexp, $initialValue);
+		$parts = preg_split($regexp, $value);
 		foreach ($parts as $i => &$part) {
 			if (!empty($part) && $parts != 'null' && $part != 'false' && $part != 'true' && !is_numeric($part)) {
 				$part = trim(trim($part, '"'), "'");
@@ -631,6 +620,21 @@
 				$text .= $signs[$i];
 			}
 		}		
+		return $text;
+	}
+
+	function getInitialsObject($initialValue, $initialType, &$component) {
+		$originalValue = $initialValue;
+		$initialValue = trim(preg_replace('/[\r\n\t]/', '', $initialValue));
+		if ($initialValue == '{}' || $initialValue == '[]') {
+			return array('initials' => array(), 'binds' => array());
+		}
+		$initialValue = preg_replace('/:\s+/', ':', $initialValue);
+		$regexp = '/\.bind\(([^\)]+)\)/';		
+		preg_match_all($regexp, $initialValue, $binds);
+		$binds = $binds[1];
+		$text = transformIntoValidJson(preg_replace($regexp, '__BIND__', $initialValue));
+		
 		$initialsObject = json_decode($text, true);
 		if ($initialsObject === null) {
 			$example = getInitialParamExample($initialType);
@@ -1466,6 +1470,28 @@
 		print_r($arr);
 		print('</xmp>');
 		if ($isExit) exit();
+	}
+
+	function getDataConstants($data, &$dataIndex) {
+		$data = implode('', $data);
+		$regexp = '\#(\w+)\s*=\s*';
+		preg_match_all('/'.$regexp.'/', $data, $matches);
+		$vars = $matches[1];
+		foreach ($vars as $i => $v) {
+			if (isset($dataIndex[$v])) {
+				error('Обнаружено повторное определение контстанты данных с именем <b>'.$v.'</b>');
+			}
+			$dataIndex[$v] = $i;
+		}
+		$var = transformIntoValidJson('{'.trim(preg_replace('/;*\s*'.$regexp.'/', ",'$1':", $data), ',').'}');
+		
+		$var = preg_replace('/@(\w+)/', "<nq>__.$1<nq>", $var);
+		$data = json_decode($var, true);
+		if ($data === null) {
+			error('Ошибка парсинга контстанты данных<br><br>'.$var);
+		}
+		$dataIndex = array_keys($dataIndex);
+		return array_values($data);
 	}
 
 	function getTextConstants($texts, &$textsIndex) {

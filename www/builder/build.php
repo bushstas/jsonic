@@ -255,7 +255,7 @@
 			'Globals', 'User', 'StoreKeeper',
 
 			'__', '__T', '__ROUTES', '__TAGS', '__A', '__EVENTTYPES', '__HASHROUTER', '__DEFAULTROUTE', '__ERRORROUTES',
-			'__VIEWCONTAINER', '__USEROPTIONS'
+			'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V'
 		);
 
 		$classes = array(
@@ -279,6 +279,7 @@
 		}
 
 		$texts = array();
+		$data = array();
 		$templates = array();
 		$css = array();
 		$apiConfig = '';
@@ -303,6 +304,8 @@
 				$css[] = $compiledCss = preg_replace("/\/\*[^\*]*\*\//", "", $content);
 			} elseif ($file['ext'] == 'texts') {
 				$texts[] = $content;
+			} elseif ($file['ext'] == 'data') {
+				$data[] = $content;
 			}
 		}
 
@@ -471,6 +474,10 @@
 			$textsIndex = array();
 			$globals[] = "var __ = ".str_replace('"', "'", json_encode(getTextConstants($texts, $textsIndex))).';';
 		}
+		if (!empty($data)) {
+			$dataIndex = array();
+			$globals[] = "var __V = ".str_replace('"', "'", json_encode(getDataConstants($data, $dataIndex))).';';
+		}
 		$dictionaryUrl = $config['pathToDictionary'];
 		$globals[] = "var __DICTURL = '".$dictionaryUrl."';";
 		$globals[] = "var __TAGS = ".str_replace('"', "'", json_encode(getTagShortcuts())).';';
@@ -591,8 +598,12 @@
 
 		array_unshift($compiledJs, "var __T = ".preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))).';');
 		array_unshift($compiledJs, ';(function() {');
+		$compiledJs = preg_replace("/'<nq>/", '', $compiledJs);
+		$compiledJs = preg_replace("/<nq>'/", '', $compiledJs);
+		$compiledJs = preg_replace("/<nq>/", '', $compiledJs);
 		$compiledJs = implode("\n", $compiledJs);
 		$compiledJs = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $compiledJs);
+		
 		if (is_array($textsIndex)) {
 			$regexp = '/\b__\.\w+\b/';
 			preg_match_all($regexp, $compiledJs, $matches);
@@ -611,6 +622,24 @@
 				}
 			}
 		}
+		if (is_array($dataIndex)) {
+			$regexp = '/[=:\[,]\s*\#\w+/';
+			preg_match_all($regexp, $compiledJs, $matches);
+			$codes = $matches[0];
+			$parts = preg_split($regexp, $compiledJs);			
+			$compiledJs = '';
+			foreach ($parts as $i => $part) {
+				$compiledJs .= $part;
+				if (isset($codes[$i])) {
+					$parts2 = explode('#', $codes[$i]);
+					$index = array_search($parts2[1], $dataIndex);
+					if (is_bool($index)) {
+						error('Константа данных <b>'.$parts2[1].'</b> не найдена');
+					}
+					$compiledJs .= $parts2[0].'__V['.$index.']';
+				}
+			}
+		}		
 		if ($advancedMode) {
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);

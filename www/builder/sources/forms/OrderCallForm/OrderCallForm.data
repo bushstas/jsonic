@@ -1,0 +1,23 @@
+#nameInput = {
+	'cmpid': 'name',
+	'type': 'text',
+	'name': 'name',
+	'caption': @contactName,
+	'class': 'half-width'
+}
+
+#emailInput = {
+	'cmpid': 'phone',
+	'type': 'text',
+	'name': 'phone',
+	'caption': @contactPhone,
+	'class': 'half-width'
+}
+
+#phoneInput = {
+	'cmpid': 'email',
+	'type': 'text',
+	'name': 'email',
+	'caption': @contactEmail,
+	'class': 'half-width'
+}

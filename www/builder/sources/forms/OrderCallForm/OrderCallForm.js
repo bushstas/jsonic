@@ -1,31 +1,13 @@
 form OrderCallForm
 
 initial options = {
-	'action': 'orderCall/send.php',
+	'action': CONFIG.orderCall.send,
 	'method': 'POST',
 	'container': 'app-order-call',
 	'controls': [
-		{
-			'cmpid': 'name',
-			'type': 'text',
-			'name': 'name',
-			'caption': @contactName,
-			'class': 'half-width'
-		},
-		{
-			'cmpid': 'phone',
-			'type': 'text',
-			'name': 'phone',
-			'caption': @contactPhone,
-			'class': 'half-width'
-		},
-		{
-			'cmpid': 'email',
-			'type': 'text',
-			'name': 'email',
-			'caption': @contactEmail,
-			'class': 'half-width'
-		},
+		#nameInput,
+		#emailInput,
+		#phoneInput,
 		{
 			'cmpid': 'topic',
 			'type': 'select',
@@ -59,7 +41,7 @@ initial options = {
 	],
 	'submit': {
 		'value': @orderCall,
-		'class': 'standart-button green-button send-button'
+		'class': @greenButton + ' send-button'
 	}
 };
 
