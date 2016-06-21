@@ -4,7 +4,7 @@ initial options = {
 	'action': 'user/login.php',
 	'method': 'POST',
 	'ajax': true,
-	'container': 'app-authform-inputs',
+	'container': '->> app-authform-inputs',
 	'controls': [
 		{
 			'cmpid': 'login',
@@ -23,7 +23,7 @@ initial options = {
 	],
 	'submit': {
 		'value': @enter,
-		'class': 'app-submit'
+		'class': '->> app-submit'
 	}
 };
 

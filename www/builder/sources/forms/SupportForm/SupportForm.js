@@ -22,6 +22,6 @@ initial options = {
 	],
 	'submit': {
 		'value': @send,
-		'class': @greenButton + ' send-button'
+		'class': @greenButton + ' ->> send-button'
 	}
 };

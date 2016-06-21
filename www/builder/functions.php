@@ -1,5 +1,12 @@
 <?php
 	
+	$cssClassA = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m');
+	$cssClassB = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m','0','1','2','3','4','5','6','7','8','9');
+	$cssClassC = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m','0','1','2','3','4','5','6','7','8','9');
+	shuffle($cssClassA);
+	shuffle($cssClassB);
+	shuffle($cssClassC);
+
 	$textNodes = array();
 	$propsShortcuts = array(
 		'className' => 'c',
@@ -1530,6 +1537,50 @@
 		}
 		$errors = implode('<div class="delimiter"></div>', $errors);
 		die($errors);
+	}
+
+	function obfuscateCss($css, &$indexArr) {
+		$regexp = '/url\([^\)]+\)/';
+		preg_match_all($regexp, $css, $matches);
+		$urls = $matches[0];
+		$css = preg_replace($regexp, '__URL__', $css);
+
+		preg_match_all('/\.([a-z][\w\-]{3,})/i', $css, $matches);
+		$classes = array_unique($matches[1]);
+		$counts = array(0,0,0);
+		foreach ($classes as $class) {
+			$indexArr[$class] = generateObfiscatedCssClassName($counts);
+		}
+		printArr($indexArr);
+		foreach ($indexArr as $k => $v) {
+			$css = preg_replace('/\.'.$k.'([\s\.\#,\{:])/', '.'.$v."$1", $css);
+		}
+		$parts = explode('__URL__', $css);
+		$css = '';
+		foreach ($parts as $i => $part) {
+			$css .= $part;
+			if (isset($urls[$i])) {
+				$css .= $urls[$i];
+			}
+		}
+		return $css;
+	}
+
+	function generateObfiscatedCssClassName(&$counts) {
+		global $cssClassA, $cssClassB, $cssClassC;
+		$l1 = $cssClassA[$counts[0]];
+		$l2 = $cssClassB[$counts[1]];
+		$l3 = $cssClassC[$counts[2]];
+		$counts[2]++;
+		if ($counts[2] == count($cssClassC)) {
+			$counts[2] = 0;
+			$counts[1]++;
+		}
+		if ($counts[1] == count($cssClassB)) {
+			$counts[1] = 0;
+			$counts[0]++;
+		}
+		return $l1.$l2.$l3;
 	}
 
 ?>

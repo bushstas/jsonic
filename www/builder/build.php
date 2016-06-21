@@ -309,6 +309,20 @@
 			}
 		}
 
+		// compiling CSS
+		if (!empty($css)) {
+			$compiledCss = implode("\n", $css);
+			$cssClassIndex = array();
+			$compiledCss = obfuscateCss($compiledCss, $cssClassIndex);
+			$compiledCss = preg_replace("/\t/", " ", $compiledCss);
+			$compiledCss = preg_replace("/[\r\n]/", "", $compiledCss);
+			$compiledCss = preg_replace("/\}/", "}\n", $compiledCss);
+			$compiledCss = preg_replace("/ {1,}\{/", "{", $compiledCss);
+			$compiledCss = preg_replace("/([:\{;,]) {1,}/", "$1", $compiledCss);
+			$compiledCss = preg_replace("/\*\/[ \t]*([^\r\n])/", "*/\n$1", $compiledCss);
+			createFile(DEFAULT_PATH.$pathToCompiledCss, $compiledCss);
+		}
+
 		$classNames = array();
 		$doubles = array();
 		$classesList = array();
@@ -668,18 +682,6 @@
 		
 		if ($isHashRouter !== true && $router['generateTree'] === true) {
 			generateTree($routes, $pathToIndexFile, $indexFileContent);
-		}
-
-		// CSS
-		if (!empty($css)) {
-			$compiledCss = implode("\n", $css);
-			$compiledCss = preg_replace("/\t/", " ", $compiledCss);
-			$compiledCss = preg_replace("/[\r\n]/", "", $compiledCss);
-			$compiledCss = preg_replace("/\}/", "}\n", $compiledCss);
-			$compiledCss = preg_replace("/ {1,}\{/", "{", $compiledCss);
-			$compiledCss = preg_replace("/([:\{;,]) {1,}/", "$1", $compiledCss);
-			$compiledCss = preg_replace("/\*\/[ \t]*([^\r\n])/", "*/\n$1", $compiledCss);
-			createFile(DEFAULT_PATH.$pathToCompiledCss, $compiledCss);
 		}
 
 	?>

@@ -40,17 +40,17 @@ function selectByIndex(index) {
 }
 
 function enableOption(index, isEnabled) {
-	var optionsContainer = this.findElement('.app-select-options');
+	var optionsContainer = this.findElement('.->> app-select-options');
 	var optionElement = optionsContainer.getChildAt(index);
-	optionElement.toggleClass('disabled', !isEnabled);
+	optionElement.toggleClass('->> disabled', !isEnabled);
 	if (index == this.selectedIndex) {
 		this.selectByIndex(index == 0 ? index + 1 : 0);
     }
 }
 
 function onOptionsClick(e) {
-	var target = e.getTarget('.app-select-option');
-	if (target && !target.hasClass('disabled')) {
+	var target = e.getTarget('.->> app-select-option');
+	if (target && !target.hasClass('->> disabled')) {
 		var value = target.getData('value');
 		this.selectByValue(value);
 		this.dispatchEvent('change', {'value': value});
@@ -64,7 +64,7 @@ function getControlValue() {
 
 function onClick() {
 	this.set('active', true);
-	Popuper.watch(this, this.findElement('.app-select'));
+	Popuper.watch(this, this.findElement('.->> app-select'));
 }
 
 function hide() {

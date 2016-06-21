@@ -7,7 +7,7 @@ function onRendered() {
 }
 
 function onClick(e) {
-	var target = e.getTarget('.app-popup-menu-button');
+	var target = e.getTarget('.->> app-popup-menu-button');
 	if (!isNull(target)) {
 		var idx = target.getData('index');
 		var value = target.getData('value');
@@ -30,7 +30,7 @@ function onBeforeShow() {}
 
 function show() {
 	var outerElement = this.getElement();
-	var innerElement = this.findElement('.app-popup-menu-inner-container');
+	var innerElement = this.findElement('.->> app-popup-menu-inner-container');
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
 	outerElement.setStyle({'max-height': height + 'px', 'height': height + 'px'});

@@ -1,7 +1,7 @@
 component SearchFormFilterMenu extends PopupMenu
 
 initial args = {
-	'className': 'filters-menu',
+	'className': '->> filters-menu',
 	'maxHeight': 400
 };
 
@@ -20,8 +20,8 @@ initial helpers = [
 		'callback': this.onCheckboxChange,
 		'options': {
 			'intValue': true,
-			'checkboxClass': 'app-ui-checkbox',
-			'checkboxCheckedClass': 'checked',
+			'checkboxClass': '->> app-ui-checkbox',
+			'checkboxCheckedClass': '->> checked',
 			'labelClass': null
 		}
 	}

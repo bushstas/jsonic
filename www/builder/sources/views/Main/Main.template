@@ -2,11 +2,15 @@
 	<table class="app-mainpage-table" cellpadding="0px" cellspacing="0px">
 		<tr>
 			<td class="app-mainpage-left-column">
-				<div>
-					<div>
+				<div class="app-mainpage-left-column-area">
+					<div class="app-mainpage-left-column-title">
 						{@personal}
 					</div>
 					<component UserInfo>
+					<div class="mainpage-leftcolumn-title bold">
+						{@calendar}
+					</div>
+					<component Calendar>
 				</div>
 			</td>
 			<td class="app-mainpage-content-column">

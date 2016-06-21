@@ -3,7 +3,7 @@ form OrderCallForm
 initial options = {
 	'action': CONFIG.orderCall.send,
 	'method': 'POST',
-	'container': 'app-order-call',
+	'container': '->> app-order-call',
 	'controls': [
 		#nameInput,
 		#emailInput,
@@ -14,7 +14,7 @@ initial options = {
 			'name': 'topic',
 			'options': Dictionary.get('orderCallTopics'),
 			'caption': @callTopic,
-			'class': 'half-width'
+			'class': '->> half-width'
 		},
 		{
 			'cmpid': 'date',
@@ -22,7 +22,7 @@ initial options = {
 			'name': 'date',
 			'options': this.getDateOptions(),
 			'caption': @callDate,
-			'class': 'half-width'
+			'class': '->> half-width'
 		},
 		{
 			'cmpid': 'time',
@@ -30,7 +30,7 @@ initial options = {
 			'name': 'time',
 			'options': Dictionary.get('timeOptions'),
 			'caption': @callTime,
-			'class': 'half-width'
+			'class': '->> half-width'
 		},
 		{
 			'cmpid': 'comment',
@@ -41,7 +41,7 @@ initial options = {
 	],
 	'submit': {
 		'value': @orderCall,
-		'class': @greenButton + ' send-button'
+		'class': @greenButton + ' ->> send-button'
 	}
 };
 

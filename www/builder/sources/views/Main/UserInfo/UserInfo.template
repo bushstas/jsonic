@@ -32,7 +32,7 @@
 <a href="{@tariffsLink}" target="_blank" class="tariffs standart-button white-button">
 	{@tariffs}
 </a>
-<div class="mainpage-manager-title bold">
+<div class="mainpage-leftcolumn-title bold">
 	{@manager}
 </div>
 <div class="mainpage-manager-info">
