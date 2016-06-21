@@ -1,5 +1,6 @@
 <?php
 	
+	$cssCounters = array(0,0,0);	
 	$cssClassA = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m');
 	$cssClassB = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m','0','1','2','3','4','5','6','7','8','9');
 	$cssClassC = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m','0','1','2','3','4','5','6','7','8','9');
@@ -1180,6 +1181,7 @@
 	}
 
 	function getTagProperties($html, &$child, $component) {
+		global $obfuscate;
 		global $propsShortcuts;
 		global $eventTypesShortcuts;
 		$props = array();
@@ -1192,6 +1194,8 @@
 			$propName = $propNames[$i];
 			$propValue = $propValues[$i];
 			$hasCode = hasCode($propValue);
+			$fullPropName = $propName;
+			$isObfClName = $obfuscate === true && $fullPropName == 'class';
 
 			if (is_numeric($child['t']) || !empty($child['cmp'])) {
 				if ($propName == 'scope') {
@@ -1200,6 +1204,8 @@
 				}
 				if (isset($propsShortcuts[$propName])) {
 					$propName = $propsShortcuts[$propName];
+				} else {
+					$propName = preg_replace('/^data-/', '_', $propName);
 				}
 				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
 					if ($hasCode) {
@@ -1246,11 +1252,17 @@
 				$attrParts = array();
 				foreach ($parts as $idx => $part) {
 					if (!empty($part)) {
+						if ($isObfClName) {
+							$part = getObfuscatedClassName($part);
+						}
 						$attrContent .= $part;
 						$attrParts[] = $part;
 					}
 					if (isset($codes[$idx])) {
 						$code = $codes[$idx];
+						if ($isObfClName) {
+							$code = getObfuscatedClassName($code, true);
+						}
 						if (hasClassVar($code)) {
 							$attrParts[] = '<nq>'.parseAttributeClassVars($code, $names[$propName]).'<nq>';
 						} else {
@@ -1291,6 +1303,8 @@
 				if (empty($names[$propName])) {
 					unset($names[$propName]);
 				}
+			} else if ($isObfClName) {
+				$props[$propName] = getObfuscatedClassName($propValue);
 			}
 		}
 		if (!empty($props)) {
@@ -1299,6 +1313,41 @@
 		if (!empty($names)) {
 			$child['n'] = $names;
 		}
+	}
+
+	function getObfuscatedClassName($value, $isCode = false) {
+		global $cssClassIndex;
+		if (!$isCode) {
+			$value = "'".$value."'";
+		}
+		$regexp = '/"[^"]+"|\'[^\']+\'/';
+		preg_match_all($regexp, $value, $matches);
+		$strings = $matches[0];
+		$codeParts = preg_split($regexp, $value);
+		$obfuscatedValue = '';
+		foreach ($codeParts as $i => $codePart) {
+			$obfuscatedValue .= $codePart;
+			if (isset($strings[$i])) {
+				$string = preg_replace('/["\']/', '', $strings[$i]);
+				$parts = explode(' ', $string);
+				$newClassName = array();
+				foreach ($parts as $part) {
+					if (!empty($part) && isset($cssClassIndex[$part])) {
+						$newClassName[] = $cssClassIndex[$part];
+					} else {
+						if (!empty($part)) {
+							$part = addToCssClassIndex($part);
+						}
+						$newClassName[] = $part;
+					}
+				}
+				$obfuscatedValue .= "'".implode(' ', $newClassName)."'";
+			}
+		}		
+		if (!$isCode) {
+			$obfuscatedValue = trim($obfuscatedValue, "'");
+		}
+		return preg_replace('/ {2,}/', ' ', $obfuscatedValue);
 	}
 
 	function getTemplateProperties($html, &$child, $component) {
@@ -1547,11 +1596,9 @@
 
 		preg_match_all('/\.([a-z][\w\-]{3,})/i', $css, $matches);
 		$classes = array_unique($matches[1]);
-		$counts = array(0,0,0);
 		foreach ($classes as $class) {
-			$indexArr[$class] = generateObfiscatedCssClassName($counts);
+			$indexArr[$class] = generateObfiscatedCssClassName();
 		}
-		printArr($indexArr);
 		foreach ($indexArr as $k => $v) {
 			$css = preg_replace('/\.'.$k.'([\s\.\#,\{:])/', '.'.$v."$1", $css);
 		}
@@ -1566,21 +1613,29 @@
 		return $css;
 	}
 
-	function generateObfiscatedCssClassName(&$counts) {
+	function generateObfiscatedCssClassName() {
+		global $cssCounters;
 		global $cssClassA, $cssClassB, $cssClassC;
-		$l1 = $cssClassA[$counts[0]];
-		$l2 = $cssClassB[$counts[1]];
-		$l3 = $cssClassC[$counts[2]];
-		$counts[2]++;
-		if ($counts[2] == count($cssClassC)) {
-			$counts[2] = 0;
-			$counts[1]++;
+		$l1 = $cssClassA[$cssCounters[0]];
+		$l2 = $cssClassB[$cssCounters[1]];
+		$l3 = $cssClassC[$cssCounters[2]];
+		$cssCounters[2]++;
+		if ($cssCounters[2] == count($cssClassC)) {
+			$cssCounters[2] = 0;
+			$cssCounters[1]++;
 		}
-		if ($counts[1] == count($cssClassB)) {
-			$counts[1] = 0;
-			$counts[0]++;
+		if ($cssCounters[1] == count($cssClassB)) {
+			$cssCounters[1] = 0;
+			$cssCounters[0]++;
 		}
 		return $l1.$l2.$l3;
+	}
+
+	function addToCssClassIndex($className) {
+		global $cssClassIndex;
+		$obfuscatedClassName = generateObfiscatedCssClassName();
+		$cssClassIndex[$className] = $obfuscatedClassName;
+		return $obfuscatedClassName;
 	}
 
 ?>

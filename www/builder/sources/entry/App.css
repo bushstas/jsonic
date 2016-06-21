@@ -40,12 +40,12 @@ textarea {
 }
 .app-view-container {
 	padding: 0;
-    position: absolute;
-    z-index: 1;
-    top: 43px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
+  position: absolute;
+  z-index: 1;
+  top: 43px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
 }
 .bold {
   font-family: ptsansbold;

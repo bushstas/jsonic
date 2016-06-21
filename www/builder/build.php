@@ -21,6 +21,7 @@
 
 		$advancedMode = !empty($_GET['advanced']);
 		$create = !empty($_GET['create']);
+		$obfuscate = !empty($_GET['obfuscate']);
 		include_once 'functions.php';
 	
 		define('CONFIG_FILENAME', 'config.json');
@@ -502,7 +503,7 @@
 		$globals[] = "var __HASHROUTER = ".($isHashRouter ? 'true' : 'false').';';
 		$globals[] = "var __INDEXROUTE = ".($indexRoute ? "'".$indexRoute."'" : 'null').';';
 		$globals[] = "var __DEFAULTROUTE = ".($defaultRoute ? "'".$defaultRoute."'" : 'null').';';
-		$globals[] = "var __VIEWCONTAINER = '".$viewContainer."';";
+		$globals[] = "var __VIEWCONTAINER = '->>".$viewContainer."';";
 		$globals[] = "var __I = '".($advancedMode ? '_i' : 'initiate')."';";
 		$globals[] = "var __GI = '".($advancedMode ? '_gi' : 'getInitials')."';";
 		
@@ -653,7 +654,21 @@
 					$compiledJs .= $parts2[0].'__V['.$index.']';
 				}
 			}
-		}		
+		}
+		if ($obfuscate === true) {
+			$regexp = '/->>\s*([a-z][\w\-]{3,})/';
+			preg_match_all($regexp, $compiledJs, $matches);
+			$cssClasses = $matches[1];
+			$parts = preg_split($regexp, $compiledJs);
+			$compiledJs = '';
+			foreach ($parts as $i => $part) {
+				$compiledJs .= $part;
+				if (isset($cssClasses[$i]) && isset($cssClassIndex[$cssClasses[$i]])) {
+					$compiledJs .= $cssClassIndex[$cssClasses[$i]];
+				}
+			}
+		}
+		$compiledJs = preg_replace('/->> {0,1}/', '', $compiledJs);
 		if ($advancedMode) {
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);

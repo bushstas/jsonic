@@ -78,7 +78,7 @@ Element.prototype.getAncestor = function(selector) {
 	return null;
 };
 Element.prototype.getData = function(name) {
-	return this.getAttribute('data-' + name) || '';
+	return this.getAttribute('_' + name) || '';
 };
 Element.prototype.getRect = function() {
 	return this.getBoundingClientRect();

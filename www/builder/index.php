@@ -48,6 +48,10 @@
 				<input type="checkbox" vlaue="1" name="advanced"> 
 				Усиленная обфускация
 			</label>
+			<label>
+				<input type="checkbox" vlaue="1" name="obfuscate"> 
+				Обфускация css классов
+			</label>			
 		</div>
 	</form>
 </body>

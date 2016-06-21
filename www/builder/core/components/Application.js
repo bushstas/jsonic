@@ -4,7 +4,6 @@ Application.prototype.initiate = function() {
 };
 Application.prototype.run = function() {
 	this.element = document.createElement('div');
-	this.element.className = 'application-container';
 	document.body.appendChild(this.element);
 	this.render(this.element);
 	this.createViewContainer();
@@ -94,7 +93,6 @@ Application.prototype.onViewReady = function() {
 };
 Application.prototype.createViewContentElement = function() {
 	var element = document.createElement('div');
-	element.className = 'app-view-content-container';
 	this.viewContainer.appendChild(element);
 	return element;
 };
