@@ -1,6 +1,6 @@
 var StyleNameCache = {};
 Element.prototype.setClass = function(className) {
-	this.className = className;
+	this.className = className.trim();
 }
 Element.prototype.toggleClass = function(className, isAdding) {
 	if (isAdding) {
@@ -112,7 +112,13 @@ Element.prototype.getChildAt = function(index) {
 };
 Element.prototype.attr = function(attrName) {
 	if (!isUndefined(arguments[1])) {
-		this.setAttribute(attrName, arguments[1]);
+		if (attrName == 'class') {
+			this.setClass(arguments[1]);
+		} else if (attrName == 'value') {
+			this.value = arguments[1];
+		} else {
+			this.setAttribute(attrName, arguments[1]);
+		}
 	} else {
 		return this.getAttribute(attrName);
 	}

@@ -21,7 +21,11 @@
 		</div>
 		<div class="app-calendar-days">
 			{foreach $days as &day}
-				<span class="{&day.another?'another':''}{&day.current?'current':''}">{&day.num}</span>
+				<span class="{&day.another?'another':''}
+							 {&day.current?' current':''}
+							 {&day.marked?' marked':''}">
+					{&day.num}
+				</span>
 			{/foreach}
 		</div>
 	</div>

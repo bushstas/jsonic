@@ -1,16 +1,18 @@
 component Calendar
 
 function initiate() {
-	this.month = 0;
-	this.year = 0;
+	this.month = Dates.getMonth();
+	this.year = Dates.getYear();
 }
 
 function onRendered() {
-	this.redraw(Dates.getMonth(), Dates.getYear());
+	this.redraw();
 }
 
-function redraw(month, year) {
+function redraw() {
 	var day       = this.isCurrentMonth() ? Dates.getDay() : 0,
+		month     = this.month,
+		year      = this.year,
 		curDays   = Dates.getDays(month, year),
 		prevMonth = month - 1 >= 0 ? month - 1 : 11,
 		prevYear  = prevMonth < 12 ? year : year - 1,
@@ -22,32 +24,36 @@ function redraw(month, year) {
 		days      = [];
 
 	for (var i = 0; i < firstCell; i++) {
-		days.push({'num': prevDays - i, 'another': true});
+		days.push({num: prevDays - i, another: true});
 	}
 	days = days.reverse();
 	for (var i = firstCell; i < curDays + firstCell; i++) {
-		days.push({'num': count, 'current': count == day});
+		days.push({num: count, current: count == day, marked: this.isMarked(count, month, year)});
 		lastCell = i;
 		count++;
 	}
-	count = 1;
-	for (var i = curDays + firstCell; i < 42; i++) {
-		days.push({'num': count, 'another': true});
-		if (days[34] && days[34]['num'] < curDays) {
-			break;
-		}
-		count++;
+	var len = days.length;
+	var more =  len <= 35 ? 35 - len : 42 - len;		
+	for (var i = 1; i <= more; i++) {
+		days.push({num: i, another: true});
 	}
-
 	this.set({
-		'year' : Dates.getYear(),
-		'month': Dates.getMonthName(),
+		'year' : year,
+		'month': Dates.getMonthName(month),
 		'days' : days
 	});
 }
 
 function isCurrentMonth() {
-	return this.month == 0 && this.year == 0;
+	return this.month == Dates.getMonth() && this.year == Dates.getYear();
+}
+
+function reset() {
+	this.changeMonth();
+}
+
+function isMarked() {
+	return false;
 }
 
 function onPrevClick() {
@@ -59,10 +65,8 @@ function onNextClick() {
 }
 
 function changeMonth(value) {
-	var	date = Dates.getDate();	
-	if (!value) {
-		this.month = date.month;
-		this.year = date.year;
+	if (!isNumber(value)) {
+		this.initiate();
 	} else {
 		this.month += value;
 		if (this.month == 12) {
@@ -73,5 +77,5 @@ function changeMonth(value) {
 			this.year--;
 		}
 	}
-	this.redraw(this.month, this.year);
+	this.redraw();
 }

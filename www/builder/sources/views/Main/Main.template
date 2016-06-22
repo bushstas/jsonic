@@ -11,7 +11,7 @@
 						{@calendar}
 						<component Tooltip args="{#calendarTooltip}">
 					</div>
-					<component Calendar>
+					<component FavoritesCalendar>
 				</div>
 			</td>
 			<td class="app-mainpage-content-column">

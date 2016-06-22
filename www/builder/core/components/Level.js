@@ -78,7 +78,7 @@ Level.prototype.createElement = function(props) {
 				if (attrName == 'scope') {
 					this.parentLevel.setScope(element);
 				} else {
-					element.setAttribute(attrName, props['p'][k]);
+					element.attr(attrName, props['p'][k]);
 				}
 			} else if (isFunction(props['p'][k])) {
 				if (props['n'] && (isArray(props['n'][k]) || isString(props['n'][k]))) {
@@ -108,7 +108,7 @@ Level.prototype.createElement = function(props) {
 					}
 				}
 				if (attrValue) {
-					element.setAttribute(__A[k] || k, attrValue);
+					element.attr(__A[k] || k, attrValue);
 				}
 			}
 		}
@@ -343,10 +343,7 @@ Level.prototype.propagatePropertyChange = function(changedProps) {
 					}
 					attrValue = attrValue.trim();
 					var attrName = __A[propAttr[1]] || propAttr[1];
-					propAttr[0].setAttribute(attrName, attrValue);
-					if (attrName == 'value') {
-						propAttr[0].value = attrValue;
-					}
+					propAttr[0].attr(attrName, attrValue);
 				}
 			}
 		}

@@ -348,7 +348,9 @@
 			}
 
 			$cssClassIndex = array();
-			$compiledCss = obfuscateCss($compiledCss, $cssClassIndex);
+			if ($obfuscate === true) {
+				$compiledCss = obfuscateCss($compiledCss, $cssClassIndex);
+			}
 			$compiledCss = preg_replace("/\t/", " ", $compiledCss);
 			$compiledCss = preg_replace("/[\r\n]/", "", $compiledCss);
 			$compiledCss = preg_replace("/\}/", "}\n", $compiledCss);
