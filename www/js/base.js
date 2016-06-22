@@ -1,96 +1,3271 @@
-(function(){function z(){}function g(){}function F(a){this.W=a;this.Ha=!!this.W.i()}function A(){}function w(){}function Q(){}function G(a){this.items=a.p;this.ub=a.h;this.J=[]}function r(){}function t(){this.children=[];this.gb=!1}function R(){}function J(){}function va(){function a(){var a=f.getData("value");return u.has(n,"intValue",!0)?~~a:a}function b(b,m){f=m.target;ja=f.$();var g=u.get(n,"checkboxClass","cu9");(g=ja.contains(g))||(g=u.get(n,"labelClass"),g=p(g)?ja.contains(g):!1);g&&(n=e[b],
-h=d[b],v=c[b],k=u.get(n,"checkboxCheckedClass","cua"),g=!ja.contains(k),f.Ya(k,g),h.call(v,{target:f,value:a(),checked:g,intChecked:g?1:0}))}var c=[],d=[],e=[],n,h,v,ja,k,f;this.subscribe=function(a,h,n){q(h)&&-1==c.indexOf(a)&&(c.push(a),d.push(h),e.push(n||null),(a=a.P())&&a.addEventListener("click",b.bind(null,c.length-1),!1))}}function Da(){}function V(){var a={},b,c,d,e;this.show=function(n,h,v){q(n)&&(c=n,e=h,b=c.name+(p(v)?"_"+v:""),x(a[b])&&(a[b]=new c,a[b].u(document.body)),d=a[b],k(e)&&
-d.set(e),d.show())};window.addEventListener("popstate",function(){for(var b in a)a[b].I()})}function S(){function a(a){k(a)&&(c=a);b()}var b,c={};this.load=function(c){wa("dictionary/get.php")?c():(b=c,(new ka("dictionary/get.php",a.bind(this))).send("GET"))};this.get=function(a,b){return u.get(c,a,b)};this.set=function(a,b){c[a]=b}}function la(){var a={},b={},c={},d={};this.Vb=function(a,b){x(c[b])&&(c[b]=a)};this.ia=function(a){return b[a]};this.subscribe=function(b,c,d){m(a[b])||(a[b]=[]);a[b].push([c,
-d])};this.unsubscribe=function(b,c){if(m(a[c]))for(var d=!1;!d;)for(var d=!0,v=0;v<a[c].length;v++)if(a[c][v][1]==b){a[c].splice(v,1);d=!1;break}};this.get=function(a){return d[a]};this.set=function(b,c){d[b]=c;if(m(a[b]))for(var h=0;h<a[b].length;h++)q(a[b][h][0])&&a[b][h][0].call(a[b][h][1]||null,c,b)};this.has=function(a,b){return u.has(d,a,b)}}function ma(){var a,b;this.watch=function(c,d){-1==a.indexOf(c)&&(a.push(c),b.push(d||null))};a=[];b=[];document.documentElement.addEventListener("mousedown",
-function(c){for(var d=0;d<a.length;d++)K(b[d])&&c.wd(b[d])||(a[d].I(),a=[],b=[])},!1)}function aa(){function a(a){var b=~~a.replace(/[^\d]/g,"");a=a.replace(/\d/g,"");return b?c[a]?c[a]*b*1E3:(y("No given measure: "+a,"getMilliseconds",this),0):(y("Given period number is empty","getMilliseconds",this),0)}function b(a){a=window.localStorage.getItem("stored_"+a);if(!a)return null;try{a=JSON.parse(a)}catch(b){return y("Json parse exception","getItem",this),null}return a}var c={month:2592E3,day:86400,
-hour:3600,min:60};this.set=function(a,b){var c="stored_"+a,h=JSON.stringify({data:b,timestamp:window.Date.now().toString()});window.localStorage.setItem(c,h)};this.get=function(a){a=b(a);return u.has(a,"data")?a.data:null};this.pc=function(c,e){var n=b(c),h;if(h=u.has(n,"data")){h=n.timestamp;var v=window.Date.now(),k=a(e);p(h)&&(h=Number(h));h=k&&h&&v-h<k}return h?n.data:null};this.remove=function(a){window.localStorage.removeItem("stored_"+a)}}function ka(a,b){function c(a){a=a.target;if(v&&4==
-a.readyState){v=!1;a=a.response;var c;try{c=JSON.parse(a)}catch(d){c=a}q(b)&&b(c)}}function d(a,b){if(u.empty(b))return"";if(k(b)){if(b instanceof FormData)return b;if("GET"==a){var c=[],d;for(d in b)c.push(d+"="+(b[d]||"").toString());return"?"+c.join("&")}}else return b.toString();return JSON.stringify(b||"")}function e(a){a=a.replace(/^[\.\/]+/,"");p("api")&&(a="api/"+a.replace(/^api\//,""));return"/"+a}var n=this,h,v=!1,f;this.kb=function(b){v=!0;var g=h||a,m=this.method||"POST";b=d(m,b||void 0);
-f=new XMLHttpRequest;f.onreadystatechange=c.bind(n);"GET"==m&&(g+=b,b="");try{f.open(m,e(g),!0)}catch(l){y("Error opening XMLHttpRequest: "+l.message,"execute",this);return}if(k(void 0))for(var p in void 0)f.setRequestHeader(p,(void 0)[p]);"GET"!=m&&f.setRequestHeader("Content-Type","application/json");f.withCredentials=!1;f.send(b)};this.send=function(a,b,c){this.method=a;h=c;this.kb(b);h=this.method=null}}function Ea(){var a=[];this.wb=function(b,c,d){a.push([b,c,d]);b.addEventListener(c,d,!1)};
-this.Oc=function(a,c,d){function e(){d();a.removeEventListener(c,e,!1)}a.addEventListener(c,e,!1)};this.A=function(){for(var b,c=0;c<a.length;c++)(b=a[c])&&b[0].removeEventListener(b[1],b[2],!1);a=null}}function l(){function a(a,c){if(null===a)a=c;else for(var d in c)x(a[d])?a[d]=c[d]:u.la(a[d],c[d]);return a}this.Hc=function(a){for(var c,d,e,n=0;n<a.length;n++){d=a[n];c=a[++n];for(var h=0;h<c.length;h++){e=c[h];d!=Q&&(e.prototype.N||(e.prototype.N=[]),e.prototype.N.push(d));for(var v in d.prototype)!e.prototype[v]&&
-v!=Na&&v!=Oa&&(e.prototype[v]=d.prototype[v])}}};this.b=function(b){function c(b,h){for(var e=0;e<b.length;e++){q(b[e].prototype._i)&&b[e].prototype._i.call(h);if(q(b[e].prototype._gi)){var f=b[e].prototype._gi();k(f)&&(d=a(d,f))}m(b[e].prototype.N)&&c(b[e].prototype.N,h)}}var d=null;m(this.N)&&c(this.N,this);this.S=b||{};q(this.constructor.prototype._i)&&this.constructor.prototype._i.call(this);if(q(this.constructor.prototype._gi)){var e=this.constructor.prototype._gi();null===d?d=e:k(e)&&(d=a(d,
-e))}this.V=d;b&&p(b.cmpid)&&this.Nb(b.cmpid)}}function H(){function a(){if(m(r))for(var a,b,c,d=0;d<r.length;d++)if(a=r[d][0],b=r[d][1],c=r[d][2],k(b)&&a==t.name){a={};for(var e in b)a[e]=this.Ga(b[e]);c.Bc(a)}}function b(b,c){t=b;q(f)?f(b,c):y("navigation handler is not function","changeRoute",this);k(b)||y("route is invalid","changeRoute",this);a();if(m(l))for(var d=0;d<l.length;d++)l[d].Ma(t.name)}function c(a){q(v[a])&&(v[a]={name:a,view:v[a],error:a});return v[a]}function d(){var a;a=window.location.hash;
-w=[];var d=[];a=a.replace(/^[\#\/]+|\/$/g,"").split("/");a[0]||(a[0]="main");for(var e=0;e<a.length;e++){w.push(a[e]);var n=w.join("/");h[n]&&d.push(n)}a=(a=d[d.length-1])?h[a]:c(404);g.kd(a.name+"-page");d=a.accessLevel;I(d)&&!L.Cc(d)&&(a=c(401));b(a,!0)}function e(a,b){b=b||[];for(var c=u.clone(b),d,n=0;n<a.length;n++){d=a[n].name;c.push(d);var v=u.clone(a[n].children);delete a[n].children;d=a[n].path=c.join("/");var f=a[n];if(k(f.params)){var g={},l=void 0;for(l in f.params)/^\$\d+$/.test(f.params[l])&&
-(g[l]=f.params[l].replace(/[^\d]/g,""));for(l in g)delete f.params[l];f.dinamicParams=g}h[d]=a[n];m(v)&&e(v,u.clone(c));c=u.clone(b)}}var n=Fa,h={},v=Ga,f,g,l,t,r,w;this.nd=function(a){f=a};this.Ic=function(){g=document.querySelector("body");e(n);window.addEventListener("popstate",d.bind(this));d()};this.Ga=function(a){return m(w)?w[a]:""};this.redirect=function(a,d){var e;e=~~a;e==a&&(a=e);if(I(a))e=c(a);else if(p(a))a:{for(var n in h)if(h[n].name==a){e=h[n];break a}e=void 0}else{y("redirect view name is invalid",
-"redirect",this);return}k(e)?(d&&!I(a)&&window.history.replaceState({},"","#"+e.path),b(e,!!d)):y("redirect route is invalid","redirect",this)};this.subscribe=function(a,b){var c=t.name;r=r||[];r.push([c,a,b])};this.Ub=function(a){k(a)&&q(a.Ma)&&(l=l||[],l.push(a))};this.Fc=function(a){return-1<l.indexOf(a)};this.vc=function(){return t?t.name:null}}function L(){function a(){2==e&&(h=!0,d instanceof Function&&(d=new d,d.hd()))}function b(){e++;a()}function c(b){n=b;e++;a()}var d,e=0,n={},h=!1,f;this.load=
-function(a){if(!h&&(d=a,f)){f.kb();return}c({type:"guest",accessLevel:0})};this.Ec=function(){var a=u.get(Ha,"fullAccess",null),b=~~n.accessLevel;return!I(a)||b>=a};this.Cc=function(a){return n.accessLevel>=a};this.getAttribute=function(a){return n[a]};this.setAttribute=function(a,b){var c={};c[a]=b;this.jd(c)};this.jd=function(a){if(k(a))for(var b in a)n[b]=a[b]};(function(){var a=Ha;k(a)&&a.login&&p(a.login)&&(f=new ka(a.login,c.bind(this)))})();(function(){S.load(b.bind(this))})()}function u(){this.remove=
-function(a,b){var c=a.indexOf(b);-1<c&&this.Hb(a,c)};this.Hb=function(a,b){a.splice(b,1)};this.Aa=function(a,b){if(typeof a!==typeof b||m(a)&&m(b)&&a.length!==b.length)return!1;if(k(a))for(var c in a){if(a.hasOwnProperty(c)&&(!q(a[c])||!q(b[c]))){if(m(a[c])&&m(b[c])&&a[c].length!==b[c].length||typeof a[c]!==typeof b[c])return!1;if(k(a[c])&&k(b[c])){if(!this.Aa(a[c],b[c]))return!1}else if(a[c]!==b[c])return!1}}else return a===b;return!0};this.la=function(){var a=arguments;k(a[0])||(a[0]={});for(var b=
-1;b<a.length;b++)if(W(a[b]))for(var c in a[b])a[0][c]=a[b][c]};this.clone=function(a){return W(a)?JSON.parse(JSON.stringify(a)):a};this.get=function(a,b,c){return this.has(a,b)?a[b]:c};this.has=function(a,b,c){if(!k(a))return!1;var d=!x(a[b]);return d&&!x(c)?a[b]==c:d};this.empty=function(a){if(!W(a))return!0;if(k(a)){for(var b in a)return!1;return!0}return x(a[0])}}function y(a,b,c){window.console.log(void 0===b?a:new Pa(a,b,c))}function Pa(a,b,c){this.object=c;this.method=b;this.message=a}function T(){return Math.floor(2147483648*
-Math.random()).toString(36)+Math.abs(Math.floor(2147483648*Math.random())^+new Date).toString(36)}function Qa(a){return String(a).replace(/\-([a-z])/g,function(a,c){return c.toUpperCase()})}function k(a){return!!a&&"object"==typeof a&&!(a instanceof Node)&&!m(a)}function m(a){return a instanceof Array}function W(a){return m(a)||k(a)}function K(a){return a instanceof Element}function q(a){return a instanceof Function}function p(a){return"string"==typeof a}function I(a){return"number"==typeof a}function x(a){return void 0===
-a}function wa(a){return x(a)||null===a||!1===a||0===a||"0"===a||""===a}function na(a){l.b.call(this,a)}function xa(a){l.b.call(this,a)}function oa(a){l.b.call(this,a)}function pa(a){l.b.call(this,a)}function qa(a){l.b.call(this,a)}function ra(a){l.b.call(this,a)}function U(a){l.b.call(this,a)}function ya(a){l.b.call(this,a)}function Ia(a){l.b.call(this,a)}function Ja(a){l.b.call(this,a)}function ba(a){l.b.call(this,a)}function ca(a){l.b.call(this,a)}function M(a){l.b.call(this,a)}function X(a){l.b.call(this,
-a)}function da(a){l.b.call(this,a)}function sa(a){l.b.call(this,a)}function Ka(a){l.b.call(this,a)}function La(a){l.b.call(this,a)}function D(a){l.b.call(this,a)}function B(a){l.b.call(this,a)}function za(a){l.b.call(this,a)}function Y(a){l.b.call(this,a)}function C(){l.b.call(this);this.pa()}function ea(){l.b.call(this);this.pa()}function ta(a){l.b.call(this,a)}function N(a){l.b.call(this,a)}function fa(a){l.b.call(this,a)}function ga(a){l.b.call(this,a)}function O(a){l.b.call(this,a)}function ua(a){l.b.call(this,
-a)}function ha(a){l.b.call(this,a)}function E(a){l.b.call(this,a)}function ia(a){l.b.call(this,a)}function Aa(a){l.b.call(this,a);H.Ub(this)}var P="\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442; \u00a0 ;LOGO;\u0413\u043b\u0430\u0432\u043d\u0430\u044f;\u041f\u043e\u0438\u0441\u043a;\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435;\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a;\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430".split(";"),
-f="\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a;\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439;\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c;\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440;\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b;\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c;\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440;\u0423\u0432\u0435\u0440\u0435\u043d\u044b?;\u0414\u0430;\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430;\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443;\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443;\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430;cel;cel ce8;cel cem;\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d;\u041b\u043e\u0433\u0438\u043d;\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c;\u041f\u0430\u0440\u043e\u043b\u044c;\u0412\u043e\u0439\u0442\u0438;\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f;\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d;Email;\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430;\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430;\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430;\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435;\u0441\u0435\u0433\u043e\u0434\u043d\u044f;\u0437\u0430\u0432\u0442\u0440\u0430;\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b;\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442;\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c;\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430;\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422;\u041a\u043b\u0438\u0435\u043d\u0442;\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f;Email;\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d;\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430;\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430;http://initpro.ru/tariffs/;\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b;\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440;http://initpro.ru/order/#1;\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444;\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f;8-800-700-12-50;\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439;\u0438\u043b\u0438;\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a;\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a".split(";"),
-Z=[{cmpid:"name",type:"text",name:"name",caption:f[21],"class":"cup"},{cmpid:"phone",type:"text",name:"phone",caption:f[22],"class":"cup"},{cmpid:"email",type:"text",name:"email",caption:f[23],"class":"cup"}],Ra="div span table tbody thead tr td th ul ol li p a form input img video audio aside article b big blockquote button canvas caption center code col colgroup footer font h1 h2 h3 h4 h5 h6 header hr i iframe label menu pre s section select strong textarea u small".split(" "),Ba={c:"class",i:"id",
-v:"value",t:"title",p:"placeholder",tp:"type",h:"href",s:"src",tr:"target",m:"method",st:"style",w:"width",ht:"height",sz:"size",mx:"maxlength",a:"action",n:"name",sc:"scope",r:"role",cp:"cellpadding",cs:"cellspacing"},Sa="click mouseover mouseout mouseenter mouseleave mousemove contextmenu dblclick mousedown mouseup keydown keyup keypress blur change focus focusin focusout input invalid reset search select submit drag dragend dragenter dragleave dragover dragstart drop copy cut paste popstate wheel storage show toggle touchend touchmove touchstart touchcancel message error open transitionend abort play pause load durationchange progress resize scroll unload hashchange beforeunload pageshow pagehide".split(" "),
-Fa=[{name:"main",view:ra,accessLevel:10,title:"Home",params:{text:"blablabla",name:"$2"}},{name:"search",view:U,accessLevel:0,title:"\u041f\u043e\u0438\u0441\u043a",load:["Filters"]},{name:"favorite",view:qa,accessLevel:0,title:"\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435"},{name:"analytics",view:xa,accessLevel:0,title:"\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430"}],Ga={404:pa,401:oa},Na="_i",Oa="_gi",Ha={login:"user/login.php",logout:"user/logout.php",save:"user/save.php",fullAccess:11},
-Ca={load:"filters/get.php",save:"filters/save.php",set:"filters/set.php"};z.prototype._i=function(){this.va={}};z.prototype.hd=function(){this.element=document.createElement("div");document.body.appendChild(this.element);this.u(this.element);this.ic();this.fb(Fa);this.Lc()};z.prototype.Lc=function(){H.nd(this.zc.bind(this));H.Ic()};z.prototype.fb=function(a){for(var b=0;b<a.length;b++)this.va[a[b].name]=null,m(a[b].children)&&this.fb(a[b].children);a=Ga;if(k(a))for(var c in a)this.va[c]=null};z.prototype.zc=
-function(a,b){this.Nc=b;this.cb=a;var c=this.va[a.name],d=this.ea==c;!d&&this.ea&&this.$a(this.ea,!1);this.ea=c;!x(c)&&q(a.view)?(c?this.$a(c,!0,d):(c=this.tb(a,!0),c=this.ea=this.va[a.name]=new a.view(c),c.od(this.bd.bind(this)),d=this.jc(),c.u(d),c.Kc(),la.Vb(c,a.name)),I(a.error)&&this.yb(a.error)):this.log("no view to represent given route","handleNavigation",a)};z.prototype.tb=function(a,b){var c;if(k(a.dinamicParams)){c={};for(var d in a.dinamicParams)c[d]=H.Ga(a.dinamicParams[d])}b&&(k(c)?
-u.la(c,a.params):c=a.params);return c};z.prototype.bd=function(){if(this.Nc){var a=this.cb.title;if(p(a)&&k(void 0)){var b,c;for(c in void 0)b=new RegExp("\\$"+c),a=a.replace(b,(void 0)[c])}this.pd(a||"Page title")}};z.prototype.jc=function(){var a=document.createElement("div");this.Za.appendChild(a);return a};z.prototype.ic=function(){var a;a=document.body.querySelector(".cec");a||(a=document.createElement("div"),a.className="cec",this.element.appendChild(a));this.Za=a};z.prototype.$a=function(a,
-b,c){var d=a.parentElement;if(b){var e=this.tb(this.cb);k(e)&&a.set(e);c||this.Za.appendChild(d)}else this.Za.removeChild(d);a.Sb(b)};z.prototype.pd=function(a){var b=document.getElementsByTagName("title")[0];K(b)||(b=document.getElementsByTagName("head")[0],K(b)||(b=document.getElementsByTagName("html")[0].appendChild(document.createElement("head"))),b=b.appendChild(document.createElement("title")));b.innerHTML=a};z.prototype.yb=function(){};g.prototype._i=function(){this.Gb={};this.Qa=this.get.bind(this);
-this.Ba={};this.ua=!1};g.prototype.u=function(a){this.parentElement=a;this.pa();this.load()};g.prototype.pa=function(){var a=this.V;if(k(a))for(var b in a)if(W(a[b])&&"globals"!=b)if("followers"==b)for(var c in a[b])this.Tb(c,a[b][c]);else if("controllers"==b)for(var d=0;d<a[b].length;d++)this.ya(a[b][d]);else"props"==b?u.la(this.S,a[b]):"options"==b&&this.vb(a[b])};g.prototype.vb=function(){};g.prototype.dd=function(){var a=this.Fa("helpers");if(m(a))for(var b=0;b<a.length;b++)this.vd(a[b])};g.prototype.ya=
-function(a){if(k(a.on))for(var b in a.on)a.controller.subscribe(b,a.on[b],this)};g.prototype.Tb=function(a,b){q(b)&&(this.Ba[a]=b)};g.prototype.vd=function(a){q(a.callback)&&a.helper.subscribe(this,a.callback,a.options)};g.prototype.Fa=function(a){return u.get(this.V,a)};g.prototype.load=function(){var a=this.Fa("loader");if(k(a)&&k(a.controller)){this.Ja=a.controller;var b=!!a.async;this.Ja.subscribe("load",this.Tc.bind(this,b),this);a=a.options;q(a)&&(a=a());this.Ja.ga("load",a);if(!b){this.gd();
-return}}this.Cb()};g.prototype.gd=function(){this.da=document.createElement("span");this.parentElement.appendChild(this.da)};g.prototype.Tc=function(a,b){this.Ab(b);a||this.Cb()};g.prototype.Cb=function(){if(!this.ua){this.level=new t;var a=this.g(this.Qa,this.qc());m(a)&&this.level.u(a,this.parentElement,this,this.da);this.ua=!0;this.na();this.D();this.da&&(this.parentElement.removeChild(this.da),this.da=null);this.dd()}};g.prototype.qc=function(){return this.Fa("args")||{}};g.prototype.Mc=function(a){return this.N&&
--1<this.N.indexOf(a)};g.prototype.dispatchEvent=function(a,b){if(m(this.j))for(var c=0;c<this.j.length;c++)this.j[c].type==a&&this.j[c].handler.call(this.j[c].subscriber||null,b)};g.prototype.nc=function(a){if(m(this.children))for(var b=0;b<this.children.length;b++)a.call(this,this.children[b],b);else y("this.children is not an array")};g.prototype.get=function(a){return this.Gb[a]||this.S[a]};g.prototype.toggle=function(a){this.set(a,!this.get(a))};g.prototype.set=function(a,b){var c;x(b)?c=a:(c=
-{},c[a]=b);var d=!1,e={},n,h;for(h in c)n=this.S[h],n==c[h]||m(n)&&m(c[h])&&u.Aa(n,c[h])||(d=!0,this.S[h]=c[h],e[h]=c[h]);this.level&&d&&this.level.R(e);for(h in e)x(this.Ba[h])||this.Ba[h].call(this)};g.prototype.M=function(){return this.level?this.level.M():null};g.prototype.kc=function(a){this.td();q(a)&&(this.timeout=window.setTimeout(a.bind(this),2500))};g.prototype.td=function(){window.clearTimeout(this.timeout)};g.prototype.R=function(){};g.prototype.D=function(){};g.prototype.Ab=function(){};
-g.prototype.na=function(){};g.prototype.g=function(){return null};g.prototype.ab=function(a,b){this.level.Ib(a,b)};g.prototype.removeChild=function(a){if(a)if(p(a))(a=this.T(a))&&a.A();else if(k(a)){var b=this.children.indexOf(a);-1<b&&(this.children.splice(b,1),a.A())}};g.prototype.Sa=function(a){this.children=this.children||[];-1==this.children.indexOf(a)&&this.children.push(a)};g.prototype.Ea=function(a){return this.children[a]};g.prototype.T=function(a){if(!this.children)return null;for(var b=
-0;b<this.children.length;b++)if(this.children[b].Wb==a)return this.children[b];return null};g.prototype.Nb=function(a){this.Wb=a};g.prototype.ia=function(){return this};g.prototype.P=function(){return this.scope||this.parentElement};g.prototype.L=function(a){return this.P().querySelector(a)};g.prototype.addListener=function(a,b,c){K(a)?(this.G=this.G||new Ea,this.G.wb(a,b,c.bind(this))):a.subscribe(b,c,this)};g.prototype.subscribe=function(a,b,c){this.j=this.j||[];this.j.push({type:a,handler:b,subscriber:c})};
-g.prototype.Wa=function(a){this.level&&this.level.Wa(a)};g.prototype.ca=function(a){this.scope=a};g.prototype.log=function(a,b){y(a,b,this)};g.prototype.A=function(){this.za();this.fa();this.level.A();this.V=this.Ja=this.j=this.children=this.Qa=this.Gb=this.S=this.parentElement=this.level=null};g.prototype.fa=function(){};F.prototype.u=function(a,b){this.parentElement=a;this.B=b;this.O(!1)};F.prototype.O=function(a){var b=this.tc();m(b)&&(this.level=new t,this.level.u(b,this.parentElement,this.B,
-a?this.ka():null))};F.prototype.ed=function(){var a=!!this.W.i();a!=this.Ha&&(this.Ha=a,this.ib(),this.O(!0))};F.prototype.tc=function(){return this.Ha?this.W.c():q(this.W.e)?this.W.e():null};F.prototype.R=function(a,b){this.level&&this.level.R(a,b)};F.prototype.M=function(){return this.level?this.level.M():null};F.prototype.ib=function(){this.level&&(this.level.A(),this.level=null)};F.prototype.A=function(){this.za();this.ib();this.l=this.W=this.B=this.parentElement=null};A.prototype._gi=function(){return{enabled:!0}};
-A.prototype.getName=function(){return this.S.name};A.prototype.sb=function(){return this.uc(this.ja())};A.prototype.ja=function(){return(x(this.value)?this.S.value:this.value)||""};A.prototype.uc=function(a){switch(u.get(this.options,"type")){case "array":p(a)?a=a.split(","):m(a)||(a=[a]);break;case "string":m(a)?a=a.join(","):a=k(a)?JSON.stringify(a):I(a)?a+"":a?"1":"";break;case "number":p(a)?a=Number(a):a="boolean"==typeof a?a?1:0:m(a)?~~a[0]:0;break;case "boolean":a=!!a&&"0"===a}return this.xc(a)};
-A.prototype.xc=function(a){return a};A.prototype.sd=function(a){this.value=a;this.rd(a)};A.prototype.rd=function(a){this.set("value",a)};A.prototype.ld=function(){this.set("enabled",!1)};A.prototype.fa=function(){this.value=this.options=null};w.prototype._i=function(){this.j=[]};w.prototype.pa=function(){var a=this.V;if(k(a))for(var b in a)if(a[b]&&k(a[b])&&"globals"!=b)if("options"==b)this.options=a[b];else if("controllers"==b)for(var c=0;c<a[b].length;c++)this.ya(a[b][c])};w.prototype.ya=function(a){if(k(a.controller)&&
-k(a.on))for(var b in a.on)a.controller.subscribe(b,a.on[b],this)};w.prototype.subscribe=function(a,b,c){this.j.push([a,b,c])};w.prototype.unsubscribe=function(a,b){for(var c=!1;!c;)for(var c=!0,d=0;d<this.j.length;d++)if(this.j[d][2]==a&&(!b||this.j[d][0]==b)){this.j.splice(d,1);c=!1;break}};w.prototype.dispatchEvent=function(a,b){var c=b;u.has(this.options,"clone",!0)&&(c=u.clone(b));if(m(this.j))for(var d=0;d<this.j.length;d++)this.j[d][0]==a&&q(this.j[d][1])&&this.j[d][1].call(this.j[d][2]||null,
-c,this)};w.prototype.getData=function(){return action&&this.data&&k(this.data)?this.data[action]:this.data};w.prototype.getItem=function(a,b){b=b||"load";return W(this.data[b])?this.data[b][a]:null};w.prototype.load=function(){this.ga("load")};w.prototype.ga=function(a,b){var c,d=this.lb(a);this.action=d;if("load"!=a||!this.yc()){k(b)||(b={});d&&k(d)&&d.options&&k(d.options)&&u.la(b,d.options);var e=d.method||"POST";(c=c||this.Pc(d.url,b))&&p(c)||y("url to execute the action "+a+" is invalid or empty",
-"doAction",this);this.request=this.request||new ka(c,this.xb.bind(this));this.request.send(e,b,c)}};w.prototype.yc=function(){if(this.Qb()){var a=u.get(this.options,"storeAs");if(p(a)&&(a=aa.pc(a,u.get(this.options,"storePeriod")),W(a)))return this.xb(a),!0}return!1};w.prototype.Pc=function(a,b){var c,d;for(d in b)if(p(b[d])||I(b[d]))c=new RegExp("\\$"+d),a=a.replace(c,b[d]);return a};w.prototype.xb=function(a){var b=this.action.name;this.data=this.data||{};this.data[b]=a;q(this.action.callback)&&
-this.action.callback.call(this,a);this.dispatchEvent(b,a);"load"==b&&this.Qb()&&this.ud(!0,a)};w.prototype.Qb=function(){return!1===u.get(this.options,"store")?!1:u.has(this.options,"storeAs")};w.prototype.ud=function(a,b){a?aa.set(this.options.storeAs,b):aa.remove(this.options.storeAs)};w.prototype.lb=function(a){var b=u.get(this.V,"actions");if(k(b)){b=b[a];if(k(b))return p(b.name)||(k(b.routeOptions)&&"load"==a&&this.Jc(b),b.name=a),b;y("action is invalid","getAction",this)}else y("no actions",
-"getAction",this);return null};w.prototype.Jc=function(a){var b;this.eb={};var c={},d;for(d in a.routeOptions)b=H.Ga(a.routeOptions[d]),p(b)&&(c[d]=b);this.Mb(c,a);H.subscribe(a.routeOptions,this)};w.prototype.Mb=function(a,b){this.eb=a;k(b.options)||(b.options={});for(var c in a)b.options[c]=a[c]};w.prototype.Bc=function(a){if(!u.Aa(a,this.eb)){var b=this.lb("load");this.Mb(a,b);this.ga("load")}};w.prototype.A=function(){this.j=null;this.request&&this.request.A();this.V=this.action=this.data=this.request=
-this.options=null};Q.prototype.ka=function(){if(!this.l)return null;if(this.l instanceof Node)return this.l;var a=this.l.M();return a?a:this.l.ka()};Q.prototype.Ob=function(a){this.l=a;a instanceof Node||this.l.qd(this)};Q.prototype.qd=function(a){this.oa=a};Q.prototype.za=function(){this.oa&&this.oa.Ob(this.l);this.l=this.oa=null};Q.prototype.ca=function(a){this.B.ca(a)};G.prototype.u=function(a,b){this.parentElement=a;this.B=b;this.bb(!1)};G.prototype.bb=function(a){if(this.items instanceof Array)for(var b=
-0;b<this.items.length;b++)this.O(this.ub(this.items[b],b),a)};G.prototype.O=function(a,b){var c=new t;c.u(a,this.parentElement,this.B,b?this.ka():null);this.J.push(c)};G.prototype.update=function(a){this.items=a;this.jb();this.bb(!0)};G.prototype.R=function(a,b){for(var c=0;c<this.J.length;c++)this.J[c].R(a,b)};G.prototype.M=function(){return this.J[0]?this.J[0].M():null};G.prototype.jb=function(){for(var a=0;a<this.J.length;a++)this.J[a].A();this.J=[]};G.prototype.A=function(){this.za();this.jb();
-this.oa=this.l=this.ub=this.items=this.B=this.parentElement=this.J=null};r.prototype._i=function(){this.options={}};r.prototype.vb=function(a){k(a)?(this.options=a,a.ajax?this.Yb():this.bc()):y("no form options")};r.prototype.bc=function(){var a=document.createElement("form");p(this.options.method)&&a.setAttribute("method",this.options.method);if(p(this.options.action)){var b=this.Xb(this.options.action);a.setAttribute("action",b)}this.parentElement.appendChild(a);this.ca(a);this.parentElement=a;
-b=T();this.gc(b);a.setAttribute("target",b);this.Da=a};r.prototype.Xb=function(a){a=a.replace(/^[\.\/]+/,"");p("api")&&(a="api/"+a.replace(/^api\//,""));return"/"+a};r.prototype.na=function(){var a=this.options.container;a&&p(a)&&(a=this.L("."+a));a=a||this.parentElement;this.options.ajax&&this.ca(a);if(m(this.options.controls))for(var b=0;b<this.options.controls.length;b++)k(this.options.controls[b])&&this.$b(this.options.controls[b],a);k(this.options.submit)&&this.fc(a)};r.prototype.$b=function(a,
-b){var c;switch(a.type){case "select":c=this.ec(a);break;case "textarea":c=this.hc(a);break;default:c=this.cc(a)}this.ab(c,b)};r.prototype.cc=function(a){return new ha(a)};r.prototype.ec=function(a){return new E(a)};r.prototype.hc=function(a){return new ia(a)};r.prototype.fc=function(a){var b=new sa(this.options.submit);this.ab(b,a);this.addListener(b,"submit",this.Oa)};r.prototype.gc=function(a){var b=document.createElement("iframe");b.setAttribute("id",a);b.setAttribute("name",a);b.style.display=
-"none";this.parentElement.appendChild(b)};r.prototype.Yb=function(){this.request=new ka(this.options.action,this.Ac.bind(this))};r.prototype.Oa=function(){this.Da?(this.md(),this.Da.submit()):this.request&&this.request.send(this.options.method||"POST",this.getData())};r.prototype.md=function(){this.Z=T();window[this.Z]=this;K(this.aa)||(this.aa=document.createElement("input"),this.aa.setAttribute("name","formKey"),this.aa.setAttribute("type","hidden"),this.aa.value=this.Z,this.P().appendChild(this.aa))};
-r.prototype.getData=function(){var a={};this.oc(function(b){var c=b.getName();c&&p(c)&&(a[c]=b.sb())});return a};r.prototype.oc=function(a){this.nc(function(b,c){b.Mc(A)&&a.call(this,b,c)})};r.prototype.Ac=function(a){if(p(a))try{a=JSON.parse(a)}catch(b){y("incorrect form response","handleResponse",this)}k(a)&&a.success?this.Fb(a):this.Uc(a);p(this.Z)&&(this.Z=null,delete window[this.Z])};r.prototype.Fb=function(){};r.prototype.Uc=function(a){this.log(k(a)&&p(a.error)?a.error:"","onFailure",a)};r.prototype.Xa=
-function(a,b){if(p(a)){var c=this.T(a);c&&c.sd(b)}};r.prototype.mc=function(){if(p("email")){var a=this.T("email");a&&a.ld()}};r.prototype.fa=function(){this.Da=this.request=this.options=null};t.prototype.u=function(a,b,c,d){this.parentElement=b;this.B=c;this.l=d;this.ta(a);this.l=this.Pa=null};t.prototype.ta=function(a){if(m(a))for(var b=0;b<a.length;b++)this.Ua(a[b]);else this.Ua(a)};t.prototype.Ua=function(a){if(a||0===a)k(a)?x(a.t)?a.i?this.Zb(a):a.h?this.ac(a):x(a.pr)?q(a.tmp)?this.Gc(a):a.cmp&&
-this.Ib(a):this.dc(a):this.createElement(a):this.createTextNode(a)};t.prototype.O=function(a,b){var c=new t;c.u(a,b,this);this.children.push(c)};t.prototype.createTextNode=function(a){"<br>"==a?this.appendChild(document.createElement("br")):this.appendChild(document.createTextNode(a))};t.prototype.dc=function(a){var b=document.createTextNode(a.p||"");this.appendChild(b);this.sa=this.sa||{};this.K=this.K||{};a=a.pr;var c=T();this.sa[c]=b;this.K[a]=this.K[a]||[];this.K[a].push(c)};t.prototype.createElement=
-function(a){var b=document.createElement(Ra[a.t]||"span");this.appendChild(b);if(k(a.p)){var c,d;for(d in a.p)if(p(a.p[d])||I(a.p[d]))c=Ba[d]||d,"scope"==c?this.B.ca(b):b.setAttribute(c,a.p[d]);else if(q(a.p[d])){if(a.n&&(m(a.n[d])||p(a.n[d]))){this.qa=this.qa||{};this.C=this.C||{};var e=T();this.qa[e]=[b,d,a.p[d]];if(p(a.n[d]))this.C[a.n[d]]=this.C[a.n[d]]||[],this.C[a.n[d]].push(e);else for(c=0;c<a.n[d].length;c++)this.C[a.n[d][c]]=this.C[a.n[d][c]]||[],this.C[a.n[d][c]].push(e)}e=a.p[d]();m(e)||
-(e=[e]);var n="",h;for(c=0;c<e.length;c++)(h=q(e[c])?e[c]():e[c])&&(n+=h);n&&b.setAttribute(Ba[d]||d,n)}}if(m(a.e)){var f;this.G=this.G||new Ea;for(c=0;c<a.e.length;c++)f=Sa[a.e[c]]||f,d=a.e[c+1],e=!0===a.e[c+2],p(f)&&q(d)&&(e?(this.G.Oc(b,f,d),c++):this.G.wb(b,f,d)),c++}m(a.c)?1==a.c.length&&(p(a.c[0])||I(a.c[0]))?b.innerHTML=a.c[0]:this.O(a.c,b):k(a.c)?this.O(a.c,b):x(a.c)||(b.innerHTML=a.c)};t.prototype.appendChild=function(a){this.l?this.parentElement.insertBefore(a,this.l):this.parentElement.appendChild(a);
-this.ba(a)};t.prototype.Zb=function(a){if(!0===a.i)this.ta(a.c);else if(q(a.i)&&q(a.c)){var b=a.p;if(m(b)){this.X=this.X||{};this.F=this.F||{};a=new F(a);a.u(this.parentElement,this);var c=T();this.X[c]=a;for(var d=0;d<b.length;d++)this.F[b[d]]=this.F[b[d]]||[],this.F[b[d]].push(c);this.ba(a)}else a.i()?this.ta(a.c()):q(a.e)&&this.ta(a.e())}};t.prototype.ac=function(a){var b=a.f,c=!b;this.Ca=this.Ca||{};this.H=this.H||{};a=new G(a);a.u(this.parentElement,this);c||(this.Ca[T()]=a,this.H[b]=this.H[b]||
-[],this.H[b].push(a));this.ba(a)};t.prototype.ba=function(a,b){var c=a instanceof Node;this.Pa&&this.Pa.Ob(a);this.Pa=c?null:a;this.firstChild||(this.firstChild=a);c?(this.ha||(this.ha=a),this.Ia=a):this.children.push(a);b&&this.Sa(a)};t.prototype.Gc=function(a){var b=this.ia();a=a.tmp.call(b,b.Qa,a.p);if(m(a))for(b=0;b<a.length;b++)this.Ua(a[b])};t.prototype.Ib=function(a,b){b=b||this.parentElement;if(q(a.cmp)){var c=a.p,d={},e,f,h,g,l;if(k(c))for(g in c)if(f=c[g],"cmpid"==g)l=f;else{if(q(c[g])&&
-(f=c[g](),m(f)&&(f=f.join("")),a.n&&k(a.n)&&(m(a.n[g])||p(a.n[g]))))if(this.ra=this.ra||{},this.o=this.o||{},e=e||T(),p(a.n[g]))this.o[a.n[g]]=this.o[a.n[g]]||[],-1==this.o[a.n[g]].indexOf(e)&&this.o[a.n[g]].push([e,c[g]]);else for(h=0;h<a.n[g].length;h++)this.o[a.n[g][h]]=this.o[a.n[g][h]]||[],-1==this.o[a.n[g][h]].indexOf(e)&&this.o[a.n[g][h]].push([e,c[g]]);d[g]=f}c=new a.cmp(d);c.u(b);this.ba(c,!0);l&&c.Nb(l);e&&(this.ra[e]=c);e=a.e;if(m(e))for(h=0;h<e.length;h++)c.subscribe(e[h],e[h+1],this),
-h++}else a&&k(a)&&(a.ua||a.u(b),this.ba(a,!0))};t.prototype.Sa=function(a){this.B.Sa(a)};t.prototype.ia=function(){return this.B.ia()};t.prototype.R=function(a){var b,c,d;for(b in a){c=a[b];if(this.F&&m(this.F[b])){var e;for(d=0;d<this.F[b].length;d++)e=this.F[b][d],this.X[e]&&this.X[e].ed()}if(this.H&&m(this.H[b]))for(d=0;d<this.H[b].length;d++)this.H[b][d].update(c);if(this.K&&m(this.K[b]))for(d=0;d<this.K[b].length;d++)if(e=this.sa[this.K[b][d]])e.textContent=c;if(this.C&&m(this.C[b])){var f;for(d=
-0;d<this.C[b].length;d++)if(c=this.C[b][d],c=this.qa[c],m(c)){f=c[2]();e="";for(var h,g=0;g<f.length;g++)h=q(f[g])?f[g]():f[g],x(h)||(e+=h);e=e.trim();f=Ba[c[1]]||c[1];c[0].setAttribute(f,e);"value"==f&&(c[0].value=e)}}if(this.o&&m(this.o[b]))for(d=0;d<this.o[b].length;d++)c=this.ra[this.o[b][d][0]],e=this.o[b][d][1](),m(e)&&(e=e.join("")),c&&c.set(b,e);for(d=0;d<this.children.length;d++)this.children[d].R(a)}};t.prototype.M=function(){if(this.firstChild instanceof Node)return this.firstChild;var a=
-this.children[0];return a instanceof t?a.parentElement:a?a.M():null};t.prototype.A=function(){for(var a=0;a<this.children.length;a++)this.children[a].A();this.G&&this.G.A();this.lc();this.Ra=this.G=this.Ia=this.ha=this.firstChild=this.B=this.parentElement=this.o=this.ra=this.C=this.qa=this.K=this.sa=this.H=this.F=this.children=this.Ca=this.X=null};t.prototype.lc=function(){for(var a=this.pb(),b=0;b<a.length;b++)this.parentElement.removeChild(a[b])};t.prototype.Wa=function(a){var b=!a;if(b!==this.gb)if(this.gb=
-b,a=this.pb(),b)for(this.Ra=this.parentElement,this.parentElement=document.createElement("div"),b=0;b<a.length;b++)this.parentElement.appendChild(a[b]);else for(this.l=this.B.ka(),this.parentElement=this.Ra,this.Ra=null,b=0;b<a.length;b++)this.appendChild(a[b])};t.prototype.pb=function(){var a=[];if(this.ha&&this.Ia)for(var b=!1,c=0;c<this.parentElement.childNodes.length&&(this.parentElement.childNodes[c]==this.ha&&(b=!0),b&&a.push(this.parentElement.childNodes[c]),this.parentElement.childNodes[c]!=
-this.Ia);c++);return a};R.prototype.na=function(){H.Fc(this)&&this.Ma(H.vc())};R.prototype.Ma=function(a){this.ua&&(K(this.wa)&&this.Lb(this.wa,!1),a=this.rc(a),K(a)&&this.Lb(a,!0))};R.prototype.rc=function(a){return this.L('a[role="'+a+'"]')};R.prototype.Lb=function(a,b){a.Ya(this.yd||"cu4",b);b&&(this.wa=a)};R.prototype.fa=function(){this.wa=null};J.prototype.na=function(){this.hb()};J.prototype.od=function(a){this.Bb=a};J.prototype.hb=function(){q(this.Bb)&&this.Bb()};J.prototype.Sb=function(a){a&&
-this.hb()};J.prototype.Kc=function(){var a=this.ob();if(m(a))for(var b=0;b<a.length;b++)k(a[b])&&a[b].load()};J.prototype.ob=function(){return null};va=new va;Da=new Da;V=new V;S=new S;la=new la;ma=new ma;aa=new aa;Array.prototype.contains=function(a){var b=~~a;return b==a?-1<this.indexOf(b)||-1<this.indexOf(a+""):-1<this.indexOf(a)};var Ma={};Element.prototype.kd=function(a){this.className=a};Element.prototype.Ya=function(a,b){b?this.xa(a):this.Ta(a)};Element.prototype.xa=function(a){if(p(a)){var b=
-this.$();a=a.split(" ");for(var c=0;c<a.length;c++)-1==b.indexOf(a[c])&&b.push(a[c]);this.className=b.join(" ")}};Element.prototype.Ta=function(a){if(p(a)){var b=this.$();a=a.split(" ");for(var c=[],d=0;d<b.length;d++)-1==a.indexOf(b[d])&&c.push(b[d]);this.className=c.join(" ")}};Element.prototype.Dc=function(){return-1<this.$().indexOf("cuw")};Element.prototype.$=function(){var a=(this.className||"").trim().replace(/ {2,}/g," ");return a?a.split(" "):[]};Element.prototype.mb=function(a){if(wa(a)||
-!p(a))return null;if(q(Element.prototype.closest))return this.closest(a);a=a.trim().split(" ");a=a[a.length-1].split(".");var b,c=this.tagName.toLowerCase();wa(a[0])||(b=a[0].toLowerCase());u.Hb(a,0);for(var d=this,e,f,h;d;){h=d.$();e=x(b)||b==c;for(var g=f=0;g<h.length;g++)-1<a.indexOf(h[g])&&f++;if(f==a.length&&e)return d;d=d.parentNode}return null};Element.prototype.getData=function(a){return this.getAttribute("_"+a)||""};Element.prototype.qb=function(){return this.getBoundingClientRect()};Element.prototype.Pb=
-function(a){function b(a,b){var d;d=Ma[b];d||(d=Qa(b),Ma[b]=d);d&&(c.style[d]=a)}var c=this;if("string"==typeof a)b(value,a);else for(var d in a)b(a[d],d)};Element.prototype.Ea=function(a){return this.childNodes[a]};MouseEvent.prototype.rb=function(a){return this.target.mb(a)};MouseEvent.prototype.wd=function(a){if(K(a))for(var b=this.target;b;){if(b==a)return!0;b=b.parentNode}return!1};l=new l;na.prototype.yb=function(){this.T("menu").Wa(!1)};na.prototype.g=function(){return[{cmp:Aa,p:{cmpid:"menu"}},
-{t:0,p:{c:"cec"}}]};xa.prototype.g=function(){return[{t:0,p:{c:"cul"}}]};oa.prototype.D=function(){};oa.prototype.g=function(){return[{c:{cmp:ga},t:0,p:{c:"cek"}}]};pa.prototype.D=function(){};pa.prototype.g=function(){return[{c:[{c:"404",t:0,p:{c:"ceq"}},{c:P[0],t:0,p:{c:"ce0"}}],t:0,p:{c:"cex"}}]};qa.prototype.D=function(){};qa.prototype.g=function(){return[{t:0,p:{c:"cul"}}]};ra.prototype.D=function(){};ra.prototype.g=function(){return[{c:{c:{c:[{c:{c:[{c:f[34],t:0,p:{c:"ce6"}},{cmp:Y},{c:f[51],
-t:0,p:{c:"ced cev"}},{cmp:Ka}],t:0,p:{c:"ce3"}},t:6,p:{c:"ce2"}},{t:6,p:{c:"cbm"}}],t:5},t:2,p:{c:"ceh",cp:"0px",cs:"0px"}},t:0,p:{c:"cul cep",sc:1}}]};U.prototype.D=function(){};U.prototype.Vc=function(){this.toggle("expanded")};U.prototype.g=function(a){return[{c:[{cmp:ba,e:["expand",this.Vc.bind(this)],p:{cmpid:"form"}},{cmp:Ja,p:{cmpid:"datatable"}}],t:0,p:{c:function(){return["cul",a("expanded")?" cuu":""]},sc:1},n:{c:"expanded"}}]};U.prototype._gi=function(){return{props:{expanded:!0}}};U.prototype.ob=
-function(){return[C]};ya.prototype.g=function(){return[{c:{cmp:Ia},t:0,p:{c:"cur"}}]};ba.prototype.Rb=function(){this.dispatchEvent("expand")};ba.prototype.g=function(a,b){return[{c:[{c:b.title,t:0,p:{c:"cuv"}},{t:0,e:[0,this.Rb.bind(this)],p:{c:"cu8"}},{t:0,e:[0,this.Rb.bind(this)],p:{c:"cum"}},{cmp:da}],t:0,p:{c:"cuc",sc:1}}]};ba.prototype._gi=function(){return{args:{title:f[0]}}};ca.prototype.Sc=function(){alert("create filter")};ca.prototype.cd=function(){alert("create filter with wizard")};ca.prototype._gi=
-function(){return{args:{className:"cub"},props:{buttons:[{name:f[1],handler:this.Sc},{name:f[2],handler:this.cd}]}}};M.prototype.D=function(){B.prototype.D.call(this)};M.prototype.ma=function(a){this.fd(a)};M.prototype.Rc=function(a){C.ga("set",{filterId:a.value,param:"isAutoOpen",value:a.checked})};M.prototype.nb=function(a){return{value:a.filterId,name:a.header,isAutoOpen:a.isAutoOpen}};M.prototype.U=function(a,b){return[{t:0,p:{c:"cu9"+(b.item.Bd?" cua":""),_value:b.item.value}}]};M.prototype._gi=
-function(){return{args:{className:"cuy",maxHeight:400},controllers:[{controller:C,on:{load:this.ma}}],helpers:[{helper:va,callback:this.Rc,options:{intValue:!0,checkboxClass:"cu9",checkboxCheckedClass:"cua",labelClass:null}}]}};X.prototype.ma=function(a){this.set("quantity",a.length)};X.prototype.Db=function(){V.show(ta,{filterId:la.get("filterId")})};X.prototype.g=function(a){return[{c:[{c:[{c:f[3],t:1},{cmp:ca}],t:0,p:{c:"cus"}},{c:[{c:f[4],t:0,p:{c:"cu5"}},{c:[{c:{pr:"quantity",p:a("quantity")},
-t:42,p:{c:"cuj"}},{t:0,p:{c:"cui"}}],t:0,p:{c:"cu1"}},{cmp:M}],t:0,p:{c:function(){return["cuf",a("quantity")?"":" cuk"]}},n:{c:"quantity"}},{c:{pr:"filterName",p:a("filterName")},t:0,e:[0,this.Db.bind(this)],p:{c:"cuq"}},{c:f[5],t:0,e:[0,this.Db.bind(this)],p:{c:"cux"}}],t:0,p:{c:"cuz",sc:1}}]};X.prototype._gi=function(){return{controllers:[{controller:C,on:{load:this.ma}}],props:{filterName:"Master"}}};da.prototype.Yc=function(a){var b=a.target.mb(".cue");b.xa("cu4");this.kc(function(){b.Ta("cu4")})};
-da.prototype.Zc=function(){};da.prototype.g=function(){return[{c:[{c:f[6],t:0,e:[0,this.Yc.bind(this)],p:{c:"cuo"}},{c:[f[7]," ",{c:f[8],t:40,p:{c:"cbe"}}],t:0,e:[0,this.Zc.bind(this)],p:{c:"cun"}}],t:0,p:{c:"cue"}},{c:{cmp:X},t:0,p:{c:"cbo",sc:1}}]};sa.prototype.Oa=function(){this.dispatchEvent("submit")};sa.prototype.g=function(a){return[{c:{c:{pr:"value",p:a("value")},t:0,e:[0,this.Oa.bind(this)],p:{c:function(){return[a("class")]}},n:{c:"class"}},t:0,p:{c:"cer"}}]};La.prototype.g=function(a){return[{t:0,
-p:{c:"cu9",_value:function(){return[a("value")]}},n:{_value:"value"}}]};D.prototype.show=function(){this.set("shown",!0);this.Va();this.Eb()};D.prototype.Va=function(){var a=this.P().qb();this.set({marginTop:Math.round(a.height/-2)+"px",marginLeft:Math.round(a.width/-2)+"px"})};D.prototype.I=function(){this.set("shown",!1);this.zb()};D.prototype.expand=function(){this.toggle("expanded")};D.prototype.Eb=function(){};D.prototype.zb=function(){};D.prototype.g=function(a,b){return[{t:0,e:[0,this.I.bind(this)],
-p:{c:function(){return["cea",a("shown")?" cez":""]}},n:{c:"shown"}},{c:[{c:{t:0,e:[0,this.I.bind(this)],p:{c:"cej"}},i:!!b.zd},{c:{t:0,e:[0,this.expand.bind(this)],p:{c:"cei"}},i:!!b.Ad},{c:{pr:"title",p:a("title")},t:0,p:{c:"ce5"}},{c:{tmp:this.U},t:0,p:{c:"ce1",st:function(){return[a("height")?"max-height:"+a("height")+"px;":""]}},n:{st:"height"}}],t:0,p:{c:function(){return["ces",a("expanded")?" cef":"",a("shown")?" cez":""]},sc:1,st:function(){return["width:",a("width"),"px;margin-left:",a("marginLeft"),
-";margin-top:",a("marginTop"),";"]}},n:{c:["expanded","shown"],st:["width","marginLeft","marginTop"]}}]};D.prototype.U=function(){return null};D.prototype._gi=function(){return{args:{closable:!0},followers:{width:this.Va,height:this.Va},props:{width:600}}};B.prototype.D=function(){this.button=this.P().parentNode;this.addListener(this.button,"click",this.$c)};B.prototype.La=function(a){var b=a.rb(".cug");if(null!==b){var c=b.getData("index");b.getData("value");b=this.get("buttons");m(b)&&k(b[c])&&
-q(b[c].handler)&&b[c].handler.call(this,a)}};B.prototype.$c=function(){this.show()};B.prototype.show=function(){var a=this.P(),b=this.L(".cu7").qb(),b=Math.min(b.height,u.get(this.options,"maxHeight",400));a.Pb({"max-height":b+"px",height:b+"px"});this.button.xa("active");ma.watch(this,a)};B.prototype.I=function(){this.P().Pb({"max-height":"0",height:"0"});this.button.Ta("active")};B.prototype.fd=function(a){for(var b=[],c=0;c<a.length;c++)b.push(this.nb(a[c]));this.set("buttons",b)};B.prototype.nb=
-function(a){return{value:a.value,name:a.name}};B.prototype.g=function(a,b){return[{c:{c:{h:function(a,b){return[{c:[a.name,{tmp:this.U,p:{item:a}}],t:0,p:{c:"cug",_value:a.value,_index:b}}]}.bind(this),p:a("buttons"),f:"buttons"},t:0,e:[0,this.La.bind(this)],p:{c:"cu7",st:b.maxHeight?"max-height:"+b.maxHeight+"px;":""}},t:0,p:{c:"cut "+b.className,sc:1}}]};B.prototype.U=function(){return null};za.prototype.g=function(){return[{t:0,p:{c:"cb4"}}]};Y.prototype.Ab=function(a){L.Ec()?a.needToProlong&&
-(a.prolongButtonText=f[46]):a.prolongButtonText=f[45];this.set(a)};Y.prototype.Na=function(){V.show(N)};Y.prototype.g=function(a){return[{c:[{c:[{c:[f[35],":"],t:6},{c:{pr:"userName",p:a("userName")},t:6}],t:5},{c:[{c:[f[36],":"],t:6},{c:{pr:"companyName",p:a("companyName")},t:6}],t:5},{c:[{c:[f[37],":"],t:6},{c:{pr:"userEmail",p:a("userEmail")},t:6}],t:5},{c:[{c:[f[38],":"],t:6},{c:{pr:"typeAccess",p:a("typeAccess")},t:6,p:{c:" cev"}}],t:5},{c:[{c:[f[39],":"],t:6},{c:{pr:"beginAccessDate",p:a("beginAccessDate")},
-t:6}],t:5},{c:[{c:[f[40],":"],t:6},{c:{pr:"endAccessDate",p:a("endAccessDate")},t:6,p:{c:function(){return[a("needToProlong")?"cbn":""]}},n:{c:"needToProlong"}}],t:5}],t:2,p:{c:"cew",cp:"0px",cs:"0px",sc:1}},{c:function(){return[{c:{pr:"prolongButtonText",p:a("prolongButtonText")},t:12,p:{h:f[44],tr:"_blank",c:"cbr cel cem"}}]},p:["prolongButtonText"],i:function(){return a("prolongButtonText")}},{c:f[42],t:12,p:{h:f[41],tr:"_blank",c:"cbt cel ceo"}},{c:f[43],t:0,p:{c:"ced cev"}},{c:[{c:{pr:"managerName",
-p:a("managerName")},t:0,p:{c:"cbl"}},{c:[{c:[" ",{c:f[47],t:0,p:{c:"cbb"}},{c:f[48],t:0,p:{c:"cbv"}}],t:0,p:{c:"cbc"}},{pr:"managerPhone",p:a("managerPhone")},P[1],{c:f[49],t:51}],t:0,p:{c:"cbu"}},{c:{pr:"managerEmail",p:a("managerEmail")},t:0,p:{c:"cb8"}}],t:0,p:{c:"cb7"}},{c:f[50],t:0,e:[0,this.Na.bind(this)],p:{c:"cel ce8"}}]};Y.prototype._gi=function(){return{loader:{controller:ea,async:!0}}};C.prototype.ma=function(){};C.prototype.Wc=function(){};C.prototype.Qc=function(){};C.prototype._gi=function(){return{options:{key:"filterId",
-store:!1,storeAs:"filters",storePeriod:"1day",clone:!0},actions:{load:{url:Ca.load,method:"GET",callback:this.Wc.bind(this)},save:{url:Ca.add,method:"POST",callback:this.Qc},set:{url:Ca.set,method:"POST"}}}};ea.prototype._gi=function(){return{actions:{load:{url:"user/get.php",method:"GET"}}}};ta.prototype._i=function(){this.controller=C};ta.prototype._gi=function(){return{props:{title:f[33]}}};N.prototype.ad=function(){this.I();V.show(fa)};N.prototype.Eb=function(){var a=this.Ea(0),a=a.xd.bind(a);
-this.interval=setInterval(a,6E4);a()};N.prototype.zb=function(){clearInterval(this.interval)};N.prototype.U=function(){return[{cmp:O},{c:f[10],t:0,e:[0,this.ad.bind(this)],p:{c:"cel ceu"}}]};N.prototype._gi=function(){return{props:{title:f[9]}}};fa.prototype.Na=function(){this.I();V.show(N)};fa.prototype.U=function(){return[{cmp:ua},{c:f[12],t:0,e:[0,this.Na.bind(this)],p:{c:"cel ceu"}}]};fa.prototype._gi=function(){return{props:{title:f[11]}}};ga.prototype.Fb=function(){window.location.reload()};
-ga.prototype.g=function(){return[{c:P[2],t:0,p:{c:"ce4"}},{t:0,p:{c:"cen"}}]};ga.prototype._gi=function(){return{options:{action:"user/login.php",method:"POST",ajax:!0,container:"cen",controls:[{cmpid:"login",type:"text",name:"login",placeholder:f[16],caption:f[17]},{cmpid:"password",type:"password",name:"password",placeholder:f[18],caption:f[19]}],submit:{value:f[20],"class":""}}}};O.prototype.D=function(){this.Xa("name",L.getAttribute("name"));this.Xa("phone",L.getAttribute("phone"));var a=L.getAttribute("email");
-a&&(this.Xa("email",a),this.mc())};O.prototype.wc=function(){for(var a=S.get("monthNames"),b=new Date,c=b.getFullYear(),d=b.getMonth()+1,b=b.getDate(),e=33-(new Date(c,d-1,33)).getDate(),g=[],h,k=d,l,m=0,p=0,q=0;10>m;){h=b+p;if(b+p>e&&(h-=e,k=d+1,12<k))break;l=(new Date(c,k-1,h)).getDay();0==l||5<l?p++:(l=S.get("dayNames")[l],l=1<m||q&&q!=h-1?h+" "+a[k]+", "+l:(0==m?f[28]:f[29])+", "+h+" "+a[k],g.push({value:l,title:l}),m++,p++,q=h)}return g};O.prototype.xd=function(){var a=this.T("date"),b=this.T("time"),
-c=a.sb();if((new RegExp(f[28])).test(c)){for(var c=[11,13,16],d=(new Date).getUTCHours()+3,e=[],g=0;g<c.length;g++)d>=c[g]&&e.push(g);if(e.length==c.length)a.Y(0,!1);else for(g=0;g<e.length;g++)b.Y(e[g],!1)}else b.Y(0,!0),b.Y(1,!0),b.Y(2,!0)};O.prototype.g=function(){return[{t:0,p:{c:"cet"}}]};O.prototype._gi=function(){return{options:{action:"orderCall/send.php",method:"POST",container:"cet",controls:[Z[0],Z[1],Z[2],{cmpid:"topic",type:"select",name:"topic",options:S.get("orderCallTopics"),caption:f[24],
-"class":"cup"},{cmpid:"date",type:"select",name:"date",options:this.wc(),caption:f[25],"class":"cup"},{cmpid:"time",type:"select",name:"time",options:S.get("timeOptions"),caption:f[26],"class":"cup"},{cmpid:"comment",type:"textarea",name:"comment",caption:f[27]}],submit:{value:f[50],"class":f[14]+" ceb"}}}};ua.prototype.g=function(){return[{t:0,p:{c:"cet"}}]};ua.prototype._gi=function(){return{options:{action:"support/send.php",controls:[Z[0],Z[1],Z[2],{cmpid:"comment",type:"textarea",name:"comment",
-caption:f[30]},{cmpid:"screenshot",type:"file",name:"screenshot",accept:"image/*",caption:f[31]}],submit:{value:f[32],"class":f[14]+" ceb"}}}};ha.prototype.Ka=function(){};ha.prototype.ja=function(){return this.L("input").value};ha.prototype.g=function(a){return[{c:[{c:function(){return[{c:{pr:"caption",p:a("caption")},t:0,p:{c:"cuh"}}]},p:["caption"],i:function(){return a("caption")}},{t:14,e:[18,this.Ka.bind(this)],p:{tp:function(){return[a("type")]},n:function(){return[a("name")]},p:function(){return[a("placeholder")]},
-v:function(){return[a("value")]},readonly:function(){return[a("enabled")?"readonly":""]},accept:function(){return[a("accept")]}},n:{tp:"type",n:"name",p:"placeholder",v:"value",readonly:"enabled",accept:"accept"}}],t:0,p:{c:function(){return["cu0 ",a("class")]},sc:1},n:{c:"class"}}]};E.prototype.D=function(){var a=this.get("value"),b;x(a)||(b=this.Kb(a));b||this.Jb(0)};E.prototype.Kb=function(a){var b=this.get("options");if(m(b))for(var c=0;c<b.length;c++)if(b[c].value==a)return this.selectedIndex=
-c,this.set({value:a,title:b[c].title}),!0;return!1};E.prototype.Jb=function(a){this.selectedIndex=a;var b=this.get("options");k(b[a])&&this.set({value:b[a].value,title:b[a].title})};E.prototype.Y=function(a,b){this.L(".cu6").Ea(a).Ya("cuw",!b);a==this.selectedIndex&&this.Jb(0==a?a+1:0)};E.prototype.Xc=function(a){(a=a.rb(".cud"))&&!a.Dc()&&(a=a.getData("value"),this.Kb(a),this.dispatchEvent("change",{value:a}),this.I())};E.prototype.ja=function(){return this.L("input").value};E.prototype.La=function(){this.set("active",
-!0);ma.watch(this,this.L(".cu2"))};E.prototype.I=function(){this.set("active",!1)};E.prototype.g=function(a){return[{c:[{c:function(){return[{c:{pr:"caption",p:a("caption")},t:0,p:{c:"cuh"}}]},p:["caption"],i:function(){return a("caption")}},{c:[{c:{pr:"title",p:a("title")},t:0,e:[0,this.La.bind(this)],p:{c:"cu3"}},{c:{h:function(a){return[{c:a.title,t:0,p:{c:"cud",_value:a.value}}]}.bind(this),p:a("options"),f:"options"},t:0,e:[0,this.Xc.bind(this)],p:{c:"cu6"}}],t:0,p:{c:function(){return["cu2",
-a("active")?" cu4":""]}},n:{c:"active"}},{t:14,p:{tp:"hidden",n:function(){return[a("name")]},v:function(){return[a("value")]}},n:{n:"name",v:"value"}}],t:0,p:{c:function(){return["cu0 ",a("class")]},sc:1},n:{c:"class"}}]};ia.prototype.Ka=function(){};ia.prototype.ja=function(){return this.L("textarea").value};ia.prototype.g=function(a){return[{c:[{c:function(){return[{c:{pr:"caption",p:a("caption")},t:0,p:{c:"cuh"}}]},p:["caption"],i:function(){return a("caption")}},{c:{pr:"value",p:a("value")},
-t:49,e:[18,this.Ka.bind(this)],p:{n:function(){return[a("name")]},p:function(){return[a("placeholder")]},readonly:function(){return[a("enabled")?"readonly":""]}},n:{n:"name",p:"placeholder",readonly:"enabled"}}],t:0,p:{c:function(){return["cu0 ",a("class")]},sc:1},n:{c:"class"}}]};Aa.prototype.g=function(){return[{c:{c:[{t:12,p:{h:"#main",c:"ce9"}},{c:P[3],t:12,p:{h:"#main",r:"main"}},{c:P[4],t:12,p:{h:"#search",r:"search"}},{c:P[5],t:12,p:{h:"#favorite",r:"favorite"}},{c:P[6],t:12,p:{h:"#planzakupok",
-r:"planzakupok"}},{c:P[7],t:12,p:{h:"#analytics",r:"analytics"}}],t:0,p:{c:"cey"}},t:0,p:{c:"ce7",sc:1}}]};l.Hc([Q,[g,G,F],g,[z,J,r,A,R,ya,ba,X,da,sa,Ka,La,D,B,za,Y],z,[na],J,[xa,oa,pa,qa,ra,U],ya,[Ja],w,[C,ea],D,[ta,N,fa],r,[ga,O],O,[ua],A,[ha,E,ia],R,[Aa],za,[Ia],B,[ca,M]]);u=new u;H=new H;L=new L;C=new C;ea=new ea;L.load(na)})();
+;(function() {
+var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442',' \u00A0 ','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
+var __ = ['\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','vec','vec ve9','vec vei','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a'];
+var __V = [{'cmpid':'name','type':'text','name':'name','caption':__[21],'class':'vzm'},{'cmpid':'phone','type':'text','name':'phone','caption':__[22],'class':'vzm'},{'cmpid':'email','type':'text','name':'email','caption':__[23],'class':'vzm'}];
+var __DICTURL = 'dictionary/get.php';
+var __TAGS = ['div','span','table','tbody','thead','tr','td','th','ul','ol','li','p','a','form','input','img','video','audio','aside','article','b','big','blockquote','button','canvas','caption','center','code','col','colgroup','footer','font','h1','h2','h3','h4','h5','h6','header','hr','i','iframe','label','menu','pre','s','section','select','strong','textarea','u','small'];
+var __A = {'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'};
+var __EVENTTYPES = ['click','mouseover','mouseout','mouseenter','mouseleave','mousemove','contextmenu','dblclick','mousedown','mouseup','keydown','keyup','keypress','blur','change','focus','focusin','focusout','input','invalid','reset','search','select','submit','drag','dragend','dragenter','dragleave','dragover','dragstart','drop','copy','cut','paste','popstate','wheel','storage','show','toggle','touchend','touchmove','touchstart','touchcancel','message','error','open','transitionend','abort','play','pause','load','durationchange','progress','resize','scroll','unload','hashchange','beforeunload','pageshow','pagehide'];
+var __ROUTES = [{'name':'main','view':Main,'accessLevel':10,'title':'Home','params':{'text':'blablabla','name':'$2'}},{'name':'search','view':Search,'accessLevel':0,'title':'\u041f\u043e\u0438\u0441\u043a','load':['Filters']},{'name':'favorite','view':Favorite,'accessLevel':0,'title':'\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435'},{'name':'analytics','view':Analytics,'accessLevel':0,'title':'\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'}];
+var __ERRORROUTES = {'404':Error404,'401':Error401};
+var __HASHROUTER = true;
+var __INDEXROUTE = 'main';
+var __DEFAULTROUTE = null;
+var __VIEWCONTAINER = 'veb';
+var __I = 'initiate';
+var __GI = 'getInitials';
+var __APIDIR = 'api';
+var __PAGETITLE = 'Page title';
+var __USEROPTIONS = {'login':'user/login.php','logout':'user/logout.php','save':'user/save.php','fullAccess':11};
+var CONFIG = {'user': {'get': 'user/get.php'},'filters': {'load': 'filters/get.php','save': 'filters/save.php','set': 'filters/set.php'},'support': {'send': 'support/send.php'},'orderCall': {'send': 'orderCall/send.php'}};
+function Application() {}
+Application.prototype.initiate = function() {
+	this.views = {};
+};
+Application.prototype.run = function() {
+	this.element = document.createElement('div');
+	document.body.appendChild(this.element);
+	this.render(this.element);
+	this.createViewContainer();
+	this.defineViews(__ROUTES);
+	this.initRouter();
+};
+Application.prototype.initRouter = function() {
+	Router.setNavigationHandler(this.handleNavigation.bind(this));
+	Router.init();
+};
+Application.prototype.defineViews = function(routes) {
+	for (var i = 0; i < routes.length; i++) {
+		this.views[routes[i]['name']] = null;
+		if (isArray(routes[i]['children'])) {
+			this.defineViews(routes[i]['children']);
+		}
+	}
+	var errorRoutes = __ERRORROUTES;
+	if (isObject(errorRoutes)) {
+		for (var k in errorRoutes) {
+			this.views[k] = null;
+		}
+	}
+};
+Application.prototype.handleNavigation = function(route, changeTitle) {
+	this.isChangeTitle = changeTitle;
+	this.currentRoute = route;
+	var view = this.views[route['name']];
+	var isSameView = this.currentView == view;
+	if (!isSameView && this.currentView) {
+		this.activateView(this.currentView, false);
+	}
+	this.currentView = view;
+	if (!isUndefined(view) && isFunction(route['view'])) {
+		if (!view) {
+			var viewParams = this.getViewParams(route, true);
+			view = this.currentView = this.views[route['name']] = new route['view'](viewParams);
+			view.setOnReadyHandler(this.onViewReady.bind(this));
+			var viewContentElement = this.createViewContentElement();
+			view.render(viewContentElement);
+			view.initControllers();
+			Globals.addView(view, route['name']);
+		} else {
+			this.activateView(view, true, isSameView);
+		}
+		if (isNumber(route['error'])) {
+			this.onError(route['error']);
+		} else {
+			this.onNoErrors();
+		}
+	} else {
+		this.log('no view to represent given route', 'handleNavigation', route);
+	}
+};
+Application.prototype.getViewParams = function(route, allParams) {
+	var params;
+	if (isObject(route['dinamicParams'])) {
+		params = {};
+		for (var k in route['dinamicParams']) {
+			params[k] = Router.getPathPartAt(route['dinamicParams'][k]);
+		}
+	}
+	if (allParams) {
+		if (isObject(params)) {
+			Objects.merge(params, route['params']);
+		} else {
+			params = route['params'];
+		}
+	}
+	return params;
+};
+Application.prototype.onViewReady = function() {
+	if (this.isChangeTitle) {
+		var title = this.currentRoute['title'];
+		if (isString(title)) {
+			var titleParams = this.currentView.getTitleParams();
+			if (isObject(titleParams)) {
+				var regExp;
+				for (var k in titleParams) {
+					regExp = new RegExp("\\$" + k)
+					title = title.replace(regExp, titleParams[k]);
+				}
+			}
+		}
+		this.setPageTitle(title ||__PAGETITLE || '');
+	}
+};
+Application.prototype.createViewContentElement = function() {
+	var element = document.createElement('div');
+	this.viewContainer.appendChild(element);
+	return element;
+};
+Application.prototype.createViewContainer = function() {
+	var viewContainer;
+	var containerClass = __VIEWCONTAINER;
+	if (containerClass) {
+		viewContainer = document.body.querySelector('.' + containerClass);
+	}
+	if (!viewContainer) {
+	 	viewContainer = document.createElement('div');
+		if (containerClass) {
+			viewContainer.className = containerClass;
+		}
+		this.element.appendChild(viewContainer);
+	}
+	this.viewContainer = viewContainer;
+};
+Application.prototype.activateView = function(view, isActivated, isSameView) {
+	var parentElement = view.getParentElement();
+	if (!isActivated) {
+		this.viewContainer.removeChild(parentElement);
+	} else {
+		var params = this.getViewParams(this.currentRoute);
+		if (isObject(params)) {
+			view.set(params);
+		}
+		if (!isSameView) {
+			this.viewContainer.appendChild(parentElement);
+		}
+	}
+	view.activate(isActivated);
+};
+Application.prototype.setPageTitle = function(title) {
+	var titleElement = document.getElementsByTagName('title')[0];
+	if (!isElement(titleElement)) {
+		var headElement = document.getElementsByTagName('head')[0];
+		if (!isElement(headElement)) {
+			var htmlElement = document.getElementsByTagName('html')[0];
+			headElement = htmlElement.appendChild(document.createElement('head'));
+		}
+		titleElement = headElement.appendChild(document.createElement('title'));
+	}
+	titleElement.innerHTML = title;
+};
+Application.prototype.disposeView = function(viewName) {
+	if (isObject(this.views[viewName])) {
+		this.views[viewName].dispose();
+		this.views[viewName] = null;
+	}
+};
+Application.prototype.onNoErrors = function() {};
+Application.prototype.onError = function(errorCode) {};
+function Component() {}
+Component.prototype.initiate = function() {
+	this.propsToSet = {};
+	this.provider = this.get.bind(this);
+	this.followers = {};
+	this.rendered = false;
+	this.disposed = false;
+};
+Component.prototype.render = function(parentElement) {
+	this.parentElement = parentElement;
+	this.processInitials();
+	this.load();
+};
+Component.prototype.processInitials = function() {
+	var initials = this.initials;
+	if (isObject(initials)) {
+		for (var k in initials) {
+			if (isArrayLike(initials[k])) {
+				if (k == 'globals') {
+				} else if (k == 'followers') {
+					for (var j in initials[k]) {
+						this.addFollower(j, initials[k][j]);
+					}
+				} else if (k == 'controllers') {
+					for (var i = 0; i < initials[k].length; i++) {
+						this.attachController(initials[k][i]);
+					}
+				} else if (k == 'props') {
+					Objects.merge(this.props, initials[k]);
+				} else if (k == 'options') {
+					this.initOptions(initials[k]);
+				}
+			}
+		}
+	}
+};
+Component.prototype.initOptions = function(options) {};
+Component.prototype.processPostRenderInitials = function() {
+	var helpers = this.getInitial('helpers');
+	if (isArray(helpers)) {
+		for (var i = 0; i < helpers.length; i++) {
+			this.subscribeToHelper(helpers[i]);
+		}
+	}
+};
+Component.prototype.attachController = function(options) {
+	if (isObject(options['on'])) {
+		for (var k in options['on']) {
+			options.controller.subscribe(k, options['on'][k], this);
+		}
+	}
+};
+Component.prototype.addFollower = function(name, handler) {
+	if (isFunction(handler)) {
+		this.followers[name] = handler;
+	}
+};
+Component.prototype.subscribeToHelper = function(options) {
+	if (isFunction(options['callback'])) {
+		options['helper'].subscribe(this, options['callback'], options['options']);
+	}
+};
+Component.prototype.getInitial = function(initialName) {
+	return Objects.get(this.initials, initialName);
+};
+Component.prototype.load = function() {
+	var loader = this.getInitial('loader');
+	if (isObject(loader) && isObject(loader['controller'])) {
+		this.loader = loader['controller'];
+		var isAsync = !!loader['async'];
+		this.loader.subscribe('load', this.onDataLoad.bind(this, isAsync), this);
+		var options = loader['options'];
+		if (isFunction(options)) {
+			options = options();
+		}
+		this.loader.doAction('load', options);
+		if (!isAsync) {
+			this.renderTempPlaceholder();
+			return;
+		}
+	}
+	this.onReadyToRender();
+};
+Component.prototype.renderTempPlaceholder = function() {
+	this.tempPlaceholder = document.createElement('span');
+	this.parentElement.appendChild(this.tempPlaceholder);
+};
+Component.prototype.onDataLoad = function(isAsync, data) {
+	this.onLoaded(data);
+	if (!isAsync) {
+		this.onReadyToRender();
+	}
+};
+Component.prototype.onReadyToRender = function() {
+	if (!this.isRendered()) {
+		this.level = new Level();
+		var content = this.getTemplateMain(this.provider, this.getArgs());
+		if (isArray(content)) {
+			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
+		}
+		this.rendered = true;
+		this.onRenderComplete();
+		this.onRendered();
+		if (this.tempPlaceholder) {
+			this.parentElement.removeChild(this.tempPlaceholder);
+			this.tempPlaceholder = null;
+		}
+		this.processPostRenderInitials();
+	}
+};
+Component.prototype.getArgs = function() {
+	return this.getInitial('args') || {};
+};
+Component.prototype.instanceOf = function(parent) {
+	return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
+};
+Component.prototype.dispatchEvent = function(eventType, eventParams) {
+	if (isArray(this.listeners)) {
+		for (var i = 0; i < this.listeners.length; i++) {
+			if (this.listeners[i]['type'] == eventType) {
+				this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
+			}
+		}
+	}
+};
+Component.prototype.forEachChild = function(callback) {
+	if (isArray(this.children)) {
+		for (var i = 0; i < this.children.length; i++) {
+			callback.call(this, this.children[i], i);
+		}
+	} else {
+		log('this.children is not an array');
+	}
+};
+Component.prototype.get = function(propName) {
+	return this.propsToSet[propName] || this.props[propName];
+};
+Component.prototype.toggle = function(propName) {
+	this.set(propName, !this.get(propName));
+};
+Component.prototype.set = function(propName, propValue) {
+	var props;
+	if (!isUndefined(propValue)) {
+		props = {};
+		props[propName] = propValue;
+	} else {
+		props = propName;
+	}
+	var isChanged = false;
+	var changedProps = {};
+	var currentValue;
+	for (var k in props) {
+		currentValue = this.props[k];
+		if (currentValue == props[k]) continue;
+		if (isArray(currentValue) && isArray(props[k])) {
+			if (Objects.equals(currentValue, props[k])) continue;
+		}
+		isChanged = true;
+		this.props[k] = props[k];
+		changedProps[k] = props[k];
+	}
+	if (this.level && isChanged) {
+		this.level.propagatePropertyChange(changedProps);
+	}
+	for (var k in changedProps) {
+		if (!isUndefined(this.followers[k])) {
+			this.followers[k].call(this);
+		}
+	}
+	changedProps = null;
+};
+Component.prototype.getFirstNodeChild = function() {
+	if (this.level) {
+		return this.level.getFirstNodeChild();
+	}
+	return null;
+};
+Component.prototype.preset = function(propName, propValue) {
+	this.propsToSet[propName] = propValue;
+};
+Component.prototype.fire = function() {
+	for (var k in this.propsToSet) {
+		this.set(k, this.propsToSet[k]);
+		delete this.propsToSet[k];
+	}
+};
+Component.prototype.delay = function() {
+	this.stopDelay();
+	if (isFunction(arguments[0])) {
+		this.timeout = window.setTimeout(arguments[0].bind(this), arguments[1] || 200);
+	}
+};
+Component.prototype.stopDelay = function() {
+	window.clearTimeout(this.timeout);
+};
+Component.prototype.propagatePropertyChange = function() {};
+Component.prototype.onRendered = function() {};
+Component.prototype.onLoaded = function() {};
+Component.prototype.onRenderComplete = function() {};
+Component.prototype.getTemplateMain = function() {
+	return null;
+};
+Component.prototype.addChild = function(child, parentElement) {
+	this.level.renderComponent(child, parentElement);
+};
+Component.prototype.removeChild = function(child) {
+	if (!child) return;
+	if (isString(child)) {
+		var child = this.getChildById(child);
+		if (child) {
+			child.dispose();
+		}
+	} else if (isObject(child)) {
+		var childIndex = this.children.indexOf(child);
+		if (childIndex > -1) {
+			this.children.splice(childIndex, 1);
+			child.dispose();
+		}
+	}
+ };
+Component.prototype.registerChildComponent = function(childComponent) {
+	this.children = this.children || [];
+	if (this.children.indexOf(childComponent) == -1) {
+		this.children.push(childComponent);
+	}
+};
+Component.prototype.getChildAt = function(index) {
+	return this.children[index];
+};
+Component.prototype.getChildById = function(childComponentId) {
+	if (!this.children) return null;
+	for (var i = 0; i < this.children.length; i++) {
+		if (this.children[i].getId() == childComponentId) {
+			return this.children[i];
+		}
+	}
+	return null;
+};
+Component.prototype.setId = function(id) {
+	this.componentId = id;
+};
+Component.prototype.getId = function() {
+	return this.componentId;
+};
+Component.prototype.getProvider = function() {
+	return this.provider;
+};
+Component.prototype.getComponent = function() {
+	return this;
+};
+Component.prototype.getElement = function() {
+	return this.scope || this.parentElement;
+};
+Component.prototype.findElement = function(selector, scopeElement) {
+	return (scopeElement || this.getElement()).querySelector(selector);
+};
+Component.prototype.findElements = function(selector, scopeElement) {
+	return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
+};
+Component.prototype.removeNode = function(node) {
+	if (isString(node)) {
+		node = this.findElement(node);
+	}
+	if (isNode(node) && node.parentNode == this.parentElement) {
+		this.parentElement.removeChild(node);
+	}
+};
+Component.prototype.getParentElement = function() {
+	return this.parentElement;
+};
+Component.prototype.isRendered = function() {
+	return this.rendered;
+};
+Component.prototype.isDisposed = function() {
+	return this.disposed;
+};
+Component.prototype.addListener = function(target, eventType, handler) {
+	if (isElement(target)) {
+		this.eventHandler = this.eventHandler || new EventHandler();
+		this.eventHandler.listen(target, eventType, handler.bind(this));
+	} else {
+		target.subscribe(eventType, handler, this);
+	}
+};
+Component.prototype.subscribe = function(eventType, handler, subscriber) {
+	this.listeners = this.listeners || [];
+	this.listeners.push({'type': eventType, 'handler': handler, 'subscriber': subscriber});
+};
+Component.prototype.setAppended = function(isAppended) {
+	if (this.level) {
+		this.level.setAppended(isAppended);
+	}
+};
+Component.prototype.setScope = function(scope) {
+	this.scope = scope;
+};
+Component.prototype.log = function(message, method, opts) {
+	log(message, method, this, opts);
+};
+Component.prototype.dispose = function() {
+	this.disposeLinks();
+	this.disposeInternal();
+	this.level.dispose();
+	this.level = null;
+	this.parentElement = null;
+	this.props = null;
+	this.propsToSet = null;	
+	this.provider = null;
+	this.children = null;
+	this.disposed = true;
+	this.listeners = null;
+	this.loader = null;
+	this.initials = null;
+};
+Component.prototype.disposeInternal = function() {};
+function Condition(params) {
+	this.params = params;
+	this.isTrue = !!this.params['i']();
+}
+Condition.prototype.render = function(parentElement, parentLevel) {
+	this.parentElement = parentElement;
+	this.parentLevel = parentLevel;
+	this.createLevel(false);
+};
+Condition.prototype.createLevel = function(isUpdating) {
+	var children = this.getChildren();
+	if (isArray(children)) {
+		this.level = new Level();
+		var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+		this.level.render(children, this.parentElement, this.parentLevel, nextSiblingChild);
+	}
+};
+Condition.prototype.recheck = function() {
+	var isTrue = !!this.params['i']();
+	if (isTrue != this.isTrue) {
+		this.isTrue = isTrue;
+		this.disposeLevel();
+		this.createLevel(true);
+	}
+};
+Condition.prototype.getChildren = function() {
+	return this.isTrue ? this.params['c']() : (isFunction(this.params['e']) ? this.params['e']() : null);
+};
+Condition.prototype.propagatePropertyChange = function(propName, propValue) {
+	if (this.level) {
+		this.level.propagatePropertyChange(propName, propValue);
+	}	
+};
+Condition.prototype.getFirstNodeChild = function() {
+	if (this.level) {
+		return this.level.getFirstNodeChild();
+	}
+	return null;
+};
+Condition.prototype.disposeLevel = function() {
+	if (this.level) {
+		this.level.dispose();
+		this.level = null;
+	}
+};
+Condition.prototype.dispose = function() {
+	this.disposeLinks();
+	this.disposeLevel();
+	this.parentElement = null;
+	this.parentLevel = null;
+	this.params = null;
+	this.nextSiblingChild = null;
+};
+function Control() {}
+Control.prototype.getInitials = function() {
+	return {'enabled': true};
+};
+Control.prototype.getName = function() {
+	return this.props.name;
+};
+Control.prototype.getValue = function() {
+	var value = this.getControlValue();
+	return this.getCorrectedValue(value);
+}
+Control.prototype.getControlValue = function() {
+	return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+}
+Control.prototype.getCorrectedValue = function(value) {
+	var type = Objects.get(this.options, 'type');
+	switch (type) {
+		case 'array':
+			if (isString(value)) {
+				value = value.split(',');
+			} else if (!isArray(value)) {
+				value = [value];
+			}
+		break;
+		case 'string':
+			if (isArray(value)) {
+				value = value.join(',');
+			} else if (isObject(value)) {
+				value = JSON.stringify(value);
+			} else if (isNumber(value)) {
+				value = value + '';
+			} else if (!!value) {
+				value = '1';
+			} else {
+				value = '';
+			}
+		break;
+		case 'number':
+			if (isString(value)) {
+				value = stringToNumber(value);
+			} else if (isBool(value)) {
+				value = !!value ? 1 : 0;
+			} else if (isArray(value)) {
+				value = ~~value[0];
+			} else {
+				value = 0;
+			}
+		break;
+		case 'boolean':
+			value = !!value && value === '0';
+		break;
+	}
+	return this.getProperValue(value);
+};
+Control.prototype.getProperValue = function(value) {
+	return value;
+};
+Control.prototype.setValue = function(value) {
+	this.value = value;
+	this.setProperValue(value);
+};
+Control.prototype.setProperValue = function(value) {
+	this.set('value', value);
+};
+Control.prototype.isEnabled = function() {
+	return !!this.get('enabled');
+};
+Control.prototype.setEnabled = function(isEnabled) {
+	this.set('enabled', isEnabled);
+};
+Control.prototype.disposeInternal = function() {
+	this.options = null;
+	this.value = null;
+};
+function Controller() {}
+Controller.prototype.initiate = function() {
+	this.listeners = [];
+};
+Controller.prototype.processInitials = function() {
+	var initials = this.initials;
+	if (isObject(initials)) {
+		for (var k in initials) {
+			if (initials[k] && isObject(initials[k])) {
+				if (k == 'globals') {
+				} else if (k == 'options') {
+					this.options = initials[k];
+				} else if (k == 'controllers') {
+					for (var i = 0; i < initials[k].length; i++) {
+						this.attachController(initials[k][i]);
+					}
+				}
+			}
+		}
+	}
+};
+Controller.prototype.attachController = function(options) {
+	if (isObject(options['controller'])) {
+		if (isObject(options['on'])) {
+			for (var k in options['on']) {
+				options.controller.subscribe(k, options['on'][k], this);
+			}
+		}
+	}
+};
+Controller.prototype.subscribe = function(eventType, callback, subscriber) {
+	this.listeners.push([eventType, callback, subscriber]);
+};
+Controller.prototype.unsubscribe = function(subscriber, eventType) {
+	var done = false;
+	while (!done) {
+		done = true;
+		for (var i = 0; i < this.listeners.length; i++) {
+			if (this.listeners[i][2] == subscriber && (!eventType || this.listeners[i][0] == eventType)) {
+				this.listeners.splice(i, 1);
+				done = false;
+				break;
+			}
+		}
+	}
+};
+Controller.prototype.dispatchEvent = function(eventType, data) {
+	var dataToDispatch = data;
+	if (Objects.has(this.options, 'clone', true)) {
+		dataToDispatch = Objects.clone(data);
+	}
+	if (isArray(this.listeners)) {
+		for (var i = 0; i < this.listeners.length; i++) {
+			if (this.listeners[i][0] == eventType && isFunction(this.listeners[i][1])) {
+				this.listeners[i][1].call(this.listeners[i][2] || null, dataToDispatch, this);
+			}
+		}
+	}
+};
+Controller.prototype.getData = function(actionName) {
+	return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
+};
+Controller.prototype.getItemById = function(id) {
+	var primaryKey = this.getPrimaryKey();
+	var data = this.data['load'];
+	if (isArray(data)) {
+		for (var i = 0; i < data.length; i++) {
+			if (Objects.has(data[i], primaryKey, id)) return data[i];
+		}
+	}
+	return null;
+};
+Controller.prototype.getItem = function(nameOrIndex, actionName) {
+	actionName = actionName || 'load';
+	return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
+};
+Controller.prototype.load = function() {
+	this.doAction('load');
+};
+Controller.prototype.doAction = function(actionName, options, url) {
+	var action = this.getAction(actionName);
+	this.action = action;	
+	if (actionName == 'load' && this.gotFromStore()) {
+		return;
+	}
+	if (!isObject(options)) {
+		options = {};
+	}
+	if (action && isObject(action) && action['options'] && isObject(action['options'])) {
+		Objects.merge(options, action['options']);
+	}
+	var method = action['method'] || 'POST';
+	url = url || this.makeUrl(action['url'], options);
+	if (!url || !isString(url)) {
+		log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
+	}
+	this.request = this.request || new AjaxRequest(url, this.onActionComplete.bind(this));
+	this.request.send(method, options, url);
+};
+Controller.prototype.gotFromStore = function() {
+	if (this.shouldStore()) {
+		var storeAs = Objects.get(this.options, 'storeAs');
+		if (isString(storeAs)) {
+			var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
+			if (isArrayLike(storedData)) {
+				this.onActionComplete(storedData);
+				return true;
+			}
+		}
+	}
+	return false;
+};
+Controller.prototype.makeUrl = function(url, options) {
+	var regExp;
+	for (var k in options) {
+		if (isString(options[k]) || isNumber(options[k])) {
+			regExp = new RegExp('\\$' + k)
+			url = url.replace(regExp, options[k]);
+		}
+	}
+	return url;
+};
+Controller.prototype.onActionComplete = function(data) {
+	var actionName = this.action['name'];
+	this.data = this.data || {};
+	this.data[actionName] = data;
+	if (isFunction(this.action['callback'])) {
+		this.action['callback'].call(this, data);
+	}
+	this.dispatchEvent(actionName, data);
+	if (actionName == 'load' && this.shouldStore()) {
+		this.store(true, data);
+	}
+};
+Controller.prototype.shouldStore = function() {
+	var shouldStore = Objects.get(this.options, 'store');
+	if (shouldStore === false) return false;
+	return Objects.has(this.options, 'storeAs');
+};
+Controller.prototype.store = function(isAdding, data) {
+	if (isAdding) {
+		StoreKeeper.set(this.options['storeAs'], data);
+	} else {
+		StoreKeeper.remove(this.options['storeAs']);
+	}
+};
+Controller.prototype.getPrimaryKey = function() {
+	return Objects.get(this.options, 'key', 'id');
+};
+Controller.prototype.getAction = function(actionName) {	
+	var actions = Objects.get(this.initials, 'actions');
+	if (isObject(actions)) {
+		var action = actions[actionName];
+		if (isObject(action)) {
+			if (!isString(action['name'])) {
+				if (isObject(action['routeOptions']) && actionName == 'load') {
+					this.initActionRouteOptions(action);
+				}
+				action['name'] = actionName;
+			}
+			return action;
+		}
+		log('action is invalid', 'getAction', this, {action: action});
+	} else {
+		log('no actions', 'getAction', this, {actions: actions});
+	}
+	return null;
+};
+Controller.prototype.initActionRouteOptions = function(action) {
+	var value;
+	this.currentRouteOptions = {};
+	var routeOptions = {};
+	for (var k in action['routeOptions']) {
+		value = Router.getPathPartAt(action['routeOptions'][k]);
+		if (isString(value)) {
+			routeOptions[k] = value;
+		}
+	}
+	this.setCurrentRouteOptions(routeOptions, action);
+	Router.subscribe(action['routeOptions'], this);
+};
+Controller.prototype.setCurrentRouteOptions = function(routeOptions, action) {
+	this.currentRouteOptions = routeOptions;
+	if (!isObject(action['options'])) {
+		action['options'] = {};
+	}
+	for (var k in routeOptions) {
+		action['options'][k] = routeOptions[k];
+	}
+};
+Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
+	if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
+		var action = this.getAction('load');
+		this.setCurrentRouteOptions(routeOptions, action);
+		this.doAction('load');
+	}
+};
+Controller.prototype.dispose = function() {
+	this.listeners = null;
+	if (this.request) {
+		this.request.dispose();
+	}
+	this.options = null;
+	this.request = null;
+	this.data = null;
+	this.action = null;
+	this.initials = null;
+};
+function Core() {}
+Core.prototype.getNextSiblingChild = function() {
+	if (!this.nextSiblingChild) {
+		return null;
+	}
+	if (this.nextSiblingChild instanceof Node) {
+		return this.nextSiblingChild;
+	}
+	var firstNodeChild = this.nextSiblingChild.getFirstNodeChild();
+	if (firstNodeChild) {
+		return firstNodeChild;
+	}
+	return this.nextSiblingChild.getNextSiblingChild();	
+};
+Core.prototype.setNextSiblingChild = function(nextSiblingChild) {
+	this.nextSiblingChild = nextSiblingChild;
+	if (!(nextSiblingChild instanceof Node)) {
+		this.nextSiblingChild.setPrevSiblingChild(this);
+	}
+};
+Core.prototype.setPrevSiblingChild = function(prevSiblingChild) {
+	this.prevSiblingChild = prevSiblingChild;
+};
+Core.prototype.disposeLinks = function() {
+	if (this.prevSiblingChild) {
+		this.prevSiblingChild.setNextSiblingChild(this.nextSiblingChild);
+	}
+	this.prevSiblingChild = null;
+	this.nextSiblingChild = null;
+};
+Core.prototype.setScope = function(scope) {
+	this.parentLevel.setScope(scope);
+};
+Core.prototype.getPropName = function(i) {
+	this.parentLevel.getPropName(i);
+};
+function Foreach(params) {
+	this.items = params['p'];
+	this.handler = params['h'];
+	this.levels = [];
+}
+Foreach.prototype.render = function(parentElement, parentLevel) {
+	this.parentElement = parentElement;
+	this.parentLevel = parentLevel;
+	this.createLevels(false);
+};
+Foreach.prototype.createLevels = function(isUpdating) {
+	if (this.items instanceof Array) {
+		for (var i = 0; i < this.items.length; i++) {
+			this.createLevel(this.handler(this.items[i], i), isUpdating);
+		}
+	}
+};
+Foreach.prototype.createLevel = function(items, isUpdating) {
+	var level = new Level();
+	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
+	this.levels.push(level);
+};
+Foreach.prototype.update = function(items) {
+	this.items = items;
+	this.disposeLevels();
+	this.createLevels(true);
+};
+Foreach.prototype.propagatePropertyChange = function(propName, propValue) {
+	for (var i = 0; i < this.levels.length; i++) {
+		this.levels[i].propagatePropertyChange(propName, propValue);
+	}
+};
+Foreach.prototype.getFirstNodeChild = function() {
+	if (this.levels[0]) {
+		return this.levels[0].getFirstNodeChild();
+	}
+	return null;
+};
+Foreach.prototype.disposeLevels = function() {
+	for (var i = 0; i < this.levels.length; i++) {
+		this.levels[i].dispose();
+	}
+	this.levels = [];
+};
+Foreach.prototype.dispose = function() {
+	this.disposeLinks();
+	this.disposeLevels();
+	this.levels = null;
+	this.parentElement = null;
+	this.parentLevel = null;
+	this.items = null
+	this.handler = null;
+	this.nextSiblingChild = null;
+	this.prevSiblingChild = null;
+};
+function Form() {}
+Form.prototype.initiate = function() {
+	this.options = {};
+};
+Form.prototype.initOptions = function(options) {
+	if (isObject(options)) {
+		this.options = options;
+		if (!options['ajax']) {
+			this.createFormElement();
+		} else {
+			this.createAjaxRequest();
+		}
+	} else {
+		log('no form options');
+	}
+};
+Form.prototype.createFormElement = function() {
+	var formElement = document.createElement('form');
+	if (isString(this.options['method'])) {
+		formElement.setAttribute('method', this.options['method']);
+	}
+	if (isString(this.options['action'])) {
+		var action = this.correctAction(this.options['action']);
+		formElement.setAttribute('action', action);
+	}
+	this.parentElement.appendChild(formElement);
+	this.setScope(formElement);
+	this.parentElement = formElement;
+	var iframeId = generateRandomKey();
+	this.createTargetIframe(iframeId);
+	formElement.setAttribute('target', iframeId);
+	this.formElement = formElement;
+};
+Form.prototype.correctAction = function(url) {
+	url = url.replace(/^[\.\/]+/, '');
+	if (isString(__APIDIR)) {
+		var regExp = new RegExp('^' + __APIDIR + "\/");
+		url = __APIDIR + '/' + url.replace(regExp, '');
+	}
+	return '/' + url;
+};
+Form.prototype.onRenderComplete = function() {
+	var controlsContainer = this.options['container'];
+	if (controlsContainer && isString(controlsContainer)) {
+		controlsContainer = this.findElement('.' + controlsContainer);
+	}
+	controlsContainer = controlsContainer || this.parentElement;
+	if (this.options['ajax']) {
+		this.setScope(controlsContainer);
+	}	
+	if (isArray(this.options['controls'])) {
+		var control;
+		for (var i = 0; i < this.options['controls'].length; i++) {
+			if (isObject(this.options['controls'][i])) {
+				this.createControl(this.options['controls'][i], controlsContainer);
+			}
+		}
+	}
+	if (isObject(this.options['submit'])) {
+		this.createSubmit(controlsContainer);
+	}
+};
+Form.prototype.createControl = function(options, parentElement) {
+	var control;
+	switch (options['type']) {
+		case 'select':
+			control = this.createSelect(options);
+		break;
+		case 'textarea':
+			control = this.createTextarea(options);
+		break;
+		default:
+			control = this.createInput(options);
+	}
+	this.addChild(control, parentElement);
+};
+Form.prototype.createInput = function(options) {
+	return new Input(options);
+};
+Form.prototype.createSelect = function(options) {
+	return new Select(options);
+};
+Form.prototype.createTextarea = function(options) {
+	return new Textarea(options);
+};
+Form.prototype.createSubmit = function(parentElement) {
+	var control = new Submit(this.options['submit']);
+	this.addChild(control, parentElement);
+	this.addListener(control, 'submit', this.onSubmit);
+};
+Form.prototype.createTargetIframe = function(id) {
+	var iframe = document.createElement('iframe');
+	iframe.setAttribute('id', id);
+	iframe.setAttribute('name', id);
+	iframe.style.display = 'none';
+	this.parentElement.appendChild(iframe);
+};
+Form.prototype.createAjaxRequest = function() {
+	this.request = new AjaxRequest(this.options['action'], this.handleResponse.bind(this));
+};
+Form.prototype.onSubmit = function() {
+	if (this.isValid()) {
+		if (this.formElement) {
+			this.setFormKey();
+			this.formElement.submit();
+		} else if (this.request) {
+			this.request.send(this.options['method'] || 'POST', this.getData());
+		}
+	}
+};
+Form.prototype.setFormKey = function() {
+	this.formKey = generateRandomKey();
+	window[this.formKey] = this;
+	if (!isElement(this.keyInput)) {
+		this.keyInput = document.createElement('input');
+		this.keyInput.setAttribute('name', 'formKey');
+		this.keyInput.setAttribute('type', 'hidden');
+		this.keyInput.value = this.formKey;
+		this.getElement().appendChild(this.keyInput);
+	}
+};
+Form.prototype.isValid = function() {
+	return true;
+};
+Form.prototype.getData = function() {
+	var data = {};
+	this.forEachControlChild(function(child) {
+		var name = child.getName();
+		if (!!name && isString(name)) {
+			data[name] = child.getValue();
+		}
+	});
+	return data;
+};
+Form.prototype.forEachControlChild = function(callback) {
+	this.forEachChild(function(child, index) {
+		if (child.instanceOf(Control)) {
+			callback.call(this, child, index);
+		}
+	});
+};
+Form.prototype.handleResponse = function(data) {
+	if (isString(data)) {
+		try {
+			data = JSON.parse(data);
+		} catch (e) {
+			log('incorrect form response', 'handleResponse', this, {'data': data});
+		}
+	}
+	if (isObject(data) && data['success']) {
+		this.onSuccess(data);
+	} else {
+		this.onFailure(data);
+	}
+	if (isString(this.formKey)) {
+		this.formKey = null;
+		delete window[this.formKey];
+	}
+};
+Form.prototype.onSuccess = function(data) {};
+Form.prototype.onFailure = function(data) {
+	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
+	this.log(error, 'onFailure', data);
+};
+Form.prototype.setControlValue = function(name, value) {
+	if (isString(name)) {
+		var child = this.getChildById(name);
+		if (child) {
+			child.setValue(value);
+		}
+	}
+};
+Form.prototype.enableControl = function(name, isEnabled) {
+	if (isString(name)) {
+		var child = this.getChildById(name);
+		if (child) {
+			child.setEnabled(isEnabled);
+		}
+	}
+};
+Form.prototype.disposeInternal = function() {
+	this.options = null;
+	this.request = null;
+	this.formElement = null;
+};
+function Level() {
+	this.children = [];
+	this.detached = false;
+}
+Level.prototype.render = function(items, parentElement, parentLevel, nextSiblingChild) {
+	this.parentElement = parentElement;
+	this.parentLevel = parentLevel;
+	this.nextSiblingChild = nextSiblingChild;
+	this.renderItems(items);
+	this.prevChild = null;
+	this.nextSiblingChild = null;
+};
+Level.prototype.renderItems = function(items) {
+	if (isArray(items)) {
+		for (var i = 0; i < items.length; i++) {
+			this.renderItem(items[i]);
+		}
+	} else {
+		this.renderItem(items);
+	}
+};
+Level.prototype.renderItem = function(item) {
+	if (!item && item !== 0) return;
+	if (!isObject(item)) {
+		this.createTextNode(item);
+	} else if (!isUndefined(item['t'])) {
+		this.createElement(item);
+	} else if (item['i']) {
+		this.createCondition(item);
+	} else if (item['h']) {
+		this.createForeach(item);
+	} else if (!isUndefined(item['pr'])) {
+		this.createPropertyNode(item);
+	} else if (isFunction(item['tmp'])) {
+		this.includeTemplate(item);
+	} else if (item['cmp']) {
+		this.renderComponent(item);
+	}
+};
+Level.prototype.createLevel = function(items, parentElement) {
+	var level = new Level();
+	level.render(items, parentElement, this);
+	this.children.push(level);
+};
+Level.prototype.createTextNode = function(content) {
+	if (content == '<br>') {
+		this.appendChild(document.createElement('br'));
+	} else {
+		this.appendChild(document.createTextNode(content));
+	}
+};
+Level.prototype.createPropertyNode = function(props) {
+	var propNode = document.createTextNode(props['p'] || '');
+	this.appendChild(propNode);	
+	this.propNodes = this.propNodes || {};
+	this.propNodesByProps = this.propNodesByProps || {};
+	var propName = props['pr'];
+	var key = generateRandomKey();
+	this.propNodes[key] = propNode;
+	this.propNodesByProps[propName] = this.propNodesByProps[propName] || [];
+	this.propNodesByProps[propName].push(key);
+};
+Level.prototype.createElement = function(props) {
+	var element = document.createElement(__TAGS[props['t']] || 'span');
+	this.appendChild(element);
+	if (isObject(props['p'])) {
+		var attrName;		
+		for (var k in props['p']) {
+			if (isString(props['p'][k]) || isNumber(props['p'][k])) {
+				attrName = __A[k] || k;
+				if (attrName == 'scope') {
+					this.parentLevel.setScope(element);
+				} else {
+					element.setAttribute(attrName, props['p'][k]);
+				}
+			} else if (isFunction(props['p'][k])) {
+				if (props['n'] && (isArray(props['n'][k]) || isString(props['n'][k]))) {
+					this.propAttrs = this.propAttrs || {};
+					this.propAttrsByProps = this.propAttrsByProps || {};
+					var key = generateRandomKey();
+					this.propAttrs[key] = [element, k, props['p'][k]];
+					if (isString(props['n'][k])) {
+						this.propAttrsByProps[props['n'][k]] = this.propAttrsByProps[props['n'][k]] || [];
+						this.propAttrsByProps[props['n'][k]].push(key);
+					} else {
+						for (var i = 0; i < props['n'][k].length; i++) {					
+							this.propAttrsByProps[props['n'][k][i]] = this.propAttrsByProps[props['n'][k][i]] || [];
+							this.propAttrsByProps[props['n'][k][i]].push(key);
+						}
+					}
+				}
+				var attrParts = props['p'][k]();
+				if (!isArray(attrParts)) {
+					attrParts = [attrParts];
+				}
+				var attrValue = '', partValue;
+				for (i = 0; i < attrParts.length; i++) {
+					partValue = isFunction(attrParts[i]) ? attrParts[i]() : attrParts[i];
+					if (partValue) {
+						attrValue += partValue;
+					}
+				}
+				if (attrValue) {
+					element.setAttribute(__A[k] || k, attrValue);
+				}
+			}
+		}
+	}
+	if (isArray(props['e'])) {
+		var eventType, eventHandler;
+		this.eventHandler = this.eventHandler || new EventHandler();
+		for (i = 0; i < props['e'].length; i++) {
+			eventType = __EVENTTYPES[props['e'][i]] || eventType;
+			eventHandler = props['e'][i + 1];
+			var isOnce = props['e'][i + 2] === true;
+			if (isString(eventType) && isFunction(eventHandler)) {
+				if (isOnce) {
+					this.eventHandler.listenOnce(element, eventType, eventHandler);
+					i++;
+				} else {
+					this.eventHandler.listen(element, eventType, eventHandler);
+				}
+			}
+			i++;
+		}
+	}
+	if (isArray(props['c'])) {
+		if (props['c'].length == 1 && (isString(props['c'][0]) || isNumber(props['c'][0]))) {
+			element.innerHTML = props['c'][0];
+		} else {
+			this.createLevel(props['c'], element);
+		}
+	} else if (isObject(props['c'])) {
+		this.createLevel(props['c'], element);
+	} else if (!isUndefined(props['c'])) {
+		element.innerHTML = props['c'];
+	}
+};
+Level.prototype.appendChild = function(child) {
+	if (this.nextSiblingChild) {
+		this.parentElement.insertBefore(child, this.nextSiblingChild);	
+	} else {	
+		this.parentElement.appendChild(child);	
+	}
+	this.registerChild(child);
+};
+Level.prototype.createCondition = function(params) {
+	if (params['i'] === true) {
+		this.renderItems(params['c']);
+	} else if (isFunction(params['i']) && isFunction(params['c'])) {
+		var propNames = params['p'];
+		if (isArray(propNames)) {
+			this.conditions = this.conditions || {};
+			this.conditionsByProps = this.conditionsByProps || {};
+			var condition = new Condition(params);
+			condition.render(this.parentElement, this);
+			var key = generateRandomKey();
+			this.conditions[key] = condition;
+			for (var i = 0; i < propNames.length; i++) {
+				this.conditionsByProps[propNames[i]] = this.conditionsByProps[propNames[i]] || [];
+				this.conditionsByProps[propNames[i]].push(key);
+			}
+			this.registerChild(condition);
+		} else if (params['i']()) {
+			this.renderItems(params['c']());
+		} else if (isFunction(params['e'])) {
+			this.renderItems(params['e']());
+		}
+	}
+};
+Level.prototype.createForeach = function(params) {
+	var propName = params['f'];
+	var isLocal = !propName;
+	this.foreaches = this.foreaches || {};
+	this.foreachesByProps = this.foreachesByProps || {};
+	var foreach = new Foreach(params);
+	foreach.render(this.parentElement, this);
+	if (!isLocal) {
+		var key = generateRandomKey();
+		this.foreaches[key] = foreach;
+		this.foreachesByProps[propName] = this.foreachesByProps[propName] || [];
+		this.foreachesByProps[propName].push(foreach);		
+	}
+	this.registerChild(foreach);
+};
+Level.prototype.registerChild = function(child, isComponent) {
+	var isNodeChild = isNode(child);
+	if (this.prevChild) {
+		this.prevChild.setNextSiblingChild(child);
+	}
+	this.prevChild = isNodeChild ? null : child;
+	if (!this.firstChild) {
+		this.firstChild = child;
+	}	
+	if (isNodeChild) {
+		if (!this.firstNodeChild) {
+			this.firstNodeChild = child;
+		}
+		this.lastNodeChild = child;
+	} else {
+		this.children.push(child);
+	}
+	if (isComponent) {
+		this.registerChildComponent(child);
+	}
+};
+Level.prototype.includeTemplate = function(item) {
+	var component = this.getComponent();
+	var items = item['tmp'].call(component, component.getProvider(), item['p']);
+	if (isArray(items)) {
+		for (var i = 0; i < items.length; i++) {
+			this.renderItem(items[i]);
+		}
+	}
+};
+Level.prototype.renderComponent = function(item, parentElement) {
+	parentElement = parentElement || this.parentElement;
+	if (isFunction(item['cmp'])) {
+		var rawProps = item['p'];
+		var props = {};
+		var key, value, i, k, cmpid;
+		if (isObject(rawProps)) {
+			for (k in rawProps) {
+				value = rawProps[k];
+				if (k == 'cmpid') {
+					cmpid = value;
+					continue;
+				}
+				if (isFunction(rawProps[k])) {
+					value = rawProps[k]();
+					if (isArray(value)) {
+						value = value.join('');
+					}
+					if (item['n'] && isObject(item['n']) && (isArray(item['n'][k]) || isString(item['n'][k]))) {
+						this.propComps = this.propComps || {};
+						this.propCompsByProps = this.propCompsByProps || {};
+						key = key || generateRandomKey();
+						if (isString(item['n'][k])) {
+							this.propCompsByProps[item['n'][k]] = this.propCompsByProps[item['n'][k]] || [];
+							if (this.propCompsByProps[item['n'][k]].indexOf(key) == -1) {
+								this.propCompsByProps[item['n'][k]].push([key, rawProps[k]]);
+							}
+						} else {
+							for (i = 0; i < item['n'][k].length; i++) {
+								this.propCompsByProps[item['n'][k][i]] = this.propCompsByProps[item['n'][k][i]] || [];
+								if (this.propCompsByProps[item['n'][k][i]].indexOf(key) == -1) {
+									this.propCompsByProps[item['n'][k][i]].push([key, rawProps[k]]);
+								}
+							}
+						}
+					}
+				}
+				props[k] = value;
+			}
+		}
+		var component = new item['cmp'](props);
+		component.render(parentElement);
+		this.registerChild(component, true);
+		if (cmpid) {
+			component.setId(cmpid);
+		}
+		if (key) {
+			this.propComps[key] = component;
+		}
+		var events = item['e'];
+		if (isArray(events)) {
+			for (i = 0; i < events.length; i++) {
+				component.subscribe(events[i], events[i + 1], this);
+				i++;	
+			}
+		}
+	} else if (item && isObject(item)) {
+		if (!item.isRendered()) {
+			item.render(parentElement);
+		}
+		this.registerChild(item, true);
+	}
+};
+Level.prototype.registerChildComponent = function(childComponent) {
+	this.parentLevel.registerChildComponent(childComponent);
+};
+Level.prototype.getComponent = function() {
+	return this.parentLevel.getComponent();
+};
+Level.prototype.propagatePropertyChange = function(changedProps) {
+	var propName, propValue, i;
+	for (propName in changedProps) {
+		propValue = changedProps[propName];
+		if (this.conditionsByProps && isArray(this.conditionsByProps[propName])) {
+			var conditionKey;
+			for (i = 0; i < this.conditionsByProps[propName].length; i++) {
+				conditionKey = this.conditionsByProps[propName][i];
+				if (this.conditions[conditionKey]) {
+					this.conditions[conditionKey].recheck();
+				}
+			}
+		}
+		if (this.foreachesByProps && isArray(this.foreachesByProps[propName])) {
+			for (i = 0; i < this.foreachesByProps[propName].length; i++) {
+				this.foreachesByProps[propName][i].update(propValue);
+			}
+		}
+		if (this.propNodesByProps && isArray(this.propNodesByProps[propName])) {
+			var node;
+			for (i = 0; i < this.propNodesByProps[propName].length; i++) {
+				node = this.propNodes[this.propNodesByProps[propName][i]];
+				if (node) {
+					node.textContent = propValue;
+				}
+			}
+		}
+		if (this.propAttrsByProps && isArray(this.propAttrsByProps[propName])) {
+			var key, propAttr, attrParts;
+			for (i = 0; i < this.propAttrsByProps[propName].length; i++) {
+				key = this.propAttrsByProps[propName][i];
+				propAttr = this.propAttrs[key];
+				if (isArray(propAttr)) {
+					attrParts = propAttr[2]();
+					var attrValue = '';
+					var attrVal;
+					for (var j = 0; j < attrParts.length; j++) {
+						attrVal = isFunction(attrParts[j]) ? attrParts[j]() : attrParts[j];
+						if (!isUndefined(attrVal)) {
+							attrValue += attrVal;
+						}
+					}
+					attrValue = attrValue.trim();
+					var attrName = __A[propAttr[1]] || propAttr[1];
+					propAttr[0].setAttribute(attrName, attrValue);
+					if (attrName == 'value') {
+						propAttr[0].value = attrValue;
+					}
+				}
+			}
+		}
+		if (this.propCompsByProps && isArray(this.propCompsByProps[propName])) {
+			var component, value;
+			for (i = 0; i < this.propCompsByProps[propName].length; i++) {
+				component = this.propComps[this.propCompsByProps[propName][i][0]];
+				value = this.propCompsByProps[propName][i][1]();
+				if (isArray(value)) {
+					value = value.join('');
+				}
+				if (component) {
+					component.set(propName, value);
+				}
+			}
+		}
+		for (i = 0; i < this.children.length; i++) {
+			this.children[i].propagatePropertyChange(changedProps);
+		}
+	}
+};
+Level.prototype.getParentElement = function() {
+	return this.parentElement;
+};
+Level.prototype.getFirstNodeChild = function() {
+	if (isNode(this.firstChild)) {
+		return this.firstChild;
+	}
+	var firstLevel = this.children[0];
+	if (firstLevel instanceof Level) {
+		return firstLevel.getParentElement();
+	} else if (firstLevel) {
+		return firstLevel.getFirstNodeChild();
+	}
+	return null;
+};
+Level.prototype.dispose = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].dispose();
+	}
+	if (this.eventHandler) {
+		this.eventHandler.dispose();
+	}
+	this.disposeDom();
+	this.conditions = null;
+	this.foreaches = null;
+	this.children = null;
+	this.conditionsByProps = null;
+	this.foreachesByProps = null;
+	this.propNodes = null;
+	this.propNodesByProps = null;
+	this.propAttrs = null;
+	this.propAttrsByProps = null;
+	this.propComps = null;
+	this.propCompsByProps = null;	
+	this.parentElement = null;
+	this.parentLevel = null;
+	this.firstChild = null;
+	this.firstNodeChild = null;
+	this.lastNodeChild = null;
+	this.eventHandler = null;
+	this.realParentElement = null;
+};
+Level.prototype.disposeDom = function() {
+	var elementsToDispose = this.getElements();
+	for (var i = 0; i < elementsToDispose.length; i++) {
+		this.parentElement.removeChild(elementsToDispose[i]);
+	}
+	elementsToDispose = null;
+};
+Level.prototype.setAppended = function(isAppended) {
+	var isDetached = !isAppended;
+	if (isDetached === this.detached) return;
+	this.detached = isDetached;
+	var elements = this.getElements();
+	if (isDetached) {
+		this.realParentElement = this.parentElement;
+		this.parentElement = document.createElement('div'); 
+		for (var i = 0; i < elements.length; i++) {
+			this.parentElement.appendChild(elements[i]);
+		}
+	} else {
+		this.nextSiblingChild = this.parentLevel.getNextSiblingChild();
+		this.parentElement = this.realParentElement;
+		this.realParentElement = null;
+		for (var i = 0; i < elements.length; i++) {
+			this.appendChild(elements[i]);
+		}
+	}
+};
+Level.prototype.getElements = function() {
+	var elements = [];
+	if (this.firstNodeChild && this.lastNodeChild) {
+		var isAdding = false;
+		for (var i = 0; i < this.parentElement.childNodes.length; i++) {
+			if (this.parentElement.childNodes[i] == this.firstNodeChild) {
+				isAdding = true;
+			}
+			if (isAdding) {
+				elements.push(this.parentElement.childNodes[i]);
+			}
+			if (this.parentElement.childNodes[i] == this.lastNodeChild) {
+				break;
+			}
+		}
+	}
+	return elements;
+};
+function Menu() {};
+Menu.prototype.onRenderComplete = function() {
+	if (Router.hasMenu(this)) {
+		this.onNavigate(Router.getCurrentRouteName());
+	}
+};
+Menu.prototype.onNavigate = function(viewName) {
+	if (this.rendered) {
+		if (isElement(this.activeButton)) {
+			this.setButtonActive(this.activeButton, false);	
+		}
+		var button = this.getButton(viewName);
+		if (isElement(button)) {
+			this.setButtonActive(button, true);
+		}
+	}
+};
+Menu.prototype.getButton = function(viewName) {
+	return this.findElement('a[role="' + viewName + '"]');
+};
+Menu.prototype.setButtonActive = function(button, isActive) {
+	var activeClassName = this.activeButtonClass || 'vz6';
+	button.toggleClass(activeClassName, isActive);
+	if (isActive) {
+		this.activeButton = button;
+	}
+};
+Menu.prototype.disposeInternal = function() {
+	this.activeButton = null;
+};
+function View() {}
+View.prototype.onRenderComplete = function() {
+	this.dispatchReadyEvent();
+};
+View.prototype.setOnReadyHandler = function(handler) {
+	this.onReadyHandler = handler;
+};
+View.prototype.dispatchReadyEvent = function() {
+	if (isFunction(this.onReadyHandler)) {
+		this.onReadyHandler();
+	}
+};
+View.prototype.activate = function(isActivated) {
+	if (isActivated) {
+		this.dispatchReadyEvent();
+	}
+};
+View.prototype.initControllers = function() {
+	var controllersToLoad = this.getControllersToLoad();
+	if (isArray(controllersToLoad)) {
+		for (var i = 0; i < controllersToLoad.length; i++) {
+			if (isObject(controllersToLoad[i])) {
+				controllersToLoad[i].load();
+			}
+		}
+	}
+};
+View.prototype.getTitleParams = function() {};
+View.prototype.getControllersToLoad = function() {
+	return null;
+};
+function CheckboxHandler() {
+	var subscribers = [];
+	var handlers = [];
+	var options = [];
+	var defaultCheckboxClass = 'vzj';
+	var defaultCheckboxCheckedClass = 'vzw';
+	var currentOptions, currentHandler, currentObject,
+		currentClasses, currentCheckedClass, currentTarget;
+	this.subscribe = function(subscriber, handler, opts) {
+		if (isFunction(handler) && subscribers.indexOf(subscriber) == -1) {
+			subscribers.push(subscriber);
+			handlers.push(handler);
+			options.push(opts || null);
+			var element = subscriber.getElement();
+			if (element) {
+				var index = subscribers.length - 1;
+				element.addEventListener('click', onClick.bind(null, index), false);
+			}
+		}
+	};
+	var onClick = function(index, e) {
+		currentTarget = e.target;
+		currentClasses = currentTarget.getClasses();
+		if (isProperTarget()) {
+			defineOptions(index);
+			defineCheckedClass();			
+			var checked = isChecked();
+			currentTarget.toggleClass(currentCheckedClass, checked);
+			currentHandler.call(currentObject, {
+				'target': currentTarget,
+				'value': getValue(),
+				'checked': checked,
+				'intChecked': checked ? 1 : 0
+			});
+		}
+	};
+	var defineOptions = function(index) {
+		currentOptions = options[index];
+		currentHandler = handlers[index];
+		currentObject = subscribers[index];
+	};
+	var isProperTarget = function() {
+		var checkboxClass = Objects.get(currentOptions, 'checkboxClass', defaultCheckboxClass);
+		var is = currentClasses.contains(checkboxClass);
+		return is || isLabelTarget();
+	};
+	var isLabelTarget = function() {
+		var labelClass = Objects.get(currentOptions, 'labelClass');
+		if (isString(labelClass)) {
+			return currentClasses.contains(labelClass);
+		}
+		return false;
+	};
+	var defineCheckedClass = function() {
+		currentCheckedClass = Objects.get(currentOptions, 'checkboxCheckedClass', defaultCheckboxCheckedClass);
+	};
+	var isChecked = function() {
+		return !currentClasses.contains(currentCheckedClass);
+	};
+	var getValue = function() {
+		var value = currentTarget.getData('value');
+		return isIntValue() ? ~~value : value;
+	};
+	var isIntValue = function() {
+		return Objects.has(currentOptions, 'intValue', true);
+	};
+}
+CheckboxHandler = new CheckboxHandler();
+function ClickHandler() {
+	var subscribers = [];
+}
+ClickHandler = new ClickHandler();
+function Dialoger() {
+	var dialogs = {};
+	var currentDialogId, currentDialogClass, currentDialog,
+		currentDialogOptions;
+	this.show = function(dialogClass, options, dialogId) {
+		if (isFunction(dialogClass)) {
+			currentDialogClass = dialogClass;
+			currentDialogOptions = options;
+			defineDialogId(dialogId);
+			defineDialog();
+			showDialog();
+		}
+	};
+	var defineDialogId = function(dialogId) {
+		currentDialogId = currentDialogClass.name + (isString(dialogId) ? '_' + dialogId : '');
+	};
+	var defineDialog = function() {
+		if (isUndefined(dialogs[currentDialogId])) {
+			dialogs[currentDialogId] = new currentDialogClass();
+			dialogs[currentDialogId].render(document.body);
+		}
+		currentDialog = dialogs[currentDialogId];
+	};
+	var showDialog = function() {
+		if (isObject(currentDialogOptions)) {
+			currentDialog.set(currentDialogOptions);
+		}
+		currentDialog.show();
+	};
+	var closeAll = function() {
+		for (var k in dialogs) {
+			dialogs[k].hide();
+		}
+	};
+	window.addEventListener('popstate', closeAll);
+}
+Dialoger = new Dialoger();
+function Dictionary() {
+	var onLoadCallback;
+	var items = {};
+	this.load = function(callback) {
+		var url = __DICTURL;
+		if (!isNone(url)) {
+			onLoadCallback = callback;
+			var request = new AjaxRequest(url, onLoad.bind(this));
+			request.send('GET');
+		} else {
+			callback();
+		}
+	};
+	this.get = function(key, defaultValue) {
+		return Objects.get(items, key, defaultValue);
+	};
+	this.set = function(key, value) {
+		items[key] = value;
+	};
+	var onLoad = function(data) {
+		if (isObject(data)) {
+			items = data;
+		}
+		onLoadCallback();
+	};
+}
+Dictionary = new Dictionary();
+var __D = Dictionary;
+function Globals() {
+	var listeners = {};
+	var components = {};
+	var views = {};
+	var globalVars = {};
+	this.addView = function(view, key) {
+		if (isUndefined(views[key])) {
+			views[key] = view;
+		}
+	};
+	this.getView = function(key) {
+		return views[key];
+	};
+	this.addComponent = function(component, key) {
+		if (isUndefined(components[key])) {
+			components[key] = component;
+		}
+	};
+	this.getComponent = function(key) {
+		return components[key];
+	};
+	this.removeComponent = function(key) {
+		delete components[key];
+	};
+	this.subscribe = function(globalVarName, callback, subscriber) {
+		if (!isArray(listeners[globalVarName])) {
+			listeners[globalVarName] = [];
+		}
+		listeners[globalVarName].push([callback, subscriber]);
+	};
+	this.unsubscribe = function(subscriber, globalVarName) {
+		if (isArray(listeners[globalVarName])) {
+			var done = false;
+			while (!done) {
+				done = true;
+				for (var i = 0; i < listeners[globalVarName].length; i++) {
+					if (listeners[globalVarName][i][1] == subscriber) {
+						listeners[globalVarName].splice(i, 1);
+						done = false;
+						break;
+					}
+				}
+			}
+		}
+	};
+	this.get = function(globalVarName) {
+		return globalVars[globalVarName];
+	};
+	this.set = function(globalVarName, globalVarValue) {
+		globalVars[globalVarName] = globalVarValue;
+		if (isArray(listeners[globalVarName])) {
+			for (var i = 0; i < listeners[globalVarName].length; i++) {
+				if (isFunction(listeners[globalVarName][i][0])) {
+					listeners[globalVarName][i][0].call(listeners[globalVarName][i][1] || null, globalVarValue, globalVarName);
+				}
+			}
+		}
+	};
+	this.has = function(globalVarName, globalVarValue) {
+		return Objects.has(globalVars, globalVarName, globalVarValue);
+	};
+}
+Globals = new Globals();
+function Popuper() {
+	var components;
+	var elements;
+	var reset = function() {
+		components = [];
+		elements = [];
+	};
+	this.watch = function(component, element) {
+		if (components.indexOf(component) == -1) {
+			components.push(component);
+			elements.push(element || null);
+		}
+	};
+	var onBodyMouseDown = function(e) {
+		for (var i = 0; i < components.length; i++) {
+			if (!isElement(elements[i]) || !e.targetHasAncestor(elements[i])) {
+				components[i].hide();
+				reset();
+			}
+		}
+	};
+	reset();
+	var body = document.documentElement;
+	body.addEventListener('mousedown', onBodyMouseDown, false);
+}
+Popuper = new Popuper();
+function StoreKeeper() {
+	var prefix = 'stored_';
+	var secondsInMeasures = {
+		'month': 2592000,
+		'day'  : 86400,
+		'hour' : 3600,
+		'min'  : 60
+	};
+	this.set = function(key, value) {
+		var localStorageKey = getLocalStorageKey(key);
+		var item = JSON.stringify({
+			'data': value,
+			'timestamp': (window['Date']['now']()).toString()
+		});
+		window.localStorage.setItem(localStorageKey, item);
+	};
+	this.get = function(key) {
+		var item = getItem(key);
+		return Objects.has(item, 'data') ? item['data'] : null;
+	};
+	this.getActual = function(key, period) {
+		var item = getItem(key);
+		return Objects.has(item, 'data') && isActual(item['timestamp'], period) ? item['data'] : null;
+	};
+	this.remove = function(key) {
+		var localStorageKey = getLocalStorageKey(key);
+		window.localStorage.removeItem(localStorageKey);
+	};
+	var isActual = function(savedMilliseconds, period) {
+		var nowMilliseconds    = window['Date']['now'](),
+			periodMilliseconds = getMilliseconds(period);
+		if (isString(savedMilliseconds)) {
+			savedMilliseconds = stringToNumber(savedMilliseconds);
+		}
+		return periodMilliseconds && savedMilliseconds && nowMilliseconds - savedMilliseconds < periodMilliseconds;
+	};
+	var getItem = function(key) {
+		var localStorageKey = getLocalStorageKey(key);
+		var item = window.localStorage.getItem(localStorageKey);
+		if (!item) return null;
+		try {
+			item = JSON.parse(item);
+		} catch (exception) {
+			log('Json parse exception', 'getItem', this, {'item': item});
+			return null;	
+		}
+		return item;
+	};
+	var getMilliseconds = function(period) {
+		var periodNumber  = ~~period.replace(/[^\d]/g, '');
+		var periodMeasure =   period.replace(/\d/g, '');
+		if (!periodNumber) {
+			log('Given period number is empty', 'getMilliseconds', this);
+			return 0;		
+		}
+		if (!secondsInMeasures[periodMeasure]) {
+			log('No given measure: ' + periodMeasure, 'getMilliseconds', this);
+			return 0;
+		}
+		return secondsInMeasures[periodMeasure] * periodNumber * 1000;
+	};
+	var getLocalStorageKey = function(key) {
+		return prefix + key;
+	};
+}
+StoreKeeper = new StoreKeeper();
+Array.prototype.contains = function(v) {
+	var iv = ~~v;
+	if (iv == v) return this.indexOf(iv) > -1 || this.indexOf(v + '') > -1;
+	return this.indexOf(v) > -1;
+};
+var StyleNameCache = {};
+Element.prototype.setClass = function(className) {
+	this.className = className;
+}
+Element.prototype.toggleClass = function(className, isAdding) {
+	if (isAdding) {
+		this.addClass(className);
+	} else {
+		this.removeClass(className);
+	}
+};
+Element.prototype.addClass = function(className) {
+	if (isString(className)) {
+		var classNames = this.getClasses();
+		var addedClasses = className.split(' ');
+		for (var i = 0; i < addedClasses.length; i++) {
+			if (classNames.indexOf(addedClasses[i]) == -1) {
+				classNames.push(addedClasses[i]);
+			}
+		}
+		this.className = classNames.join(' ');
+	}
+};
+Element.prototype.removeClass = function(className) {
+	if (isString(className)) {
+		var classNames = this.getClasses();
+		var removedClasses = className.split(' ');
+		var newClasses = [];
+		for (var i = 0; i < classNames.length; i++) {
+			if (removedClasses.indexOf(classNames[i]) == -1) {
+				newClasses.push(classNames[i]);
+			}
+		}
+		this.className = newClasses.join(' ');
+	}
+};
+Element.prototype.hasClass = function(className) {
+	return this.getClasses().indexOf(className) > -1;
+};
+Element.prototype.getClasses = function() {
+	var classNames = (this.className || '').trim().replace(/ {2,}/g, ' ');
+	if (classNames) {
+		return classNames.split(' ');
+	}
+	return [];
+};
+Element.prototype.getAncestor = function(selector) {
+	if (isNone(selector) || !isString(selector)) {
+		return null;
+	}
+	if (isFunction(Element.prototype.closest)) {
+		return this.closest(selector);
+	}
+	var parts = selector.trim().split(' ');
+	var properSelector = parts[parts.length - 1];
+	var classes = properSelector.split('.');
+	var selectorTag;
+	var thisTag = this.tagName.toLowerCase();
+	if (!isNone(classes[0])) {
+		selectorTag = classes[0].toLowerCase();
+	}
+	Objects.removeAt(classes, 0);
+	var element = this, isSameTag, foundClasses, elementClasses;
+	while (element) {
+		elementClasses = element.getClasses();
+		isSameTag = isUndefined(selectorTag) || selectorTag == thisTag;
+		foundClasses = 0;
+		for (var i = 0; i < elementClasses.length; i++) {
+			if (classes.indexOf(elementClasses[i]) > -1) {
+				foundClasses++;
+			}
+		}
+		if (foundClasses == classes.length && isSameTag) {
+			return element;
+		}
+		element = element.parentNode;
+	}
+	return null;
+};
+Element.prototype.getData = function(name) {
+	return this.getAttribute('_' + name) || '';
+};
+Element.prototype.getRect = function() {
+	return this.getBoundingClientRect();
+};
+Element.prototype.setStyle = function(style) {
+	var element = this;
+	var set = function(value, style) {
+		var propertyName = getVendorJsStyleName(style);	
+		if (propertyName) {
+			element.style[propertyName] = value;
+		}
+	};
+	var getVendorJsStyleName = function(style) {
+		var propertyName = StyleNameCache[style];
+		if (!propertyName) {
+			propertyName = toCamelCase(style);
+	    	StyleNameCache[style] = propertyName;
+	  	}	
+		return propertyName;
+	};
+	if (typeof style == 'string') {
+	    set(value, style);
+	} else {
+		for (var key in style) {
+	  		set(style[key], key);
+	   	}
+	}
+};
+Element.prototype.getChildAt = function(index) {
+	return this.childNodes[index];
+};
+MouseEvent.prototype.getTarget = function(selector) {
+	return this.target.getAncestor(selector);
+};
+MouseEvent.prototype.targetHasAncestor = function(element) {
+	if (isElement(element)) {
+		var target = this.target;		
+		while (target) {
+			if (target == element) {
+				return true;
+			}
+			target = target.parentNode;
+		}
+	}
+	return false;
+};
+function AjaxRequest(url, callback, params) {
+	var self = this, tempUrl, active = false, 
+		withCredentials = false, headers, request, 
+		responseType;
+	this.setHeaders = function(head) {
+		headers = head;
+	};
+	this.setResponseType = function(respType) {
+		responseType = respType;
+	};
+	this.setWithCredentials = function(withCred) {
+		withCredentials = withCred;
+	};
+	this.execute = function(pars) {
+		active = true;
+		pars = pars || params;
+		var u = tempUrl || url,
+			method = this.method || 'POST',
+			content = getRequestContent(method, pars);
+		createRequest();
+		if (method == 'GET') {
+			u += content;
+			content = '';
+		}
+		try {
+		    request.open(method, correctUrl(u), true);
+		} catch (err) {
+		    log('Error opening XMLHttpRequest: ' + err.message, 'execute', this);
+		    return;
+		}
+		if (isObject(headers)) {
+			for (var k in headers) {
+		    	request.setRequestHeader(k, headers[k]);
+			};
+		}
+		if (method != 'GET' && (!headers || !headers['Content-Type'])) {
+			request.setRequestHeader('Content-Type', 'application/json');
+		}
+		if (responseType) {
+			request.responseType = responseType;
+		}
+		request.withCredentials = withCredentials;
+		request.send(content);
+	};
+	this.send = function(method, pars, u) {
+		this.method = method;
+		tempUrl = u;
+		this.execute(pars);
+		this.method = null;
+		tempUrl = null;
+	};
+	var correctUrl = function(u) {
+		u = u.replace(/^[\.\/]+/, '');
+		if (isString(__APIDIR)) {
+			var regExp = new RegExp('^' + __APIDIR + "\/");
+			u = __APIDIR + '/' + u.replace(regExp, '');
+		}
+		return '/' + u;
+	};
+	var createRequest = function() {
+		request = new XMLHttpRequest();
+		request.onreadystatechange = onReadyStateChange.bind(self);
+	};
+	var getRequestContent = function(method, pars) {
+		if (Objects.empty(pars)) return '';
+		if (!isObject(pars)) {
+			return pars.toString();
+		} else if (pars instanceof FormData) {
+			return pars;
+		} else if (method == 'GET') {
+			var content = [];
+			for (var k in pars) {
+				content.push(k + '=' + (pars[k] || '').toString());
+			}
+			return '?' + content.join('&');
+		}
+		return JSON.stringify(pars || '');
+	};
+	var onReadyStateChange = function(e) {
+		var req = e.target;
+		if (active && req.readyState == 4) {
+			active = false;
+			var response = req.response;
+			var data;
+			try {
+				data = JSON.parse(response);
+			} catch (e) {
+				data = response;
+			}
+			if (isFunction(callback)) {
+				callback(data);
+			}
+		}
+	};
+}
+function EventHandler() {
+	var listeners = [];
+	this.listen = function(element, type, handler) {
+		listeners.push([element, type, handler]);
+		element.addEventListener(type, handler, false);
+	};
+	this.listenOnce = function(element, type, handler) {
+		var callback = function() {
+			handler();
+			element.removeEventListener(type, callback, false);
+		}
+		element.addEventListener(type, callback, false);
+	};
+	this.unlisten = function(element, type) {
+		var listener;
+		for (var i = 0; i < listeners.length; i++) {
+			listener = listeners[i];
+			if (listener && listener[0] == element && listener[1] == type) {
+				listener[0].removeEventListener(listener[1], listener[2], false);
+				listeners[i] = null;
+			}
+		}
+	};
+	this.dispose = function() {
+		var listener;
+		for (var i = 0; i < listeners.length; i++) {
+			listener = listeners[i];
+			if (listener) {
+				listener[0].removeEventListener(listener[1], listener[2], false);
+			}
+		}
+		listeners = null;
+	};
+}
+function Initialization() {
+	this.inherits = function(list) {
+		var children, parent, child, initials;
+		for (var k = 0; k < list.length; k++) {
+			parent = list[k];
+			children = list[++k];
+			for (var i = 0; i < children.length; i++) {
+				child = children[i];
+				if (parent != Core) {
+					if (!child.prototype.inheritedSuperClasses) {
+						child.prototype.inheritedSuperClasses = [];
+					}
+					child.prototype.inheritedSuperClasses.push(parent);
+				}
+				for (var method in parent.prototype) {
+					if (!child.prototype[method] && isMethodToInherit(method)) {
+						child.prototype[method] = parent.prototype[method];
+					}
+				}
+			}
+		}
+	};
+	this.initiate = function(props) {
+		var initials = null;
+		var initiateParental = function(superClasses, object) {
+			for (var i = 0; i < superClasses.length; i++) {
+				if (isFunction(superClasses[i].prototype.initiate)) {
+					superClasses[i].prototype.initiate.call(object);
+				}
+				if (isFunction(superClasses[i].prototype.getInitials)) {
+					var parentInitials = superClasses[i].prototype.getInitials();
+					if (isObject(parentInitials)) {
+						initials = extendInitials(initials, parentInitials);
+					}
+				}
+				if (isArray(superClasses[i].prototype.inheritedSuperClasses)) {
+					initiateParental(superClasses[i].prototype.inheritedSuperClasses, object);
+				}
+			}
+		};
+		if (isArray(this.inheritedSuperClasses)) {
+			initiateParental(this.inheritedSuperClasses, this);
+		}
+		this.props = props || {};
+		if (isFunction(this.constructor.prototype.initiate)) {
+			this.constructor.prototype.initiate.call(this);
+		}
+		if (isFunction(this.constructor.prototype.getInitials)) {
+			var ownInitials = this.constructor.prototype.getInitials();
+			if (isNull(initials)) {
+				initials = ownInitials;
+			} else if (isObject(ownInitials)) {
+				initials = extendInitials(initials, ownInitials);
+			}
+		}
+		this.initials = initials;
+		if (props && isString(props['cmpid'])) {
+			this.setId(props['cmpid']);
+		}
+	};
+	var isMethodToInherit = function(method) {
+		return method != __I && method != __GI;
+	};
+	var extendInitials = function(initials1, initials2) {
+		if (isNull(initials1)) {
+			initials1 = initials2;
+		} else {
+			for (var k in initials2) {
+				if (isUndefined(initials1[k])) {
+					initials1[k] = initials2[k];
+				} else {
+					Objects.merge(initials1[k], initials2[k]);
+				}
+			}
+		}
+		return initials1;
+	};
+}
+Initialization = new Initialization();
+function Router() {
+	var routes = __ROUTES;
+	var properRoutes = {};
+	var isHashRouter = !!__HASHROUTER;
+	var defaultRoute = __DEFAULTROUTE;
+	var indexRoute = __INDEXROUTE;
+	var errorRoutes = __ERRORROUTES;
+	var handler, bodyElement, menues, currentRoute,
+		subscribers, pathParts;
+	this.setNavigationHandler = function(handlr) {
+		handler = handlr;
+	};
+	this.init = function() {
+		bodyElement = document.querySelector('body');
+		initRoutes(routes);
+		if (isHashRouter) {
+			window.addEventListener('popstate', onNavigate.bind(this));
+		}
+		onNavigate();
+	};
+	this.getPathPartAt = function(index) {
+		return isArray(pathParts) ? pathParts[index] : '';
+	};
+	this.redirect = function(viewName, replState) {
+		var route;
+		var intViewName = ~~viewName;
+		if (intViewName == viewName) {
+			viewName = intViewName;
+		}
+		if (isNumber(viewName)) {
+			route = getErrorRoute(viewName);
+		} else if (isString(viewName)) {
+			route = getRouteByName(viewName);
+		} else {
+			log('redirect view name is invalid', 'redirect', this, {'viewName': viewName});
+			return;
+		}
+		if (!isObject(route)) {
+			log('redirect route is invalid', 'redirect', this, {'route': route});
+		} else {
+			if (replState && !isNumber(viewName)) {
+				replaceState(route);
+			}
+			changeRoute(route, !!replState);
+		}
+	};
+	this.subscribe = function(options, controller) {
+		var routeName = currentRoute['name'];
+		subscribers = subscribers || [];
+		subscribers.push([routeName, options, controller]);
+	};
+	this.addMenu = function(menu) {
+		if (isObject(menu) && isFunction(menu.onNavigate)) {
+			menues = menues || [];
+			menues.push(menu);
+		}
+	};
+	this.hasMenu = function(menu) {
+		return menues.indexOf(menu) > -1;
+	};
+	this.getCurrentRoute = function() {
+		return currentRoute;
+	};
+	this.getCurrentRouteName = function() {
+		if (currentRoute) {
+			return currentRoute['name'];
+		}
+		return null;
+	};
+	var getRoute = function() {
+		var params = window.location.search;
+		var path;
+		if (isHashRouter) {
+			path = window.location.hash;
+		} else {
+			path = window.location.pathname;
+		}
+		pathParts = [];
+		var properPaths = [];
+		path = path.replace(/^[\#\/]+|\/$/g, '').split('/');		
+		if (!path[0]) {
+			path[0] = indexRoute;
+		}
+		for (var i = 0; i < path.length; i++) {
+			pathParts.push(path[i]);
+			var pathName = pathParts.join('/');			
+			if (properRoutes[pathName]) {
+				properPaths.push(pathName);
+			}
+		}
+		path = properPaths[properPaths.length - 1];
+		if (path) {
+			return properRoutes[path];
+		} else if (defaultRoute && properRoutes[defaultRoute]) {
+			return properRoutes[defaultRoute];
+		}
+		return getErrorRoute(404);
+	};
+	var initRoutes = function(rts, parents) {
+		parents = parents || [];
+		var tempParents = Objects.clone(parents);
+		var name, path;
+		for (var i = 0; i < rts.length; i++) {
+			name = rts[i]['name'];
+			tempParents.push(name);
+			var children = Objects.clone(rts[i]['children']);
+			delete rts[i]['children'];
+			path = rts[i]['path'] = tempParents.join('/');
+			initRouteParams(rts[i]);
+			properRoutes[path] = rts[i];
+			if (isArray(children)) {
+				initRoutes(children, Objects.clone(tempParents));
+			}
+			tempParents = Objects.clone(parents);
+		}
+	};
+	var initRouteParams = function(route) {
+		if (isObject(route['params'])) {
+			var dinamicParams = {};
+			for (var k in route['params']) {
+				if ((/^\$\d+$/).test(route['params'][k])) {
+					dinamicParams[k] = route['params'][k].replace(/[^\d]/g, '');
+				}
+			}
+			for (var k in dinamicParams) {
+				delete route['params'][k];
+			}
+			route['dinamicParams'] = dinamicParams;
+		}
+	};
+	var onNavigate = function() {
+		var route = getRoute();
+		bodyElement.setClass(route['name'] + '-page');
+		var accessLevel = route['accessLevel'];
+		if (isNumber(accessLevel) && !User.hasAccessLevel(accessLevel)) {
+			route = getErrorRoute(401);
+		}
+		changeRoute(route, true);
+	};
+	var getRouteByName = function(viewName) {
+		for (var k in properRoutes) {
+			if (properRoutes[k]['name'] == viewName) {
+				return properRoutes[k];
+			}
+		}
+	};
+	var getErrorRoute = function(errorCode) {
+		if (isFunction(errorRoutes[errorCode])) {
+			errorRoutes[errorCode] = {'name': errorCode, 'view': errorRoutes[errorCode], 'error': errorCode};
+		}
+		return errorRoutes[errorCode];
+	};
+	var changeRoute = function(route, changeTitle) {
+		currentRoute = route;
+		if (isFunction(handler)) {
+			handler(route, changeTitle);
+		} else {
+			log('navigation handler is not function', 'changeRoute', this, {'handler': handler});
+		}
+		if (!isObject(route)) {
+			log('route is invalid', 'changeRoute', this, {'route': route});
+		}
+		informSubscribers();
+		informMenues();
+	};
+	var replaceState = function(route) {
+		if (isHashRouter) {
+			window.history.replaceState({}, '', '#' + route['path']);
+		} else {
+			window.location.href = '/' + route['path'];
+		}
+	};
+	var informSubscribers = function() {
+		if (isArray(subscribers)) {
+			var subscrView, opts, subscriber;
+			for (var i = 0; i < subscribers.length; i++) {
+				subscrView = subscribers[i][0]
+				opts = subscribers[i][1];
+				subscriber = subscribers[i][2];
+				if (isObject(opts) && subscrView == currentRoute['name']) {
+					var routeOptions = {};
+					for (var k in opts) {
+						routeOptions[k] = this.getPathPartAt(opts[k]);
+					}
+					subscriber.handleRouteOptionsChange(routeOptions);
+				}
+			}
+		}
+	};
+	var informMenues = function() {
+		if (isArray(menues)) {
+			for (var i = 0; i < menues.length; i++) {
+				menues[i].onNavigate(currentRoute['name']);
+			}
+		}
+	};
+}
+function User() {
+	var app;
+	var loadedItems = 0;
+	var attributes = {};
+	var loaded = false;
+	var loadRequest;
+	var saveRequest;
+	var initOptions = function() {
+		var userOptions = __USEROPTIONS;
+		if (isObject(userOptions)) {
+			if (userOptions['login'] && isString(userOptions['login'])) {
+				loadRequest = new AjaxRequest(userOptions['login'], onLoad.bind(this));
+			}
+		}
+	};
+	var loadDictionary = function() {
+		Dictionary.load(onLoadDictionary.bind(this));
+	};
+	this.load = function(application) {
+		if (!loaded) {
+			app = application;
+			if (loadRequest) {
+				loadRequest.execute();
+				return;
+			}
+		}
+		onLoad(getDefaultAttributes());
+	};
+	var onLoad = function(attrs) {
+		attributes = attrs;
+		loadedItems++;
+		onLoadItem();
+	};
+	var onLoadDictionary = function() {
+		loadedItems++;
+		onLoadItem();
+	};
+	var onLoadItem = function() {
+		if (loadedItems == 2) {
+			loaded = true;
+			if (app instanceof Function) {
+				app = new app();
+				app.run();
+			}
+		}
+	};
+	this.hasFullAccess = function() {
+		var fullAccess = Objects.get(__USEROPTIONS, 'fullAccess', null);
+		var accessLevel = ~~attributes['accessLevel'];
+		return !isNumber(fullAccess) || accessLevel >= fullAccess;
+	};
+	this.hasAccessLevel = function(accessLevel, isEqual) {
+		if (!isEqual) {
+			return attributes['accessLevel'] >= accessLevel;
+		}
+		return attributes['accessLevel'] == accessLevel;
+	};
+	this.hasType = function(userType) {
+		return attributes['type'] == userType;
+	};
+	this.isAuthorized = function() {
+		return attributes['accessLevel'] > 0;
+	};
+	this.getAttribute = function(attributeName) {
+		return attributes[attributeName];
+	};
+	this.setAttribute = function(attributeName, attributeValue, isToSave) {
+		var attrs = {};
+		attrs[attributeName] = attributeValue;
+		this.setAttributes(attrs, isToSave);
+	};
+	this.setAttributes = function(attrs, isToSave) {
+		if (isObject(attrs)) {
+			for (var k in attrs) {
+				attributes[k] = attrs[k];
+			}		
+			if (isToSave && saveRequest) {
+				saveRequest.execute(attributes);
+			}
+		}
+	};
+	var getDefaultAttributes = function() {
+		return {
+			'type': 'guest',
+			'accessLevel': 0
+		};
+	};
+	initOptions();
+	loadDictionary();
+}
+function Objects() {
+	this.each = function(arr, callback) {
+		if (arguments[2]) {
+			callback = callback.bind(arguments[2]);
+		}
+		for (var i = 0; i < arr.length; i++) {
+			var result = callback(arr[i], i);
+			if (result == '__break') break;
+		}
+	};
+	this.remove = function(arr, item) {
+		var idx = arr.indexOf(item);
+		if (idx > -1) {
+			this.removeAt(arr, idx);
+		}
+	};
+	this.removeAt = function(arr, idx) {
+		arr.splice(idx, 1);
+	};
+	this.equals = function(arr1, arr2) {
+		if (typeof arr1 !== typeof arr2) return false;
+	    if (isArray(arr1) && isArray(arr2) && arr1.length !== arr2.length) return false;
+	    if (isObject(arr1)) {
+	        for (var p in arr1) {
+	        	if (arr1.hasOwnProperty(p)) {
+		            if (isFunction(arr1[p]) && isFunction(arr2[p])) continue;
+		            if (isArray(arr1[p]) && isArray(arr2[p]) && arr1[p].length !== arr2[p].length) return false;
+		            if (typeof arr1[p] !== typeof arr2[p]) return false;
+		            if (isObject(arr1[p]) && isObject(arr2[p])) {
+		            	if (!this.equals(arr1[p], arr2[p])) return false; 
+		            } else if (arr1[p] !== arr2[p]) {
+		            	return false;
+		            }
+	        	}
+	        }
+	    } else return arr1 === arr2;
+	    return true;		
+	};
+	this.merge = function() {
+		var arrs = arguments;
+		if (!isObject(arrs[0])) {
+			arrs[0] = {};
+		}
+		for (var i = 1; i < arrs.length; i++) {
+			if (isArrayLike(arrs[i])) {
+				for (var k in arrs[i]) {
+					arrs[0][k] = arrs[i][k];
+				}
+			}
+		}
+	};
+	this.clone = function(obj) {
+		if (!isArrayLike(obj)) return obj;
+		return JSON.parse(JSON.stringify(obj));
+	};
+	this.get = function(obj, key, defaultValue) {
+		return this.has(obj, key) ? obj[key] : defaultValue;
+	};
+	this.has = function(obj, key, value) {
+		if (!isObject(obj)) return false;
+		var has = !isUndefined(obj[key]);
+		if (has && !isUndefined(value)) {
+			return obj[key] == value;
+		}
+		return has;
+	};
+	this.empty = function(obj) {
+		if (!isArrayLike(obj)) {
+			return true;
+		}
+		if (isObject(obj)) {
+			for (var k in obj) {
+				return false;
+			}
+			return true;
+		}
+		return isUndefined(obj[0]);
+	};
+}
+function log(message, method, object, opts) {
+	window.console.log(method === undefined ? message : new Error(message, method, object, opts));
+}
+function Error(message, method, object, opts) {
+	this.object = object;
+	this.method = method;
+	this.message = message;
+	this.opts = opts;
+}
+function generateRandomKey() {
+	var x = 2147483648, now = +new Date();
+	return Math.floor(Math.random() * x).toString(36) + Math.abs(Math.floor(Math.random() * x) ^ now).toString(36);
+}
+function toCamelCase(str) {
+	return String(str).replace(/\-([a-z])/g, function(all, match) {
+		return match.toUpperCase();
+	});
+}
+function isObject(a) {
+	return !!a && typeof a == 'object' && !isNode(a) && !isArray(a);
+}
+function isArray(a) {
+	return a instanceof Array;
+}
+function isArrayLike(a) {
+	return isArray(a) || isObject(a);
+}
+function isElement(a) {
+	return a instanceof Element;
+}
+function isNode(a) {
+	return a instanceof Node;
+}
+function isFunction(a) {
+	return a instanceof Function;
+}
+function isBool(a) {
+	return typeof a == 'boolean';
+}
+function isString(a) {
+	return typeof a == 'string';
+}
+function isNumber(a) {
+	return typeof a == 'number';
+}
+function isUndefined(a) {
+	return a === undefined;
+}
+function isNull(a) {
+	return a === null;
+}
+function isNone(a) {
+	return isUndefined(a) || isNull(a) || a === false || a === 0 || a === '0' || a === '';
+}
+function stringToNumber(str) {
+	return Number(str);
+}
+function App(props) {
+	Initialization.initiate.call(this, props);
+};
+App.prototype.onNoErrors = function() {
+	var menu = this.getChildById('menu');
+	//menu.setAppended(true);
+};
+App.prototype.onError = function(errorCode) {
+	var menu = this.getChildById('menu');
+	menu.setAppended(false);
+};
+App.prototype.getTemplateMain = function(p, args) {
+	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'p':{'c':'veb'}}]
+};
+function Analytics(props) {
+	Initialization.initiate.call(this, props);
+};
+Analytics.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'p':{'c':'vzc'}}]
+};
+function Error401(props) {
+	Initialization.initiate.call(this, props);
+};
+Error401.prototype.onRendered = function() {
+};
+Error401.prototype.getTemplateMain = function(p, args) {
+	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'ve5'}}]
+};
+function Error404(props) {
+	Initialization.initiate.call(this, props);
+};
+Error404.prototype.onRendered = function() {
+};
+Error404.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':'404','t':0,'p':{'c':'ve8'}},{'c':__T[0],'t':0,'p':{'c':'vex'}}],'t':0,'p':{'c':'veo'}}]
+};
+function Favorite(props) {
+	Initialization.initiate.call(this, props);
+};
+Favorite.prototype.onRendered = function() {
+};
+Favorite.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'p':{'c':'vzc'}}]
+};
+function Main(props) {
+	Initialization.initiate.call(this, props);
+};
+Main.prototype.onRendered = function() {
+};
+Main.prototype.getTemplateMain = function(p, args) {
+	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[34],'t':0,'p':{'c':'veh'}},{'cmp':UserInfo},{'c':__[51],'t':0,'p':{'c':'ved ve4'}},{'cmp':Calendar}],'t':0,'p':{'c':'vel'}},'t':6,'p':{'c':'ven'}},{'t':6,'p':{'c':'v3i'}}],'t':5},'t':2,'p':{'c':'vek','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'vzc vem','sc':1}}]
+};
+function Search(props) {
+	Initialization.initiate.call(this, props);
+};
+Search.prototype.onRendered = function() {
+	this.openInformer();
+};
+Search.prototype.openInformer = function() {
+	var datatable = this.getChildById('datatable');
+};
+Search.prototype.openFilter = function(filterId) {
+};
+Search.prototype.onFormExpand = function() {
+	this.toggle('expanded');
+};
+Search.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'cmp':SearchForm,'e':['expand',this.onFormExpand.bind(this)],'p':{'cmpid':'form'}},{'cmp':TendersDataTable,'p':{'cmpid':'datatable'}}],'t':0,'p':{'c':function(){return['vzc',p('expanded')?' vz7':'']},'sc':1},'n':{'c':'expanded'}}]
+};
+Search.prototype.getInitials = function() {
+	return {
+		'props':{'expanded': true}
+	};
+};
+Search.prototype.getControllersToLoad = function() {
+	return [Filters];
+};
+function DataTable(props) {
+	Initialization.initiate.call(this, props);
+};
+DataTable.prototype.getTemplateMain = function(p, args) {
+	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'vzt'}}]
+};
+function DataTableTabPanel(props) {
+	Initialization.initiate.call(this, props);
+};
+function TendersDataTable(props) {
+	Initialization.initiate.call(this, props);
+};
+function SearchForm(props) {
+	Initialization.initiate.call(this, props);
+};
+SearchForm.prototype.toggleExpand = function() {
+	this.dispatchEvent('expand');
+};
+SearchForm.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':args.title,'t':0,'p':{'c':'vz4'}},{'t':0,'e':[0,this.toggleExpand.bind(this)],'p':{'c':'vz9'}},{'t':0,'e':[0,this.toggleExpand.bind(this)],'p':{'c':'vzi'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'vzb','sc':1}}]
+};
+SearchForm.prototype.getInitials = function() {
+	return {
+		'args':{'title': __[0]}
+	};
+};
+function SearchFormCreateFilterMenu(props) {
+	Initialization.initiate.call(this, props);
+};
+SearchFormCreateFilterMenu.prototype.onCreateButtonClick = function() {
+	alert('create filter')
+};
+SearchFormCreateFilterMenu.prototype.onWizardButtonClick = function() {
+	alert('create filter with wizard')	
+};
+SearchFormCreateFilterMenu.prototype.getInitials = function() {
+	return {
+		'args':{'className': 'vz2'},
+		'props':{'buttons': [{'name': __[1],'handler': this.onCreateButtonClick},{'name': __[2],'handler': this.onWizardButtonClick}]}
+	};
+};
+function SearchFormFilterMenu(props) {
+	Initialization.initiate.call(this, props);
+};
+SearchFormFilterMenu.prototype.onRendered = function() {
+	PopupMenu.prototype.onRendered.call(this);
+};
+SearchFormFilterMenu.prototype.onLoadFilters = function(filters) {
+	this.renderButtons(filters);
+};
+SearchFormFilterMenu.prototype.onCheckboxChange = function(e) {
+	Filters.doAction('set', {'filterId': e.value, 'param': 'isAutoOpen', 'value': e.checked});
+};
+SearchFormFilterMenu.prototype.getButtonData = function(item) {
+	return {
+		'value': item['filterId'],
+		'name': item['header'],
+		'isAutoOpen': item['isAutoOpen']
+	};
+};
+SearchFormFilterMenu.prototype.handleClick = function(value, button) {
+	Globals.getView('search').openFilter(value);
+};
+SearchFormFilterMenu.prototype.getTemplateContent = function(p, args) {
+	return[{'t':0,'p':{'c':'vzj'+(args.item.isAutoOpen?' vzw':''),'_value':args.item.value}}]
+};
+SearchFormFilterMenu.prototype.getInitials = function() {
+	return {
+		'args':{'className': 'vzf','maxHeight': 400},
+		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
+		'helpers':[{'helper': CheckboxHandler,'callback': this.onCheckboxChange,'options': {'intValue': true,'checkboxClass': 'vzj','checkboxCheckedClass': 'vzw','labelClass': null}}]
+	};
+};
+function SearchFormFilters(props) {
+	Initialization.initiate.call(this, props);
+};
+SearchFormFilters.prototype.onLoadFilters = function(filters) {
+	this.set('quantity', filters.length);
+};
+SearchFormFilters.prototype.onSaveFilterClick = function() {
+	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
+};
+SearchFormFilters.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':[{'c':__[3],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'vzs'}},{'c':[{'c':__[4],'t':0,'p':{'c':'vzu'}},{'c':[{'c':{'pr':'quantity','p':p('quantity')},'t':42,'p':{'c':'vzv'}},{'t':0,'p':{'c':'vza'}}],'t':0,'p':{'c':'vz1'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return['vzp',!p('quantity')?' vz5':'']}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':p('filterName')},'t':0,'e':[0,this.onSaveFilterClick.bind(this)],'p':{'c':'vz8'}},{'c':__[5],'t':0,'e':[0,this.onSaveFilterClick.bind(this)],'p':{'c':'vzo'}}],'t':0,'p':{'c':'vzg','sc':1}}]
+};
+SearchFormFilters.prototype.getInitials = function() {
+	return {
+		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
+		'props':{'filterName': 'Master'}
+	};
+};
+function TenderSearchForm(props) {
+	Initialization.initiate.call(this, props);
+};
+TenderSearchForm.prototype.onResetButtonClick = function(e) {
+	var button = e.target.getAncestor('.vzz');
+	button.addClass('vz6');
+	this.delay(function() {
+		button.removeClass('vz6');
+	}, 2500);
+};
+TenderSearchForm.prototype.onResetConfirmed = function() {
+};
+TenderSearchForm.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':__[6],'t':0,'e':[0,this.onResetButtonClick.bind(this)],'p':{'c':'vz0'}},{'c':[__[7],' ',{'c':__[8],'t':40,'p':{'c':'v3z'}}],'t':0,'e':[0,this.onResetConfirmed.bind(this)],'p':{'c':'vzy'}}],'t':0,'p':{'c':'vzz'}},{'c':{'cmp':SearchFormFilters},'t':0,'p':{'c':'v30','sc':1}}]
+};
+function Submit(props) {
+	Initialization.initiate.call(this, props);
+};
+Submit.prototype.onSubmit = function() {
+	this.dispatchEvent('submit');
+};
+Submit.prototype.getTemplateMain = function(p, args) {
+	return[{'c':{'c':{'pr':'value','p':p('value')},'t':0,'e':[0,this.onSubmit.bind(this)],'p':{'c':function(){return[p('class')]}},'n':{'c':'class'}},'t':0,'p':{'c':'vet'}}]
+};
+function Calendar(props) {
+	Initialization.initiate.call(this, props);
+};
+function Checkbox(props) {
+	Initialization.initiate.call(this, props);
+};
+Checkbox.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'p':{'c':'vzj','_value':function(){return[p('value')]}},'n':{'_value':'value'}}]
+};
+function Dialog(props) {
+	Initialization.initiate.call(this, props);
+};
+Dialog.prototype.show = function() {
+	this.set('shown', true);
+	this.reposition();	
+	this.onShow();
+};
+Dialog.prototype.reposition = function() {
+	var element = this.getElement();
+	var rect = element.getRect();
+	this.set({
+		'marginTop': Math.round(rect.height / -2) + 'px',
+		'marginLeft': Math.round(rect.width / -2) + 'px'
+	});
+};
+Dialog.prototype.hide = function() {
+	this.set('shown', false);
+	this.onHide();
+};
+Dialog.prototype.expand = function() {
+	this.toggle('expanded');
+};
+Dialog.prototype.onShow = function() {
+};
+Dialog.prototype.onHide = function() {
+};
+Dialog.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'e':[0,this.hide.bind(this)],'p':{'c':function(){return['vew',p('shown')?' veg':'']}},'n':{'c':'shown'}},{'c':[{'c':{'t':0,'e':[0,this.hide.bind(this)],'p':{'c':'vev'}},'i':!!args.closable},{'c':{'t':0,'e':[0,this.expand.bind(this)],'p':{'c':'vea'}},'i':!!args.expandable},{'c':{'pr':'title','p':p('title')},'t':0,'p':{'c':'veu'}},{'c':{'tmp':this.getTemplateContent},'t':0,'p':{'c':'ve1','st':function(){return[p('height')?'max-height:'+p('height')+'px;':'']}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return['ves',p('expanded')?' vep':'',p('shown')?' veg':'']},'sc':1,'st':function(){return['width:',p('width'),'px;margin-left:',p('marginLeft'),';margin-top:',p('marginTop'),';']}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
+};
+Dialog.prototype.getTemplateContent = function(p, args) {
+	return null
+};
+Dialog.prototype.getInitials = function() {
+	return {
+		'args':{'closable': true},
+		'followers':{'width': this.reposition,height: this.reposition},
+		'props':{'width': 600}
+	};
+};
+function PopupMenu(props) {
+	Initialization.initiate.call(this, props);
+};
+PopupMenu.prototype.onRendered = function() {
+	var element = this.getElement();
+	this.button = element.parentNode;
+	this.addListener(this.button, 'click', this.onShowButtonClick);
+};
+PopupMenu.prototype.onClick = function(e) {
+	var target = e.getTarget('.vzr');
+	if (!isNull(target)) {
+		var idx = target.getData('index');
+		var value = target.getData('value');
+		var buttons = this.get('buttons');
+		if (isArray(buttons) && isObject(buttons[idx]) && isFunction(buttons[idx]['handler'])) {
+			buttons[idx]['handler'].call(this, e);
+			return;
+		}
+		this.handleClick(value, target);
+	}
+};
+PopupMenu.prototype.onShowButtonClick = function() {
+	this.onBeforeShow();
+	this.show();
+};
+PopupMenu.prototype.handleClick = function(value, button) {
+};
+PopupMenu.prototype.onBeforeShow = function() {
+};
+PopupMenu.prototype.show = function() {
+	var outerElement = this.getElement();
+	var innerElement = this.findElement('.vz3');
+	var rect = innerElement.getRect();
+	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
+	outerElement.setStyle({'max-height': height + 'px', 'height': height + 'px'});
+    this.button.addClass('active');
+    Popuper.watch(this, outerElement);
+};
+PopupMenu.prototype.hide = function() {
+	var outerElement = this.getElement();
+	outerElement.setStyle({'max-height': '0', 'height': '0'});
+	this.button.removeClass('active');
+};
+PopupMenu.prototype.renderButtons = function(items) {
+	var buttons = [];
+	for (var i = 0; i < items.length; i++) {	
+		buttons.push(this.getButtonData(items[i]));
+	}
+	this.set('buttons', buttons);
+};
+PopupMenu.prototype.getButtonData = function(item) {
+	return {
+		'value': item['value'],
+		'name': item['name']
+	};
+};
+PopupMenu.prototype.getTemplateMain = function(p, args) {
+	return[{'c':{'c':{'h':(function(button,idx){return[{'c':[button.name,{'tmp':this.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'vzr','_value':button.value,'_index':idx}}]}).bind(this),'p':p('buttons'),'f':'buttons'},'t':0,'e':[0,this.onClick.bind(this)],'p':{'c':'vz3','st':(args.maxHeight?'max-height:'+args.maxHeight+'px;' :'')}},'t':0,'p':{'c':'vze '+args.className,'sc':1}}]
+};
+PopupMenu.prototype.getTemplateContent = function(p, args) {
+	return null
+};
+function TabPanel(props) {
+	Initialization.initiate.call(this, props);
+};
+TabPanel.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'p':{'c':'v36'}}]
+};
+function UserInfo(props) {
+	Initialization.initiate.call(this, props);
+};
+UserInfo.prototype.onLoaded = function(data) {
+	if (!User.hasFullAccess()) {
+		data['prolongButtonText'] = __[45];
+	} else if (data['needToProlong']) {
+		data['prolongButtonText'] = __[46];
+	}
+	this.set(data);
+};
+UserInfo.prototype.onOrderCallButtonClick = function() {
+	Dialoger.show(OrderCall);	
+};
+UserInfo.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':[{'c':[__[35],':'],'t':6},{'c':{'pr':'userName','p':p('userName')},'t':6}],'t':5},{'c':[{'c':[__[36],':'],'t':6},{'c':{'pr':'companyName','p':p('companyName')},'t':6}],'t':5},{'c':[{'c':[__[37],':'],'t':6},{'c':{'pr':'userEmail','p':p('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[38],':'],'t':6},{'c':{'pr':'typeAccess','p':p('typeAccess')},'t':6,'p':{'c':' ve4'}}],'t':5},{'c':[{'c':[__[39],':'],'t':6},{'c':{'pr':'beginAccessDate','p':p('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[40],':'],'t':6},{'c':{'pr':'endAccessDate','p':p('endAccessDate')},'t':6,'p':{'c':function(){return[p('needToProlong')?'v3y':'']}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'veq','cp':'0px','cs':'0px','sc':1}},{'c':function(){return[{'c':{'pr':'prolongButtonText','p':p('prolongButtonText')},'t':12,'p':{'h':__[44],'tr':'_blank','c':'v3t vec vei'}}]},'p':['prolongButtonText'],'i':function(){return(p('prolongButtonText'))}},{'c':__[42],'t':12,'p':{'h':__[41],'tr':'_blank','c':'v3e vec ve0'}},{'c':__[43],'t':0,'p':{'c':'ved ve4'}},{'c':[{'c':{'pr':'managerName','p':p('managerName')},'t':0,'p':{'c':'v3c'}},{'c':[{'c':[' ',{'c':__[47],'t':0,'p':{'c':'v32'}},{'c':__[48],'t':0,'p':{'c':'v34'}}],'t':0,'p':{'c':'v3b'}},{'pr':'managerPhone','p':p('managerPhone')},__T[1],{'c':__[49],'t':51}],'t':0,'p':{'c':'v37'}},{'c':{'pr':'managerEmail','p':p('managerEmail')},'t':0,'p':{'c':'v39'}}],'t':0,'p':{'c':'v33'}},{'c':__[50],'t':0,'e':[0,this.onOrderCallButtonClick.bind(this)],'p':{'c':'vec ve9'}}]
+};
+UserInfo.prototype.getInitials = function() {
+	return {
+		'loader':{'controller': UserInfoLoader,'async': true }
+	};
+};
+function Filters() {
+	Initialization.initiate.call(this);
+	this.processInitials();
+};
+Filters.prototype.onLoadFilters = function(data) {
+};
+Filters.prototype.onLoad = function(data) {
+};
+Filters.prototype.onAdd = function(data) {
+};
+Filters.prototype.getInitials = function() {
+	return {
+		'options':{'key': 'filterId','store': false,'storeAs': 'filters','storePeriod': '1day','clone': true},
+		'actions':{'load': {'url' : CONFIG.filters.load,'method' : 'GET','callback': this.onLoad.bind(this)},'save': {'url' : CONFIG.filters.add,'method' : 'POST','callback': this.onAdd},'set': {'url' : CONFIG.filters.set,'method': 'POST'}}
+	};
+};
+function UserInfoLoader() {
+	Initialization.initiate.call(this);
+	this.processInitials();
+};
+UserInfoLoader.prototype.getInitials = function() {
+	return {
+		'actions':{'load': {'url' : CONFIG.user.get,'method' : 'GET'}}
+	};
+};
+function FilterEdit(props) {
+	Initialization.initiate.call(this, props);
+};
+FilterEdit.prototype.initiate = function() {
+	this.controller = Filters;
+};
+FilterEdit.prototype.getInitials = function() {
+	return {
+		'props':{'title': __[33]}
+	};
+};
+function OrderCall(props) {
+	Initialization.initiate.call(this, props);
+};
+OrderCall.prototype.onSupportButtonClick = function() {
+	this.hide();
+	Dialoger.show(Support);
+};
+OrderCall.prototype.onShow = function() {
+	var form = this.getChildAt(0);
+	var handler = form.validateTime.bind(form);
+	this.interval = setInterval(handler, 60000);
+	handler();
+};
+OrderCall.prototype.onHide = function() {
+	clearInterval(this.interval);
+};
+OrderCall.prototype.getTemplateContent = function(p, args) {
+	return[{'cmp':OrderCallForm},{'c':__[10],'t':0,'e':[0,this.onSupportButtonClick.bind(this)],'p':{'c':'vec ve7'}}]
+};
+OrderCall.prototype.getInitials = function() {
+	return {
+		'props':{'title': __[9]}
+	};
+};
+function Support(props) {
+	Initialization.initiate.call(this, props);
+};
+Support.prototype.onOrderCallButtonClick = function() {
+	this.hide();
+	Dialoger.show(OrderCall);
+};
+Support.prototype.getTemplateContent = function(p, args) {
+	return[{'cmp':SupportForm},{'c':__[12],'t':0,'e':[0,this.onOrderCallButtonClick.bind(this)],'p':{'c':'vec ve7'}}]
+};
+Support.prototype.getInitials = function() {
+	return {
+		'props':{'title': __[11]}
+	};
+};
+function AuthForm(props) {
+	Initialization.initiate.call(this, props);
+};
+AuthForm.prototype.onSuccess = function() {
+	window.location.reload();
+};
+AuthForm.prototype.getTemplateMain = function(p, args) {
+	return[{'c':__T[2],'t':0,'p':{'c':'ve6'}},{'t':0,'p':{'c':'vey'}}]
+};
+AuthForm.prototype.getInitials = function() {
+	return {
+		'options':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'vey','controls': [{'cmpid': 'login','type': 'text','name': 'login','placeholder': __[16],'caption': __[17]},{'cmpid': 'password','type': 'password','name': 'password','placeholder': __[18],'caption': __[19]}],'submit': {'value': __[20],'class': ''}}
+	};
+};
+function OrderCallForm(props) {
+	Initialization.initiate.call(this, props);
+};
+OrderCallForm.prototype.onRendered = function() {
+	this.setControlValue('name', User.getAttribute('name'));
+	this.setControlValue('phone', User.getAttribute('phone'));
+	var email = User.getAttribute('email');
+	if (email) {
+		this.setControlValue('email', email);
+		this.enableControl('email', false);
+	}
+};
+OrderCallForm.prototype.getDateOptions = function() {
+	var monthNames = Dictionary.get('monthNames'),
+		date  = new Date(),
+		year  = date.getFullYear(),
+		time  = date.getHours,
+		month = date.getMonth() + 1,
+		day   = date.getDate(),
+		days  = 33 - new Date(year, month - 1, 33).getDate(),
+		dates = [], d, m = month, dayInWeek, count = 0, index = 0, txt;
+	var prev = 0;
+	while (count < 10) {
+		d = day + index;
+		if (day + index > days) {
+			d = d - days;
+			m = month + 1;
+			if (m > 12) {
+				break;
+			}
+		}
+		dayInWeek = new Date(year, m - 1, d).getDay();
+		if (dayInWeek == 0 || dayInWeek > 5) {
+			index++;
+			continue;
+		}	
+		dayInWeek = Dictionary.get('dayNames')[dayInWeek];
+		txt = count > 1 || (!!prev &&prev != d - 1) ? d + ' ' + monthNames[m] + ', ' + dayInWeek : (count == 0 ? __[28] : __[29]) + ', ' + d + ' ' + monthNames[m];
+		dates.push({'value': txt, 'title': txt});
+		count++;
+		index++;
+		prev = d;
+	}
+	date = day + ' ' + monthNames[month];
+	return dates;
+};
+OrderCallForm.prototype.validateTime = function() {
+	var dateSelect = this.getChildById('date');
+	var timeSelect = this.getChildById('time');
+	var dateValue = dateSelect.getValue();
+    var isToday = (new RegExp(__[28])).test(dateValue);
+    if (isToday) {
+	    var d = new Date();
+	    var times = [11, 13, 16];
+	    var moscowTime = d.getUTCHours() + 3;
+	    var disabledIndexes = [];
+	    for (var i = 0; i < times.length; i++) {
+	    	if (moscowTime >= times[i]) {
+	    		disabledIndexes.push(i);
+	    	}
+	    }
+	    if (disabledIndexes.length == times.length) {
+	    	dateSelect.enableOption(0, false);
+	    } else {
+	    	for (i = 0; i < disabledIndexes.length; i++) {
+	    		timeSelect.enableOption(disabledIndexes[i], false);
+	    	}
+	    }
+	} else {
+		timeSelect.enableOption(0, true);
+		timeSelect.enableOption(1, true);
+		timeSelect.enableOption(2, true);
+	}
+};
+OrderCallForm.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'p':{'c':'vee'}}]
+};
+OrderCallForm.prototype.getInitials = function() {
+	return {
+		'options':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'vee','controls': [__V[0],__V[1],__V[2],{'cmpid': 'topic','type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[24],'class': 'vzm'},{'cmpid': 'date','type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[25],'class': 'vzm'},{'cmpid': 'time','type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[26],'class': 'vzm'},{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[27]}],'submit': {'value': __[50],'class': __[14] + ' ve2'}}
+	};
+};
+function SupportForm(props) {
+	Initialization.initiate.call(this, props);
+};
+SupportForm.prototype.getTemplateMain = function(p, args) {
+	return[{'t':0,'p':{'c':'vee'}}]
+};
+SupportForm.prototype.getInitials = function() {
+	return {
+		'options':{'action': CONFIG.support.send,'controls': [__V[0],__V[1],__V[2],{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[30]},{'cmpid': 'screenshot','type': 'file','name': 'screenshot','accept': 'image/*','caption': __[31]}],'submit': {'value': __[32],'class': __[14] + ' ve2'}}
+	};
+};
+function Input(props) {
+	Initialization.initiate.call(this, props);
+};
+Input.prototype.onChange = function() {
+};
+Input.prototype.getControlValue = function() {
+	return this.findElement('input').value;
+};
+Input.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'vzk'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'t':14,'e':[18,this.onChange.bind(this)],'p':{'tp':function(){return[p('type')]},'n':function(){return[p('name')]},'p':function(){return[p('placeholder')]},'v':function(){return[p('value')]},'readonly':function(){return[p('enabled')?'readonly':'']},'accept':function(){return[p('accept')]}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return['vzx ',p('class')]},'sc':1},'n':{'c':'class'}}]
+};
+function Select(props) {
+	Initialization.initiate.call(this, props);
+};
+Select.prototype.onRendered = function() {
+	var value = this.get('value');
+	var selected;
+	if (!isUndefined(value)) {
+		selected = this.selectByValue(value);
+	}
+	if (!selected) {
+		this.selectByIndex(0);
+	}
+};
+Select.prototype.selectByValue = function(value) {
+	var options = this.get('options');
+	if (isArray(options)) {
+		for (var i = 0; i < options.length; i++) {
+			if (options[i]['value'] == value) {
+				this.selectedIndex = i;
+				this.set({
+					'value': value,
+					'title': options[i]['title']
+				});
+				return true;
+			}
+		}
+	}
+	return false;
+};
+Select.prototype.selectByIndex = function(index) {
+	this.selectedIndex = index;
+	var options = this.get('options');
+	if (isObject(options[index])) {
+		this.set({
+			'value': options[index]['value'],
+			'title': options[index]['title']
+		});
+	}
+};
+Select.prototype.enableOption = function(index, isEnabled) {
+	var optionsContainer = this.findElement('.vzh');
+	var optionElement = optionsContainer.getChildAt(index);
+	optionElement.toggleClass('vzq', !isEnabled);
+	if (index == this.selectedIndex) {
+		this.selectByIndex(index == 0 ? index + 1 : 0);
+    }
+};
+Select.prototype.onOptionsClick = function(e) {
+	var target = e.getTarget('.vzd');
+	if (target && !target.hasClass('vzq')) {
+		var value = target.getData('value');
+		this.selectByValue(value);
+		this.dispatchEvent('change', {'value': value});
+		this.hide();
+	}
+};
+Select.prototype.getControlValue = function() {
+	return this.findElement('input').value;
+};
+Select.prototype.onClick = function() {
+	this.set('active', true);
+	Popuper.watch(this, this.findElement('.vzn'));
+};
+Select.prototype.hide = function() {
+	this.set('active', false);
+};
+Select.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'vzk'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'c':[{'c':{'pr':'title','p':p('title')},'t':0,'e':[0,this.onClick.bind(this)],'p':{'c':'vzl'}},{'c':{'h':(function(option){return[{'c':option.title,'t':0,'p':{'c':'vzd','_value':option.value}}]}).bind(this),'p':p('options'),'f':'options'},'t':0,'e':[0,this.onOptionsClick.bind(this)],'p':{'c':'vzh'}}],'t':0,'p':{'c':function(){return['vzn',p('active')?' vz6':'']}},'n':{'c':'active'}},{'t':14,'p':{'tp':'hidden','n':function(){return[p('name')]},'v':function(){return[p('value')]}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return['vzx ',p('class')]},'sc':1},'n':{'c':'class'}}]
+};
+function Textarea(props) {
+	Initialization.initiate.call(this, props);
+};
+Textarea.prototype.onChange = function() {
+};
+Textarea.prototype.getControlValue = function() {
+	return this.findElement('textarea').value;
+};
+Textarea.prototype.getTemplateMain = function(p, args) {
+	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'vzk'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'c':{'pr':'value','p':p('value')},'t':49,'e':[18,this.onChange.bind(this)],'p':{'n':function(){return[p('name')]},'p':function(){return[p('placeholder')]},'readonly':function(){return[p('enabled')?'readonly':'']}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return['vzx ',p('class')]},'sc':1},'n':{'c':'class'}}]
+};
+function TopMenu(props) {
+	Initialization.initiate.call(this, props);
+	Router.addMenu(this);
+	this.isRouteMenu = true;
+};
+TopMenu.prototype.getTemplateMain = function(p, args) {
+	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'vej'}},{'c':__T[3],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[4],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[5],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[6],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[7],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'vef'}},'t':0,'p':{'c':'ve3','sc':1}}]
+};
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,SearchForm,SearchFormFilters,TenderSearchForm,Submit,Calendar,Checkbox,Dialog,PopupMenu,TabPanel,UserInfo],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTable,[TendersDataTable],Controller,[Filters,UserInfoLoader],Dialog,[FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
+Objects = new Objects();
+Router = new Router();
+User = new User();
+Filters = new Filters();
+UserInfoLoader = new UserInfoLoader();
+User.load(App);
+})();
