@@ -80,7 +80,7 @@
 	}
 
 	function gatherFiles($dir, $list, $getContent = false) {
-		$extensions = array('js', 'css', 'template', 'texts', 'data');
+		$extensions = array('js', 'css', 'template', 'texts', 'data', 'cssconst');
 		if (is_dir($dir)) {
 			$files = scandir($dir);
 			if (is_array($files)) {
@@ -291,15 +291,22 @@
 		$parts = preg_split('/\n/', $content);
 		$originalFirstLine = trim($parts[0]);
 		$firstLine = trim(preg_replace('/\s*,\s*/', ',', $originalFirstLine), ';');
+		if (empty($content)) {
+			error("Файл <b>".$file['path']."</b> пуст");
+		}
 		if (preg_match('/[а-я]/si', $firstLine)) {
 			error("Недопустимые кириллические символы в первой строке файла <b>".$file['path']."</b>");
 		}
 		$lineParts = preg_split('/\s+/', $firstLine);
 		$classType = strtolower($lineParts[0]);
+		
 		if (!preg_match('/^[a-z]+$/', $classType)) {
 			error("Недопустимые символы в ключевом слове <b>".$classType."</b> определяющем тип класса в файле <b>".$file['path']."</b>");
 		}
 		if (!is_array($classes[$classType])) {
+			if (!isset($lineParts[1])) {
+				error('Отсутствует корректное определение класса <b>'.$file['name'].'</b> в файле <b>'.$file['path'].'</b>');	
+			}
 			error('Неизвестный тип класса <b>'.$classType.'</b> в файле <b>'.$file['path'].'</b>.<br>Допустимые значения: <b>application</b>, <b>component</b>, <b>view</b>, <b>controller</b>, <b>dialog</b>, <b>form</b>, <b>menu</b>, <b>control</b>');
 		}
 		$classNameRegExp = "/^[A-Z][a-zA-Z\d]+$/";
@@ -1636,6 +1643,23 @@
 		$obfuscatedClassName = generateObfiscatedCssClassName();
 		$cssClassIndex[$className] = $obfuscatedClassName;
 		return $obfuscatedClassName;
+	}
+
+	function getCssConstants($texts) {
+		$constants = array();
+		$regexp = '/\$(\w+)\s*:\s*/';
+		foreach ($texts as $text) {
+			preg_match_all($regexp, $text, $matches);
+			$varNames = $matches[1];
+			if (!empty($varNames)) {
+				$parts = preg_split($regexp, $text);
+				array_shift($parts);
+				foreach ($parts as $i => $part) {
+					$constants[$varNames[$i]] = trim($part);
+				}
+			}
+		}
+		return $constants;
 	}
 
 ?>

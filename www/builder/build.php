@@ -233,6 +233,18 @@
 			createViewDirs($routes, $pathToViews);
 			createErrorViewDirs($errorViews, $pathToViews);
 		}
+		if (isset($config['tooltipClass']) && $config['tooltipClass'] !== null && $config['tooltipClass'] !== false) {
+			if (!is_string($config['tooltipClass'])) {
+				error("Параметр конфигурации <b>tooltipClass</b> должен быть строкой, содержащей название класса");
+			}
+			$tooltipClass = $config['tooltipClass'];
+		}
+		if (isset($config['tooltipApi'])) {
+			if (!is_string($config['tooltipApi'])) {
+				error("Параметр конфигурации <b>tooltipApi</b> должен быть строкой, содержащей путь к api для загрузки текста подсказки");
+			}
+			$tooltipApi = $config['tooltipApi'];
+		}
 
 
 		if (empty($config['entry'])) {
@@ -280,6 +292,7 @@
 		}
 
 		$texts = array();
+		$cssconsts = array();
 		$data = array();
 		$templates = array();
 		$css = array();
@@ -307,12 +320,33 @@
 				$texts[] = $content;
 			} elseif ($file['ext'] == 'data') {
 				$data[] = $content;
+			} elseif ($file['ext'] == 'cssconst') {
+				$cssconsts[] = $content;
 			}
 		}
+		$cssconsts = getCssConstants($cssconsts);
 
 		// compiling CSS
 		if (!empty($css)) {
 			$compiledCss = implode("\n", $css);
+			$regexp = '/\$\w+/';
+			preg_match_all($regexp, $compiledCss, $matches);
+			$matches = $matches[0];
+			if (!empty($matches) && empty($cssconsts)) {
+				error('Обнаружено использование css констант, но не найден ни один файл <b>.cssconst</b> для их описания<br>Разместите файл с любым именем и данным расширением в любой директории вашего приложения<br><br><b>Содержание файла должно иметь вид:</b><br><br>$white: #FFFFFF<br>$block: display: block;<br>$area: position: relative; margin: auto; background-color: #fff;<br><br><b>Использование:</b><br><br>.selector {<br>&nbsp;&nbsp;&nbsp;&nbsp;color: $white;<br>&nbsp;&nbsp;&nbsp;&nbsp;$block<br>&nbsp;&nbsp;&nbsp;&nbsp;$area<br>}');
+			}
+			$parts = preg_split($regexp, $compiledCss);
+			$compiledCss = '';
+			foreach ($parts as $i => $part) {
+				$compiledCss .= $part;
+				if (isset($matches[$i])) {
+					if (!isset($cssconsts[trim($matches[$i], '$')])) {
+						error('Обнаружена неизвестная css константа <b>'.$matches[$i].'</b>');
+					}
+					$compiledCss .= $cssconsts[trim($matches[$i], '$')];
+				}
+			}
+
 			$cssClassIndex = array();
 			$compiledCss = obfuscateCss($compiledCss, $cssClassIndex);
 			$compiledCss = preg_replace("/\t/", " ", $compiledCss);
@@ -481,7 +515,10 @@
 			}
 		}
 		if (!empty($routerMenuClasses)) {
-			error("Класс(ы) <b>".implode(', ', $routerMenuClasses)."</b> указанные в параметре <b>router['menu']</b> не найдены");
+			error("Класс(ы) <b>".implode(', ', $routerMenuClasses)."</b> указанные в параметре конфигурации <b>router['menu']</b> не найдены");
+		}
+		if (!empty($tooltipClass) && !isset($classNames[$tooltipClass])) {
+			error("Класс <b>".$tooltipClass."</b> указанный в параметре конфигурации <b>tooltipClass</b> не найден");
 		}
 
 		$sourcesCache = array();
@@ -506,7 +543,9 @@
 		$globals[] = "var __VIEWCONTAINER = '->>".$viewContainer."';";
 		$globals[] = "var __I = '".($advancedMode ? '_i' : 'initiate')."';";
 		$globals[] = "var __GI = '".($advancedMode ? '_gi' : 'getInitials')."';";
-		
+		$globals[] = "var __TC = ".(!empty($tooltipClass) ? $tooltipClass : 'null').";";
+		$globals[] = "var __TA = '".$tooltipApi."';";
+
 		if (!empty($pathToApi)) {
 			$globals[] = "var __APIDIR = '".$pathToApi."';";
 		}
@@ -663,7 +702,10 @@
 			$compiledJs = '';
 			foreach ($parts as $i => $part) {
 				$compiledJs .= $part;
-				if (isset($cssClasses[$i]) && isset($cssClassIndex[$cssClasses[$i]])) {
+				if (isset($cssClasses[$i])) {
+					if (!isset($cssClassIndex[$cssClasses[$i]])) {
+						$cssClassIndex[$cssClasses[$i]] = addToCssClassIndex($cssClasses[$i]);
+					}
 					$compiledJs .= $cssClassIndex[$cssClasses[$i]];
 				}
 			}

@@ -24,14 +24,14 @@
 body {
 	padding: 0;
 	margin: 0;
-	font-family: ptsans;
+	$regular
 	color: #505b6e;
 }
 h1 {
 	font-weight: normal;
 }
 a {
-	cursor: pointer;
+	$pointer
 	text-decoration: none;
 	color: #505b6e;
 }
@@ -48,22 +48,22 @@ textarea {
   bottom: 0px;
 }
 .bold {
-  font-family: ptsansbold;
+  $bold
 }
 .standart-button {
-  position: relative;
-  display: block;
+  $rel
+  $block
   line-height: 38px;
   max-height: 38px;
   min-height: 38px;
   font-size: 14px;
   background-color: #5c729e;
-  color: #ffffff;
-  font-family: ptsansbold;
+  $white
+  $bold
   border-radius: 3px;
-  text-align: center;
-  cursor: pointer;
-  box-sizing: border-box;
+  $center
+  $pointer
+  $box
   background-image: url(../images/buttons/blue.png);
   background-position: 0 0;
 }
@@ -88,20 +88,26 @@ textarea {
 .standart-button.gray-button:hover {
   border: 1px solid #919498;
   background-color: #d3d5dd;
-    color: #2c3b5a;
+  color: #2c3b5a;
 }
 .standart-button.white-button {
   color: #535f77;
   background-color: #ffffff;
   border: 1px solid #a6b3cb;
   line-height: 36px;
-  font-family: ptsans;
+  $regular
   background-image: none !important;
 }
 .standart-button.white-button:hover {
   border: 1px solid #677CA7;
-    color: #3D485F;
+  color: #3D485F;
 }
 .standart-button.disabled {
   background: #aaa;
+}
+.float-left {
+  $fleft
+}
+.float-right {
+  $fright
 }

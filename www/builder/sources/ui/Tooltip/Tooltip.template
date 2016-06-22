@@ -1,0 +1,1 @@
+<div class="tooltiped app-tooltip {&args.className}" txt="{&args.txt}" key="{&args.key}" cls="{&args.cls}" cap="{&args.caption}"></div>

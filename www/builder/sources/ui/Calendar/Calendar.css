@@ -1,0 +1,76 @@
+.app-calendar {
+	margin-top: 4px;
+    border: 1px solid #e4eaf3;
+    $radius3
+    box-shadow: 0 0 6px #dde4ef;
+    font-size: 14px;
+}
+.app-calendar-header {
+    background-color: #f5f8fc;
+    $rel
+    height: 42px;
+    $radius3
+    border-bottom: 1px solid #d6e1f0;
+}
+.app-calendar-prev,
+.app-calendar-next {
+	$abs
+	width: 30px;
+    top: 0px;
+    bottom: 0px;
+    $bg
+    $pointer
+    z-index: 2;
+}
+.app-calendar-prev {
+	background-image: url(../images/arrows/left1.png);
+	left: 19%;
+}
+.app-calendar-next {
+	background-image: url(../images/arrows/right1.png);
+	right: 19%;
+}
+.app-calendar-prev:hover,
+.app-calendar-next:hover {
+	opacity: 0.7;
+}
+.app-calendar-month {
+    $abs
+    color: #5d687a;
+    line-height: 42px;
+    left: 0;
+    right: 0;
+    $bold
+    $center
+}
+.app-calendar-year {
+	$inb
+	margin-left: 4px;
+}
+.app-calendar-content {
+	padding: 7px;
+}
+.app-calendar-day-names {
+	line-height: 30px;
+	$bold
+	$nowrap
+	color: #6d798f;
+}
+.app-calendar-days span,
+.app-calendar-day-names span {
+	$inb
+	width: 9.2%;
+	$center
+	margin: 2px 2.5%;
+}
+.app-calendar-days span {
+	line-height: 26px;
+}
+.app-calendar-days span.another {
+	color: #bbb;
+}
+.app-calendar-days span.current {
+	background-color: #7e8fad;
+    $white
+    $radius3
+}

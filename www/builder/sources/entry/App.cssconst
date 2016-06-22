@@ -1,0 +1,26 @@
+$red     : #b65f5f
+
+$rel     : position: relative;
+$abs     : position: absolute;
+$fix     : position: fixed;
+$rubber  : position: absolute;left: 0;right: 0;top: 0;bottom: 0;
+$bg      : background-position:center center;background-repeat:no-repeat;
+$block   : display: block;
+$inb     : display: inline-block;
+$none    : display: none;
+$round   : border-radius: 50%;
+$regular : font-family: ptsans;
+$bold    : font-family: ptsansbold;
+$pointer : cursor: pointer;
+$center  : text-align: center;
+$box     : box-sizing: border-box;
+$white   : color: #fff;
+$bgwhite : background-color: #fff;
+$noimg   : background-image: none;
+$left    : text-align: left;
+$right   : text-align: right;
+$fleft   : float: left;
+$fright  : float: right;
+$radius3 : border-radius: 3px;
+$radius4 : border-radius: 4px;
+$nowrap  : white-space: nowrap;

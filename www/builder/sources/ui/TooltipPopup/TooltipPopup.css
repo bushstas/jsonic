@@ -1,0 +1,36 @@
+.app-tooltip-popup {
+	$fix
+	$bgwhite
+	$box
+	$none
+	z-index: 750;
+    border-radius: 3px;
+    border: 1px solid #C1C7D2;
+    font-size: 14px;
+    color: #47536c;
+    line-height: 20px;
+    min-width: 200px;
+    max-width: 400px;
+}
+.app-tooltip-popup.shown {
+	$block
+}
+.app-tooltip-popup-caption {
+    height: 35px;
+    line-height: 36px;
+    border-bottom: 1px solid #e5e9f3;
+    padding-left: 43px;
+    background-image: url(../images/tooltips/info.png);
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-color: #f7f8f9;
+    color: #4a5b6f;
+    font-size: 16px;
+    $bold
+}
+.app-tooltip-popup-caption:empty {
+	$none
+}
+.app-tooltip-popup-text {
+	padding: 15px 18px;
+}

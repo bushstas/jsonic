@@ -9,6 +9,7 @@
 					<component UserInfo>
 					<div class="mainpage-leftcolumn-title bold">
 						{@calendar}
+						<component Tooltip args="{#calendarTooltip}">
 					</div>
 					<component Calendar>
 				</div>

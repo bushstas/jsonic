@@ -1,6 +1,7 @@
 function EventHandler() {
-	var listeners = [];
+	var listeners;
 	this.listen = function(element, type, handler) {
+		listeners = listeners || [];
 		listeners.push([element, type, handler]);
 		element.addEventListener(type, handler, false);
 	};

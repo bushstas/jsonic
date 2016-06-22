@@ -110,3 +110,10 @@ Element.prototype.setStyle = function(style) {
 Element.prototype.getChildAt = function(index) {
 	return this.childNodes[index];
 };
+Element.prototype.attr = function(attrName) {
+	if (!isUndefined(arguments[1])) {
+		this.setAttribute(attrName, arguments[1]);
+	} else {
+		return this.getAttribute(attrName);
+	}
+};

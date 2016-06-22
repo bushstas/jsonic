@@ -63,5 +63,7 @@
 		"fullAccess": 11
 	},
 
-	"pathToDictionary": "dictionary/get.php"
+	"pathToDictionary": "dictionary/get.php",
+	"tooltipClass": "TooltipPopup",
+	"tooltipApi": "tooltip/get.php"
 }

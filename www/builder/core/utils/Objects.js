@@ -48,6 +48,7 @@ function Objects() {
 				}
 			}
 		}
+		return arrs[0];
 	};
 	this.clone = function(obj) {
 		if (!isArrayLike(obj)) return obj;

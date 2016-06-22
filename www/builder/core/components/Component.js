@@ -15,6 +15,11 @@ Component.prototype.render = function(parentElement) {
 };
 
 Component.prototype.processInitials = function() {
+	this.initials = this.initials || {};
+	if (isObject(this.props['args'])) {
+		this.initials['args'] = Objects.merge(this.initials['args'], this.props['args']);
+		delete this.props['args'];
+	}
 	var initials = this.initials;
 	if (isObject(initials)) {
 		for (var k in initials) {
