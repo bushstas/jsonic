@@ -13,3 +13,6 @@ MouseEvent.prototype.targetHasAncestor = function(element) {
 	}
 	return false;
 };
+MouseEvent.prototype.targetHasClass = function(className) {
+	return this.target.hasClass(className) || (!!this.target.parentNode && this.target.parentNode.hasClass(className));
+};

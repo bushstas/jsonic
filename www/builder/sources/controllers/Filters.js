@@ -15,7 +15,7 @@ initial actions = {
 		'callback': this.onLoad.bind(this)
 	},
 	'save': {
-		'url'     : CONFIG.filters.add,
+		'url'     : CONFIG.filters.save,
 		'method'  : 'POST',
 		'callback': this.onAdd
 	},

@@ -17,8 +17,8 @@ initial controllers = [
 initial helpers = [
 	{
 		'helper': CheckboxHandler,
-		'callback': this.onCheckboxChange,
 		'options': {
+			'callback': this.onCheckboxChange,
 			'intValue': true,
 			'checkboxClass': '->> app-ui-checkbox',
 			'checkboxCheckedClass': '->> checked',

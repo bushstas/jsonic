@@ -297,6 +297,7 @@
 		$templates = array();
 		$css = array();
 		$apiConfig = '';
+		$isConfigJsFile = false;
 		foreach ($files as $file) {
 			$content = file_get_contents($file['path']);
 			$content = preg_replace('/^\s+|\s+$/', '', $content);
@@ -305,9 +306,10 @@
 				$content = preg_replace("/\/\*[\S\s]*?\*\//", "", $content);
 				if ($file['name'] == 'config') {
 					if (!preg_match('/^\s*var +CONFIG *= *\{/', $content)) {
-						error('Файл конфигурации путей к api <b>config.js</b> должен иметь вид <b>var CONFIG = {...}</b>');
+						error("Файл конфигурации путей к api <b>config.js</b> должен иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>");
 					}
 					$apiConfig = preg_replace('/^\s*var +CONFIG *= *|[;\r\n\t]/', '', $content);
+					$isConfigJsFile = true;
 				} else {
 					parseJsClass($content, $classes, $file);
 				}
@@ -323,6 +325,11 @@
 			} elseif ($file['ext'] == 'cssconst') {
 				$cssconsts[] = $content;
 			}
+		}
+		if (!$isConfigJsFile) {
+			error("Файл конфигурации путей к api <b>config.js</b> не найден.<br>Поместите его в любую директорию вашего приложения.<br><b>Содержимое файла должно иметь вид:</b>
+				<xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp><br><b>Использование:</b><br><br>CONFIG.items.get
+			");
 		}
 		$cssconsts = getCssConstants($cssconsts);
 
@@ -509,6 +516,18 @@
 						}
 					}
 				}
+				if (is_array($component['onActions'])) {
+					foreach ($component['onActions'] as $componentAction) {
+						$controller = $classes['controller'][$componentAction['controller']];
+						$actions = $controller['actions'];
+						if (!is_array($actions)) {
+							$actions = array();
+						}
+						if (!isset($actions[$componentAction['action']])) {
+							error('Событие <b>'.$componentAction['action'].'</b> указаннное в initial параметре <b>controllers</b> класса <b>'.$component['name'].'</b> не найдено в initial параметре <b>actions</b> контроллера <b>'.$componentAction['controller'].'</b>');
+						}
+					}
+				}
 			}
 		}
 		foreach ($routeControllersToLoad as $routeControllersToLoad) {
@@ -556,6 +575,11 @@
 			$globals[] = createObjectString('__USEROPTIONS', $user, array('/\\\/', ''));
 		}
 		if (!empty($apiConfig)) {
+			$apiConfigJson = transformIntoValidJson($apiConfig);
+			$apiConfigObject = json_decode($apiConfigJson, true);
+			if ($apiConfigObject === null) {
+				error("Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>");
+			}
 			$globals[] = createObjectString('CONFIG', $apiConfig, array('/\\\/', ''));
 		}
 		
@@ -712,6 +736,13 @@
 				}
 			}
 		}
+		preg_match_all('/CONFIG\.(\w+)\.(\w+)/', $compiledJs, $matches);
+		foreach ($matches[1] as $i => $match) {
+			if (empty($apiConfigObject[$match][$matches[2][$i]])) {
+				error("Параметр <b>CONFIG.".$match.".".$matches[2][$i]."</b> не найден в файле конфигурации <b>config.js</b>");
+			}
+		}
+		
 		$compiledJs = preg_replace('/->> {0,1}/', '', $compiledJs);
 		if ($advancedMode) {
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);

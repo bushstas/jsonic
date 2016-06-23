@@ -70,8 +70,8 @@ Component.prototype.addFollower = function(name, handler) {
 };
 
 Component.prototype.subscribeToHelper = function(options) {
-	if (isFunction(options['callback'])) {
-		options['helper'].subscribe(this, options['callback'], options['options']);
+	if (isObject(options['options'])) {
+		options['helper'].subscribe(this, options['options']);
 	}
 };
 

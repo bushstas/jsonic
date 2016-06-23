@@ -1,16 +1,14 @@
 function CheckboxHandler() {
 	var subscribers = [];
-	var handlers = [];
 	var options = [];
 	var defaultCheckboxClass = '->> app-ui-checkbox';
 	var defaultCheckboxCheckedClass = '->> checked';
-	var currentOptions, currentHandler, currentObject,
+	var currentOptions, currentObject,
 		currentClasses, currentCheckedClass, currentTarget;
 
-	this.subscribe = function(subscriber, handler, opts) {
-		if (isFunction(handler) && subscribers.indexOf(subscriber) == -1) {
+	this.subscribe = function(subscriber, opts) {
+		if (isFunction(opts['callback']) && subscribers.indexOf(subscriber) == -1) {
 			subscribers.push(subscriber);
-			handlers.push(handler);
 			options.push(opts || null);
 			var element = subscriber.getElement();
 			if (element) {
@@ -27,7 +25,7 @@ function CheckboxHandler() {
 			defineCheckedClass();			
 			var checked = isChecked();
 			currentTarget.toggleClass(currentCheckedClass, checked);
-			currentHandler.call(currentObject, {
+			currentOptions['callback'].call(currentObject, {
 				'target': currentTarget,
 				'value': getValue(),
 				'checked': checked,
@@ -37,7 +35,6 @@ function CheckboxHandler() {
 	};
 	var defineOptions = function(index) {
 		currentOptions = options[index];
-		currentHandler = handlers[index];
 		currentObject = subscribers[index];
 	};
 	var isProperTarget = function() {

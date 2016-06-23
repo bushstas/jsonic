@@ -518,6 +518,7 @@
 			}
 			validateCallback($value['callback'], $initialValue, $initialType, $component, $key, 'callback');
 		}
+		$component['actions'] = $initials;
 	}
 
 	function validateLoaderInitials($initials, $initialValue, $initialType, &$component) {
@@ -600,6 +601,7 @@
 		if (!isArray($initials, $initialValue)) {
 			initialArrayTypeError($initialValue, $initialType, $component);
 		}
+		$component['onActions'] = array();
 		foreach ($initials as $i => $value) {
 			validateObjectFields($value, $initialValue, $initialType, $component);
 			if (!isAssocArray($value)) {
@@ -611,7 +613,11 @@
 			if (empty($value['on'])) {
 				error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет элемент с индексом <b>'.$i.'</b>, у которого отсутствует параметр <b>on</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
 			}
-			validateCallback($value['callback'], $initialValue, $initialType, $component, $i, 'callback');
+			validateObjectFields($value['on'], $initialValue, $initialType, $component);
+			foreach ($value['on'] as $action => $callback) {
+				validateCallback($callback, $initialValue, $initialType, $component, $i, 'callback');
+				$component['onActions'][] = array('controller' => $value['controller'], 'action' => $action);
+			}
 			$component['controllers'][] = $value['controller'];
 		}
 	}

@@ -20,6 +20,9 @@ function Dates() {
 		}
 		return months[this.getMonth()];
 	};
+	this.getTimeStamp = function() {
+		return new Date().getTime();
+	};
 	this.getDays = function(month, year) {
 		return 33 - new Date(year, month, 33).getDate();
 	};

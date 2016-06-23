@@ -1,12 +1,7 @@
 component Calendar
 
-function initiate() {
-	this.month = Dates.getMonth();
-	this.year = Dates.getYear();
-}
-
 function onRendered() {
-	this.redraw();
+	this.reset();
 }
 
 function redraw() {
@@ -49,7 +44,9 @@ function isCurrentMonth() {
 }
 
 function reset() {
-	this.changeMonth();
+	this.month = Dates.getMonth();
+	this.year = Dates.getYear();
+	this.redraw();
 }
 
 function isMarked() {
@@ -65,17 +62,13 @@ function onNextClick() {
 }
 
 function changeMonth(value) {
-	if (!isNumber(value)) {
-		this.initiate();
-	} else {
-		this.month += value;
-		if (this.month == 12) {
-			this.month = 0;
-			this.year++;
-		} else if (this.month == -1) {
-			this.month = 11;
-			this.year--;
-		}
+	this.month += value;
+	if (this.month == 12) {
+		this.month = 0;
+		this.year++;
+	} else if (this.month == -1) {
+		this.month = 11;
+		this.year--;
 	}
 	this.redraw();
 }

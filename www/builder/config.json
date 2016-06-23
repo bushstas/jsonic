@@ -22,6 +22,7 @@
 				"view": "Main",
 				"accessLevel": 10,
 				"title": "Home",
+				"load": ["Favorites"],
 				"params": {
 					"text": "blablabla",
 					"name": "$2"
