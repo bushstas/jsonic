@@ -1,0 +1,1 @@
+component DataTableStandartRow extends DataTableRow

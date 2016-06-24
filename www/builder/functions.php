@@ -862,6 +862,7 @@
 	}
  
 	function getTemplateFunctions($template, $class, $component) {
+		global $calledComponents;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
 		$template = preg_replace('/&nbsp;/', '\u00A0', $template);
@@ -870,7 +871,7 @@
 		preg_match_all($regexp, $template, $matches);
 		$templateNames = $matches[1];
 		if (!empty($templateNames)) {
-			if (!preg_match("/\{template +\.main *\}/", $template) && !hasParentMainTemplate($component)) {
+			if (!preg_match("/\{template +\.main *\}/", $template) && !hasParentMainTemplate($component) && in_array($component['name'], $calledComponents)) {
 				error('Шаблон <b>main</b> класса <b>'.$class.'</b> не найден среди прочих');
 			}
 			$templateContents = preg_split($regexp, $template);

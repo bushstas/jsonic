@@ -481,11 +481,13 @@
 
 		// Checking components
 		$usedComponents = array();
+		$calledComponents = array();
 		$filesOfUsedComponents = array();
 		foreach ($templates as $filename => $file) {
 			preg_match_all("/<component +[\"']*([^\"'\s>]+)/i", $file, $matches);
 			foreach ($matches[1] as $match) {
 				$usedComponents[] = $match;
+				$calledComponents[$match] = 1;
 				if (!is_array($filesOfUsedComponents[$match])) {
 					$filesOfUsedComponents[$match] = array();
 				}
@@ -819,6 +821,27 @@
 			rename('base2.js', DEFAULT_PATH.$pathToCompiledJs);
 		} else {
 			createFile(DEFAULT_PATH.$pathToCompiledJs, $compiledJs);
+		}
+
+		if (!empty($config['scripts'])) {
+			if (!is_string($config['scripts'])) {
+				error("\nПараметр конфигурации <b>scripts</b> присутствует, но не является строкой.");
+			}
+			if (!is_dir($config['scripts'])) {
+				error("\nДиректория, указанная в параметре конфигурации <b>scripts</b> не найдена.");
+			}
+			$files = gatherFiles($config['scripts'], array(), true);
+			$additionalContent = '';
+			foreach ($files as $file) {
+				if ($file['ext'] == 'js') {
+					$additionalContent .= rtrim($file['content'], ';').';';
+				}
+			}
+			if (!empty($additionalContent)) {
+				$jsCompiledContent = file_get_contents(DEFAULT_PATH.$pathToCompiledJs);
+				$jsCompiledContent = $additionalContent."\n\n".$jsCompiledContent;
+				createFile(DEFAULT_PATH.$pathToCompiledJs, $jsCompiledContent);
+			}
 		}
 		
 		

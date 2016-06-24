@@ -1,0 +1,18 @@
+{template .colorMark}
+	<div class="app-datatable-color-mark">
+	mark
+	</div>	
+{/template}
+
+{template .controls}
+	<div class="app-datatable-checkbox-container">
+		checkbox
+	</div>
+	<div class="app-datatable-star-container">
+		star
+	</div>
+{/template}
+
+{template .hotMark}
+	<div data-title="Горячий тендер - у данной закупки заканчивается период подачи заявок на участие." class="tooltiped datatable-tooltiped datatable-hot-tender" data-timeout="true"></div>
+{/template}

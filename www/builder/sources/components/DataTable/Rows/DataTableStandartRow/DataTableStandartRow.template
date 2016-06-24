@@ -1,0 +1,24 @@
+{template .main}
+	<a href="#tender/{&args['Id']}" target="_blank" class="app-datatable-standart-row" scope="1" data-id="{&args['Id']}">
+		<template colorMark>
+		<template controls>
+		<div class="app-datatable-standart-row-top">
+		
+		</div>
+		<div class="app-datatable-standart-row-price">
+			{&args['price']}
+		</div>
+		<div class="app-datatable-standart-row-name">
+			{if &args['hot']}
+				<template hotMark>										
+			{/if}
+			{&args['name']}	
+		</div>
+		<div class="app-datatable-standart-row-bottom">
+		
+		</div>
+		{if $fragments}
+			<component DataTableFragmets data="{$fragments}">
+		{/if}
+	</a>
+{/template}

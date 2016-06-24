@@ -1,5 +1,7 @@
 $red        : #b65f5f
 $width      : width: 1350px;
+$segoebold  : font-family: segoesemibold;
+$segoe      : font-family: Segoe UI;
 
 $l          : left: 0;
 $r          : right: 0;

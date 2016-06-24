@@ -11,7 +11,8 @@
 	"scope"      : "./sources",
 	"sources"    : "./core",
 	"blanks"     : "./blanks",
-	"container"  : "app-view-container",	
+	"scripts"    : "./scripts",
+	"container"  : "app-view-container",
 	"views"      : "views",
 	"pathToApi"  : "api",
 	

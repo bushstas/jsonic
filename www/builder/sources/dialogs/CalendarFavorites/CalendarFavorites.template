@@ -1,3 +1,5 @@
 {template .content}
-	111111111111111
+	{foreach $tenders as &index => &tender}
+		<component DataTableStandartRow args="{&tender}">
+	{/foreach}
 {/template}
