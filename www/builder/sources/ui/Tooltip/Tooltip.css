@@ -1,15 +1,5 @@
 .app-tooltip {
-	width: 18px;
-	height: 18px;
-	background-color: #C1C6D6;
-	line-height: 17px;
-	$inb
-	$round
-	$pointer
-	$bold
-	$center
-	$box
-	$white
+	$wh18 $bc#C1C6D6 $lh17 $inb $round $pointer $bold $center $box $white
 }
 .app-tooltip:before {
 	content: '!';

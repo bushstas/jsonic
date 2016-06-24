@@ -296,6 +296,7 @@
 		$data = array();
 		$templates = array();
 		$css = array();
+		$cssData = array();
 		$apiConfig = '';
 		$isConfigJsFile = false;
 		foreach ($files as $file) {
@@ -316,8 +317,8 @@
 			} elseif ($file['ext'] == 'template') {
 				$templates[$file['name']] = $content;
 			} elseif ($file['ext'] == 'css') {
-				$css[] = '/* '.$file['name'].' */';
-				$css[] = $compiledCss = preg_replace("/\/\*[^\*]*\*\//", "", $content);
+				$cssData[] = $file;
+				$css[] =  '/* '.$file['name'].' */'.preg_replace("/\/\*[^\*]*\*\//", "", $content);
 			} elseif ($file['ext'] == 'texts') {
 				$texts[] = $content;
 			} elseif ($file['ext'] == 'data') {
@@ -335,7 +336,69 @@
 
 		// compiling CSS
 		if (!empty($css)) {
+			foreach ($css as $i => &$cssFile) {
+				$regexp = '/\$imgsrc\s*=\s*([^\s]+)/';
+				preg_match_all($regexp, $cssFile, $matches);
+				if (count($matches[0]) > 1) {
+					error('Обнаружено более одного <b>$imgsrc</b> определения пути к фоновым изображениям в файле стилей <b>'.$cssData[$i]['path'].'</b>');
+				}
+				$pathToImages = '';
+				if (count($matches[1]) > 0) {
+					$pathToImages = rtrim($matches[1][0], '/').'/';
+					$cssFile = preg_replace($regexp, '', $cssFile);
+					$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)\s*=\s*([^\s]+)/i', "background-image:url(".$pathToImages."$2.$1);", $cssFile);
+				}
+			}
 			$compiledCss = implode("\n", $css);
+			$regexp = '/\$\s*\(([^\)]+)\)/';
+			preg_match_all($regexp, $compiledCss, $matches);
+			$matches = $matches[1];			
+			$parts = preg_split($regexp, $compiledCss);
+			$compiledCss = '';
+			foreach ($parts as $i => $part) {
+				$compiledCss .= $part;
+				if (isset($matches[$i])) {
+					$styles = preg_split('/[ \$]/', $matches[$i]);
+					foreach ($styles as $style) {
+						if (!empty($style)) {
+							if (!preg_match('/^background-image/', $style)) {
+								$compiledCss .= '$'.trim($style, '$').' ';
+							} else {
+								$compiledCss .= $style;
+							}
+						}
+					}
+				}
+			}
+			$shorts = array(
+				'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
+				'p' => 'padding', 'pl' => 'padding-left', 'pr' => 'padding-right', 'pt' => 'padding-top', 'pb' => 'padding-bottom',
+				'm' => 'margin', 'ml' => 'margin-left', 'mr' => 'margin-right', 'mt' => 'margin-top', 'mb' => 'margin-bottom',
+				'fs' => 'font-size', 'lh' => 'line-height', 'br' => 'border-radius', 'mah' => 'max-height', 'mih' => 'min-height',
+				'maw' => 'max-width', 'miw' => 'min-width'
+			);
+			foreach ($shorts as $k => $v) {
+				$regexp = '/\$'.$k.' *(-*\#*[\d\.]+)(%)*/';
+				$px = !in_array($k, array('z')) ? 'px' : '';
+				$compiledCss = preg_replace($regexp, $v.":$1".$px."$2;", $compiledCss);
+			}
+			$shorts = array('c' => 'color', 'bc' => 'background-color', 'boc' => 'border-color');
+			foreach ($shorts as $k => $v) {
+				$regexp = '/\$'.$k.'\# *(\w{3,6})/';
+				$compiledCss = preg_replace($regexp, $v.":#$1;", $compiledCss);
+			}
+			$shorts = array('bo' => 'border', 'bol' => 'border-left', 'bot' => 'border-top', 'bor' => 'border-right', 'bob' => 'border-bottom');
+			foreach ($shorts as $k => $v) {
+				$regexp = '/\$'.$k.'\# *(\w{3,6})/';
+				$compiledCss = preg_replace($regexp, $v.":1px solid #$1;", $compiledCss);
+			}
+
+			$compiledCss = preg_replace('/\$rot(-*\d+)/', "transform:rotate($1deg);", $compiledCss);
+			$compiledCss = preg_replace('/\$wh(\d+)(%)*/', "width:$1px$2;height:$1px$2;", $compiledCss);
+
+
+			$compiledCss = str_replace('px%', '%', $compiledCss);
+			$compiledCss = preg_replace('/;{2,}/', ';', $compiledCss);
 			$regexp = '/\$\w+/';
 			preg_match_all($regexp, $compiledCss, $matches);
 			$matches = $matches[0];

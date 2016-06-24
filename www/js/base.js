@@ -1,5 +1,5 @@
 ;(function() {
-var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442',' \u00A0 ','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
+var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442',' \u00A0 ','111111111111111','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
 var __ = ['\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','standart-button','standart-button green-button','standart-button red-button','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a'];
 var __V = [{'cmpid':'name','type':'text','name':'name','caption':__[21],'class':'half-width'},{'cmpid':'phone','type':'text','name':'phone','caption':__[22],'class':'half-width'},{'cmpid':'email','type':'text','name':'email','caption':__[23],'class':'half-width'},{'key':'calendar','className':'float-right'}];
 var __DICTURL = 'dictionary/get.php';
@@ -3143,9 +3143,8 @@ FavoritesCalendar.prototype.onLoadFavorites = function(data) {
 };
 FavoritesCalendar.prototype.onMarkedDayClick = function(e) {
 	var timestamp = e.target.innerHTML + '.' + (this.month + 1) + '.' + this.year;
-	console.log(this.tenderByDates)
 	if (isArray(this.tenderByDates[timestamp])) {
-		alert(111)
+		Dialoger.show(CalendarFavorites, {'tenders': this.tenderByDates[timestamp]});
 	}
 };
 FavoritesCalendar.prototype.getInitials = function() {
@@ -3341,6 +3340,12 @@ UserInfoLoader.prototype.getInitials = function() {
 		'actions':{'load': {'url' : CONFIG.user.get,'method' : 'GET'}}
 	};
 };
+function CalendarFavorites(props) {
+	Initialization.initiate.call(this, props);
+};
+CalendarFavorites.prototype.getTemplateContent = function(p, args) {
+	return[__T[2]]
+};
 function FilterEdit(props) {
 	Initialization.initiate.call(this, props);
 };
@@ -3398,7 +3403,7 @@ AuthForm.prototype.onSuccess = function() {
 	window.location.reload();
 };
 AuthForm.prototype.getTemplateMain = function(p, args) {
-	return[{'c':__T[2],'t':0,'p':{'c':'app-authform-logo'}},{'t':0,'p':{'c':'app-authform-inputs'}}]
+	return[{'c':__T[3],'t':0,'p':{'c':'app-authform-logo'}},{'t':0,'p':{'c':'app-authform-inputs'}}]
 };
 AuthForm.prototype.getInitials = function() {
 	return {
@@ -3595,9 +3600,9 @@ function TopMenu(props) {
 	this.isRouteMenu = true;
 };
 TopMenu.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[3],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[4],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[5],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[6],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[7],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
+	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[4],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[5],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[6],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[7],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[8],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
 };
-Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,SearchForm,SearchFormFilters,TenderSearchForm,Submit,Calendar,Checkbox,Dialog,PopupMenu,TabPanel,Tooltip,TooltipPopup,UserInfo],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTable,[TendersDataTable],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,UserInfoLoader],Dialog,[FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,SearchForm,SearchFormFilters,TenderSearchForm,Submit,Calendar,Checkbox,Dialog,PopupMenu,TabPanel,Tooltip,TooltipPopup,UserInfo],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTable,[TendersDataTable],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
 Objects = new Objects();
 Router = new Router();
 User = new User();

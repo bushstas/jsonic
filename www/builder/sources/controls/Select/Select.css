@@ -1,67 +1,39 @@
 .app-select {
-    position: relative;
-    box-sizing: border-box;
-    color: #6f7b9a;
-    font-family: ptsansbold;
-    font-size: 14px;
-    border: 1px solid #bec8da;
+    $(rel box bold c#6f7b9a fs14 bo#bec8da br3 pointer)
     box-shadow: inset 2px 1px 3px #d7deec;
-    border-radius: 3px;
-    cursor: pointer;
 }
 .app-select:hover {
-    border-color: #68758c;
+    $boc#68758c
     box-shadow: 1px 1px 6px #bfc7d8;
 }
 .app-select.active {
-    z-index: 10;
+    $z10
 }
 .app-select.active:hover {
-    z-index: 15;
+    $z15
 }
 .app-select-value {
-    padding: 10px 10px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    $ (p10 nowrap ovh ell)
+    
 }
 .app-select-options {
-    position: absolute;
-    display: none;
-    top: 100%;
-    left: -1px;
-    right: -1px;
-    margin-top: 2px;
-    max-height: 300px;
+    $ (abs none t100% l-1 r-1 mt2 mah300 bgwhite bo#bec8da br4 p6 regular)
     overflow: auto;
-    background-color: #ffffff;
-    border: 1px solid #bec8da;
-    border-radius: 4px;
     box-shadow: 2px 2px 5px #e4e4e4;
-    padding: 6px;
 }
 .app-select.active .app-select-options {
-    display: block;
-    font-family: ptsans;
+    $block 
 }
 .app-select-option {
-    line-height: 13px;
-    font-size: 13px;
-    padding: 7px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
-    color: #444C61;
+    $( lh13 fs13 p7 tovh pointer c#444C61)
 }
 .app-select-option:hover {
-    color: #5f6b7f;
-    background-color: #e7ecf4;
+    $ (c#5f6b7f bc#e7ecf4)
 }
 .app-select-option.disabled {
-    color: #a5aec0;
+    $c#a5aec0
     cursor: default;
 }
 .app-select-option.disabled:hover {
-    background-color: #ffffff;
+    $bgwhite
 }

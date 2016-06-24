@@ -2,35 +2,22 @@
 	margin: 5px 0;
 }
 .app-input-container.half-width {
-	display: inline-block;
-	width: 49%;
-    vertical-align: top;
+	$inb $w49% $vtop
 }
 .app-input-container.half-width:nth-child(2n) {
-	margin-left: 2%;
+	$ml2%
 }
 .app-input-caption {
-	color: #6f7b9a;
-    font-size: 14px;
-    line-height: 14px;
-    margin-bottom: 6px;
+	$c#6f7b9a $fs14 $lh14 $mb6
 }
 .app-input-container textarea,
 .app-input-container input {
-	padding: 10px 10px;
-	box-sizing: border-box;
-    width: 100%;
-    background-color: transparent;
-    color: #6f7b9a;
-    font-family: ptsansbold;
-    font-size: 14px;
-	border: 1px solid #bec8da;
+	$p10 $box $w100% $tran $c#6f7b9a $bold $fs14 $bo#bec8da $br3
     box-shadow: inset 2px 1px 3px #d7deec;
-    border-radius: 3px;
 }
 .app-input-container textarea:focus,
 .app-input-container input:focus {
-    border-color: #38986a;
+    $boc#38986a 
     box-shadow: 1px 1px 6px #93C7AE;
     outline: none;
 }

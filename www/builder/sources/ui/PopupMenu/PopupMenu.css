@@ -1,37 +1,11 @@
 .app-popup-menu-outer-container {
-    position: absolute;
-    z-index: 500;
-    width: 200px;
-    margin-top: 1px;
-    text-align: left;
-    top: 100%;
-    border-radius: 3px;
-    background-color: #ffffff;
-    border-left: 1px solid #6C7992;
-    border-right: 1px solid #6C7992;
-    max-height: 0px;
-    overflow: hidden;
+    $abs $z500 $w200 $mt1 $left $t100% $br3 $bgwhite $bol#6C7992 $bor#6C7992 $mah0 $ovh
     transition: all 0.2s;
 }
 .app-popup-menu-inner-container {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    $abs $l $r $b $bot#6C7992 $bob#6C7992 $bgwhite $br3
     padding: 5px 0;
-    border-top: 1px solid #6C7992;
-    border-bottom: 1px solid #6C7992;
-    background-color: #ffffff;
-    border-radius: 3px;
 }
 .app-popup-menu-button {
-    position: relative;
-    padding-left: 15px;
-    line-height: 30px;
-    font-size: 14px;
-    color: #424b57;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    height: 30px;
+    $rel $pl15 $lh30 $fs14 $c#424b57 $pointer $nowrap $ovh $h30
 }

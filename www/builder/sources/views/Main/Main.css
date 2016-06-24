@@ -1,53 +1,32 @@
+$imgsrc = ../images/mainpage
+
 .main-view-content {
-	position: relative;
-	width: 1350px;
-	margin: auto;
+	$rel $width $ma
 }
 .main-view-content table {
-	width: 100%;
+	$w100%
 }
 .app-mainpage-table td {
-	vertical-align: top;
+	$vtop
 }
 .app-mainpage-table .app-mainpage-left-column {
-	width: 354px;    
-    padding: 12px;
+	$w354 $p12    
 }
 .app-mainpage-left-column-area {
-	position: relative;
+	$rel $mih180 $br3 $fs14
     padding: 49px 20px 12px 20px;
-    min-height: 180px;
     box-shadow: 0 0 6px #c1c5d1;
-    border-radius: 3px;
-    font-size: 14px;
 }
 .app-mainpage-left-column-title {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    line-height: 39px;
-    height: 37px;
-    color: #edf0f4;
-    background-color: #51648d;
+    $abs $l $r $t $lh39 $h37 $c#edf0f4 $bc#51648d $pl43 $bold $norep $png = person-icon
     border-radius: 3px 3px 0 0;
-    padding-left: 43px;
-    background-image: url(../images/mainpage/person-icon.png);
-    background-repeat: no-repeat;
     background-position: 17px 50%;
-    font-family: ptsansbold;
 }
 .app-mainpage-left-column > div:last-child {
-    position: relative;
+    $rel $mih180 $br3 $fs14
     padding: 49px 20px 12px 20px;
-    min-height: 180px;
     box-shadow: 0 0 6px #c1c5d1;
-    border-radius: 3px;
-    font-size: 14px;
 }
 .mainpage-leftcolumn-title {
-    margin-top: 27px;
-    font-size: 16px;
-    color: #4c546b;
-    padding-bottom: 7px;
+    $mt27 $fs16 $c#4c546b $pb7
 }

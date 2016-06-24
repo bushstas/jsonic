@@ -1,59 +1,39 @@
+$imgsrc = ../images/topmenu
 .app-top-menu {
-	position: fixed;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    z-index: 2;
-    height: 42px;
-    line-height: 42px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #B6BFCE;
+	$fix $t $l $r $z2 $h42 $lh42 $bgwhite $bob#B6BFCE
     box-shadow: 0 1px 6px #D1D8E2;
 }
 .app-top-menu-inner {
-    position: relative;
+    $rel
 }
 body.main-page .app-top-menu-inner {
-    width: 1350px;
-    margin: auto;
+    $width $ma
 }
 .app-top-menu a {
-	display: block;
-    float: left;
-    height: 38px;
-    padding-left: 35px;
-    padding-right: 20px;
-    background-repeat: no-repeat;
+	$rel $block $fleft $h38 $pl35 $pr20 $norep $c#4c546b $fs14
     background-position: 10px 54%;
-    position: relative;
-    color: #4c546b;
-    font-size: 14px;
     border-bottom: 4px solid #ffffff;
 }
 .app-top-menu a.app-top-menu-logo {
-    width: 148px;
-    height: 42px;
+    $w148 $h42 $box $png = logo
     background-position: 50% 64%;
-    background-image: url(../images/topmenu/logo.png);
-    box-sizing: border-box;
 }
 .app-top-menu a:nth-child(2) {
-	background-image: url(../images/topmenu/main.png);
+	$png = main
 }
 .app-top-menu a:nth-child(3) {
-	background-image: url(../images/topmenu/search.png);
+	$png = search
 }
 .app-top-menu a:nth-child(4) {
-	background-image: url(../images/topmenu/favorite.png);
+	$png = favorite
 }
 .app-top-menu a:nth-child(5) {
-	background-image: url(../images/topmenu/planzakupok.png);
+	$png = planzakupok
 }
 .app-top-menu a:nth-child(6) {
-	background-image: url(../images/topmenu/analytics.png);
+	$png = analytics
 }
 .app-top-menu a.active {
-    color: #4C546B;
-    font-family: ptsansbold;
-    border-bottom: 4px solid #4C546B !important;
+    $c#4C546B $bold 
+    border-bottom: 4px solid #4C546B $i;
 }

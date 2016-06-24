@@ -1,11 +1,11 @@
-*::-webkit-scrollbar { width: 10px; height: 10px;} 
-*::-webkit-scrollbar-button { background-color: #c1c1c1;display: none;} 
-*::-webkit-scrollbar-track { background-color: #bec5cf;} 
-*::-webkit-scrollbar-track-piece { background-color: #bec5cf;} 
-*::-webkit-scrollbar-thumb { min-height: 35px; min-width: 35px; background-color: #45546d; cursor: pointer;} 
-*::-webkit-scrollbar-thumb:hover { background-color: #60708b;} 
-*::-webkit-scrollbar-corner { background-color: #bec5cf;}
-*::-webkit-resizer { background-color: #bec5cf;}
+*::-webkit-scrollbar { $wh10 } 
+*::-webkit-scrollbar-button { $none } 
+*::-webkit-scrollbar-track { $bc#bec5cf } 
+*::-webkit-scrollbar-track-piece { $bc#bec5cf } 
+*::-webkit-scrollbar-thumb { $mih35 $miw35 $bc#45546d $pointer } 
+*::-webkit-scrollbar-thumb:hover { $bc#60708b } 
+*::-webkit-scrollbar-corner { $bc#bec5cf }
+*::-webkit-resizer { $bc#bec5cf }
 
 @font-face {
     font-family: 'ptsans';
@@ -22,88 +22,54 @@
   font-style: normal;
 }
 body {
-	padding: 0;
-	margin: 0;
-	$regular
-	color: #505b6e;
+	$p0 $m0 $regular $c#505b6e
 }
 h1 {
-	font-weight: normal;
+	$normal
 }
 a {
-	$pointer
+	$pointer $c#505b6e
 	text-decoration: none;
-	color: #505b6e;
 }
 textarea {
   resize: none;
 }
 .app-view-container {
-	padding: 0;
-  position: absolute;
-  z-index: 1;
-  top: 43px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+	$abs $p0 $z1 $t43 $l $r $b
 }
 .bold {
   $bold
 }
 .standart-button {
-  $rel
-  $block
-  line-height: 38px;
-  max-height: 38px;
-  min-height: 38px;
-  font-size: 14px;
-  background-color: #5c729e;
-  $white
-  $bold
-  border-radius: 3px;
-  $center
-  $pointer
-  $box
+  $rel $block $lh38 $mah38 $mih38 $fs14 $bc#5c729e $white $bold $br3 $center $pointer $box
   background-image: url(../images/buttons/blue.png);
   background-position: 0 0;
 }
 .standart-button:hover {
-  background-position: 0 100% !important;
+  background-position: 0 100% $i;
 }
 .standart-button.green-button {
+  $bc#38986a
   background-image: url(../images/buttons/green.png);
-  background-color: #38986a;
 }
 .standart-button.red-button {
+  $bc#b65f5f
   background-image: url(../images/buttons/red.png);
-  background-color: #b65f5f;
 }
 .standart-button.gray-button {
-  background-image: none !important;
-  background-color: #e1e1e2;
-  color: #40434e;
-  border: 1px solid #b7b6b6;
-  line-height: 36px;
+  $noimg $bc#e1e1e2 $c#40434e $bo#b7b6b6 $lh36
 }
 .standart-button.gray-button:hover {
-  border: 1px solid #919498;
-  background-color: #d3d5dd;
-  color: #2c3b5a;
+  $bo#919498 $bc#d3d5dd $c#2c3b5a
 }
 .standart-button.white-button {
-  color: #535f77;
-  background-color: #ffffff;
-  border: 1px solid #a6b3cb;
-  line-height: 36px;
-  $regular
-  background-image: none !important;
+  $noimg $c#535f77 $bgwhite  $bo#a6b3cb $lh36 $regular
 }
 .standart-button.white-button:hover {
-  border: 1px solid #677CA7;
-  color: #3D485F;
+  $bo#677CA7 $c#3D485F
 }
 .standart-button.disabled {
-  background: #aaa;
+  $bc#aaa
 }
 .float-left {
   $fleft

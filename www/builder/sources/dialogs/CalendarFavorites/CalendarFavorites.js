@@ -1,0 +1,5 @@
+dialog CalendarFavorites;
+
+initial props = {
+
+};

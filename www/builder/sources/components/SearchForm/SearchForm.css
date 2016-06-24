@@ -1,150 +1,72 @@
+$imgsrc = ../images/searchform
+
 .app-search-form {
-	position: absolute;
-	color: #222121;
-    z-index: 2;
-    background-color: #444b57;
-    top: 7px;
-    left: -300px;
-    bottom: 7px;
-    width: 330px;
-    border-radius: 4px;
+	$abs $z2 $t7 $l-300 $b7 $w330 $br4 $c#222121 $bc#444b57    
 }
 .view-content.form-expanded .app-search-form {
-    left: 7px;
+    $l7
 }
 .app-search-form-title {
-    height: 37px;
-    line-height: 39px;
-    color: #edf0f4;
+    $h37 $lh39 $pl31 $bold $fs14 $box $c#edf0f4 $bob#3e4552
     background-image: linear-gradient(to bottom, #647188, #4d5768);
     border-radius: 4px 4px 0 0;
-    border-bottom: 1px solid #3e4552;
-    padding-left: 31px;
-    font-family: ptsansbold;
-    font-size: 14px;
-    box-sizing: border-box;
 }
 .app-search-form-title:before {
-    content: '';
-    background-image: url(../images/searchform/search.png);
-    display: inline-block;
-    width: 11px;
-    height: 11px;
-    margin-right: 8px;
+    $cnt $inb $w11 $h11 $mr8 $png = search
 }
 .app-search-form-close-side {
-    position: absolute;
+    $abs $noimg $t $r $b $pointer $w30 $z25 $bc#6279A7
     border-radius: 0 3px 3px 0;
-    background-color: #6279A7;
-    background-image: none;
-    width: 30px;
-    height: auto;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 25;
-    cursor: pointer;
+    height: auto;    
 }
 .app-search-form-close-side:hover {
-    background-color: #6E88BD;
+    $bc#6E88BD
 }
 .app-search-form-close-side:after {
     content: 'Расширенный поиск';
-    transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    font-size: 16px;
-    color: #fff;
-    line-height: 20px;
-    position: absolute;
-    right: -83px;
-    top: 90px;
-    width: 200px;
-    font-family: ptsansbold;
+    $rot-90 $fs16 $white $lh20 $abs $r-83 $t90 $w200 $bold
 }
 .view-content.form-expanded .app-search-form-close-side {
-    display: none;
+    $none
 }
 .app-search-form-close {
-    transform: rotate(180deg);
-    display: block;
-    position: absolute;
-    right: 0px;
-    top: 7px;
-    background-image: url(../images/searchform/close.png);
-    background-repeat: no-repeat;
+    $rot180 $block $abs $r $t7 $norep $pointer $z26 $wh23 $png = close    
     background-position: 100% 50%;
-    cursor: pointer;
-    z-index: 26;
-    height: 23px;
-    width: 23px;
     transition: all 0.2s ease-out;
 }
 .view-content.form-expanded .app-search-form-close {
-    transform: rotate(0deg);
-    right: 10px;
+    $rot0 $r10
 }
 .app-search-form-reset {
-    position: absolute;
-    right: 34px;
-    top: 5px;
-    padding-left: 22px;
-    line-height: 16px;
-    height: 25px;
-    width: 0px;
-    color: #5c606a;
-    font-size: 14px;
-    font-family: ptsansbold;
-    background-image: url(../images/searchform/clear.png);
-    background-position: 100% 50%;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    white-space: nowrap;
-    z-index: 10;
+    $abs $r34 $t5 $pl22 $lh16 $h25 $w0 $fs14 $bold $norep $pointer $nowrap $z10 $png = clear $c#5c606a
+    background-position: 100% 50%;    
 }
 .app-search-form-reset .hover-label {
-    display: none;
-    position: absolute;
-    background-color: #D35655;
-    color: #ffffff;
-    line-height: 36px;
-    top: 50%;
-    margin-top: -18px;
+    $none $abs $white $r $lh36 $t50% $mt-18 $bc#D35655
     padding: 0 10px 0 11px;
-    right: 0;
 }
 .app-search-form-reset:hover .hover-label {
-    display: block;
+    $block
 }
 .app-search-form-reset.active .hover-label {
-    display: none;
+    $none
 }
 .app-search-form-reset.active {
-    width: 134px;
-    height: 36px;
-    top: 0;
-    background-color: #D35655;
+    $w134 $h36 $t $bc#D35655
 }
 .app-search-form-reset .confirm-label {
-    display: none;
-    line-height: 36px;
-    white-space: nowrap;
-    color: #ffffff;
+    $none $nowrap $white $right $lh36
     border-top-left-radius: 4px;
     cursor: auto;
-    text-align: right;
 }
 .app-search-form-reset .confirm-label i {
-    margin-left: 15px;
+    $ml15
 }
 .app-search-form-reset.active .confirm-label {
-    display: block;
+    $block
 }
 .app-search-form-reset.active .confirm-label i {
+    $lh36 $pointer $bc#B35050
     font-style: normal;
     padding: 9px 15px;
-    line-height: 36px;
-    background-color: #B35050;
-    cursor: pointer;
 }

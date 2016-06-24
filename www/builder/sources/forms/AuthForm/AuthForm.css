@@ -1,8 +1,6 @@
 .app-authform-logo {
-	font-size: 50px;
-	text-align: center;
-	line-height: 50px;
+	$fs50 $center $lh50
 }
 .app-authform-inputs {
-	margin-top: 20px;
+	$mt20
 }

@@ -1,85 +1,55 @@
+$imgsrc = ../images/arrows
 .app-calendar {
-	margin-top: 4px;
-    border: 1px solid #e4eaf3;
-    $radius3
+	$br3 $mt4 $bo#e4eaf3 $fs14    
     box-shadow: 0 0 6px #dde4ef;
-    font-size: 14px;
 }
 .app-calendar-header {
-    background-color: #f5f8fc;
-    $rel
-    height: 42px;
-    $radius3
-    border-bottom: 1px solid #d6e1f0;
+    $rel $bc#f5f8fc $h42 $br3 $bob#d6e1f0
 }
 .app-calendar-prev,
 .app-calendar-next {
-	$abs
-	width: 30px;
-    top: 0px;
-    bottom: 0px;
-    $bg
-    $pointer
-    z-index: 2;
+	$abs $w30 $t $b $bg $pointer $z2
 }
 .app-calendar-prev {
-	background-image: url(../images/arrows/left1.png);
-	left: 19%;
+	$l19% $png = left1
 }
 .app-calendar-next {
-	background-image: url(../images/arrows/right1.png);
-	right: 19%;
+	$r19% $png = right1
 }
 .app-calendar-prev:hover,
 .app-calendar-next:hover {
-	opacity: 0.7;
+	$opac7
 }
 .app-calendar-month {
-    $abs
-    color: #5d687a;
-    line-height: 42px;
-    left: 0;
-    right: 0;
-    $bold
-    $center
+    $abs $c#5d687a $lh42 $l $r $bold $center
 }
 .app-calendar-year {
-	$inb
-	margin-left: 4px;
+	$inb $ml4
 }
 .app-calendar-content {
-	padding: 7px;
+	$p7
 }
 .app-calendar-day-names {
-	line-height: 30px;
-	$bold
-	$nowrap
-	color: #6d798f;
+	$lh30 $bold $nowrap $c#6d798f
 }
 .app-calendar-days span,
 .app-calendar-day-names span {
-	$inb
-	width: 9.2%;
-	$center
+	$inb $w9.2% $center
 	margin: 2px 2.5%;
 }
 .app-calendar-days span {
-	line-height: 26px;
+	$lh26
 }
 .app-calendar-days span.another {
-	color: #bbb;
+	$c#bbb
 }
 .app-calendar-days span.marked {
+    $white $br3 $pointer
     background-color: $red !important;
-    $white
-    $radius3
-    $pointer
 }
 .app-calendar-days span.marked:hover {
-    opacity: 0.7;
+    $opac7
 }
 .app-calendar-days span.current {
-	background-color: #7e8fad;
-    $white
-    $radius3
+	$bc#7e8fad $white $br3
 }
