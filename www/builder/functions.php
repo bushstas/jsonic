@@ -905,8 +905,11 @@
 				$data = str_replace('<\/plus>', "+'", $data);
 				$data = str_replace('\\', '', $data);
 				
-				$data = preg_replace("/\[*<function>\[*(',)*/", 'function(){return[', $data);
-				$data = preg_replace("/(,')*\]*<\/function>\]*/", ']}', $data);
+				$data = preg_replace("/\[*<function>\[*(',)*/", 'function(){return ', $data);
+				$data = preg_replace("/(,')*\]*<\/function>\]*/", '}', $data);
+
+				$data = preg_replace("/\[*<function_returns_array>\[*(',)*/", 'function(){return[', $data);
+				$data = preg_replace("/(,')*\]*<\/function_returns_array>\]*/", ']}', $data);
 
 				$data = preg_replace("/\['<foreach ([^>]+)>',/", "(function($1){return[", $data);
 				$data = preg_replace("/,*'<\/foreach>'\]/", ']}).bind(this)', $data);
@@ -1056,8 +1059,8 @@
 			}
 		}
 		if (!empty($elseChildren) && is_array($elseChildren[0]['c'])) {
-			array_unshift($elseChildren[0]['c'], '<function>');
-			array_push($elseChildren[0]['c'], '</function>');
+			array_unshift($elseChildren[0]['c'], '<function_returns_array>');
+			array_push($elseChildren[0]['c'], '</function_returns_array>');
 			return array('c' => $children, 'e' => $elseChildren[0]['c']);
 		} else {
 			return $children;
@@ -1166,8 +1169,8 @@
 				$child['p'] = $matches[1];
 			}
 			$child['i'] = '<nq>function(){return('.$ifCondition.')}<nq>';
-			array_unshift($child['c'], '<nq><function>');
-			array_push($child['c'], '</function><nq>');
+			array_unshift($child['c'], '<nq><function_returns_array>');
+			array_push($child['c'], '</function_returns_array><nq>');
 		} else {
 			if (!preg_match('/'.$signs.'/', $ifCondition)) {
 				$child['i'] = '<nq>!!'.$ifCondition.'<nq>';
@@ -1265,7 +1268,7 @@
 				$attrContent = '';
 				$attrParts = array();
 				foreach ($parts as $idx => $part) {
-					if (!empty($part)) {
+					if ($part !== '') {
 						if ($isObfClName) {
 							$part = getObfuscatedClassName($part);
 						}
@@ -1278,7 +1281,8 @@
 							$code = getObfuscatedClassName($code, true);
 						}
 						if (hasClassVar($code)) {
-							$attrParts[] = '<nq>'.parseAttributeClassVars($code, $names[$propName]).'<nq>';
+							$code = parseAttributeClassVars($code, $names[$propName]);
+							$attrParts[] = '<nq>'.$code.'<nq>';
 						} else {
 							if ($hasClassVar) {
 								$attrParts[] = '<nq>'.$code.'<nq>';
@@ -1294,7 +1298,7 @@
 				}
 				
 				if ($hasClassVar) {
-					$attrContent = implode('","', $attrParts);
+					$attrContent = implode('"+"', $attrParts);
 				}
 
 				$hasFunctionCall = hasFunctionCall($attrContent);
@@ -1307,7 +1311,6 @@
 					$binding2 = !empty($hasFunctionCall) ? ').bind(this)' : '';
 					$attrContent = '<nq>'.$binding1.'<function>"'.$attrContent.'"</function>'.$binding2.'<nq>';
 				}
-
 
 				$props[$propName] = correctTagAttributeText($propName, $attrContent);
 				$names[$propName] = array_unique($names[$propName]);
@@ -1406,6 +1409,9 @@
 			foreach ($matches[1] as $match) {
 				$names[] = $match;
 			}
+		}
+		if (preg_match('/.\?[^:]+:./', $code)) {
+			$code = '('.$code.')';
 		}
 		return preg_replace($regexp, "p('$1')", $code);
 	}

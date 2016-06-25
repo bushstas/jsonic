@@ -17,7 +17,7 @@ Component.prototype.render = function(parentElement) {
 Component.prototype.processInitials = function() {
 	this.initials = this.initials || {};
 	if (isObject(this.props['args'])) {
-		this.initials['args'] = Objects.merge(this.initials['args'], this.props['args']);
+		this.receivedArgs = this.props['args'];
 		delete this.props['args'];
 	}
 	var initials = this.initials;
@@ -112,14 +112,7 @@ Component.prototype.onDataLoad = function(isAsync, data) {
 
 Component.prototype.onReadyToRender = function() {
 	if (!this.isRendered()) {
-		this.level = new Level();
-		var content = this.getTemplateMain(this.provider, this.getArgs());
-		if (isArray(content)) {
-			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
-		}
-		this.rendered = true;
-		this.onRenderComplete();
-		this.onRendered();
+		this.doRendering();
 		if (this.tempPlaceholder) {
 			this.parentElement.removeChild(this.tempPlaceholder);
 			this.tempPlaceholder = null;
@@ -128,8 +121,23 @@ Component.prototype.onReadyToRender = function() {
 	}
 };
 
+Component.prototype.doRendering = function() {
+	this.level = new Level();
+	var content = this.getTemplateMain(this.provider, this.getCombinedArgs());
+	if (isArray(content)) {
+		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
+	}
+	this.rendered = true;
+	this.onRenderComplete();
+	this.onRendered();
+};
+
 Component.prototype.getArgs = function() {
-	return this.getInitial('args') || {};
+	return null;
+};
+
+Component.prototype.getCombinedArgs = function() {
+	return Objects.merge({}, this.initials['args'], this.getArgs(), this.receivedArgs); 
 };
 
 Component.prototype.instanceOf = function(parent) {
@@ -213,6 +221,12 @@ Component.prototype.fire = function() {
 		this.set(k, this.propsToSet[k]);
 		delete this.propsToSet[k];
 	}
+};
+
+Component.prototype.refresh = function(args) {
+	if (args) this.receivedArgs = args;
+	this.unrender();
+	this.doRendering();
 };
 
 Component.prototype.delay = function() {
@@ -356,20 +370,30 @@ Component.prototype.log = function(message, method, opts) {
 	log(message, method, this, opts);
 };
 
-Component.prototype.dispose = function() {
+Component.prototype.unrender = function() {
 	this.disposeLinks();
 	this.disposeInternal();
 	this.level.dispose();
+	if (this.eventHandler) {
+		this.eventHandler.dispose();
+		this.eventHandler = null;
+	}
 	this.level = null;
+	this.listeners = null;
+};
+
+Component.prototype.dispose = function() {
+	this.unrender();
 	this.parentElement = null;
 	this.props = null;
 	this.propsToSet = null;	
 	this.provider = null;
 	this.children = null;
 	this.disposed = true;
-	this.listeners = null;
 	this.loader = null;
 	this.initials = null;
+	this.followers = null;
+	this.receivedArgs = null;
 };
 
 Component.prototype.disposeInternal = function() {};

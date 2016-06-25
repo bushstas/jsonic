@@ -242,24 +242,15 @@ Level.prototype.renderComponent = function(item, parentElement) {
 				}
 				if (isFunction(rawProps[k])) {
 					value = rawProps[k]();
-					if (isArray(value)) {
-						value = value.join('');
-					}
-					if (item['n'] && isObject(item['n']) && (isArray(item['n'][k]) || isString(item['n'][k]))) {
+					if (isObject(item['n']) && (isArray(item['n'][k]) || isString(item['n'][k]))) {
 						this.propComps = this.propComps || {};
 						this.propCompsByProps = this.propCompsByProps || {};
 						key = key || generateRandomKey();
 						if (isString(item['n'][k])) {
-							this.propCompsByProps[item['n'][k]] = this.propCompsByProps[item['n'][k]] || [];
-							if (this.propCompsByProps[item['n'][k]].indexOf(key) == -1) {
-								this.propCompsByProps[item['n'][k]].push([key, rawProps[k]]);
-							}
+							this.registerPropComp(item['n'][k], key, rawProps[k], k);
 						} else {
 							for (i = 0; i < item['n'][k].length; i++) {
-								this.propCompsByProps[item['n'][k][i]] = this.propCompsByProps[item['n'][k][i]] || [];
-								if (this.propCompsByProps[item['n'][k][i]].indexOf(key) == -1) {
-									this.propCompsByProps[item['n'][k][i]].push([key, rawProps[k]]);
-								}
+								this.registerPropComp(item['n'][k][i], key, rawProps[k], k);
 							}
 						}
 					}
@@ -288,6 +279,13 @@ Level.prototype.renderComponent = function(item, parentElement) {
 			item.render(parentElement);
 		}
 		this.registerChild(item, true);
+	}
+};
+
+Level.prototype.registerPropComp = function(k, key, raw, kk) {
+	this.propCompsByProps[k] = this.propCompsByProps[k] || [];
+	if (this.propCompsByProps[k].indexOf(key) == -1) {
+		this.propCompsByProps[k].push([key, raw, kk == 'args']);
 	}
 };
 
@@ -352,11 +350,12 @@ Level.prototype.propagatePropertyChange = function(changedProps) {
 			for (i = 0; i < this.propCompsByProps[propName].length; i++) {
 				component = this.propComps[this.propCompsByProps[propName][i][0]];
 				value = this.propCompsByProps[propName][i][1]();
-				if (isArray(value)) {
-					value = value.join('');
-				}
 				if (component) {
-					component.set(propName, value);
+					if (this.propCompsByProps[propName][i][2] && isObject(value)) {
+						component.refresh(value);
+					} else {
+						component.set(propName, value);
+					}
 				}
 			}
 		}

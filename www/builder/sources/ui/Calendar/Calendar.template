@@ -1,4 +1,5 @@
 <div class="app-calendar">
+	{&args.aaa}
 	<div class="app-calendar-header">
 		<div class="app-calendar-prev" onClick="onPrevClick"></div>
 		<div class="app-calendar-month">

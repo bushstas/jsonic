@@ -1,7 +1,7 @@
 ;(function() {
 var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442','mark','checkbox','star',' \u00A0 ','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
-var __ = ['\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','standart-button','standart-button green-button','standart-button red-button','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a'];
-var __V = [{'cmpid':'name','type':'text','name':'name','caption':__[21],'class':'half-width'},{'cmpid':'phone','type':'text','name':'phone','caption':__[22],'class':'half-width'},{'cmpid':'email','type':'text','name':'email','caption':__[23],'class':'half-width'},{'key':'calendar','className':'float-right'}];
+var __ = ['\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','in6','in6 in1','in6 ink','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a'];
+var __V = [{'cmpid':'name','type':'text','name':'name','caption':__[21],'class':'i0n'},{'cmpid':'phone','type':'text','name':'phone','caption':__[22],'class':'i0n'},{'cmpid':'email','type':'text','name':'email','caption':__[23],'class':'i0n'},{'key':'calendar','className':'ind'}];
 var __DICTURL = 'dictionary/get.php';
 var __TAGS = ['div','span','table','tbody','thead','tr','td','th','ul','ol','li','p','a','form','input','img','video','audio','aside','article','b','big','blockquote','button','canvas','caption','center','code','col','colgroup','footer','font','h1','h2','h3','h4','h5','h6','header','hr','i','iframe','label','menu','pre','s','section','select','strong','textarea','u','small'];
 var __A = {'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'};
@@ -11,7 +11,7 @@ var __ERRORROUTES = {'404':Error404,'401':Error401};
 var __HASHROUTER = true;
 var __INDEXROUTE = 'main';
 var __DEFAULTROUTE = null;
-var __VIEWCONTAINER = 'app-view-container';
+var __VIEWCONTAINER = 'inv';
 var __I = 'initiate';
 var __GI = 'getInitials';
 var __TC = TooltipPopup;
@@ -184,7 +184,7 @@ Component.prototype.render = function(parentElement) {
 Component.prototype.processInitials = function() {
 	this.initials = this.initials || {};
 	if (isObject(this.props['args'])) {
-		this.initials['args'] = Objects.merge(this.initials['args'], this.props['args']);
+		this.receivedArgs = this.props['args'];
 		delete this.props['args'];
 	}
 	var initials = this.initials;
@@ -268,14 +268,7 @@ Component.prototype.onDataLoad = function(isAsync, data) {
 };
 Component.prototype.onReadyToRender = function() {
 	if (!this.isRendered()) {
-		this.level = new Level();
-		var content = this.getTemplateMain(this.provider, this.getArgs());
-		if (isArray(content)) {
-			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
-		}
-		this.rendered = true;
-		this.onRenderComplete();
-		this.onRendered();
+		this.doRendering();
 		if (this.tempPlaceholder) {
 			this.parentElement.removeChild(this.tempPlaceholder);
 			this.tempPlaceholder = null;
@@ -283,8 +276,21 @@ Component.prototype.onReadyToRender = function() {
 		this.processPostRenderInitials();
 	}
 };
+Component.prototype.doRendering = function() {
+	this.level = new Level();
+	var content = this.getTemplateMain(this.provider, this.getCombinedArgs());
+	if (isArray(content)) {
+		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
+	}
+	this.rendered = true;
+	this.onRenderComplete();
+	this.onRendered();
+};
 Component.prototype.getArgs = function() {
-	return this.getInitial('args') || {};
+	return null;
+};
+Component.prototype.getCombinedArgs = function() {
+	return Objects.merge({}, this.initials['args'], this.getArgs(), this.receivedArgs); 
 };
 Component.prototype.instanceOf = function(parent) {
 	return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
@@ -358,6 +364,11 @@ Component.prototype.fire = function() {
 		this.set(k, this.propsToSet[k]);
 		delete this.propsToSet[k];
 	}
+};
+Component.prototype.refresh = function(args) {
+	if (args) this.receivedArgs = args;
+	this.unrender();
+	this.doRendering();
 };
 Component.prototype.delay = function() {
 	this.stopDelay();
@@ -472,20 +483,29 @@ Component.prototype.setScope = function(scope) {
 Component.prototype.log = function(message, method, opts) {
 	log(message, method, this, opts);
 };
-Component.prototype.dispose = function() {
+Component.prototype.unrender = function() {
 	this.disposeLinks();
 	this.disposeInternal();
 	this.level.dispose();
+	if (this.eventHandler) {
+		this.eventHandler.dispose();
+		this.eventHandler = null;
+	}
 	this.level = null;
+	this.listeners = null;
+};
+Component.prototype.dispose = function() {
+	this.unrender();
 	this.parentElement = null;
 	this.props = null;
 	this.propsToSet = null;	
 	this.provider = null;
 	this.children = null;
 	this.disposed = true;
-	this.listeners = null;
 	this.loader = null;
 	this.initials = null;
+	this.followers = null;
+	this.receivedArgs = null;
 };
 Component.prototype.disposeInternal = function() {};
 function Condition(params) {
@@ -1330,24 +1350,15 @@ Level.prototype.renderComponent = function(item, parentElement) {
 				}
 				if (isFunction(rawProps[k])) {
 					value = rawProps[k]();
-					if (isArray(value)) {
-						value = value.join('');
-					}
-					if (item['n'] && isObject(item['n']) && (isArray(item['n'][k]) || isString(item['n'][k]))) {
+					if (isObject(item['n']) && (isArray(item['n'][k]) || isString(item['n'][k]))) {
 						this.propComps = this.propComps || {};
 						this.propCompsByProps = this.propCompsByProps || {};
 						key = key || generateRandomKey();
 						if (isString(item['n'][k])) {
-							this.propCompsByProps[item['n'][k]] = this.propCompsByProps[item['n'][k]] || [];
-							if (this.propCompsByProps[item['n'][k]].indexOf(key) == -1) {
-								this.propCompsByProps[item['n'][k]].push([key, rawProps[k]]);
-							}
+							this.registerPropComp(item['n'][k], key, rawProps[k], k);
 						} else {
 							for (i = 0; i < item['n'][k].length; i++) {
-								this.propCompsByProps[item['n'][k][i]] = this.propCompsByProps[item['n'][k][i]] || [];
-								if (this.propCompsByProps[item['n'][k][i]].indexOf(key) == -1) {
-									this.propCompsByProps[item['n'][k][i]].push([key, rawProps[k]]);
-								}
+								this.registerPropComp(item['n'][k][i], key, rawProps[k], k);
 							}
 						}
 					}
@@ -1376,6 +1387,12 @@ Level.prototype.renderComponent = function(item, parentElement) {
 			item.render(parentElement);
 		}
 		this.registerChild(item, true);
+	}
+};
+Level.prototype.registerPropComp = function(k, key, raw, kk) {
+	this.propCompsByProps[k] = this.propCompsByProps[k] || [];
+	if (this.propCompsByProps[k].indexOf(key) == -1) {
+		this.propCompsByProps[k].push([key, raw, kk == 'args']);
 	}
 };
 Level.prototype.registerChildComponent = function(childComponent) {
@@ -1437,11 +1454,12 @@ Level.prototype.propagatePropertyChange = function(changedProps) {
 			for (i = 0; i < this.propCompsByProps[propName].length; i++) {
 				component = this.propComps[this.propCompsByProps[propName][i][0]];
 				value = this.propCompsByProps[propName][i][1]();
-				if (isArray(value)) {
-					value = value.join('');
-				}
 				if (component) {
-					component.set(propName, value);
+					if (this.propCompsByProps[propName][i][2] && isObject(value)) {
+						component.refresh(value);
+					} else {
+						component.set(propName, value);
+					}
 				}
 			}
 		}
@@ -1558,7 +1576,7 @@ Menu.prototype.getButton = function(viewName) {
 	return this.findElement('a[role="' + viewName + '"]');
 };
 Menu.prototype.setButtonActive = function(button, isActive) {
-	var activeClassName = this.activeButtonClass || 'active';
+	var activeClassName = this.activeButtonClass || 'i08';
 	button.toggleClass(activeClassName, isActive);
 	if (isActive) {
 		this.activeButton = button;
@@ -1601,8 +1619,8 @@ View.prototype.getControllersToLoad = function() {
 function CheckboxHandler() {
 	var subscribers = [];
 	var options = [];
-	var defaultCheckboxClass = 'app-ui-checkbox';
-	var defaultCheckboxCheckedClass = 'checked';
+	var defaultCheckboxClass = 'i0x';
+	var defaultCheckboxCheckedClass = 'i0z';
 	var currentOptions, currentObject,
 		currentClasses, currentCheckedClass, currentTarget;
 	this.subscribe = function(subscriber, opts) {
@@ -1946,7 +1964,7 @@ function Tooltiper() {
 	var request, tooltipElement;
 	var tooltip = __TC;
 	var tooltipApi = __TA;
-	var tooltipClass = 'tooltiped';
+	var tooltipClass = 'izt';
 	var addClass, text, position, key, caption;
 	var onBodyMouseOver = function(e) {
 		event = e;
@@ -2866,13 +2884,13 @@ App.prototype.onError = function(errorCode) {
 	menu.setAppended(false);
 };
 App.prototype.getTemplateMain = function(p, args) {
-	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]
+	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'p':{'c':'inv'}}]
 };
 function Analytics(props) {
 	Initialization.initiate.call(this, props);
 };
 Analytics.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'view-content'}}]
+	return[{'t':0,'p':{'c':'i05'}}]
 };
 function Error401(props) {
 	Initialization.initiate.call(this, props);
@@ -2880,7 +2898,7 @@ function Error401(props) {
 Error401.prototype.onRendered = function() {
 };
 Error401.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'app-auth-form-container'}}]
+	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'izg'}}]
 };
 function Error404(props) {
 	Initialization.initiate.call(this, props);
@@ -2888,7 +2906,7 @@ function Error404(props) {
 Error404.prototype.onRendered = function() {
 };
 Error404.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':'404','t':0,'p':{'c':'app-404-title'}},{'c':__T[0],'t':0,'p':{'c':'app-404-text'}}],'t':0,'p':{'c':'app-404-container'}}]
+	return[{'c':[{'c':'404','t':0,'p':{'c':'iz8'}},{'c':__T[0],'t':0,'p':{'c':'izd'}}],'t':0,'p':{'c':'izb'}}]
 };
 function Favorite(props) {
 	Initialization.initiate.call(this, props);
@@ -2896,15 +2914,13 @@ function Favorite(props) {
 Favorite.prototype.onRendered = function() {
 };
 Favorite.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'view-content'}}]
+	return[{'t':0,'p':{'c':'i05'}}]
 };
 function Main(props) {
 	Initialization.initiate.call(this, props);
 };
-Main.prototype.onRendered = function() {
-};
 Main.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[41],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[58],{'cmp':Tooltip,'p':{'args':__V[3]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
+	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[41],'t':0,'p':{'c':'izh'}},{'cmp':UserInfo},{'c':[__[58],{'cmp':Tooltip,'p':{'args':__V[3]}}],'t':0,'p':{'c':'izx iny'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'izi'}},'t':6,'p':{'c':'izf'}},{'t':6,'p':{'c':'iza'}}],'t':5},'t':2,'p':{'c':'iz2','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'i05 izo','sc':1}}]
 };
 Main.prototype.getControllersToLoad = function() {
 	return [Favorites];
@@ -2924,7 +2940,7 @@ Search.prototype.onFormExpand = function() {
 	this.toggle('expanded');
 };
 Search.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'cmp':SearchForm,'e':['expand',this.onFormExpand.bind(this)],'p':{'cmpid':'form'}},{'cmp':TendersDataTable,'p':{'cmpid':'datatable'}}],'t':0,'p':{'c':function(){return['view-content',p('expanded')?' form-expanded':'']},'sc':1},'n':{'c':'expanded'}}]
+	return[{'c':[{'cmp':SearchForm,'e':['expand',this.onFormExpand.bind(this)],'p':{'cmpid':'form'}},{'cmp':TendersDataTable,'p':{'cmpid':'datatable'}}],'t':0,'p':{'c':function(){return 'i05'+(p('expanded')?' i0u':'')},'sc':1},'n':{'c':'expanded'}}]
 };
 Search.prototype.getInitials = function() {
 	return {
@@ -2938,7 +2954,7 @@ function DataTable(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTable.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}}]
+	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'i0j'}}]
 };
 function DataTableTabPanel(props) {
 	Initialization.initiate.call(this, props);
@@ -2950,16 +2966,19 @@ function DataTableRow(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTableRow.prototype.getTemplateColorMark = function(p, args) {
-	return[{'c':__T[1],'t':0,'p':{'c':'app-datatable-color-mark'}}]
+	return[{'c':__T[1],'t':0,'p':{'c':'izm'}}]
 };
 DataTableRow.prototype.getTemplateControls = function(p, args) {
-	return[{'c':__T[2],'t':0,'p':{'c':'app-datatable-checkbox-container'}},{'c':__T[3],'t':0,'p':{'c':'app-datatable-star-container'}}]
+	return[{'c':__T[2],'t':0,'p':{'c':'izs'}},{'c':__T[3],'t':0,'p':{'c':'iz7'}}]
+};
+DataTableRow.prototype.getTemplateHotMark = function(p, args) {
+	return[{'t':0,'p':{'_title':null,'c':'izt izn iz3','_timeout':'true'}}]
 };
 function DataTableStandartRow(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTableStandartRow.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'tmp':this.getTemplateColorMark},{'tmp':this.getTemplateControls},{'t':0,'p':{'c':'app-datatable-standart-row-top'}},{'c':args['price'],'t':0,'p':{'c':'app-datatable-standart-row-price'}},{'c':args['name'],'t':0,'p':{'c':'app-datatable-standart-row-name'}},{'t':0,'p':{'c':'app-datatable-standart-row-bottom'}},{'c':function(){return[{'cmp':DataTableFragmets,'p':{'data':function(){return[p('fragments')]}},'n':{'data':'fragments'}}]},'p':['fragments'],'i':function(){return(p('fragments'))}}],'t':12,'p':{'h':'#/tender/'+args['Id'],'tr':'_blank','c':'app-datatable-standart-row','sc':1,'_id':args['Id']}}]
+	return[{'c':[{'tmp':this.getTemplateColorMark},{'tmp':this.getTemplateControls},{'t':0,'p':{'c':'i0w'}},{'c':args['price'],'t':0,'p':{'c':'izq'}},{'c':[{'c':{'tmp':this.getTemplateHotMark},'i':!!args['hot']},args['name']],'t':0,'p':{'c':'i06'}},{'t':0,'p':{'c':'ipj'}},{'c':function(){return[{'cmp':DataTableFragmets,'p':{'data':function(){return p('fragments')}},'n':{'data':'fragments'}}]},'p':['fragments'],'i':function(){return(p('fragments'))}}],'t':12,'p':{'h':'#tender/'+args['Id'],'tr':'_blank','c':'i0r','sc':1,'_id':args['Id']}}]
 };
 function TendersDataTable(props) {
 	Initialization.initiate.call(this, props);
@@ -2971,7 +2990,7 @@ SearchForm.prototype.toggleExpand = function() {
 	this.dispatchEvent('expand');
 };
 SearchForm.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':args.title,'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,this.toggleExpand.bind(this)],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,this.toggleExpand.bind(this)],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
+	return[{'c':[{'c':args.title,'t':0,'p':{'c':'i0y'}},{'t':0,'e':[0,this.toggleExpand.bind(this)],'p':{'c':'i01'}},{'t':0,'e':[0,this.toggleExpand.bind(this)],'p':{'c':'i0k'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'i0v','sc':1}}]
 };
 SearchForm.prototype.getInitials = function() {
 	return {
@@ -2989,7 +3008,7 @@ SearchFormCreateFilterMenu.prototype.onWizardButtonClick = function() {
 };
 SearchFormCreateFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'create-filters-menu'},
+		'args':{'className': 'i02'},
 		'props':{'buttons': [{'name': __[1],'handler': this.onCreateButtonClick},{'name': __[2],'handler': this.onWizardButtonClick}]}
 	};
 };
@@ -3016,13 +3035,13 @@ SearchFormFilterMenu.prototype.handleClick = function(value, button) {
 	Globals.getView('search').openFilter(value);
 };
 SearchFormFilterMenu.prototype.getTemplateContent = function(p, args) {
-	return[{'t':0,'p':{'c':'app-ui-checkbox'+(args.item.isAutoOpen?' checked':''),'_value':args.item.value}}]
+	return[{'t':0,'p':{'c':'i0x'+(args.item.isAutoOpen?' i0z':''),'_value':args.item.value}}]
 };
 SearchFormFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'filters-menu','maxHeight': 400},
+		'args':{'className': 'i0i','maxHeight': 400},
 		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
-		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true,'checkboxClass': 'app-ui-checkbox','checkboxCheckedClass': 'checked','labelClass': null}}]
+		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true,'checkboxClass': 'i0x','checkboxCheckedClass': 'i0z','labelClass': null}}]
 	};
 };
 function SearchFormFilters(props) {
@@ -3035,7 +3054,7 @@ SearchFormFilters.prototype.onSaveFilterClick = function() {
 	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
 };
 SearchFormFilters.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':[{'c':__[3],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'app-search-form-filters-create-button'}},{'c':[{'c':__[4],'t':0,'p':{'c':'app-search-form-filters-button-inner'}},{'c':[{'c':{'pr':'quantity','p':p('quantity')},'t':42,'p':{'c':'app-search-form-filters-button-quantity'}},{'t':0,'p':{'c':'app-search-form-filters-button-plus'}}],'t':0,'p':{'c':'app-search-form-filters-button-side'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return['app-search-form-filters-button',!p('quantity')?' with-plus':'']}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':p('filterName')},'t':0,'e':[0,this.onSaveFilterClick.bind(this)],'p':{'c':'app-search-form-filter-name'}},{'c':__[5],'t':0,'e':[0,this.onSaveFilterClick.bind(this)],'p':{'c':'app-search-form-filter-save-button'}}],'t':0,'p':{'c':'app-search-form-filters','sc':1}}]
+	return[{'c':[{'c':[{'c':__[3],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'i0p'}},{'c':[{'c':__[4],'t':0,'p':{'c':'i0c'}},{'c':[{'c':{'pr':'quantity','p':p('quantity')},'t':42,'p':{'c':'i0e'}},{'t':0,'p':{'c':'i0a'}}],'t':0,'p':{'c':'i00'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'i09'+(!p('quantity')?' i0m':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':p('filterName')},'t':0,'e':[0,this.onSaveFilterClick.bind(this)],'p':{'c':'i07'}},{'c':__[5],'t':0,'e':[0,this.onSaveFilterClick.bind(this)],'p':{'c':'i0s'}}],'t':0,'p':{'c':'i0l','sc':1}}]
 };
 SearchFormFilters.prototype.getInitials = function() {
 	return {
@@ -3047,16 +3066,16 @@ function TenderSearchForm(props) {
 	Initialization.initiate.call(this, props);
 };
 TenderSearchForm.prototype.onResetButtonClick = function(e) {
-	var button = e.target.getAncestor('.app-search-form-reset');
-	button.addClass('active');
+	var button = e.target.getAncestor('.i0g');
+	button.addClass('i08');
 	this.delay(function() {
-		button.removeClass('active');
+		button.removeClass('i08');
 	}, 2500);
 };
 TenderSearchForm.prototype.onResetConfirmed = function() {
 };
 TenderSearchForm.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':__[6],'t':0,'e':[0,this.onResetButtonClick.bind(this)],'p':{'c':'hover-label'}},{'c':[__[7],' ',{'c':__[8],'t':40,'p':{'c':'confirm-reset-filter'}}],'t':0,'e':[0,this.onResetConfirmed.bind(this)],'p':{'c':'confirm-label'}}],'t':0,'p':{'c':'app-search-form-reset'}},{'c':{'cmp':SearchFormFilters},'t':0,'p':{'c':'app-tender-search-form','sc':1}}]
+	return[{'c':[{'c':__[6],'t':0,'e':[0,this.onResetButtonClick.bind(this)],'p':{'c':'i0b'}},{'c':[__[7],' ',{'c':__[8],'t':40,'p':{'c':'ip5'}}],'t':0,'e':[0,this.onResetConfirmed.bind(this)],'p':{'c':'i0d'}}],'t':0,'p':{'c':'i0g'}},{'c':{'cmp':SearchFormFilters},'t':0,'p':{'c':'ipu','sc':1}}]
 };
 function Submit(props) {
 	Initialization.initiate.call(this, props);
@@ -3065,7 +3084,7 @@ Submit.prototype.onSubmit = function() {
 	this.dispatchEvent('submit');
 };
 Submit.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'c':{'pr':'value','p':p('value')},'t':0,'e':[0,this.onSubmit.bind(this)],'p':{'c':function(){return[p('class')]}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
+	return[{'c':{'c':{'pr':'value','p':p('value')},'t':0,'e':[0,this.onSubmit.bind(this)],'p':{'c':function(){return p('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'inw'}}]
 };
 function Calendar(props) {
 	Initialization.initiate.call(this, props);
@@ -3135,7 +3154,7 @@ Calendar.prototype.changeMonth = function(value) {
 	this.redraw();
 };
 Calendar.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':[{'t':0,'e':[0,this.onPrevClick.bind(this)],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':p('month')},{'c':{'pr':'year','p':p('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,this.onNextClick.bind(this)],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[33],'t':1},{'c':__[34],'t':1},{'c':__[35],'t':1},{'c':__[36],'t':1},{'c':__[37],'t':1},{'c':__[38],'t':1},{'c':__[39],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':(function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?'another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]}).bind(this),'p':p('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
+	return[{'c':[args.aaa,{'c':[{'t':0,'e':[0,this.onPrevClick.bind(this)],'p':{'c':'inc'}},{'c':[{'pr':'month','p':p('month')},{'c':{'pr':'year','p':p('year')},'t':1,'p':{'c':'ina'}}],'t':0,'p':{'c':'ine'}},{'t':0,'e':[0,this.onNextClick.bind(this)],'p':{'c':'in0'}}],'t':0,'p':{'c':'in9'}},{'c':[{'c':[{'c':__[33],'t':1},{'c':__[34],'t':1},{'c':__[35],'t':1},{'c':__[36],'t':1},{'c':__[37],'t':1},{'c':__[38],'t':1},{'c':__[39],'t':1}],'t':0,'p':{'c':'ins'}},{'c':{'h':(function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?'int':'')+' '+(day.current?' in3':'')+' '+(day.marked?' inn':'')}}]}).bind(this),'p':p('days'),'f':'days'},'t':0,'p':{'c':'in7'}}],'t':0,'p':{'c':'inm'}}],'t':0,'p':{'c':'inp'}}]
 };
 function FavoritesCalendar(props) {
 	Initialization.initiate.call(this, props);
@@ -3168,14 +3187,14 @@ FavoritesCalendar.prototype.onMarkedDayClick = function(e) {
 FavoritesCalendar.prototype.getInitials = function() {
 	return {
 		'controllers':[{'controller': Favorites,'on': {'load': this.onLoadFavorites}}],
-		'helpers':[{'helper': ClickHandler,'options': {'marked': this.onMarkedDayClick}}]
+		'helpers':[{'helper': ClickHandler,'options': {'inn': this.onMarkedDayClick}}]
 	};
 };
 function Checkbox(props) {
 	Initialization.initiate.call(this, props);
 };
 Checkbox.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'app-ui-checkbox','_value':function(){return[p('value')]}},'n':{'_value':'value'}}]
+	return[{'t':0,'p':{'c':'i0x','_value':function(){return p('value')}},'n':{'_value':'value'}}]
 };
 function Dialog(props) {
 	Initialization.initiate.call(this, props);
@@ -3205,7 +3224,7 @@ Dialog.prototype.onShow = function() {
 Dialog.prototype.onHide = function() {
 };
 Dialog.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'e':[0,this.hide.bind(this)],'p':{'c':function(){return['app-dialog-mask',p('shown')?' shown':'']}},'n':{'c':'shown'}},{'c':[{'c':{'t':0,'e':[0,this.hide.bind(this)],'p':{'c':'app-dialog-close'}},'i':!!args.closable},{'c':{'t':0,'e':[0,this.expand.bind(this)],'p':{'c':'app-dialog-expand'}},'i':!!args.expandable},{'c':{'pr':'title','p':p('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':this.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return[p('height')?'max-height:'+p('height')+'px;':'']}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return['app-dialog',p('expanded')?' expanded':'',p('shown')?' shown':'']},'sc':1,'st':function(){return['width:',p('width'),'px;margin-left:',p('marginLeft'),';margin-top:',p('marginTop'),';']}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
+	return[{'t':0,'e':[0,this.hide.bind(this)],'p':{'c':function(){return 'inq'+(p('shown')?' izj':'')}},'n':{'c':'shown'}},{'c':[{'c':{'t':0,'e':[0,this.hide.bind(this)],'p':{'c':'iz6'}},'i':!!args.closable},{'c':{'t':0,'e':[0,this.expand.bind(this)],'p':{'c':'iz4'}},'i':!!args.expandable},{'c':{'pr':'title','p':p('title')},'t':0,'p':{'c':'izr'}},{'c':{'tmp':this.getTemplateContent},'t':0,'p':{'c':'izw','st':function(){return (p('height')?'max-height:'+p('height')+'px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'iz5'+(p('expanded')?' izu':'')+(p('shown')?' izj':'')},'sc':1,'st':function(){return 'width:'+p('width')+'px;margin-left:'+p('marginLeft')+';margin-top:'+p('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
 };
 Dialog.prototype.getTemplateContent = function(p, args) {
 	return null
@@ -3226,7 +3245,7 @@ PopupMenu.prototype.onRendered = function() {
 	this.addListener(this.button, 'click', this.onShowButtonClick);
 };
 PopupMenu.prototype.onClick = function(e) {
-	var target = e.getTarget('.app-popup-menu-button');
+	var target = e.getTarget('.i0h');
 	if (!isNull(target)) {
 		var idx = target.getData('index');
 		var value = target.getData('value');
@@ -3248,7 +3267,7 @@ PopupMenu.prototype.onBeforeShow = function() {
 };
 PopupMenu.prototype.show = function() {
 	var outerElement = this.getElement();
-	var innerElement = this.findElement('.app-popup-menu-inner-container');
+	var innerElement = this.findElement('.i0f');
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
 	outerElement.setStyle({'max-height': height + 'px', 'height': height + 'px'});
@@ -3274,7 +3293,7 @@ PopupMenu.prototype.getButtonData = function(item) {
 	};
 };
 PopupMenu.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'c':{'h':(function(button,idx){return[{'c':[button.name,{'tmp':this.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'app-popup-menu-button','_value':button.value,'_index':idx}}]}).bind(this),'p':p('buttons'),'f':'buttons'},'t':0,'e':[0,this.onClick.bind(this)],'p':{'c':'app-popup-menu-inner-container','st':(args.maxHeight?'max-height:'+args.maxHeight+'px;' :'')}},'t':0,'p':{'c':'app-popup-menu-outer-container '+args.className,'sc':1}}]
+	return[{'c':{'c':{'h':(function(button,idx){return[{'c':[button.name,{'tmp':this.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'i0h','_value':button.value,'_index':idx}}]}).bind(this),'p':p('buttons'),'f':'buttons'},'t':0,'e':[0,this.onClick.bind(this)],'p':{'c':'i0f','st':(args.maxHeight?'max-height:'+args.maxHeight+'px;' :'')}},'t':0,'p':{'c':'i0o '+args.className,'sc':1}}]
 };
 PopupMenu.prototype.getTemplateContent = function(p, args) {
 	return null
@@ -3283,13 +3302,13 @@ function TabPanel(props) {
 	Initialization.initiate.call(this, props);
 };
 TabPanel.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'app-tab-panel'}}]
+	return[{'t':0,'p':{'c':'ipr'}}]
 };
 function Tooltip(props) {
 	Initialization.initiate.call(this, props);
 };
 Tooltip.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+args.className,'txt':args.txt,'key':args.key,'cls':args.cls,'cap':args.caption}}]
+	return[{'t':0,'p':{'c':'izt izv '+args.className,'txt':args.txt,'key':args.key,'cls':args.cls,'cap':args.caption}}]
 };
 Tooltip.prototype.getInitials = function() {
 	return {
@@ -3300,7 +3319,7 @@ function TooltipPopup(props) {
 	Initialization.initiate.call(this, props);
 };
 TooltipPopup.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'app-tooltip-popup-caption'}},{'c':{'pr':'text','p':p('text')},'t':0,'p':{'c':'app-tooltip-popup-text'}}],'t':0,'p':{'c':function(){return['app-tooltip-popup ',p('className'),p('shown')?' shown':'']},'sc':1,'st':function(){return['left:',p('left'),'px;top:',p('top'),'px;']}},'n':{'c':['className','shown'],'st':['left','top']}}]
+	return[{'c':[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'iz1'}},{'c':{'pr':'text','p':p('text')},'t':0,'p':{'c':'izk'}}],'t':0,'p':{'c':function(){return 'izy '+p('className')+(p('shown')?' izj':'')},'sc':1,'st':function(){return 'left:'+p('left')+'px;top:'+p('top')+'px;'}},'n':{'c':['className','shown'],'st':['left','top']}}]
 };
 function UserInfo(props) {
 	Initialization.initiate.call(this, props);
@@ -3317,7 +3336,7 @@ UserInfo.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);	
 };
 UserInfo.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':[{'c':[__[42],':'],'t':6},{'c':{'pr':'userName','p':p('userName')},'t':6}],'t':5},{'c':[{'c':[__[43],':'],'t':6},{'c':{'pr':'companyName','p':p('companyName')},'t':6}],'t':5},{'c':[{'c':[__[44],':'],'t':6},{'c':{'pr':'userEmail','p':p('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[45],':'],'t':6},{'c':{'pr':'typeAccess','p':p('typeAccess')},'t':6,'p':{'c':' bold'}}],'t':5},{'c':[{'c':[__[46],':'],'t':6},{'c':{'pr':'beginAccessDate','p':p('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[47],':'],'t':6},{'c':{'pr':'endAccessDate','p':p('endAccessDate')},'t':6,'p':{'c':function(){return[p('needToProlong')?'red':'']}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return[{'c':{'pr':'prolongButtonText','p':p('prolongButtonText')},'t':12,'p':{'h':__[51],'tr':'_blank','c':'access standart-button red-button'}}]},'p':['prolongButtonText'],'i':function(){return(p('prolongButtonText'))}},{'c':__[49],'t':12,'p':{'h':__[48],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[50],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':p('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[54],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[55],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':p('managerPhone')},__T[4],{'c':__[56],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':p('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[57],'t':0,'e':[0,this.onOrderCallButtonClick.bind(this)],'p':{'c':'standart-button green-button'}}]
+	return[{'c':[{'c':[{'c':[__[42],':'],'t':6},{'c':{'pr':'userName','p':p('userName')},'t':6}],'t':5},{'c':[{'c':[__[43],':'],'t':6},{'c':{'pr':'companyName','p':p('companyName')},'t':6}],'t':5},{'c':[{'c':[__[44],':'],'t':6},{'c':{'pr':'userEmail','p':p('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[45],':'],'t':6},{'c':{'pr':'typeAccess','p':p('typeAccess')},'t':6,'p':{'c':' iny'}}],'t':5},{'c':[{'c':[__[46],':'],'t':6},{'c':{'pr':'beginAccessDate','p':p('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[47],':'],'t':6},{'c':{'pr':'endAccessDate','p':p('endAccessDate')},'t':6,'p':{'c':function(){return (p('needToProlong')?'ipw':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'izz','cp':'0px','cs':'0px','sc':1}},{'c':function(){return[{'c':{'pr':'prolongButtonText','p':p('prolongButtonText')},'t':12,'p':{'h':__[51],'tr':'_blank','c':'izl in6 ink'}}]},'p':['prolongButtonText'],'i':function(){return(p('prolongButtonText'))}},{'c':__[49],'t':12,'p':{'h':__[48],'tr':'_blank','c':'ip6 in6 inb'}},{'c':__[50],'t':0,'p':{'c':'izx iny'}},{'c':[{'c':{'pr':'managerName','p':p('managerName')},'t':0,'p':{'c':'izp'}},{'c':[{'c':[' ',{'c':__[54],'t':0,'p':{'c':'ip4'}},{'c':__[55],'t':0,'p':{'c':'iz0'}}],'t':0,'p':{'c':'izc'}},{'pr':'managerPhone','p':p('managerPhone')},__T[4],{'c':__[56],'t':51}],'t':0,'p':{'c':'iz9'}},{'c':{'pr':'managerEmail','p':p('managerEmail')},'t':0,'p':{'c':'ize'}}],'t':0,'p':{'c':'ipv'}},{'c':__[57],'t':0,'e':[0,this.onOrderCallButtonClick.bind(this)],'p':{'c':'in6 in1'}}]
 };
 UserInfo.prototype.getInitials = function() {
 	return {
@@ -3392,7 +3411,7 @@ OrderCall.prototype.onHide = function() {
 	clearInterval(this.interval);
 };
 OrderCall.prototype.getTemplateContent = function(p, args) {
-	return[{'cmp':OrderCallForm},{'c':__[10],'t':0,'e':[0,this.onSupportButtonClick.bind(this)],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':OrderCallForm},{'c':__[10],'t':0,'e':[0,this.onSupportButtonClick.bind(this)],'p':{'c':'in6 in4'}}]
 };
 OrderCall.prototype.getInitials = function() {
 	return {
@@ -3407,7 +3426,7 @@ Support.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);
 };
 Support.prototype.getTemplateContent = function(p, args) {
-	return[{'cmp':SupportForm},{'c':__[12],'t':0,'e':[0,this.onOrderCallButtonClick.bind(this)],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':SupportForm},{'c':__[12],'t':0,'e':[0,this.onOrderCallButtonClick.bind(this)],'p':{'c':'in6 in4'}}]
 };
 Support.prototype.getInitials = function() {
 	return {
@@ -3421,11 +3440,11 @@ AuthForm.prototype.onSuccess = function() {
 	window.location.reload();
 };
 AuthForm.prototype.getTemplateMain = function(p, args) {
-	return[{'c':__T[5],'t':0,'p':{'c':'app-authform-logo'}},{'t':0,'p':{'c':'app-authform-inputs'}}]
+	return[{'c':__T[5],'t':0,'p':{'c':'ino'}},{'t':0,'p':{'c':'in2'}}]
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'options':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'app-authform-inputs','controls': [{'cmpid': 'login','type': 'text','name': 'login','placeholder': __[16],'caption': __[17]},{'cmpid': 'password','type': 'password','name': 'password','placeholder': __[18],'caption': __[19]}],'submit': {'value': __[20],'class': 'app-submit'}}
+		'options':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'in2','controls': [{'cmpid': 'login','type': 'text','name': 'login','placeholder': __[16],'caption': __[17]},{'cmpid': 'password','type': 'password','name': 'password','placeholder': __[18],'caption': __[19]}],'submit': {'value': __[20],'class': 'ipy'}}
 	};
 };
 function OrderCallForm(props) {
@@ -3503,22 +3522,22 @@ OrderCallForm.prototype.validateTime = function() {
 	}
 };
 OrderCallForm.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'app-order-call'}}]
+	return[{'t':0,'p':{'c':'inf'}}]
 };
 OrderCallForm.prototype.getInitials = function() {
 	return {
-		'options':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'app-order-call','controls': [__V[0],__V[1],__V[2],{'cmpid': 'topic','type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[24],'class': 'half-width'},{'cmpid': 'date','type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[25],'class': 'half-width'},{'cmpid': 'time','type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[26],'class': 'half-width'},{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[27]}],'submit': {'value': __[57],'class': __[14] + ' send-button'}}
+		'options':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'inf','controls': [__V[0],__V[1],__V[2],{'cmpid': 'topic','type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[24],'class': 'i0n'},{'cmpid': 'date','type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[25],'class': 'i0n'},{'cmpid': 'time','type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[26],'class': 'i0n'},{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[27]}],'submit': {'value': __[57],'class': __[14] + ' ini'}}
 	};
 };
 function SupportForm(props) {
 	Initialization.initiate.call(this, props);
 };
 SupportForm.prototype.getTemplateMain = function(p, args) {
-	return[{'t':0,'p':{'c':'app-order-call'}}]
+	return[{'t':0,'p':{'c':'inf'}}]
 };
 SupportForm.prototype.getInitials = function() {
 	return {
-		'options':{'action': CONFIG.support.send,'controls': [__V[0],__V[1],__V[2],{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[30]},{'cmpid': 'screenshot','type': 'file','name': 'screenshot','accept': 'image/*','caption': __[31]}],'submit': {'value': __[32],'class': __[14] + ' send-button'}}
+		'options':{'action': CONFIG.support.send,'controls': [__V[0],__V[1],__V[2],{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[30]},{'cmpid': 'screenshot','type': 'file','name': 'screenshot','accept': 'image/*','caption': __[31]}],'submit': {'value': __[32],'class': __[14] + ' ini'}}
 	};
 };
 function Input(props) {
@@ -3530,7 +3549,7 @@ Input.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
 Input.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'app-input-caption'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'t':14,'e':[18,this.onChange.bind(this)],'p':{'tp':function(){return[p('type')]},'n':function(){return[p('name')]},'p':function(){return[p('placeholder')]},'v':function(){return[p('value')]},'readonly':function(){return[p('enabled')?'readonly':'']},'accept':function(){return[p('accept')]}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return['app-input-container ',p('class')]},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'i03'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'t':14,'e':[18,this.onChange.bind(this)],'p':{'tp':function(){return p('type')},'n':function(){return p('name')},'p':function(){return p('placeholder')},'v':function(){return p('value')},'readonly':function(){return (p('enabled')?'readonly':'')},'accept':function(){return p('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return 'i0t '+p('class')},'sc':1},'n':{'c':'class'}}]
 };
 function Select(props) {
 	Initialization.initiate.call(this, props);
@@ -3572,16 +3591,16 @@ Select.prototype.selectByIndex = function(index) {
 	}
 };
 Select.prototype.enableOption = function(index, isEnabled) {
-	var optionsContainer = this.findElement('.app-select-options');
+	var optionsContainer = this.findElement('.in5');
 	var optionElement = optionsContainer.getChildAt(index);
-	optionElement.toggleClass('disabled', !isEnabled);
+	optionElement.toggleClass('inr', !isEnabled);
 	if (index == this.selectedIndex) {
 		this.selectByIndex(index == 0 ? index + 1 : 0);
     }
 };
 Select.prototype.onOptionsClick = function(e) {
-	var target = e.getTarget('.app-select-option');
-	if (target && !target.hasClass('disabled')) {
+	var target = e.getTarget('.inu');
+	if (target && !target.hasClass('inr')) {
 		var value = target.getData('value');
 		this.selectByValue(value);
 		this.dispatchEvent('change', {'value': value});
@@ -3593,13 +3612,13 @@ Select.prototype.getControlValue = function() {
 };
 Select.prototype.onClick = function() {
 	this.set('active', true);
-	Popuper.watch(this, this.findElement('.app-select'));
+	Popuper.watch(this, this.findElement('.i0q'));
 };
 Select.prototype.hide = function() {
 	this.set('active', false);
 };
 Select.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'app-input-caption'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'c':[{'c':{'pr':'title','p':p('title')},'t':0,'e':[0,this.onClick.bind(this)],'p':{'c':'app-select-value'}},{'c':{'h':(function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]}).bind(this),'p':p('options'),'f':'options'},'t':0,'e':[0,this.onOptionsClick.bind(this)],'p':{'c':'app-select-options'}}],'t':0,'p':{'c':function(){return['app-select',p('active')?' active':'']}},'n':{'c':'active'}},{'t':14,'p':{'tp':'hidden','n':function(){return[p('name')]},'v':function(){return[p('value')]}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return['app-input-container ',p('class')]},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'i03'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'c':[{'c':{'pr':'title','p':p('title')},'t':0,'e':[0,this.onClick.bind(this)],'p':{'c':'inj'}},{'c':{'h':(function(option){return[{'c':option.title,'t':0,'p':{'c':'inu','_value':option.value}}]}).bind(this),'p':p('options'),'f':'options'},'t':0,'e':[0,this.onOptionsClick.bind(this)],'p':{'c':'in5'}}],'t':0,'p':{'c':function(){return 'i0q'+(p('active')?' i08':'')}},'n':{'c':'active'}},{'t':14,'p':{'tp':'hidden','n':function(){return p('name')},'v':function(){return p('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'i0t '+p('class')},'sc':1},'n':{'c':'class'}}]
 };
 function Textarea(props) {
 	Initialization.initiate.call(this, props);
@@ -3610,7 +3629,7 @@ Textarea.prototype.getControlValue = function() {
 	return this.findElement('textarea').value;
 };
 Textarea.prototype.getTemplateMain = function(p, args) {
-	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'app-input-caption'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'c':{'pr':'value','p':p('value')},'t':49,'e':[18,this.onChange.bind(this)],'p':{'n':function(){return[p('name')]},'p':function(){return[p('placeholder')]},'readonly':function(){return[p('enabled')?'readonly':'']}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return['app-input-container ',p('class')]},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':function(){return[{'c':{'pr':'caption','p':p('caption')},'t':0,'p':{'c':'i03'}}]},'p':['caption'],'i':function(){return(p('caption'))}},{'c':{'pr':'value','p':p('value')},'t':49,'e':[18,this.onChange.bind(this)],'p':{'n':function(){return p('name')},'p':function(){return p('placeholder')},'readonly':function(){return (p('enabled')?'readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return 'i0t '+p('class')},'sc':1},'n':{'c':'class'}}]
 };
 function TopMenu(props) {
 	Initialization.initiate.call(this, props);
@@ -3618,7 +3637,7 @@ function TopMenu(props) {
 	this.isRouteMenu = true;
 };
 TopMenu.prototype.getTemplateMain = function(p, args) {
-	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[6],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[7],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[8],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[9],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[10],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
+	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'inl'}},{'c':__T[6],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[7],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[8],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[9],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[10],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'inx'}},'t':0,'p':{'c':'inh','sc':1}}]
 };
 Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,SearchForm,SearchFormFilters,TenderSearchForm,Submit,Calendar,Checkbox,Dialog,PopupMenu,TabPanel,Tooltip,TooltipPopup,UserInfo],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
 Objects = new Objects();

@@ -1,6 +1,1 @@
 view Main
-
-
-function onRendered() {
-
-}
