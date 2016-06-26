@@ -2,11 +2,14 @@
 	$(block rel pl12 pb1 pointer)
 }
 .app-datatable-standart-row-top {
-	$(rel c#333A52 pt7 pb5)
+	$(rel c#333A52 pt7 pb5 h20)
 }
 .app-datatable-standart-row-name {
 	$(segoebold lh17 fs16 c#53638f)
 }
 .app-datatable-standart-row.viewed .app-datatable-standart-row-name {
 	$segoe
+}
+.app-datatable-standart-row-fz {
+	$(fleft br2 bold pr4 c#333A52 lh22 mr10 mt-4)
 }

@@ -295,6 +295,7 @@
 		$cssconsts = array();
 		$data = array();
 		$templates = array();
+		$includes = array();
 		$css = array();
 		$cssData = array();
 		$apiConfig = '';
@@ -325,6 +326,9 @@
 				$data[] = $content;
 			} elseif ($file['ext'] == 'cssconst') {
 				$cssconsts[] = $content;
+			} elseif ($file['ext'] == 'include') {
+				$file['content'] = $content;
+				$includes[] = $file;
 			}
 		}
 		if (!$isConfigJsFile) {
@@ -681,6 +685,10 @@
 			}
 		}
 
+		foreach ($includes as $incl) {
+			addGeneralTemplateFunction($compiledJs, $incl['content'], $incl['path']);
+		}
+
 		$inherits = array();
 		foreach ($classes as $classedByType) {
 			foreach ($classedByType as $usedClass => $class) {
@@ -813,7 +821,7 @@
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);
 		}
-		
+	
 		if ($advancedMode) {
 			createFile('base.js', $compiledJs);
 			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js');

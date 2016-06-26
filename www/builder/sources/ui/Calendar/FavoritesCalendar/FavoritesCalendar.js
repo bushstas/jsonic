@@ -43,6 +43,9 @@ function onLoadFavorites(data) {
 function onMarkedDayClick(e) {
 	var timestamp = e.target.innerHTML + '.' + (this.month + 1) + '.' + this.year;
 	if (isArray(this.tenderByDates[timestamp])) {
-		Dialoger.show(CalendarFavorites, {'tenders': this.tenderByDates[timestamp]});
+		Dialoger.show(CalendarFavorites, {
+			'title': @calendarFavoritesTitle + ' ' + Dates.getFormattedDate(timestamp, @calendarFavoritesDateFormat),
+			'tenders': this.tenderByDates[timestamp]
+		});
 	}
 }

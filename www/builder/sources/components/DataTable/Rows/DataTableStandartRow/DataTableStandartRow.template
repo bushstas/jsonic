@@ -3,7 +3,22 @@
 		<template colorMark>
 		<template controls>
 		<div class="app-datatable-standart-row-top">
-		
+			<div class="app-datatable-standart-row-fz">
+				{getFzName(&args['type'])}
+			</div>
+			<div class="app-datatable-standart-row-region">
+				<template count if="{&args['multiregion']}" count="{&args['multiregion']}">
+				{&args['regionName']}
+			</div>
+			<div class="app-datatable-standart-row-region">
+				<template count if="{&args['multicategory']}" count="{&args['multicategory']}">
+				{&args['subcategory']}
+			</div>
+			<div class="app-datatable-standart-row-type">
+				<include unavailable if="{&args['razm'] != 'N/A'}" else="{&args['razm']}" tariff="{&args['isUnavailable']}" width="66px">
+			</div>
+
+
 		</div>
 		<div class="app-datatable-standart-row-price">
 			{&args['price']}
@@ -17,8 +32,8 @@
 		<div class="app-datatable-standart-row-bottom">
 		
 		</div>
-		{if $fragments}
-			<component DataTableFragmets data="{$fragments}">
+		{if &args['fragments']}
+			<component DataTableFragmets data="{&args['fragments']}">
 		{/if}
 	</a>
 {/template}

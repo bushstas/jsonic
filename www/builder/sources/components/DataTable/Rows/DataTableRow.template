@@ -16,3 +16,9 @@
 {template .hotMark}
 	<div data-title="Горячий тендер - у данной закупки заканчивается период подачи заявок на участие." class="tooltiped datatable-tooltiped datatable-hot-tender" data-timeout="true"></div>
 {/template}
+
+{template .count}
+	<span class="app-datatable-standart-row-count">
+		{&args['count']}
+	</span>
+{/template}

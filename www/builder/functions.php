@@ -80,7 +80,7 @@
 	}
 
 	function gatherFiles($dir, $list, $getContent = false) {
-		$extensions = array('js', 'css', 'template', 'texts', 'data', 'cssconst');
+		$extensions = array('js', 'css', 'template', 'texts', 'data', 'cssconst', 'include');
 		if (is_dir($dir)) {
 			$files = scandir($dir);
 			if (is_array($files)) {
@@ -861,7 +861,7 @@
 		return false;
 	}
  
-	function getTemplateFunctions($template, $class, $component) {
+	function getTemplateFunctions($template, $component, $class = null) {
 		global $calledComponents;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
@@ -871,7 +871,7 @@
 		preg_match_all($regexp, $template, $matches);
 		$templateNames = $matches[1];
 		if (!empty($templateNames)) {
-			if (!preg_match("/\{template +\.main *\}/", $template) && !hasParentMainTemplate($component) && in_array($component['name'], $calledComponents)) {
+			if (!empty($class) && !preg_match("/\{template +\.main *\}/", $template) && !hasParentMainTemplate($component) && in_array($component['name'], $calledComponents)) {
 				error('Шаблон <b>main</b> класса <b>'.$class.'</b> не найден среди прочих');
 			}
 			$templateContents = preg_split($regexp, $template);
@@ -971,7 +971,7 @@
 			$item = $list[$i];
 			$tagName = $item['tagName'];
 			if ($item['type'] == 'text') {
-				parseTextNode($item['content'], $children);
+				parseTextNode($item['content'], $children, $component);
 			} elseif ($tagName == 'br') {
 				$children[] = '<br>';
 			} elseif (!$item['isClosing']) {
@@ -988,6 +988,12 @@
 				{
 					preg_match("/<template +[\"']*(\w+)[\"']*/i",  $content, $match);
 					$child = array('tmp' => '<nq>this.getTemplate'.ucfirst($match[1]).'<nq>');
+					getTemplateProperties($item['content'], $child, $component);
+				}
+				elseif ($tagName == 'include')
+				{
+					preg_match("/<include +[\"']*(\w+)[\"']*/i",  $content, $match);
+					$child = array('tmp' => '<nq>includeGeneralTemplate'.ucfirst($match[1]).'<nq>');
 					getTemplateProperties($item['content'], $child, $component);
 				}
 				elseif ($tagName == 'component')
@@ -1035,8 +1041,7 @@
 					} else {
 						if ($tagName == 'if') {
 							preg_match("/^\{if +([^\}]+)\}/i",  $item['content'], $match);
-							checkIfConditionForContainigProps($match[1], $child);
-							unset($child['t']);
+							checkIfConditionForContainigProps($match[1], $child, $component);
 						} elseif ($tagName == 'foreach') {
 							getForeach($item, $child);
 						}	
@@ -1132,9 +1137,9 @@
 		return $child;
 	}
 
-	function parseTextNode($content, &$children) {
+	function parseTextNode($content, &$children, $component) {
 		if (!empty($content)) {
-			$items = checkTextForContainigProps($content);
+			$items = checkTextForContainigProps($content, $component);
 			foreach ($items as $item) {
 				if (is_array($item)) {
 					$children[] = $item[0];
@@ -1156,8 +1161,14 @@
 		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
 	}
 
-	function checkIfConditionForContainigProps($ifCondition, &$child) {
+	function checkIfConditionForContainigProps($ifCondition, &$child, $component) {
+		if (is_array($component) && preg_match('/\$\w+[\.\[]/', $ifCondition)) {
+			error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$ifCondition.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+		}
 		$hasCode = preg_match('/\$\w/', $ifCondition);
+		if (is_string($component)) {
+			error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$ifCondition.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>&args</b>');
+		}
 		$signs = '[\+\-><\!=\/\*%\?:&\|]';
 		$ifCondition = preg_replace('/\s+(?='.$signs.')/', '', $ifCondition);
 		$ifCondition = preg_replace('/('.$signs.')\s+/', "$1", $ifCondition);
@@ -1203,6 +1214,7 @@
 		global $eventTypesShortcuts;
 		$props = array();
 		$names = array();
+		$ifCondition = false;
 		preg_match_all("/ +([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
 		preg_match_all("/ +([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
@@ -1219,6 +1231,10 @@
 					$props[$propsShortcuts[$propName]] = 1;
 					continue;
 				}
+				if ($propName == 'if') {
+					$ifCondition = $propValue;
+					continue;
+				}
 				if (isset($propsShortcuts[$propName])) {
 					$propName = $propsShortcuts[$propName];
 				} else {
@@ -1226,7 +1242,7 @@
 				}
 				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
 					if ($hasCode) {
-						error('Фигурные скобки внутри аттрибута события <b>'.$propName.'</b>. Ожидается название функции обработчика!');
+						error('Фигурные скобки внутри атрибута события <b>'.$propName.'</b>. Ожидается название функции обработчика!');
 					}
 					if (!is_array($child['e'])) {
 						$child['e']	= array();
@@ -1239,7 +1255,7 @@
 						$once = true;
 					}
 					$callback = preg_replace("/[^\w]/", "", $propValue);
-					if (!isMethodInClass($callback, $component)) {
+					if (is_array($component) && !isMethodInClass($callback, $component)) {
 						error('Функция обработчик события <b>'.$callback.'</b> не найдена среди методов класса <b>'.$component['name'].'</b>');
 					}
 					$eventTypeIndex = array_search($eventType, $eventTypesShortcuts);
@@ -1281,7 +1297,7 @@
 							$code = getObfuscatedClassName($code, true);
 						}
 						if (hasClassVar($code)) {
-							$code = parseAttributeClassVars($code, $names[$propName]);
+							$code = parseAttributeClassVars($code, $names[$propName], $component);
 							$attrParts[] = '<nq>'.$code.'<nq>';
 						} else {
 							if ($hasClassVar) {
@@ -1330,6 +1346,19 @@
 		if (!empty($names)) {
 			$child['n'] = $names;
 		}
+		if (!empty($ifCondition)) {
+			addIfConditionToChild(trim($ifCondition), $child, $component);
+		}
+	}
+
+	function addIfConditionToChild($ifCondition, &$child, $component) {
+		if (!preg_match('/^\{[^\}]+\}$/', $ifCondition)) {
+			error('Элемент содержит некорректный атрибут <b>if = "'.$ifCondition.'"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>');
+		}
+		$ifCondition = ltrim($ifCondition, '{');
+		$ifCondition = rtrim($ifCondition, '}');
+		$child = array('c' => $child);
+		checkIfConditionForContainigProps($ifCondition, $child, $component);
 	}
 
 	function getObfuscatedClassName($value, $isCode = false) {
@@ -1374,12 +1403,23 @@
 		preg_match_all("/ +([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
 		$propValues = array_merge($matches1[2], $matches2[2]);
+		$ifCondition = false;
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
 			$propValue = $propValues[$i];
+			if ($propName == 'if') {
+				$ifCondition = $propValue;
+				continue;
+			}
 			$hasCode = hasCode($propValue);
 			if ($hasCode) {
-				$propValue = preg_replace('/&([\w\.]+)/', "<plus>$1</plus>", $propValue);
+				if (is_string($component)) {
+					error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$propValue.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>&args</b>');
+				}
+				if (preg_match('/\$\w+[\.\[]/', $propValue)) {
+					error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$propValue.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+				}
+				$propValue = preg_replace('/&([\w\.\[\]\'"-]+)/', "<plus>$1</plus>", $propValue);
 				$propValue = preg_replace('/\$(\w+)/', "<plus>p('$1')</plus>", $propValue);
 
 				$hasFunctionCall = hasFunctionCall($propValue);
@@ -1393,6 +1433,9 @@
 		if (!empty($props)) {
 			$child['p'] = $props;
 		}
+		if (!empty($ifCondition)) {
+			addIfConditionToChild(trim($ifCondition), $child, $component);
+		}
 	}
 
 	function isMethodInClass($funcName, $component) {
@@ -1402,11 +1445,19 @@
 		return false;
 	}
 
-	function parseAttributeClassVars($code, &$names) {
+	function parseAttributeClassVars($code, &$names, $component) {
+		if (preg_match('/\$\w+[\.\[]/', $code)) {
+			if (is_array($component)) {
+				error('Элемент в шаблоне класса <b>'.$component['name'].'</b> содержит атрибут с некорректным кодом <b>'.$code.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+			}
+		}
 		$regexp = '/\$(\w+)/';
 		preg_match_all($regexp, $code, $matches);
 		if (!empty($matches[1])) {
-			foreach ($matches[1] as $match) {
+			if (is_string($component)) {
+				error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$code.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>&args</b>');
+			}
+			foreach ($matches[1] as $i => $match) {
 				$names[] = $match;
 			}
 		}
@@ -1423,12 +1474,19 @@
 		return $text;
 	}
 
-	function checkTextForContainigProps($text) {
+	function checkTextForContainigProps($text, $component) {
 		$regexp = '/\{([^\}]+)\}/';
 		preg_match_all($regexp, $text, $matches);
 		$codes = $matches[1];
 		if (empty($codes)) {
 			return array($text);
+		}
+		if (preg_match('/\$\w+[\.\[]/', $text)) {
+			if (is_array($component)) {
+				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+			} else {
+				error('Один из шаблонов файле <b>'.$component.'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+			}
 		}
 		$parts = preg_split($regexp, $text);
 		$content = array();
@@ -1479,9 +1537,17 @@
 	}
 
 	function addTemplateFunction(&$js, $class, $templateHtml, $component) {
-		$templateFunctions = getTemplateFunctions($templateHtml, $class, $component);
+		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class);
 		foreach ($templateFunctions as $templateFunction) {
 			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), 'p, args', "\n\treturn".$templateFunction['content']);
+		}
+	}
+
+	function addGeneralTemplateFunction(&$js, $templateHtml, $file) {
+		$templateFunctions = getTemplateFunctions($templateHtml, $file);
+		foreach ($templateFunctions as $templateFunction) {
+			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(args) {';
+			$js[] = "\n\treturn".$templateFunction['content']."\n}";
 		}
 	}
 

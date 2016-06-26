@@ -1,6 +1,7 @@
-function Level() {
+function Level(component) {
 	this.children = [];
 	this.detached = false;
+	this.component = component;
 }
 
 Level.prototype.render = function(items, parentElement, parentLevel, nextSiblingChild) {
@@ -42,7 +43,7 @@ Level.prototype.renderItem = function(item) {
 };
 
 Level.prototype.createLevel = function(items, parentElement) {
-	var level = new Level();
+	var level = new Level(this.component);
 	level.render(items, parentElement, this);
 	this.children.push(level);
 };

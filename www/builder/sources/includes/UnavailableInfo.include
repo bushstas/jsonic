@@ -1,0 +1,3 @@
+{template .unavailable}
+	<div class="app-unavailable-info {&args.tariff?'unavailable':'auth'}" style="{&args.width?'width:'+&args.width:''}"></div>
+{/template}

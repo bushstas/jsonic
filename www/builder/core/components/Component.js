@@ -122,7 +122,7 @@ Component.prototype.onReadyToRender = function() {
 };
 
 Component.prototype.doRendering = function() {
-	this.level = new Level();
+	this.level = new Level(this);
 	var content = this.getTemplateMain(this.provider, this.getCombinedArgs());
 	if (isArray(content)) {
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
