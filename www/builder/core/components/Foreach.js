@@ -20,6 +20,7 @@ Foreach.prototype.createLevels = function(isUpdating) {
 
 Foreach.prototype.createLevel = function(items, isUpdating) {
 	var level = new Level();
+	level.setComponent(this.parentLevel.getComponent());
 	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
 	this.levels.push(level);

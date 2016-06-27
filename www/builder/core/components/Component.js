@@ -1,6 +1,7 @@
 function Component() {}
 
 Component.prototype.initiate = function() {
+	this.propActivities = {};
 	this.propsToSet = {};
 	this.provider = this.get.bind(this);
 	this.followers = {};
@@ -122,9 +123,10 @@ Component.prototype.onReadyToRender = function() {
 };
 
 Component.prototype.doRendering = function() {
-	this.level = new Level(this);
+	this.level = new Level();
 	var content = this.getTemplateMain(this.provider, this.getCombinedArgs());
 	if (isArray(content)) {
+		this.level.setComponent(this);
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 	}
 	this.rendered = true;
@@ -192,10 +194,9 @@ Component.prototype.set = function(propName, propValue) {
 		isChanged = true;
 		this.props[k] = props[k];
 		changedProps[k] = props[k];
-	}
-	
-	if (this.level && isChanged) {
-		this.level.propagatePropertyChange(changedProps);
+	}	
+	if (isChanged) {
+		this.propagatePropertyChange(changedProps);
 	}
 	for (var k in changedProps) {
 		if (!isUndefined(this.followers[k])) {
@@ -203,6 +204,72 @@ Component.prototype.set = function(propName, propValue) {
 		}
 	}
 	changedProps = null;
+};
+
+Component.prototype.propagatePropertyChange = function(changedProps) {
+	var pn, pv, i, activities, cnds = [];
+	for (pn in changedProps) {
+		pv = changedProps[pn];
+		activities = this.propActivities['cnd'];
+		if (activities && isArray(activities[pn])) {
+			var conditionKey;
+			for (i = 0; i < activities[pn].length; i++) {
+				if (cnds.indexOf(activities[pn][i]) == -1) {
+					activities[pn][i].recheck();
+					cnds.push(activities[pn][i]);
+				}
+			}
+		}
+		activities = this.propActivities['for'];
+		if (activities && isArray(activities[pn])) {
+			for (i = 0; i < activities[pn].length; i++) {
+				activities[pn][i].update(pv);
+			}
+		}
+		activities = this.propActivities['nod'];
+		if (activities && isArray(activities[pn])) {
+			var node;
+			for (i = 0; i < activities[pn].length; i++) {
+				activities[pn][i].textContent = pv;
+			}
+		}
+		activities = this.propActivities['atr'];
+		if (activities && isArray(activities[pn])) {
+			var key, propAttr, attrParts;
+			for (i = 0; i < activities[pn].length; i++) {
+				key = activities[pn][i];
+				attrParts = activities[pn][i][2]();
+				var attrValue = '';
+				var attrVal;
+				for (var j = 0; j < attrParts.length; j++) {
+					attrVal = isFunction(attrParts[j]) ? attrParts[j]() : attrParts[j];
+					if (!isUndefined(attrVal)) {
+						attrValue += attrVal;
+					}
+				}
+				attrValue = attrValue.trim();
+				var attrName = __A[activities[pn][i][1]] || activities[pn][i][1];
+				activities[pn][i][0].attr(attrName, attrValue);
+
+			}
+		}
+		activities = this.propActivities['cmp'];
+		if (activities && isArray(activities[pn])) {
+			var component, value;
+			for (i = 0; i < activities[pn].length; i++) {
+				component = activities[pn][i][0];
+				value = activities[pn][i][1]();
+				if (component) {
+					if (activities[pn][i][2] && isObject(value)) {
+						component.refresh(value);
+					} else {
+						component.set(pn, value);
+					}
+				}
+			}
+		}
+	}
+	cnds = null;
 };
 
 Component.prototype.getFirstNodeChild = function() {
@@ -216,11 +283,9 @@ Component.prototype.preset = function(propName, propValue) {
 	this.propsToSet[propName] = propValue;
 };
 
-Component.prototype.fire = function() {
-	for (var k in this.propsToSet) {
-		this.set(k, this.propsToSet[k]);
-		delete this.propsToSet[k];
-	}
+Component.prototype.update = function() {
+	this.set(this.propsToSet);
+	this.propsToSet = {};
 };
 
 Component.prototype.refresh = function(args) {
@@ -239,8 +304,6 @@ Component.prototype.delay = function() {
 Component.prototype.stopDelay = function() {
 	window.clearTimeout(this.timeout);
 };
-
-Component.prototype.propagatePropertyChange = function() {};
 
 Component.prototype.onRendered = function() {};
 
@@ -370,6 +433,30 @@ Component.prototype.log = function(message, method, opts) {
 	log(message, method, this, opts);
 };
 
+Component.prototype.registerPropActivity = function(type, name, data) {
+	this.propActivities = this.propActivities || {};
+	this.propActivities[type] = this.propActivities[type] || {};
+	this.propActivities[type][name] = this.propActivities[type][name] || [];
+	this.propActivities[type][name].push(data);
+	return this.propActivities[type][name].length - 1;
+};
+
+Component.prototype.disposePropActivities = function(type, data) {
+	var activities = this.propActivities[type];
+	if (isObject(data)) {
+		var deleted;
+		for (var pn in data) {
+			if (isArray(activities[pn])) {
+				deleted = 0;
+				for (var i = 0; i < data[pn].length; i++) {
+					activities[pn].splice(data[pn][i] - deleted, 1);
+					deleted++;
+				}
+			}
+		}
+	}
+};
+
 Component.prototype.unrender = function() {
 	this.disposeLinks();
 	this.disposeInternal();
@@ -384,6 +471,7 @@ Component.prototype.unrender = function() {
 
 Component.prototype.dispose = function() {
 	this.unrender();
+	this.propActivities = null;
 	this.parentElement = null;
 	this.props = null;
 	this.propsToSet = null;	

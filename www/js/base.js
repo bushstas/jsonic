@@ -170,6 +170,7 @@ Application.prototype.onNoErrors = function() {};
 Application.prototype.onError = function(errorCode) {};
 function Component() {}
 Component.prototype.initiate = function() {
+	this.propActivities = {};
 	this.propsToSet = {};
 	this.provider = this.get.bind(this);
 	this.followers = {};
@@ -277,9 +278,10 @@ Component.prototype.onReadyToRender = function() {
 	}
 };
 Component.prototype.doRendering = function() {
-	this.level = new Level(this);
+	this.level = new Level();
 	var content = this.getTemplateMain(this.provider, this.getCombinedArgs());
 	if (isArray(content)) {
+		this.level.setComponent(this);
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 	}
 	this.rendered = true;
@@ -339,9 +341,9 @@ Component.prototype.set = function(propName, propValue) {
 		isChanged = true;
 		this.props[k] = props[k];
 		changedProps[k] = props[k];
-	}
-	if (this.level && isChanged) {
-		this.level.propagatePropertyChange(changedProps);
+	}	
+	if (isChanged) {
+		this.propagatePropertyChange(changedProps);
 	}
 	for (var k in changedProps) {
 		if (!isUndefined(this.followers[k])) {
@@ -349,6 +351,70 @@ Component.prototype.set = function(propName, propValue) {
 		}
 	}
 	changedProps = null;
+};
+Component.prototype.propagatePropertyChange = function(changedProps) {
+	var pn, pv, i, activities, cnds = [];
+	for (pn in changedProps) {
+		pv = changedProps[pn];
+		activities = this.propActivities['cnd'];
+		if (activities && isArray(activities[pn])) {
+			var conditionKey;
+			for (i = 0; i < activities[pn].length; i++) {
+				if (cnds.indexOf(activities[pn][i]) == -1) {
+					activities[pn][i].recheck();
+					cnds.push(activities[pn][i]);
+				}
+			}
+		}
+		activities = this.propActivities['for'];
+		if (activities && isArray(activities[pn])) {
+			for (i = 0; i < activities[pn].length; i++) {
+				activities[pn][i].update(pv);
+			}
+		}
+		activities = this.propActivities['nod'];
+		if (activities && isArray(activities[pn])) {
+			var node;
+			for (i = 0; i < activities[pn].length; i++) {
+				activities[pn][i].textContent = pv;
+			}
+		}
+		activities = this.propActivities['atr'];
+		if (activities && isArray(activities[pn])) {
+			var key, propAttr, attrParts;
+			for (i = 0; i < activities[pn].length; i++) {
+				key = activities[pn][i];
+				attrParts = activities[pn][i][2]();
+				var attrValue = '';
+				var attrVal;
+				for (var j = 0; j < attrParts.length; j++) {
+					attrVal = isFunction(attrParts[j]) ? attrParts[j]() : attrParts[j];
+					if (!isUndefined(attrVal)) {
+						attrValue += attrVal;
+					}
+				}
+				attrValue = attrValue.trim();
+				var attrName = __A[activities[pn][i][1]] || activities[pn][i][1];
+				activities[pn][i][0].attr(attrName, attrValue);
+			}
+		}
+		activities = this.propActivities['cmp'];
+		if (activities && isArray(activities[pn])) {
+			var component, value;
+			for (i = 0; i < activities[pn].length; i++) {
+				component = activities[pn][i][0];
+				value = activities[pn][i][1]();
+				if (component) {
+					if (activities[pn][i][2] && isObject(value)) {
+						component.refresh(value);
+					} else {
+						component.set(pn, value);
+					}
+				}
+			}
+		}
+	}
+	cnds = null;
 };
 Component.prototype.getFirstNodeChild = function() {
 	if (this.level) {
@@ -379,7 +445,6 @@ Component.prototype.delay = function() {
 Component.prototype.stopDelay = function() {
 	window.clearTimeout(this.timeout);
 };
-Component.prototype.propagatePropertyChange = function() {};
 Component.prototype.onRendered = function() {};
 Component.prototype.onLoaded = function() {};
 Component.prototype.onRenderComplete = function() {};
@@ -483,6 +548,28 @@ Component.prototype.setScope = function(scope) {
 Component.prototype.log = function(message, method, opts) {
 	log(message, method, this, opts);
 };
+Component.prototype.registerPropActivity = function(type, name, data) {
+	this.propActivities = this.propActivities || {};
+	this.propActivities[type] = this.propActivities[type] || {};
+	this.propActivities[type][name] = this.propActivities[type][name] || [];
+	this.propActivities[type][name].push(data);
+	return this.propActivities[type][name].length - 1;
+};
+Component.prototype.disposePropActivities = function(type, data) {
+	var activities = this.propActivities[type];
+	if (isObject(data)) {
+		var deleted;
+		for (var pn in data) {
+			if (isArray(activities[pn])) {
+				deleted = 0;
+				for (var i = 0; i < data[pn].length; i++) {
+					activities[pn].splice(data[pn][i] - deleted, 1);
+					deleted++;
+				}
+			}
+		}
+	}
+};
 Component.prototype.unrender = function() {
 	this.disposeLinks();
 	this.disposeInternal();
@@ -496,6 +583,7 @@ Component.prototype.unrender = function() {
 };
 Component.prototype.dispose = function() {
 	this.unrender();
+	this.propActivities = null;
 	this.parentElement = null;
 	this.props = null;
 	this.propsToSet = null;	
@@ -521,6 +609,7 @@ Condition.prototype.createLevel = function(isUpdating) {
 	var children = this.getChildren();
 	if (isArray(children)) {
 		this.level = new Level();
+		this.level.setComponent(this.parentLevel.getComponent());
 		var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
 		this.level.render(children, this.parentElement, this.parentLevel, nextSiblingChild);
 	}
@@ -898,6 +987,7 @@ Foreach.prototype.createLevels = function(isUpdating) {
 };
 Foreach.prototype.createLevel = function(items, isUpdating) {
 	var level = new Level();
+	level.setComponent(this.parentLevel.getComponent());
 	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
 	this.levels.push(level);
@@ -1120,10 +1210,9 @@ Form.prototype.disposeInternal = function() {
 	this.request = null;
 	this.formElement = null;
 };
-function Level(component) {
+function Level() {
 	this.children = [];
 	this.detached = false;
-	this.component = component;
 }
 Level.prototype.render = function(items, parentElement, parentLevel, nextSiblingChild) {
 	this.parentElement = parentElement;
@@ -1132,6 +1221,12 @@ Level.prototype.render = function(items, parentElement, parentLevel, nextSibling
 	this.renderItems(items);
 	this.prevChild = null;
 	this.nextSiblingChild = null;
+};
+Level.prototype.setComponent = function(component) {
+	this.component = component;
+};
+Level.prototype.getComponent = function() {
+	return this.component;
 };
 Level.prototype.renderItems = function(items) {
 	if (isArray(items)) {
@@ -1161,7 +1256,8 @@ Level.prototype.renderItem = function(item) {
 	}
 };
 Level.prototype.createLevel = function(items, parentElement) {
-	var level = new Level(this.component);
+	var level = new Level();
+	level.setComponent(this.component);
 	level.render(items, parentElement, this);
 	this.children.push(level);
 };
@@ -1173,21 +1269,18 @@ Level.prototype.createTextNode = function(content) {
 	}
 };
 Level.prototype.createPropertyNode = function(props) {
+	var propName = props['pr'];
 	var propNode = document.createTextNode(props['p'] || '');
 	this.appendChild(propNode);	
 	this.propNodes = this.propNodes || {};
-	this.propNodesByProps = this.propNodesByProps || {};
-	var propName = props['pr'];
-	var key = generateRandomKey();
-	this.propNodes[key] = propNode;
-	this.propNodesByProps[propName] = this.propNodesByProps[propName] || [];
-	this.propNodesByProps[propName].push(key);
+	this.propNodes[propName] = this.propNodes[propName] || [];
+	this.propNodes[propName].push(this.component.registerPropActivity('nod', propName, propNode));
 };
 Level.prototype.createElement = function(props) {
 	var element = document.createElement(__TAGS[props['t']] || 'span');
 	this.appendChild(element);
 	if (isObject(props['p'])) {
-		var attrName;		
+		var attrName, pn, attr;		
 		for (var k in props['p']) {
 			if (isString(props['p'][k]) || isNumber(props['p'][k])) {
 				attrName = __A[k] || k;
@@ -1197,18 +1290,17 @@ Level.prototype.createElement = function(props) {
 					element.attr(attrName, props['p'][k]);
 				}
 			} else if (isFunction(props['p'][k])) {
-				if (props['n'] && (isArray(props['n'][k]) || isString(props['n'][k]))) {
+				pn = props['n'][k];
+				if (props['n'] && (isArray(pn) || isString(pn))) {
 					this.propAttrs = this.propAttrs || {};
-					this.propAttrsByProps = this.propAttrsByProps || {};
-					var key = generateRandomKey();
-					this.propAttrs[key] = [element, k, props['p'][k]];
-					if (isString(props['n'][k])) {
-						this.propAttrsByProps[props['n'][k]] = this.propAttrsByProps[props['n'][k]] || [];
-						this.propAttrsByProps[props['n'][k]].push(key);
+					attr = [element, k, props['p'][k]];					
+					if (isString(pn)) {
+						this.propAttrs[pn] = this.propAttrs[pn] || [];
+						this.propAttrs[pn].push(this.component.registerPropActivity('atr', pn, attr));
 					} else {
-						for (var i = 0; i < props['n'][k].length; i++) {					
-							this.propAttrsByProps[props['n'][k][i]] = this.propAttrsByProps[props['n'][k][i]] || [];
-							this.propAttrsByProps[props['n'][k][i]].push(key);
+						for (var i = 0; i < pn.length; i++) {					
+							this.propAttrs[pn[i]] = this.propAttrs[pn[i]] || [];
+							this.propAttrs[pn[i]].push(this.component.registerPropActivity('atr', pn[i], attr));
 						}
 					}
 				}
@@ -1271,17 +1363,15 @@ Level.prototype.createCondition = function(params) {
 	if (params['i'] === true) {
 		this.renderItems(params['c']);
 	} else if (isFunction(params['i']) && isFunction(params['c'])) {
-		var propNames = params['p'];
+		var propNames = params['p'], pn;
 		if (isArray(propNames)) {
 			this.conditions = this.conditions || {};
-			this.conditionsByProps = this.conditionsByProps || {};
 			var condition = new Condition(params);
 			condition.render(this.parentElement, this);
-			var key = generateRandomKey();
-			this.conditions[key] = condition;
 			for (var i = 0; i < propNames.length; i++) {
-				this.conditionsByProps[propNames[i]] = this.conditionsByProps[propNames[i]] || [];
-				this.conditionsByProps[propNames[i]].push(key);
+				pn = propNames[i];
+				this.conditions[pn] = this.conditions[pn] || [];
+				this.conditions[pn].push(this.component.registerPropActivity('cnd', pn, condition));
 			}
 			this.registerChild(condition);
 		} else if (params['i']()) {
@@ -1299,10 +1389,9 @@ Level.prototype.createForeach = function(params) {
 	var foreach = new Foreach(params);
 	foreach.render(this.parentElement, this);
 	if (!isLocal) {
-		var key = generateRandomKey();
-		this.foreaches[key] = foreach;
-		this.foreachesByProps[propName] = this.foreachesByProps[propName] || [];
-		this.foreachesByProps[propName].push(foreach);		
+		this.foreaches = this.foreaches || {};
+		this.foreaches[propName] = this.foreaches[propName] || [];
+		this.foreaches[propName].push(this.component.registerPropActivity('for', propName, foreach));
 	}
 	this.registerChild(foreach);
 };
@@ -1339,30 +1428,18 @@ Level.prototype.includeTemplate = function(item) {
 Level.prototype.renderComponent = function(item, parentElement) {
 	parentElement = parentElement || this.parentElement;
 	if (isFunction(item['cmp'])) {
-		var rawProps = item['p'];
 		var props = {};
-		var key, value, i, k, cmpid;
-		if (isObject(rawProps)) {
-			for (k in rawProps) {
-				value = rawProps[k];
+		var value, i, k, cmpid;
+		var isProps = isObject(item['p']);
+		if (isProps) {
+			for (k in item['p']) {
+				value = item['p'][k];
 				if (k == 'cmpid') {
 					cmpid = value;
 					continue;
 				}
-				if (isFunction(rawProps[k])) {
-					value = rawProps[k]();
-					if (isObject(item['n']) && (isArray(item['n'][k]) || isString(item['n'][k]))) {
-						this.propComps = this.propComps || {};
-						this.propCompsByProps = this.propCompsByProps || {};
-						key = key || generateRandomKey();
-						if (isString(item['n'][k])) {
-							this.registerPropComp(item['n'][k], key, rawProps[k], k);
-						} else {
-							for (i = 0; i < item['n'][k].length; i++) {
-								this.registerPropComp(item['n'][k][i], key, rawProps[k], k);
-							}
-						}
-					}
+				if (isFunction(item['p'][k])) {
+					value = item['p'][k]();
 				}
 				props[k] = value;
 			}
@@ -1370,11 +1447,11 @@ Level.prototype.renderComponent = function(item, parentElement) {
 		var component = new item['cmp'](props);
 		component.render(parentElement);
 		this.registerChild(component, true);
+		if (isProps) {
+			this.registerPropComps(component, item['n'], item['p']);
+		}
 		if (cmpid) {
 			component.setId(cmpid);
-		}
-		if (key) {
-			this.propComps[key] = component;
 		}
 		var events = item['e'];
 		if (isArray(events)) {
@@ -1390,84 +1467,31 @@ Level.prototype.renderComponent = function(item, parentElement) {
 		this.registerChild(item, true);
 	}
 };
-Level.prototype.registerPropComp = function(k, key, raw, kk) {
-	this.propCompsByProps[k] = this.propCompsByProps[k] || [];
-	if (this.propCompsByProps[k].indexOf(key) == -1) {
-		this.propCompsByProps[k].push([key, raw, kk == 'args']);
+Level.prototype.registerPropComps = function(component, names, props) {
+	this.propComps = this.propComps || {};
+	var data;
+	for (var k in props) {
+		data = [component, props[k], k == 'args'];
+		if (isObject(names) && (isArray(names[k]) || isString(names[k]))) {
+			if (isString(names[k])) {
+				this.registerPropComp(names[k], data);
+			} else {
+				for (i = 0; i < names[k].length; i++) {
+					this.registerPropComp(names[k][i], data);
+				}
+			}
+		}
 	}
+};
+Level.prototype.registerPropComp = function(pn, data) {
+	this.propComps[pn] = this.propComps[pn] || [];
+	this.propComps[pn].push(this.component.registerPropActivity('cmp', pn, data));
 };
 Level.prototype.registerChildComponent = function(childComponent) {
 	this.parentLevel.registerChildComponent(childComponent);
 };
 Level.prototype.getComponent = function() {
 	return this.parentLevel.getComponent();
-};
-Level.prototype.propagatePropertyChange = function(changedProps) {
-	var propName, propValue, i;
-	for (propName in changedProps) {
-		propValue = changedProps[propName];
-		if (this.conditionsByProps && isArray(this.conditionsByProps[propName])) {
-			var conditionKey;
-			for (i = 0; i < this.conditionsByProps[propName].length; i++) {
-				conditionKey = this.conditionsByProps[propName][i];
-				if (this.conditions[conditionKey]) {
-					this.conditions[conditionKey].recheck();
-				}
-			}
-		}
-		if (this.foreachesByProps && isArray(this.foreachesByProps[propName])) {
-			for (i = 0; i < this.foreachesByProps[propName].length; i++) {
-				this.foreachesByProps[propName][i].update(propValue);
-			}
-		}
-		if (this.propNodesByProps && isArray(this.propNodesByProps[propName])) {
-			var node;
-			for (i = 0; i < this.propNodesByProps[propName].length; i++) {
-				node = this.propNodes[this.propNodesByProps[propName][i]];
-				if (node) {
-					node.textContent = propValue;
-				}
-			}
-		}
-		if (this.propAttrsByProps && isArray(this.propAttrsByProps[propName])) {
-			var key, propAttr, attrParts;
-			for (i = 0; i < this.propAttrsByProps[propName].length; i++) {
-				key = this.propAttrsByProps[propName][i];
-				propAttr = this.propAttrs[key];
-				if (isArray(propAttr)) {
-					attrParts = propAttr[2]();
-					var attrValue = '';
-					var attrVal;
-					for (var j = 0; j < attrParts.length; j++) {
-						attrVal = isFunction(attrParts[j]) ? attrParts[j]() : attrParts[j];
-						if (!isUndefined(attrVal)) {
-							attrValue += attrVal;
-						}
-					}
-					attrValue = attrValue.trim();
-					var attrName = __A[propAttr[1]] || propAttr[1];
-					propAttr[0].attr(attrName, attrValue);
-				}
-			}
-		}
-		if (this.propCompsByProps && isArray(this.propCompsByProps[propName])) {
-			var component, value;
-			for (i = 0; i < this.propCompsByProps[propName].length; i++) {
-				component = this.propComps[this.propCompsByProps[propName][i][0]];
-				value = this.propCompsByProps[propName][i][1]();
-				if (component) {
-					if (this.propCompsByProps[propName][i][2] && isObject(value)) {
-						component.refresh(value);
-					} else {
-						component.set(propName, value);
-					}
-				}
-			}
-		}
-		for (i = 0; i < this.children.length; i++) {
-			this.children[i].propagatePropertyChange(changedProps);
-		}
-	}
 };
 Level.prototype.getParentElement = function() {
 	return this.parentElement;
@@ -1483,33 +1507,6 @@ Level.prototype.getFirstNodeChild = function() {
 		return firstLevel.getFirstNodeChild();
 	}
 	return null;
-};
-Level.prototype.dispose = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].dispose();
-	}
-	if (this.eventHandler) {
-		this.eventHandler.dispose();
-	}
-	this.disposeDom();
-	this.conditions = null;
-	this.foreaches = null;
-	this.children = null;
-	this.conditionsByProps = null;
-	this.foreachesByProps = null;
-	this.propNodes = null;
-	this.propNodesByProps = null;
-	this.propAttrs = null;
-	this.propAttrsByProps = null;
-	this.propComps = null;
-	this.propCompsByProps = null;	
-	this.parentElement = null;
-	this.parentLevel = null;
-	this.firstChild = null;
-	this.firstNodeChild = null;
-	this.lastNodeChild = null;
-	this.eventHandler = null;
-	this.realParentElement = null;
 };
 Level.prototype.disposeDom = function() {
 	var elementsToDispose = this.getElements();
@@ -1555,6 +1552,44 @@ Level.prototype.getElements = function() {
 		}
 	}
 	return elements;
+};
+Level.prototype.dispose = function() {
+	for (var i = 0; i < this.children.length; i++) {
+		this.children[i].dispose();
+	}
+	if (this.eventHandler) {
+		this.eventHandler.dispose();
+		this.eventHandler = null;
+	}
+	this.disposeDom();
+	if (this.propComps) {
+		this.component.disposePropActivities('cmp', this.propComps);
+		this.propComps = null;
+	}
+	if (this.conditions) {
+		this.component.disposePropActivities('cnd', this.conditions);
+		this.conditions = null;
+	}
+	if (this.foreaches) {
+		this.component.disposePropActivities('for', this.foreaches);
+		this.foreaches = null;
+	}
+	if (this.propNodes) {
+		this.component.disposePropActivities('nod', this.propNodes);
+		this.propNodes = null;
+	}
+	if (this.propAttrs) {
+		this.component.disposePropActivities('atr', this.propAttrs);
+		this.propAttrs = null;
+	}
+	this.children = null;
+	this.parentElement = null;
+	this.parentLevel = null;
+	this.firstChild = null;
+	this.firstNodeChild = null;
+	this.lastNodeChild = null;
+	this.realParentElement = null;
+	this.component = null;
 };
 function Menu() {};
 Menu.prototype.onRenderComplete = function() {
