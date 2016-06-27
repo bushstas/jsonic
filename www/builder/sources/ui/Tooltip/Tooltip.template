@@ -1,1 +1,1 @@
-<div class="tooltiped app-tooltip {&args.className}" txt="{&args.txt}" key="{&args.key}" cls="{&args.cls}" cap="{&args.caption}"></div>
+<div class="tooltiped app-tooltip {~className}" txt="{~txt}" key="{~key}" cls="{~cls}" cap="{~caption}"></div>

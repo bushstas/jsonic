@@ -36,7 +36,7 @@ Level.prototype.renderItem = function(item) {
 		this.createTextNode(item);
 	} else if (!isUndefined(item['t'])) {
 		this.createElement(item);
-	} else if (item['i']) {
+	} else if (!isUndefined(item['i'])) {
 		this.createCondition(item);
 	} else if (item['h']) {
 		this.createForeach(item);
@@ -159,8 +159,12 @@ Level.prototype.appendChild = function(child) {
 };
 
 Level.prototype.createCondition = function(params) {
-	if (params['i'] === true) {
-		this.renderItems(params['c']);
+	if (isBool(params['i'])) {
+		if (params['i']) {
+			this.renderItems(params['c']);
+		} else if (!isUndefined(params['e'])) {
+			this.renderItem(params['e']);
+		}
 	} else if (isFunction(params['i']) && isFunction(params['c'])) {
 		var propNames = params['p'], pn;
 		if (isArray(propNames)) {

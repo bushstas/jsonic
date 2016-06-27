@@ -929,7 +929,6 @@
 		$html = preg_replace($regexp, '', $content);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
-		//preg_match_all('/\{let\s+([\$&]\w+)\s*:\s*([^\}]+)\}/', $html, $matches);
 
 		$regexp = "/(<\/*[a-z]+[^>]*>|\{\/*foreach[^\}]*\}|\{\/*if[^\}]*\}|\{else\})/i";
 		preg_match_all($regexp, $html, $matches);
@@ -1043,7 +1042,7 @@
 							preg_match("/^\{if +([^\}]+)\}/i",  $item['content'], $match);
 							checkIfConditionForContainigProps($match[1], $child, $component);
 						} elseif ($tagName == 'foreach') {
-							getForeach($item, $child);
+							getForeach($item, $child, $component);
 						}	
 					}
 				}
@@ -1072,7 +1071,7 @@
 		}		
 	}
 
-	function getForeach($item, &$child) {
+	function getForeach($item, &$child, $component) {
 		$child['h'] = $child['c'];
 		unset($child['c']);
 
@@ -1081,7 +1080,7 @@
 		$parts = explode(' ', trim($content));
 		
 		if ($parts[1] != 'as' || (isset($parts[3]) && $parts[3] != '=>')) {
-			error('Невалидный код <b>foreach</b>: <b>'.$item['content'].'</b>');
+			error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 		}
 		$variable = $parts[0];
 		if (isset($parts[4])) {
@@ -1097,35 +1096,31 @@
 			}
 		}
 		if (!preg_match_all('/^([\$&])(\w[\w\.]*)$/', $variable, $matches)) {
-			error('Невалидный код <b>foreach</b>: <b>'.$item['content'].'</b>');
+			error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 		}
 		$sign = $matches[1][0];
 		$variableParts = explode('.', $matches[2][0]);
 		$variable = $variableParts[0];
 		if ($sign == '&') {
-			for ($j = 1; $j < count($variableParts); $j++) {
-				if (is_numeric($variableParts[$j])) {
-					$variable .= '['.$variableParts[$j].']';
-				} else {
-					$variable .= '.'.$variableParts[$j];
-				}
-			}
+			$variableParts[0] = '';
+			$variableParts = implode('.', $variableParts);
+			$variable .= $variableParts;
 		} else {
 			if (isset($variableParts[1])) {
-				error('Невалидный код <b>foreach</b>: <b>'.$item['content'].'</b>');
+				error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 			}
 		}
 
 		if (!preg_match('/^\&\w+$/', $val)) {
-			error('Невалидный код <b>foreach</b>: <b>'.$item['content'].'</b>');
+			error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 		}
 		if (!empty($key) && !preg_match('/^\&\w+$/', $key)) {
-			error('Невалидный код <b>foreach</b>: <b>'.$item['content'].'</b>');
+			error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 		}
 		if ($sign == '&') {
 			$child['p'] = '<nq>'.$variable.'<nq>';
 		} else {
-			$child['p'] = "<nq>p('".$variable."')<nq>";
+			$child['p'] = "<nq>\$('".$variable."')<nq>";
 			$child['f'] = $variable;
 		}
 		if (!empty($key)) {
@@ -1167,14 +1162,15 @@
 		}
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string($component)) {
-			error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$ifCondition.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>&args</b>');
+			error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$ifCondition.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
 		}
 		$signs = '[\+\-><\!=\/\*%\?:&\|]';
 		$ifCondition = preg_replace('/\s+(?='.$signs.')/', '', $ifCondition);
 		$ifCondition = preg_replace('/('.$signs.')\s+/', "$1", $ifCondition);
 		$ifCondition = preg_replace('/\&(\w+)/', "$1", $ifCondition);
+		$ifCondition = preg_replace('/~(\w+)/', "_['$1']", $ifCondition);
 		if ($hasCode) {
-			$ifCondition = preg_replace('/\$(\w+)/', "p('$1')", $ifCondition);
+			$ifCondition = preg_replace('/\$(\w+)/', "\$('$1')", $ifCondition);
 			preg_match_all("/p\('([^']+)'\)/", $ifCondition, $matches);
 			if (!empty($matches[1])) {
 				$child['p'] = $matches[1];
@@ -1215,6 +1211,7 @@
 		$props = array();
 		$names = array();
 		$ifCondition = false;
+		$else = null;
 		preg_match_all("/ +([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
 		preg_match_all("/ +([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
@@ -1233,6 +1230,10 @@
 				}
 				if ($propName == 'if') {
 					$ifCondition = $propValue;
+					continue;
+				}
+				if ($propName == 'else') {
+					$else = $propValue;
 					continue;
 				}
 				if (isset($propsShortcuts[$propName])) {
@@ -1273,6 +1274,7 @@
 			$props[$propName] = $propValue;
 			if ($hasCode) {
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
+				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
 				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
 				$regexp = '/\{([^\}]*)\}/';
 				$hasClassVar = hasClassVar($propValue);
@@ -1346,18 +1348,29 @@
 		if (!empty($names)) {
 			$child['n'] = $names;
 		}
-		if (!empty($ifCondition)) {
-			addIfConditionToChild(trim($ifCondition), $child, $component);
+		if (!empty($ifCondition) || !empty($else)) {
+			addIfConditionToChild(trim($ifCondition), trim($else), $child, $component);
 		}
 	}
 
-	function addIfConditionToChild($ifCondition, &$child, $component) {
+	function addIfConditionToChild($ifCondition, $else, &$child, $component) {
+		if (!empty($else) && empty($ifCondition)) {
+			error('Элемент в шаблоне класса <b>'.$component['name'].'</b> содержит атрибут <b>else</b>, но не содержит атрибут <b>if</b>');
+		}
 		if (!preg_match('/^\{[^\}]+\}$/', $ifCondition)) {
-			error('Элемент содержит некорректный атрибут <b>if = "'.$ifCondition.'"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>');
+			error('Элемент в шаблоне класса <b>'.$component['name'].'</b> содержит некорректный атрибут <b>if = "'.$ifCondition.'"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>');
 		}
 		$ifCondition = ltrim($ifCondition, '{');
 		$ifCondition = rtrim($ifCondition, '}');
 		$child = array('c' => $child);
+		if (!empty($else)) {
+			$else = ltrim($else, '{');
+			$else = rtrim($else, '}');
+			if (preg_match('/\$\w+[\.\[]/', $else)) {
+				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$else.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+			}
+			$child['e'] = parseCode($else, true);
+		}
 		checkIfConditionForContainigProps($ifCondition, $child, $component);
 	}
 
@@ -1397,6 +1410,7 @@
 	}
 
 	function getTemplateProperties($html, &$child, $component) {
+		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
 		$names = array();
 		preg_match_all("/ +([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
@@ -1404,6 +1418,7 @@
 		$propNames = array_merge($matches1[1], $matches2[1]);
 		$propValues = array_merge($matches1[2], $matches2[2]);
 		$ifCondition = false;
+		$else = null;
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
 			$propValue = $propValues[$i];
@@ -1411,30 +1426,41 @@
 				$ifCondition = $propValue;
 				continue;
 			}
+			if ($propName == 'else') {
+				$else = $propValue;
+				continue;
+			}			
 			$hasCode = hasCode($propValue);
 			if ($hasCode) {
 				if (is_string($component)) {
-					error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$propValue.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>&args</b>');
+					error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$propValue.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
 				}
 				if (preg_match('/\$\w+[\.\[]/', $propValue)) {
 					error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$propValue.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+				}				
+				preg_match_all($regexp, $propValue, $matches);
+				$codes = $matches[1];
+				if (!empty($codes)) {
+					$parts = preg_split($regexp, $propValue);
+					$content = array();
+					foreach ($parts as $j => $part) {
+						if (!empty($part)) {
+							$content[] = $part;
+						}
+						if (isset($codes[$j])) {
+							$content[] = '<plus>'.parseCode($codes[$j], true).'</plus>';
+						}
+					}
+					$propValue = implode($content);
 				}
-				$propValue = preg_replace('/&([\w\.\[\]\'"-]+)/', "<plus>$1</plus>", $propValue);
-				$propValue = preg_replace('/\$(\w+)/', "<plus>p('$1')</plus>", $propValue);
-
-				$hasFunctionCall = hasFunctionCall($propValue);
-				if ($hasFunctionCall) {
-					$propValue = preg_replace('/\.(\w+)\(([^\)]*)\)/', "<plus>this.$1($2)</plus>", $propValue);
-				}
-				$propValue = preg_replace('/[\{\}]/', '', $propValue);
 			}
 			$props[$propName] = $propValue;
 		}
 		if (!empty($props)) {
 			$child['p'] = $props;
 		}
-		if (!empty($ifCondition)) {
-			addIfConditionToChild(trim($ifCondition), $child, $component);
+		if (!empty($ifCondition) || !empty($else)) {
+			addIfConditionToChild(trim($ifCondition), $else, $child, $component);
 		}
 	}
 
@@ -1455,7 +1481,7 @@
 		preg_match_all($regexp, $code, $matches);
 		if (!empty($matches[1])) {
 			if (is_string($component)) {
-				error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$code.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>&args</b>');
+				error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$code.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
 			}
 			foreach ($matches[1] as $i => $match) {
 				$names[] = $match;
@@ -1464,7 +1490,7 @@
 		if (preg_match('/.\?[^:]+:./', $code)) {
 			$code = '('.$code.')';
 		}
-		return preg_replace($regexp, "p('$1')", $code);
+		return preg_replace($regexp, "\$('$1')", $code);
 	}
 
 	function correctTagAttributeText($propName, $text) {
@@ -1494,23 +1520,24 @@
 			if (!empty($part)) {
 				$content[] = $part;
 			}
-			if (isset($codes[$i])) {				
-				// text constants
-				$codes[$i] = preg_replace('/\s*@(\w+)\s*/', "<nq>__.$1<nq>", $codes[$i]);
-				
-				// property node
-				$codes[$i] = preg_replace('/^\s*\$(\w+)\s*$/', "{'pr':'$1','p':p('$1')}", $codes[$i]);
-				$codes[$i] = preg_replace('/&([\w\.]+)/', "$1", $codes[$i]);
-
-				$codes[$i] = preg_replace('/^\s*\.(\w+)\((.+?)\)\s*$/', "this.$1($2)", $codes[$i]);
-				
-				$content[] = array('<nq>'.preg_replace('/\s+([\?:\+\-><=\!]{1,3})\s+/', "$1", $codes[$i]).'<nq>');
+			if (isset($codes[$i])) {
+				$content[] = array(parseCode($codes[$i]));
 			}
-		}
-		
-		
-		//printArr($content);	
+		}	
 		return $content;
+	}
+
+	function parseCode($code, $noClassVars = false) {
+		$code = trim($code);
+		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
+		if (!$noClassVars) {
+			$code = preg_replace('/^\s*\$(\w+)\s*$/', "{'pr':'$1','p':\$('$1')}", $code);
+		}
+		$code = preg_replace('/^&([a-z])/i', "$1", $code);
+		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
+		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
+		$code = preg_replace('/^\s*\.(\w+)\((.+?)\)\s*$/', "this.$1($2)", $code);
+		return '<nq>'.preg_replace('/\s+([\?:\+\-><=\!]{1,3})\s+/', "$1", $code).'<nq>';
 	}
 
 	function addConstructorFunction(&$js, $class, $isComponent) {
@@ -1539,14 +1566,14 @@
 	function addTemplateFunction(&$js, $class, $templateHtml, $component) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class);
 		foreach ($templateFunctions as $templateFunction) {
-			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), 'p, args', "\n\treturn".$templateFunction['content']);
+			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '$, _', "\n\treturn".$templateFunction['content']);
 		}
 	}
 
 	function addGeneralTemplateFunction(&$js, $templateHtml, $file) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $file);
 		foreach ($templateFunctions as $templateFunction) {
-			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(args) {';
+			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(_) {';
 			$js[] = "\n\treturn".$templateFunction['content']."\n}";
 		}
 	}

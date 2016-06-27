@@ -1,5 +1,5 @@
 <div class="app-search-form" scope="1">
-	<div class="app-search-form-title">{&args.title}</div>
+	<div class="app-search-form-title">{~title}</div>
 	<div class="app-search-form-close-side" onClick="toggleExpand"></div>
 	<div class="app-search-form-close" onClick="toggleExpand"></div>
 	<component TenderSearchForm>

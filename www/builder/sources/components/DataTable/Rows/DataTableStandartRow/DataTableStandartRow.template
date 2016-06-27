@@ -1,39 +1,39 @@
 {template .main}
-	<a href="#tender/{&args['Id']}" target="_blank" class="app-datatable-standart-row" scope="1" data-id="{&args['Id']}">
+	<a href="#tender/{~Id}" target="_blank" class="app-datatable-standart-row" scope="1" data-id="{~Id}">
 		<template colorMark>
 		<template controls>
 		<div class="app-datatable-standart-row-top">
 			<div class="app-datatable-standart-row-fz">
-				{getFzName(&args['type'])}
+				{getFzName(~type)}
 			</div>
 			<div class="app-datatable-standart-row-region">
-				<template count if="{&args['multiregion']}" count="{&args['multiregion']}">
-				{&args['regionName']}
+				<template count if="{~multiregion}" count="{~multiregion}">
+				{~regionName}
 			</div>
 			<div class="app-datatable-standart-row-region">
-				<template count if="{&args['multicategory']}" count="{&args['multicategory']}">
-				{&args['subcategory']}
+				<template count if="{~multicategory}" count="{~multicategory}">
+				{~subcategory}
 			</div>
 			<div class="app-datatable-standart-row-type">
-				<include unavailable if="{&args['razm'] != 'N/A'}" else="{&args['razm']}" tariff="{&args['isUnavailable']}" width="66px">
+				<include unavailable if="{~razm == 'N/A'}" else="{~razm}" tariff="{~isUnavailable}" width="66px">
 			</div>
 
 
 		</div>
 		<div class="app-datatable-standart-row-price">
-			{&args['price']}
+			{~price}
 		</div>
 		<div class="app-datatable-standart-row-name">
-			{if &args['hot']}
+			{if ~hot}
 				<template hotMark>										
 			{/if}
-			{&args['name']}	
+			{~name}	
 		</div>
 		<div class="app-datatable-standart-row-bottom">
 		
 		</div>
-		{if &args['fragments']}
-			<component DataTableFragmets data="{&args['fragments']}">
+		{if ~fragments}
+			<component DataTableFragmets data="{~fragments}">
 		{/if}
 	</a>
 {/template}

@@ -1,4 +1,4 @@
 #calendarTooltip = {
-	key: 'calendar',
-	className: '->> float-right'
+	'key': 'calendar',
+	'className': '->> float-right'
 }
