@@ -3029,7 +3029,7 @@ function DataTable(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTable.prototype.getTemplateMain = function($, _) {
-	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}}]
+	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}},{'c':'efd','i':.aaa(1)===true}]
 };
 function DataTableTabPanel(props) {
 	Initialization.initiate.call(this, props);

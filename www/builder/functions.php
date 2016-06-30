@@ -861,7 +861,7 @@
 		return false;
 	}
  
-	function getTemplateFunctions($template, $component, $class = null) {
+	function getTemplateFunctions($template, &$component, $class = null) {
 		global $calledComponents;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
@@ -925,7 +925,7 @@
 		return $templateFunctions;
 	}
 
-	function getParsedTemplate($content, $name, $regexp, $component) {
+	function getParsedTemplate($content, $name, $regexp, &$component) {
 		$html = preg_replace($regexp, '', $content);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
@@ -957,7 +957,7 @@
 		return preg_match("/^[<\{]\//", $tagContent);
 	}
 
-	function getHtmlChildren($list, $component) {
+	function getHtmlChildren($list, &$component) {
 		if (empty($list)) {
 			return array();
 		}
@@ -1132,7 +1132,7 @@
 		return $child;
 	}
 
-	function parseTextNode($content, &$children, $component) {
+	function parseTextNode($content, &$children, &$component) {
 		if (!empty($content)) {
 			$items = checkTextForContainigProps($content, $component);
 			foreach ($items as $item) {
@@ -1201,10 +1201,25 @@
 	}
 
 	function hasFunctionCall($code) {
-		return preg_match('/\.\w+\(/', $code);
+		preg_match_all('/\.([a-z]\w*)\(|^\s*\.([a-z]\w*)|[^\w\]]\.([a-z]\w*)/i', $code, $matches);
+		$funcs = array();
+		foreach ($matches[1] as $i => $match) {
+			if (!empty($match)) {
+				$funcs[] = $match;
+			}
+			if (!empty($matches[2][$i])) {
+				$funcs[] = $matches[2][$i];
+			}
+			if (!empty($matches[3][$i])) {
+				$funcs[] = $matches[3][$i];
+			}
+		}
+		$funcs = array_unique($funcs);
+		if (empty($funcs)) return false;
+		return $funcs;
 	}
 
-	function getTagProperties($html, &$child, $component) {
+	function getTagProperties($html, &$child, &$component) {
 		global $obfuscate;
 		global $propsShortcuts;
 		global $eventTypesShortcuts;
@@ -1321,7 +1336,13 @@
 
 				$hasFunctionCall = hasFunctionCall($attrContent);
 				if ($hasFunctionCall) {
+					if (!is_array($component['tmpCallbacks'])) {
+						$component['tmpCallbacks'] = array();
+					}
+					$component['tmpCallbacks'] = array_merge($component['tmpCallbacks'], $hasFunctionCall);
 					$attrContent = preg_replace('/\.(\w+)\(([^\)]*)\)/', "this.$1($2)", $attrContent);
+					$attrContent = preg_replace('/^\s*\.(\w+)/', "this.$1()", $attrContent);
+					$attrContent = preg_replace('/([^\w\]])\.(\w+)/', "$1this.$2()", $attrContent);					
 				}
 
 				if ($hasClassVar) {
@@ -1500,7 +1521,14 @@
 		return $text;
 	}
 
-	function checkTextForContainigProps($text, $component) {
+	function checkTextForContainigProps($text, &$component) {
+		$hasFunctionCall = hasFunctionCall($text);
+		if ($hasFunctionCall) {
+			if (!is_array($component['tmpCallbacks'])) {
+				$component['tmpCallbacks'] = array();
+			}
+			$component['tmpCallbacks'] = array_merge($component['tmpCallbacks'], $hasFunctionCall);
+		}
 		$regexp = '/\{([^\}]+)\}/';
 		preg_match_all($regexp, $text, $matches);
 		$codes = $matches[1];
@@ -1523,7 +1551,7 @@
 			if (isset($codes[$i])) {
 				$content[] = array(parseCode($codes[$i]));
 			}
-		}	
+		}
 		return $content;
 	}
 
@@ -1563,7 +1591,7 @@
 		$js[] = '};';
 	}
 
-	function addTemplateFunction(&$js, $class, $templateHtml, $component) {
+	function addTemplateFunction(&$js, $class, $templateHtml, &$component) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class);
 		foreach ($templateFunctions as $templateFunction) {
 			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '$, _', "\n\treturn".$templateFunction['content']);

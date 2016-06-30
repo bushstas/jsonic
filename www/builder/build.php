@@ -675,6 +675,13 @@
 				}
 				if (!empty($templates[$className])) {
 					addTemplateFunction($compiledJs, $className, $templates[$className], $component);
+					if (!empty($component['tmpCallbacks'])) {
+						foreach ($component['tmpCallbacks'] as $callback) {
+							if (!in_array($callback, $component['functionList'])) {
+								error("Ошибка вызова метода <b>".$callback."</b> класса <b>".$component['name']."</b> из его шаблона. Метод не найден");
+							}
+						}
+					}
 				}
 				if (!empty($component['initials'])) {
 					addGetInitialsFunction($compiledJs, $className, $component['initials']);
