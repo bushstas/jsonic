@@ -3,7 +3,6 @@ function Component() {}
 Component.prototype.initiate = function() {
 	this.propActivities = {};
 	this.propsToSet = {};
-	this.provider = this.get.bind(this);
 	this.followers = {};
 	this.rendered = false;
 	this.disposed = false;
@@ -124,7 +123,7 @@ Component.prototype.onReadyToRender = function() {
 
 Component.prototype.doRendering = function() {
 	this.level = new Level();
-	var content = this.getTemplateMain(this.provider, this.getCombinedArgs());
+	var content = this.getTemplateMain(this, this.getCombinedArgs());
 	if (isArray(content)) {
 		this.level.setComponent(this);
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
@@ -164,6 +163,10 @@ Component.prototype.forEachChild = function(callback) {
 	} else {
 		log('this.children is not an array');
 	}
+};
+
+Component.prototype.g = function(propName) {
+	return this.get(propName);
 };
 
 Component.prototype.get = function(propName) {
@@ -362,10 +365,6 @@ Component.prototype.setId = function(id) {
 
 Component.prototype.getId = function() {
 	return this.componentId;
-};
-
-Component.prototype.getProvider = function() {
-	return this.provider;
 };
 
 Component.prototype.getComponent = function() {

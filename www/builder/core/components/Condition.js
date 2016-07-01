@@ -10,13 +10,10 @@ Condition.prototype.render = function(parentElement, parentLevel) {
 };
 
 Condition.prototype.createLevel = function(isUpdating) {
-	var children = this.getChildren();
-	if (isArray(children)) {
-		this.level = new Level();
-		this.level.setComponent(this.parentLevel.getComponent());
-		var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
-		this.level.render(children, this.parentElement, this.parentLevel, nextSiblingChild);
-	}
+	this.level = new Level();
+	this.level.setComponent(this.parentLevel.getComponent());
+	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+	this.level.render(this.getChildren(), this.parentElement, this.parentLevel, nextSiblingChild);
 };
 
 Condition.prototype.recheck = function() {

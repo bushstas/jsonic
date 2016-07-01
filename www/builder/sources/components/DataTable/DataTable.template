@@ -1,6 +1,3 @@
 <div class="app-datatable-outer-container">
 	<component DataTableTabPanel>
 </div>
-{if .aaa(1) === true}
-	efd
-{/if}

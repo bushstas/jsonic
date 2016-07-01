@@ -123,7 +123,7 @@ Level.prototype.createElement = function(props) {
 		this.eventHandler = this.eventHandler || new EventHandler();
 		for (i = 0; i < props['e'].length; i++) {
 			eventType = __EVENTTYPES[props['e'][i]] || eventType;
-			eventHandler = props['e'][i + 1];
+			eventHandler = props['e'][i + 1].bind(this.component);
 			var isOnce = props['e'][i + 2] === true;
 			if (isString(eventType) && isFunction(eventHandler)) {
 				if (isOnce) {
@@ -225,7 +225,7 @@ Level.prototype.registerChild = function(child, isComponent) {
 
 Level.prototype.includeTemplate = function(item) {
 	var component = this.getComponent();
-	var items = item['tmp'].call(component, component.getProvider(), item['p']);
+	var items = item['tmp'].call(component, component, item['p']);
 	if (isArray(items)) {
 		for (var i = 0; i < items.length; i++) {
 			this.renderItem(items[i]);
@@ -264,7 +264,7 @@ Level.prototype.renderComponent = function(item, parentElement) {
 		var events = item['e'];
 		if (isArray(events)) {
 			for (i = 0; i < events.length; i++) {
-				component.subscribe(events[i], events[i + 1], this);
+				component.subscribe(events[i], events[i + 1], this.component);
 				i++;	
 			}
 		}

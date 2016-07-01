@@ -436,7 +436,7 @@
 
 		$classNames = array();
 		$doubles = array();
-		$classesList = array();
+		$classesList = getComponentClassData();
 		foreach ($classes as $type => &$classesOfType) {
 			foreach ($classesOfType as $className => &$classData) {
 				$classData['isSuper'] = in_array($type, $superClasses);
@@ -677,7 +677,7 @@
 					addTemplateFunction($compiledJs, $className, $templates[$className], $component);
 					if (!empty($component['tmpCallbacks'])) {
 						foreach ($component['tmpCallbacks'] as $callback) {
-							if (!in_array($callback, $component['functionList'])) {
+							if (!hasComponentMethod($callback, $component)) {
 								error("Ошибка вызова метода <b>".$callback."</b> класса <b>".$component['name']."</b> из его шаблона. Метод не найден");
 							}
 						}

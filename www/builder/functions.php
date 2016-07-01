@@ -745,7 +745,7 @@
 			$component['functionList'] = $functionList;
 			unset($component['content']);
 			foreach ($component['callbacks'] as $callback) {
-				if (!in_array($callback, $functionList)) {
+				if (!hasComponentMethod($callback, $component)) {
 					error("Обработчик события <b>".$callback."</b> не найден среди методов класса <b>".$component['name']."</b>");
 				}
 			}
@@ -897,6 +897,7 @@
 		
 				$data = str_replace("\'", "'", $data);
 
+				$data = str_replace('<this>', '$.', $data);
 				$data = preg_replace("/'<nq>/", '', $data);
 				$data = preg_replace("/<nq>'/", '', $data);
 				$data = preg_replace("/<nq>/", '', $data);
@@ -911,8 +912,8 @@
 				$data = preg_replace("/\[*<function_returns_array>\[*(',)*/", 'function(){return[', $data);
 				$data = preg_replace("/(,')*\]*<\/function_returns_array>\]*/", ']}', $data);
 
-				$data = preg_replace("/\['<foreach ([^>]+)>',/", "(function($1){return[", $data);
-				$data = preg_replace("/,*'<\/foreach>'\]/", ']}).bind(this)', $data);
+				$data = preg_replace("/\['<foreach ([^>]+)>',/", "function($1){return[", $data);
+				$data = preg_replace("/,*'<\/foreach>'\]/", ']}', $data);
 
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				
@@ -1120,7 +1121,7 @@
 		if ($sign == '&') {
 			$child['p'] = '<nq>'.$variable.'<nq>';
 		} else {
-			$child['p'] = "<nq>\$('".$variable."')<nq>";
+			$child['p'] = "<nq>\<this>g('".$variable."')<nq>";
 			$child['f'] = $variable;
 		}
 		if (!empty($key)) {
@@ -1156,7 +1157,7 @@
 		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
 	}
 
-	function checkIfConditionForContainigProps($ifCondition, &$child, $component) {
+	function checkIfConditionForContainigProps($ifCondition, &$child, &$component) {
 		if (is_array($component) && preg_match('/\$\w+[\.\[]/', $ifCondition)) {
 			error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$ifCondition.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
 		}
@@ -1164,20 +1165,26 @@
 		if (is_string($component)) {
 			error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$ifCondition.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
 		}
+		parseClassMethodCalls($ifCondition, $component);
 		$signs = '[\+\-><\!=\/\*%\?:&\|]';
 		$ifCondition = preg_replace('/\s+(?='.$signs.')/', '', $ifCondition);
 		$ifCondition = preg_replace('/('.$signs.')\s+/', "$1", $ifCondition);
 		$ifCondition = preg_replace('/\&(\w+)/', "$1", $ifCondition);
 		$ifCondition = preg_replace('/~(\w+)/', "_['$1']", $ifCondition);
 		if ($hasCode) {
-			$ifCondition = preg_replace('/\$(\w+)/', "\$('$1')", $ifCondition);
-			preg_match_all("/p\('([^']+)'\)/", $ifCondition, $matches);
+			preg_match_all('/\$(\w+)/', $ifCondition, $matches);
+			$ifCondition = preg_replace('/\$(\w+)/', "\<this>g('$1')", $ifCondition);
 			if (!empty($matches[1])) {
 				$child['p'] = $matches[1];
 			}
 			$child['i'] = '<nq>function(){return('.$ifCondition.')}<nq>';
-			array_unshift($child['c'], '<nq><function_returns_array>');
-			array_push($child['c'], '</function_returns_array><nq>');
+			if (count($child['c']) < 2) {
+				array_unshift($child['c'], '<nq><function>');
+				array_push($child['c'], '</function><nq>');
+			} else {
+				array_unshift($child['c'], '<nq><function_returns_array>');
+				array_push($child['c'], '</function_returns_array><nq>');
+			}
 		} else {
 			if (!preg_match('/'.$signs.'/', $ifCondition)) {
 				$child['i'] = '<nq>!!'.$ifCondition.'<nq>';
@@ -1271,7 +1278,7 @@
 						$once = true;
 					}
 					$callback = preg_replace("/[^\w]/", "", $propValue);
-					if (is_array($component) && !isMethodInClass($callback, $component)) {
+					if (is_array($component) && !hasComponentMethod($callback, $component)) {
 						error('Функция обработчик события <b>'.$callback.'</b> не найдена среди методов класса <b>'.$component['name'].'</b>');
 					}
 					$eventTypeIndex = array_search($eventType, $eventTypesShortcuts);
@@ -1279,7 +1286,7 @@
 						$eventType = $eventTypeIndex;
 					}
 					$child['e'][] = $eventType;
-					$child['e'][] = '<nq>this.'.$callback.'.bind(this)<nq>';
+					$child['e'][] = '<nq><this>'.$callback.'<nq>';
 					if ($once) {
 						$child['e'][] = true;
 					}
@@ -1334,21 +1341,10 @@
 					$attrContent = implode('"+"', $attrParts);
 				}
 
-				$hasFunctionCall = hasFunctionCall($attrContent);
-				if ($hasFunctionCall) {
-					if (!is_array($component['tmpCallbacks'])) {
-						$component['tmpCallbacks'] = array();
-					}
-					$component['tmpCallbacks'] = array_merge($component['tmpCallbacks'], $hasFunctionCall);
-					$attrContent = preg_replace('/\.(\w+)\(([^\)]*)\)/', "this.$1($2)", $attrContent);
-					$attrContent = preg_replace('/^\s*\.(\w+)/', "this.$1()", $attrContent);
-					$attrContent = preg_replace('/([^\w\]])\.(\w+)/', "$1this.$2()", $attrContent);					
-				}
+				parseClassMethodCalls($attrContent, $component);
 
 				if ($hasClassVar) {
-					$binding1 = !empty($hasFunctionCall) ? '(' : '';
-					$binding2 = !empty($hasFunctionCall) ? ').bind(this)' : '';
-					$attrContent = '<nq>'.$binding1.'<function>"'.$attrContent.'"</function>'.$binding2.'<nq>';
+					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
 				}
 
 				$props[$propName] = correctTagAttributeText($propName, $attrContent);
@@ -1374,7 +1370,24 @@
 		}
 	}
 
-	function addIfConditionToChild($ifCondition, $else, &$child, $component) {
+	function parseClassMethodCalls(&$code, &$component) {
+		if (preg_match('/\bthis\./', $code)) {
+			error('Обнаружено использование ключевого слова <b>this</b> в шаблоне класса <b>'.$component['name'].'</b>');
+		}
+		$hasFunctionCall = hasFunctionCall($code);
+		if ($hasFunctionCall) {
+			if (!is_array($component['tmpCallbacks'])) {
+				$component['tmpCallbacks'] = array();
+			}
+			$component['tmpCallbacks'] = array_merge($component['tmpCallbacks'], $hasFunctionCall);
+			$code = preg_replace('/\.(\w+)\(([^\)]*)\)/', "<this>$1($2)", $code);
+			$code = preg_replace('/^\s*\.(\w+)/', "<this>$1()", $code);
+			$code = preg_replace('/([^\w\]])\.(\w+)/', "$1<this>$2()", $code);					
+		}
+		return !!$hasFunctionCall;
+	}
+
+	function addIfConditionToChild($ifCondition, $else, &$child, &$component) {
 		if (!empty($else) && empty($ifCondition)) {
 			error('Элемент в шаблоне класса <b>'.$component['name'].'</b> содержит атрибут <b>else</b>, но не содержит атрибут <b>if</b>');
 		}
@@ -1390,7 +1403,7 @@
 			if (preg_match('/\$\w+[\.\[]/', $else)) {
 				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$else.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
 			}
-			$child['e'] = parseCode($else, true);
+			$child['e'] = parseCode($else, $component, true);
 		}
 		checkIfConditionForContainigProps($ifCondition, $child, $component);
 	}
@@ -1430,7 +1443,7 @@
 		return preg_replace('/ {2,}/', ' ', $obfuscatedValue);
 	}
 
-	function getTemplateProperties($html, &$child, $component) {
+	function getTemplateProperties($html, &$child, &$component) {
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
 		$names = array();
@@ -1469,7 +1482,7 @@
 							$content[] = $part;
 						}
 						if (isset($codes[$j])) {
-							$content[] = '<plus>'.parseCode($codes[$j], true).'</plus>';
+							$content[] = '<plus>'.parseCode($codes[$j], $component, true).'</plus>';
 						}
 					}
 					$propValue = implode($content);
@@ -1483,13 +1496,6 @@
 		if (!empty($ifCondition) || !empty($else)) {
 			addIfConditionToChild(trim($ifCondition), $else, $child, $component);
 		}
-	}
-
-	function isMethodInClass($funcName, $component) {
-		foreach ($component['functions'] as $method) {
-			if ($method['name'] == $funcName) return true;
-		}
-		return false;
 	}
 
 	function parseAttributeClassVars($code, &$names, $component) {
@@ -1511,7 +1517,7 @@
 		if (preg_match('/.\?[^:]+:./', $code)) {
 			$code = '('.$code.')';
 		}
-		return preg_replace($regexp, "\$('$1')", $code);
+		return preg_replace($regexp, "\<this>g('$1')", $code);
 	}
 
 	function correctTagAttributeText($propName, $text) {
@@ -1522,13 +1528,6 @@
 	}
 
 	function checkTextForContainigProps($text, &$component) {
-		$hasFunctionCall = hasFunctionCall($text);
-		if ($hasFunctionCall) {
-			if (!is_array($component['tmpCallbacks'])) {
-				$component['tmpCallbacks'] = array();
-			}
-			$component['tmpCallbacks'] = array_merge($component['tmpCallbacks'], $hasFunctionCall);
-		}
 		$regexp = '/\{([^\}]+)\}/';
 		preg_match_all($regexp, $text, $matches);
 		$codes = $matches[1];
@@ -1549,22 +1548,22 @@
 				$content[] = $part;
 			}
 			if (isset($codes[$i])) {
-				$content[] = array(parseCode($codes[$i]));
+				$content[] = array(parseCode($codes[$i], $component));
 			}
 		}
 		return $content;
 	}
 
-	function parseCode($code, $noClassVars = false) {
+	function parseCode($code, &$component, $noClassVars = false) {
 		$code = trim($code);
+		parseClassMethodCalls($code, $component);
 		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
 		if (!$noClassVars) {
-			$code = preg_replace('/^\s*\$(\w+)\s*$/', "{'pr':'$1','p':\$('$1')}", $code);
+			$code = preg_replace('/^\s*\$(\w+)\s*$/', "{'pr':'$1','p':\<this>g('$1')}", $code);
 		}
 		$code = preg_replace('/^&([a-z])/i', "$1", $code);
 		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
 		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
-		$code = preg_replace('/^\s*\.(\w+)\((.+?)\)\s*$/', "this.$1($2)", $code);
 		return '<nq>'.preg_replace('/\s+([\?:\+\-><=\!]{1,3})\s+/', "$1", $code).'<nq>';
 	}
 
@@ -1594,7 +1593,7 @@
 	function addTemplateFunction(&$js, $class, $templateHtml, &$component) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class);
 		foreach ($templateFunctions as $templateFunction) {
-			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '$, _', "\n\treturn".$templateFunction['content']);
+			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '$,_', "\n\treturn".$templateFunction['content']);
 		}
 	}
 
@@ -1795,5 +1794,30 @@
 		}
 		return $constants;
 	}
+
+	function hasComponentMethod($method, $component) {
+		if (in_array($method, $component['functionList'])) return true;
+		global $classesList;
+		$parents = $component['extends'];
+		if (is_array($parents)) {
+			foreach ($parents as $parent) {
+				if (in_array($method, $classesList[$parent]['functionList'])) {
+					return true;
+				}
+			}
+		}
+		return false;		
+	}
+
+	function getComponentClassData() {
+		global $config;
+		$pathToComponentClass = $config['sources'].'/components/Component.js';
+		if (!file_exists($pathToComponentClass)) {
+			error('Класс <b>Component</b> не найден по указанному пути <b>'.$pathToComponentClass.'</b>');
+		}
+		$content = file_get_contents($pathToComponentClass);
+		preg_match_all('/\bComponent\.prototype\.(\w+)\s*=\s*function\s*\(/', $content, $matches);
+		return array('Component' => array('functionList' => $matches[1]));
+	}	
 
 ?>
