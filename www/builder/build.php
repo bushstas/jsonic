@@ -364,9 +364,10 @@
 				'maw' => 'max-width', 'miw' => 'min-width'
 			);
 			foreach ($shorts as $k => $v) {
-				$regexp = '/\$'.$k.' *(-*\#*[\d\.]+)(%)*/';
+				$regexp = '/\$'.$k.' *(-*\#*[\d\._]+)(%)*/';
 				$px = !in_array($k, array('z')) ? 'px' : '';
 				$compiledCss = preg_replace($regexp, $v.":$1".$px."$2;", $compiledCss);
+				$compiledCss = preg_replace('/:(\d+%*)_(?=\d)/', ":$1px ", $compiledCss);
 			}
 			$shorts = array('c' => 'color', 'bc' => 'background-color', 'boc' => 'border-color');
 			foreach ($shorts as $k => $v) {
@@ -384,6 +385,9 @@
 
 
 			$compiledCss = str_replace('px%', '%', $compiledCss);
+			$compiledCss = str_replace('%px', '%', $compiledCss);
+			$compiledCss = preg_replace('/\s0(px|%)/', " 0", $compiledCss);
+			$compiledCss = preg_replace('/:0(px|%)/', ":0", $compiledCss);
 			$compiledCss = preg_replace('/;{2,}/', ';', $compiledCss);
 			$regexp = '/\$\w+/';
 			preg_match_all($regexp, $compiledCss, $matches);
