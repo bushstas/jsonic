@@ -361,7 +361,7 @@
 				'p' => 'padding', 'pl' => 'padding-left', 'pr' => 'padding-right', 'pt' => 'padding-top', 'pb' => 'padding-bottom',
 				'm' => 'margin', 'ml' => 'margin-left', 'mr' => 'margin-right', 'mt' => 'margin-top', 'mb' => 'margin-bottom',
 				'fs' => 'font-size', 'lh' => 'line-height', 'br' => 'border-radius', 'mah' => 'max-height', 'mih' => 'min-height',
-				'maw' => 'max-width', 'miw' => 'min-width'
+				'maw' => 'max-width', 'miw' => 'min-width', 'bp' => 'background-position'
 			);
 			foreach ($shorts as $k => $v) {
 				$regexp = '/\$'.$k.' *(-*\#*[\d\._]+)(%)*/';

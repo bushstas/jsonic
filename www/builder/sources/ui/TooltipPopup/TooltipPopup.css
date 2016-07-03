@@ -1,13 +1,12 @@
 $imgsrc = ../images/tooltips
 .app-tooltip-popup {
-	$fix $bgwhite $box $none $z750 $br3 $bo#C1C7D2 $fs14 $c#47536c $lh20 $miw200 $maw400
+	$(fix bgwhite box none z750 br3 bo#C1C7D2 fs14 c#47536c lh20 miw200 maw400)
 }
 .app-tooltip-popup.shown {
 	$block
 }
 .app-tooltip-popup-caption {
-    $h35 $lh36 $bob#e5e9f3 $pl43 $norep $c#4a5b6f $fs16 $bc#f7f8f9 $bold $png = info
-    background-position: 10px center;    
+    $(h35 lh36 bob#e5e9f3 pl43 norep c#4a5b6f fs16 bc#f7f8f9 bold png = info bp10_50%)
 }
 .app-tooltip-popup-caption:empty {
 	$none

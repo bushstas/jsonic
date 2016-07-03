@@ -190,8 +190,11 @@ Level.prototype.createIfSwitch = function(params) {
 			this.ifSwitches[propNames[i]].push(this.component.registerPropActivity('isw', propNames[i], swtch));
 		}
 	} else {
-		for (var i = 0; i < this.params['is'].length; i++) {
-
+		for (var i = 0; i < params['is'].length; i++) {
+			if (!!params['is'][i]) {
+				this.renderItems(this.params['c'][i]);
+				return;
+			}
 		}
 		if (isArray(this.params['d'])) this.renderItems(this.params['d']);
 	}

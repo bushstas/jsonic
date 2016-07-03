@@ -12,9 +12,7 @@ IfSwitch.prototype.createLevels = function(isUpdating) {
 	for (var i = 0; i < values.length; i++) {
 		if (!!values[i]) {
 			if (i === this.current) return;
-			for (var j = 0; j < children[i].length; j++) {
-				this.createLevel(children[i][j], isUpdating);
-			}
+			for (var j = 0; j < children[i].length; j++) this.createLevel(children[i][j], isUpdating);
 			this.current = i;
 			return;
 		}
