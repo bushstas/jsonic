@@ -15,5 +15,8 @@ $imgsrc = ../images/tooltips
 	$p15_18
 }
 .app-tooltip-list-item {
-	$(lh16 p5_0)
+	$(rel lh16 p4_0_4_12)
+}
+.app-tooltip-list-item:before {
+	$(cnt wh5 round abs l t10 bc#47536c)
 }

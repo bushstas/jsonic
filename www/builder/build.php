@@ -367,7 +367,7 @@
 				$regexp = '/\$'.$k.' *(-*\#*[\d\._]+)(%)*/';
 				$px = !in_array($k, array('z')) ? 'px' : '';
 				$compiledCss = preg_replace($regexp, $v.":$1".$px."$2;", $compiledCss);
-				$compiledCss = preg_replace('/:(\d+%*)_(?=\d)/', ":$1px ", $compiledCss);
+				$compiledCss = preg_replace('/([:\s])(\d+%*)_(?=\d)/', "$1$2px ", $compiledCss);
 			}
 			$shorts = array('c' => 'color', 'bc' => 'background-color', 'boc' => 'border-color');
 			foreach ($shorts as $k => $v) {

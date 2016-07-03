@@ -1,4 +1,4 @@
-<div class="app-tooltip-popup {$className}{$shown?' shown'}" style="left:{$left}px;top:{$top}px;">
+<div class="app-tooltip-popup {$className}{$shown?' shown'}" style="left:{$left}px;top:{$top}px;" scope="1">
 	<div class="app-tooltip-popup-caption">
 		{$caption}
 	</div>

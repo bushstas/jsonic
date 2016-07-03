@@ -49,14 +49,16 @@ function Tooltiper() {
 		timer = window.setTimeout(show, 500);
 	};
 	var show = function() {
-		tooltip.set('shown', true);
-		var coords = getCoords();
 		tooltip.set({
+			'shown': true,
 			'corrector': corrector,
 			'caption': caption,
-			'text': text,
-			'left': coords.x,
-			'top': coords.y
+			'text': text
+		});
+		var coords = getCoords();
+		tooltip.set({
+			'left': Math.round(coords.x),
+			'top': Math.round(coords.y)
 		});
 	};
 	var getCoords = function() {
@@ -98,25 +100,24 @@ function Tooltiper() {
 		}
 		
 		if (position == 'left') {
-			marginLeft = -tooltipRect.width - 10 + 'px';
+			marginLeft = -tooltipRect.width - 10;
 		} else if (position == 'top' || position == 'bottom') {
-			marginLeft = -Math.round(tooltipRect.width / 2) + 'px';
+			marginLeft = -Math.round(tooltipRect.width / 2);
 		} else if (position == 'right-top' || position == 'right-bottom') {
-			marginLeft = -tooltipRect.width + 'px';
+			marginLeft = -tooltipRect.width;
 		} else if (position == 'left-top') {
-			marginLeft = -rect.width + 'px';
+			marginLeft = -rect.width;
 		}
 		if (position == 'top' || position == 'left-top' || position == 'right-top') {
-			marginTop = -tooltipRect.height - 10 + 'px';
+			marginTop = -tooltipRect.height - 10;
 		}
 		
 		if (rect.width < 30 && ['left-bottom', 'right-bottom', 'bottom', 'left-top', 'right-top', 'top'].indexOf(position) != -1) {
 			coords.x -= 15;
 		}
-
 		coords.x += marginLeft;
 		coords.y += marginTop;
-		return coords;		
+		return coords;
 	};
 	var onLeave = function() {
 		window.clearTimeout(timer);

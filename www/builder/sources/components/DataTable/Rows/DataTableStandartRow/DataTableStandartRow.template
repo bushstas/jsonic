@@ -6,7 +6,7 @@
 				{getFzName(~type)}
 			</div>
 			{if ~multiregion}
-				<div class="app-datatable-standart-row-top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list">
+				<div class="app-datatable-standart-row-top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list" pos="left-top">
 					<template count count="{~multiregion}">
 					{~regionName}
 				</div>
@@ -16,7 +16,7 @@
 				</div>
 			{/if}
 			{if ~multicategory}
-				<div class="app-datatable-standart-row-top-item tooltiped" txt="{~subcategories}" cap="{@categories}" del="1" cor="list">
+				<div class="app-datatable-standart-row-top-item tooltiped" txt="{~subcategories}" cap="{@categories}" del="1" cor="list" pos="left-top">
 					<template count count="{~multicategory}">
 					{~subcategory}
 				</div>
