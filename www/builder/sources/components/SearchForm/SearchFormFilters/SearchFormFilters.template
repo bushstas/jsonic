@@ -3,7 +3,7 @@
 		<span>{@createFilter}</span>
 		<component SearchFormCreateFilterMenu>
 	</div>
-	<div class="app-search-form-filters-button{!$quantity?' with-plus':''}">
+	<div class="app-search-form-filters-button{!$quantity?' with-plus'}">
 		<div class="app-search-form-filters-button-inner">{@myFilters}</div>
 		<div class="app-search-form-filters-button-side">
 			<label class="app-search-form-filters-button-quantity">{$quantity}</label>

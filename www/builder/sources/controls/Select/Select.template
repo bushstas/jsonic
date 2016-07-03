@@ -4,7 +4,7 @@
 			{$caption}
 		</div>
 	{/if}
-	<div class="app-select{$active?' active':''}">
+	<div class="app-select{$active?' active'}">
 		<div class="app-select-value" onClick="onClick">
 			{$title}
 		</div>

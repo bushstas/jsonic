@@ -22,31 +22,25 @@ Level.prototype.getComponent = function() {
 
 Level.prototype.renderItems = function(items) {
 	if (isArray(items)) {
-		for (var i = 0; i < items.length; i++) {
-			this.renderItem(items[i]);
-		}
-	} else {
-		this.renderItem(items);
-	}
+		for (var i = 0; i < items.length; i++) this.renderItem(items[i]);
+	} else this.renderItem(items);
 };
 
 Level.prototype.renderItem = function(item) {
 	if (!item && item !== 0) return;
-	if (!isObject(item)) {
-		this.createTextNode(item);
-	} else if (!isUndefined(item['t'])) {
-		this.createElement(item);
-	} else if (!isUndefined(item['i'])) {
-		this.createCondition(item);
-	} else if (item['h']) {
-		this.createForeach(item);
-	} else if (!isUndefined(item['pr'])) {
-		this.createPropertyNode(item);
-	} else if (isFunction(item['tmp'])) {
-		this.includeTemplate(item);
-	} else if (item['cmp']) {
-		this.renderComponent(item);
+	if (isFunction(item)) {
+		this.renderItems(item());
+		return;
 	}
+	if (!isObject(item)) this.createTextNode(item);
+	else if (item.hasOwnProperty('t')) this.createElement(item);
+	else if (item.hasOwnProperty('pr')) this.createPropertyNode(item);
+	else if (item.hasOwnProperty('i')) this.createCondition(item);
+	else if (isFunction(item['h'])) this.createForeach(item);	
+	else if (item.hasOwnProperty('tmp')) this.includeTemplate(item);
+	else if (item.hasOwnProperty('cmp')) this.renderComponent(item);
+	else if (item.hasOwnProperty('is')) this.createIfSwitch(item);
+	else if (item.hasOwnProperty('sw')) this.createSwitch(item);
 };
 
 Level.prototype.createLevel = function(items, parentElement) {
@@ -57,11 +51,8 @@ Level.prototype.createLevel = function(items, parentElement) {
 };
 
 Level.prototype.createTextNode = function(content) {
-	if (content == '<br>') {
-		this.appendChild(document.createElement('br'));
-	} else {
-		this.appendChild(document.createTextNode(content));
-	}
+	if (content == '<br>') this.appendChild(document.createElement('br'));
+	else this.appendChild(document.createTextNode(content));
 };
 
 Level.prototype.createPropertyNode = function(props) {
@@ -81,11 +72,8 @@ Level.prototype.createElement = function(props) {
 		for (var k in props['p']) {
 			if (isString(props['p'][k]) || isNumber(props['p'][k])) {
 				attrName = __A[k] || k;
-				if (attrName == 'scope') {
-					this.parentLevel.setScope(element);
-				} else {
-					element.attr(attrName, props['p'][k]);
-				}
+				if (attrName == 'scope') this.component.setScope(element);
+				else element.attr(attrName, props['p'][k]);
 			} else if (isFunction(props['p'][k])) {
 				pn = props['n'][k];
 				if (props['n'] && (isArray(pn) || isString(pn))) {
@@ -102,19 +90,13 @@ Level.prototype.createElement = function(props) {
 					}
 				}
 				var attrParts = props['p'][k]();
-				if (!isArray(attrParts)) {
-					attrParts = [attrParts];
-				}
+				if (!isArray(attrParts)) attrParts = [attrParts];
 				var attrValue = '', partValue;
 				for (i = 0; i < attrParts.length; i++) {
 					partValue = isFunction(attrParts[i]) ? attrParts[i]() : attrParts[i];
-					if (partValue) {
-						attrValue += partValue;
-					}
+					if (partValue) attrValue += partValue;
 				}
-				if (attrValue) {
-					element.attr(__A[k] || k, attrValue);
-				}
+				if (attrValue) element.attr(__A[k] || k, attrValue);
 			}
 		}
 	}
@@ -129,19 +111,14 @@ Level.prototype.createElement = function(props) {
 				if (isOnce) {
 					this.eventHandler.listenOnce(element, eventType, eventHandler);
 					i++;
-				} else {
-					this.eventHandler.listen(element, eventType, eventHandler);
-				}
+				} else this.eventHandler.listen(element, eventType, eventHandler);
 			}
 			i++;
 		}
 	}
 	if (isArray(props['c'])) {
-		if (props['c'].length == 1 && (isString(props['c'][0]) || isNumber(props['c'][0]))) {
-			element.innerHTML = props['c'][0];
-		} else {
-			this.createLevel(props['c'], element);
-		}
+		if (props['c'].length == 1 && (isString(props['c'][0]) || isNumber(props['c'][0]))) element.innerHTML = props['c'][0];
+		else this.createLevel(props['c'], element);
 	} else if (isObject(props['c'])) {
 		this.createLevel(props['c'], element);
 	} else if (!isUndefined(props['c'])) {
@@ -150,11 +127,8 @@ Level.prototype.createElement = function(props) {
 };
 
 Level.prototype.appendChild = function(child) {
-	if (this.nextSiblingChild) {
-		this.parentElement.insertBefore(child, this.nextSiblingChild);	
-	} else {	
-		this.parentElement.appendChild(child);	
-	}
+	if (this.nextSiblingChild) this.parentElement.insertBefore(child, this.nextSiblingChild);	
+	else this.parentElement.appendChild(child);	
 	this.registerChild(child);
 };
 
@@ -188,47 +162,79 @@ Level.prototype.createCondition = function(params) {
 Level.prototype.createForeach = function(params) {
 	var propName = params['f'];
 	var isLocal = !propName;
-	this.foreaches = this.foreaches || {};
-	this.foreachesByProps = this.foreachesByProps || {};
-		
-	var foreach = new Foreach(params);
-	foreach.render(this.parentElement, this);
 	if (!isLocal) {
+		var foreach = new Foreach(params);
+		foreach.render(this.parentElement, this);
 		this.foreaches = this.foreaches || {};
 		this.foreaches[propName] = this.foreaches[propName] || [];
 		this.foreaches[propName].push(this.component.registerPropActivity('for', propName, foreach));
+		this.registerChild(foreach);
+	} else {
+		if (isArray(params['p'])) {
+			for (var i = 0; i < params['p'].length; i++) this.renderItems(params['h'](params['p'][i], i));
+		} else if (isObject(params['p'])) {
+			for (var k in params['p']) this.renderItems(params['h'](params['p'][k], k));
+		}
 	}
-	this.registerChild(foreach);
+};
+
+Level.prototype.createIfSwitch = function(params) {
+	var propNames = params['p'];
+	var isLocal = !isArray(propNames) || isUndefined(propNames[0]);
+	if (!isLocal) {
+		var swtch = new IfSwitch(params);
+		swtch.render(this.parentElement, this);
+		this.ifSwitches = this.ifSwitches || {};
+		for (var i = 0; i < propNames.length; i++) {
+			this.ifSwitches[propNames[i]] = this.ifSwitches[propNames[i]] || [];
+			this.ifSwitches[propNames[i]].push(this.component.registerPropActivity('isw', propNames[i], swtch));
+		}
+	} else {
+		for (var i = 0; i < this.params['is'].length; i++) {
+
+		}
+		if (isArray(this.params['d'])) this.renderItems(this.params['d']);
+	}
+};
+
+Level.prototype.createSwitch = function(params) {
+	var propName = params['p'];
+	var isLocal = !propName;
+	if (!isLocal) {
+		var swtch = new Switch(params);
+		swtch.render(this.parentElement, this);
+		this.switches = this.switches || {};
+		this.switches[propName] = this.switches[propName] || [];
+		this.switches[propName].push(this.component.registerPropActivity('swt', propName, swtch));
+	} else {
+		for (var i = 0; i < this.params['s'].length; i++) {
+			if (this.params['sw'] === this.params['s'][i]) {
+				this.renderItems(this.params['c'][i]);
+				return;
+			}
+		}
+		if (isArray(this.params['d'])) this.renderItems(this.params['d']);
+	}
 };
 
 Level.prototype.registerChild = function(child, isComponent) {
 	var isNodeChild = isNode(child);
-	if (this.prevChild) {
-		this.prevChild.setNextSiblingChild(child);
-	}
+	if (this.prevChild) this.prevChild.setNextSiblingChild(child);
 	this.prevChild = isNodeChild ? null : child;
-	if (!this.firstChild) {
-		this.firstChild = child;
-	}	
+	if (!this.firstChild) this.firstChild = child;
 	if (isNodeChild) {
-		if (!this.firstNodeChild) {
-			this.firstNodeChild = child;
-		}
+		if (!this.firstNodeChild) this.firstNodeChild = child;
 		this.lastNodeChild = child;
-	} else {
-		this.children.push(child);
-	}
-	if (isComponent) {
-		this.registerChildComponent(child);
-	}
+	} else this.children.push(child);
+	if (isComponent) this.registerChildComponent(child);
 };
 
 Level.prototype.includeTemplate = function(item) {
-	var component = this.getComponent();
-	var items = item['tmp'].call(component, component, item['p']);
-	if (isArray(items)) {
-		for (var i = 0; i < items.length; i++) {
-			this.renderItem(items[i]);
+	if (isString(item['tmp'])) item['tmp'] = this.component.getTemplateByKey(item['tmp']);
+	if (isFunction(item['tmp'])) {		
+		var items = item['tmp'].call(this.component, this.component, item['p']);
+		if (isArray(items)) {
+			for (var i = 0; i < items.length; i++) this.renderItem(items[i]);
 		}
 	}
 };
@@ -246,21 +252,15 @@ Level.prototype.renderComponent = function(item, parentElement) {
 					cmpid = value;
 					continue;
 				}
-				if (isFunction(item['p'][k])) {
-					value = item['p'][k]();
-				}
+				if (isFunction(item['p'][k])) value = item['p'][k]();
 				props[k] = value;
 			}
 		}
 		var component = new item['cmp'](props);
 		component.render(parentElement);
 		this.registerChild(component, true);
-		if (isProps) {
-			this.registerPropComps(component, item['n'], item['p']);
-		}
-		if (cmpid) {
-			component.setId(cmpid);
-		}
+		if (isProps) this.registerPropComps(component, item['n'], item['p']);
+		if (cmpid) component.setId(cmpid);
 		var events = item['e'];
 		if (isArray(events)) {
 			for (i = 0; i < events.length; i++) {
@@ -269,9 +269,7 @@ Level.prototype.renderComponent = function(item, parentElement) {
 			}
 		}
 	} else if (item && isObject(item)) {
-		if (!item.isRendered()) {
-			item.render(parentElement);
-		}
+		if (!item.isRendered()) item.render(parentElement);
 		this.registerChild(item, true);
 	}
 };
@@ -285,9 +283,7 @@ Level.prototype.registerPropComps = function(component, names, props) {
 			if (isString(names[k])) {
 				this.registerPropComp(names[k], data);
 			} else {
-				for (i = 0; i < names[k].length; i++) {
-					this.registerPropComp(names[k][i], data);
-				}
+				for (i = 0; i < names[k].length; i++) this.registerPropComp(names[k][i], data);
 			}
 		}
 	}
@@ -302,18 +298,12 @@ Level.prototype.registerChildComponent = function(childComponent) {
 	this.parentLevel.registerChildComponent(childComponent);
 };
 
-Level.prototype.getComponent = function() {
-	return this.parentLevel.getComponent();
-};
-
 Level.prototype.getParentElement = function() {
 	return this.parentElement;
 };
 
 Level.prototype.getFirstNodeChild = function() {
-	if (isNode(this.firstChild)) {
-		return this.firstChild;
-	}
+	if (isNode(this.firstChild)) return this.firstChild;
 	var firstLevel = this.children[0];
 	if (firstLevel instanceof Level) {
 		return firstLevel.getParentElement();
@@ -325,9 +315,7 @@ Level.prototype.getFirstNodeChild = function() {
 
 Level.prototype.disposeDom = function() {
 	var elementsToDispose = this.getElements();
-	for (var i = 0; i < elementsToDispose.length; i++) {
-		this.parentElement.removeChild(elementsToDispose[i]);
-	}
+	for (var i = 0; i < elementsToDispose.length; i++) this.parentElement.removeChild(elementsToDispose[i]);
 	elementsToDispose = null;
 };
 
@@ -339,16 +327,12 @@ Level.prototype.setAppended = function(isAppended) {
 	if (isDetached) {
 		this.realParentElement = this.parentElement;
 		this.parentElement = document.createElement('div'); 
-		for (var i = 0; i < elements.length; i++) {
-			this.parentElement.appendChild(elements[i]);
-		}
+		for (var i = 0; i < elements.length; i++) this.parentElement.appendChild(elements[i]);
 	} else {
 		this.nextSiblingChild = this.parentLevel.getNextSiblingChild();
 		this.parentElement = this.realParentElement;
 		this.realParentElement = null;
-		for (var i = 0; i < elements.length; i++) {
-			this.appendChild(elements[i]);
-		}
+		for (var i = 0; i < elements.length; i++) this.appendChild(elements[i]);
 	}
 };
 
@@ -357,24 +341,16 @@ Level.prototype.getElements = function() {
 	if (this.firstNodeChild && this.lastNodeChild) {
 		var isAdding = false;
 		for (var i = 0; i < this.parentElement.childNodes.length; i++) {
-			if (this.parentElement.childNodes[i] == this.firstNodeChild) {
-				isAdding = true;
-			}
-			if (isAdding) {
-				elements.push(this.parentElement.childNodes[i]);
-			}
-			if (this.parentElement.childNodes[i] == this.lastNodeChild) {
-				break;
-			}
+			if (this.parentElement.childNodes[i] == this.firstNodeChild) isAdding = true;
+			if (isAdding) elements.push(this.parentElement.childNodes[i]);
+			if (this.parentElement.childNodes[i] == this.lastNodeChild) break;
 		}
 	}
 	return elements;
 };
 
 Level.prototype.dispose = function() {
-	for (var i = 0; i < this.children.length; i++) {
-		this.children[i].dispose();
-	}
+	for (var i = 0; i < this.children.length; i++) this.children[i].dispose();
 	if (this.eventHandler) {
 		this.eventHandler.dispose();
 		this.eventHandler = null;
@@ -399,6 +375,14 @@ Level.prototype.dispose = function() {
 	if (this.propAttrs) {
 		this.component.disposePropActivities('atr', this.propAttrs);
 		this.propAttrs = null;
+	}
+	if (this.ifSwitches) {
+		this.component.disposePropActivities('isw', this.ifSwitches);
+		this.ifSwitches = null;
+	}
+	if (this.switches) {
+		this.component.disposePropActivities('swt', this.switches);
+		this.switches = null;
 	}
 	this.children = null;
 	this.parentElement = null;

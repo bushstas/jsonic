@@ -4,5 +4,5 @@
 			{$caption}
 		</div>
 	{/if}
-	<input type="{$type}" name="{$name}" placeholder="{$placeholder}" value="{$value}" onInput="onChange" readonly="{$enabled?'readonly':''}" accept="{$accept}"/>
+	<input type="{$type}" name="{$name}" placeholder="{$placeholder}" value="{$value}" onInput="onChange" readonly="{$enabled?'readonly'}" accept="{$accept}"/>
 </div>

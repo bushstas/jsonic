@@ -4,5 +4,5 @@
 			{$caption}
 		</div>
 	{/if}
-	<textarea name="{$name}" placeholder="{$placeholder}" onInput="onChange" readonly="{$enabled?'readonly':''}">{$value}</textarea>
+	<textarea name="{$name}" placeholder="{$placeholder}" onInput="onChange" readonly="{$enabled?'readonly'}">{$value}</textarea>
 </div>

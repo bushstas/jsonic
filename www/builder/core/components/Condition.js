@@ -16,7 +16,7 @@ Condition.prototype.createLevel = function(isUpdating) {
 	this.level.render(this.getChildren(), this.parentElement, this.parentLevel, nextSiblingChild);
 };
 
-Condition.prototype.recheck = function() {
+Condition.prototype.update = function() {
 	var isTrue = !!this.params['i']();
 	if (isTrue != this.isTrue) {
 		this.isTrue = isTrue;
@@ -27,12 +27,6 @@ Condition.prototype.recheck = function() {
 
 Condition.prototype.getChildren = function() {
 	return this.isTrue ? this.params['c']() : (isFunction(this.params['e']) ? this.params['e']() : null);
-};
-
-Condition.prototype.propagatePropertyChange = function(propName, propValue) {
-	if (this.level) {
-		this.level.propagatePropertyChange(propName, propValue);
-	}	
 };
 
 Condition.prototype.getFirstNodeChild = function() {

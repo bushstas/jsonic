@@ -3,7 +3,6 @@ function Component() {}
 Component.prototype.initiate = function() {
 	this.propActivities = {};
 	this.propsToSet = {};
-	this.followers = {};
 	this.rendered = false;
 	this.disposed = false;
 };
@@ -24,16 +23,14 @@ Component.prototype.processInitials = function() {
 	if (isObject(initials)) {
 		for (var k in initials) {
 			if (isArrayLike(initials[k])) {
-				if (k == 'globals') {
-
+				if (k == 'correctors') {
+					for (var j in initials[k]) this.addCorrector(j, initials[k][j]);
+				} else if (k == 'globals') {
+					for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
 				} else if (k == 'followers') {
-					for (var j in initials[k]) {
-						this.addFollower(j, initials[k][j]);
-					}
+					for (var j in initials[k]) this.addFollower(j, initials[k][j]);
 				} else if (k == 'controllers') {
-					for (var i = 0; i < initials[k].length; i++) {
-						this.attachController(initials[k][i]);
-					}
+					for (var i = 0; i < initials[k].length; i++) this.attachController(initials[k][i]);
 				} else if (k == 'props') {
 					Objects.merge(this.props, initials[k]);
 				} else if (k == 'options') {
@@ -49,30 +46,32 @@ Component.prototype.initOptions = function(options) {};
 Component.prototype.processPostRenderInitials = function() {
 	var helpers = this.getInitial('helpers');
 	if (isArray(helpers)) {
-		for (var i = 0; i < helpers.length; i++) {
-			this.subscribeToHelper(helpers[i]);
-		}
+		for (var i = 0; i < helpers.length; i++) this.subscribeToHelper(helpers[i]);
 	}
 };
 
 Component.prototype.attachController = function(options) {
 	if (isObject(options['on'])) {
-		for (var k in options['on']) {
-			options.controller.subscribe(k, options['on'][k], this);
-		}
+		for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
+	}
+};
+
+Component.prototype.addCorrector = function(name, handler) {
+	if (isFunction(handler)) {
+		this.correctors = this.correctors || {};
+		this.correctors[name] = handler;
 	}
 };
 
 Component.prototype.addFollower = function(name, handler) {
 	if (isFunction(handler)) {
+		this.followers = this.followers || {};
 		this.followers[name] = handler;
 	}
 };
 
 Component.prototype.subscribeToHelper = function(options) {
-	if (isObject(options['options'])) {
-		options['helper'].subscribe(this, options['options']);
-	}
+	if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
 };
 
 Component.prototype.getInitial = function(initialName) {
@@ -86,9 +85,7 @@ Component.prototype.load = function() {
 		var isAsync = !!loader['async'];
 		this.loader.subscribe('load', this.onDataLoad.bind(this, isAsync), this);
 		var options = loader['options'];
-		if (isFunction(options)) {
-			options = options();
-		}
+		if (isFunction(options)) options = options();
 		this.loader.doAction('load', options);
 		if (!isAsync) {
 			this.renderTempPlaceholder();
@@ -148,21 +145,15 @@ Component.prototype.instanceOf = function(parent) {
 Component.prototype.dispatchEvent = function(eventType, eventParams) {
 	if (isArray(this.listeners)) {
 		for (var i = 0; i < this.listeners.length; i++) {
-			if (this.listeners[i]['type'] == eventType) {
-				this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
-			}
+			if (this.listeners[i]['type'] == eventType) this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
 		}
 	}
 };
 
 Component.prototype.forEachChild = function(callback) {
 	if (isArray(this.children)) {
-		for (var i = 0; i < this.children.length; i++) {
-			callback.call(this, this.children[i], i);
-		}
-	} else {
-		log('this.children is not an array');
-	}
+		for (var i = 0; i < this.children.length; i++) callback.call(this, this.children[i], i);
+	} else log('this.children is not an array');
 };
 
 Component.prototype.g = function(propName) {
@@ -182,59 +173,60 @@ Component.prototype.set = function(propName, propValue) {
 	if (!isUndefined(propValue)) {
 		props = {};
 		props[propName] = propValue;
-	} else {
-		props = propName;
-	}
+	} else props = propName;
 	var isChanged = false;
 	var changedProps = {};
 	var currentValue;
 	for (var k in props) {
+		if (Objects.has(this.correctors, k)) props[k] = this.correctors[k].call(this, props[k], props);
 		currentValue = this.props[k];
 		if (currentValue == props[k]) continue;
-		if (isArray(currentValue) && isArray(props[k])) {
-			if (Objects.equals(currentValue, props[k])) continue;
-		}
+		if (isArray(currentValue) && isArray(props[k]) && Objects.equals(currentValue, props[k])) continue;
 		isChanged = true;
 		this.props[k] = props[k];
 		changedProps[k] = props[k];
 	}	
-	if (isChanged) {
-		this.propagatePropertyChange(changedProps);
-	}
+	if (isChanged) this.propagatePropertyChange(changedProps);
 	for (var k in changedProps) {
-		if (!isUndefined(this.followers[k])) {
-			this.followers[k].call(this);
-		}
+		if (Objects.has(this.followers, k)) this.followers[k].call(this);
 	}
 	changedProps = null;
 };
 
 Component.prototype.propagatePropertyChange = function(changedProps) {
-	var pn, pv, i, activities, cnds = [];
+	var pn, pv, i, activities, cnds = [], ifsw = [];
 	for (pn in changedProps) {
 		pv = changedProps[pn];
 		activities = this.propActivities['cnd'];
 		if (activities && isArray(activities[pn])) {
-			var conditionKey;
 			for (i = 0; i < activities[pn].length; i++) {
 				if (cnds.indexOf(activities[pn][i]) == -1) {
-					activities[pn][i].recheck();
+					activities[pn][i].update();
 					cnds.push(activities[pn][i]);
 				}
 			}
 		}
-		activities = this.propActivities['for'];
+		activities = this.propActivities['isw'];
 		if (activities && isArray(activities[pn])) {
 			for (i = 0; i < activities[pn].length; i++) {
-				activities[pn][i].update(pv);
+				if (ifsw.indexOf(activities[pn][i]) == -1) {
+					activities[pn][i].update();
+					ifsw.push(activities[pn][i]);
+				}
 			}
+		}
+		activities = this.propActivities['swt'];
+		if (activities && isArray(activities[pn])) {
+			for (i = 0; i < activities[pn].length; i++) activities[pn][i].update(pv);
+		}
+		activities = this.propActivities['for'];
+		if (activities && isArray(activities[pn])) {
+			for (i = 0; i < activities[pn].length; i++) activities[pn][i].update(pv);
 		}
 		activities = this.propActivities['nod'];
 		if (activities && isArray(activities[pn])) {
 			var node;
-			for (i = 0; i < activities[pn].length; i++) {
-				activities[pn][i].textContent = pv;
-			}
+			for (i = 0; i < activities[pn].length; i++) activities[pn][i].textContent = pv;
 		}
 		activities = this.propActivities['atr'];
 		if (activities && isArray(activities[pn])) {
@@ -246,14 +238,11 @@ Component.prototype.propagatePropertyChange = function(changedProps) {
 				var attrVal;
 				for (var j = 0; j < attrParts.length; j++) {
 					attrVal = isFunction(attrParts[j]) ? attrParts[j]() : attrParts[j];
-					if (!isUndefined(attrVal)) {
-						attrValue += attrVal;
-					}
+					if (!isUndefined(attrVal)) attrValue += attrVal;
 				}
 				attrValue = attrValue.trim();
 				var attrName = __A[activities[pn][i][1]] || activities[pn][i][1];
 				activities[pn][i][0].attr(attrName, attrValue);
-
 			}
 		}
 		activities = this.propActivities['cmp'];
@@ -263,22 +252,18 @@ Component.prototype.propagatePropertyChange = function(changedProps) {
 				component = activities[pn][i][0];
 				value = activities[pn][i][1]();
 				if (component) {
-					if (activities[pn][i][2] && isObject(value)) {
-						component.refresh(value);
-					} else {
-						component.set(pn, value);
-					}
+					if (activities[pn][i][2] && isObject(value)) component.refresh(value);
+					else component.set(pn, value);
 				}
 			}
 		}
 	}
 	cnds = null;
+	ifsw = null;
 };
 
 Component.prototype.getFirstNodeChild = function() {
-	if (this.level) {
-		return this.level.getFirstNodeChild();
-	}
+	if (this.level) return this.level.getFirstNodeChild();
 	return null;
 };
 
@@ -299,9 +284,7 @@ Component.prototype.refresh = function(args) {
 
 Component.prototype.delay = function() {
 	this.stopDelay();
-	if (isFunction(arguments[0])) {
-		this.timeout = window.setTimeout(arguments[0].bind(this), arguments[1] || 200);
-	}
+	if (isFunction(arguments[0])) this.timeout = window.setTimeout(arguments[0].bind(this), arguments[1] || 200);
 };
 
 Component.prototype.stopDelay = function() {
@@ -318,6 +301,10 @@ Component.prototype.getTemplateMain = function() {
 	return null;
 };
 
+Component.prototype.getTemplateByKey = function(key) {
+	return null;
+};
+
 Component.prototype.addChild = function(child, parentElement) {
 	this.level.renderComponent(child, parentElement);
 };
@@ -326,9 +313,7 @@ Component.prototype.removeChild = function(child) {
 	if (!child) return;
 	if (isString(child)) {
 		var child = this.getChildById(child);
-		if (child) {
-			child.dispose();
-		}
+		if (child) child.dispose();
 	} else if (isObject(child)) {
 		var childIndex = this.children.indexOf(child);
 		if (childIndex > -1) {
@@ -340,9 +325,7 @@ Component.prototype.removeChild = function(child) {
 
 Component.prototype.registerChildComponent = function(childComponent) {
 	this.children = this.children || [];
-	if (this.children.indexOf(childComponent) == -1) {
-		this.children.push(childComponent);
-	}
+	if (this.children.indexOf(childComponent) == -1) this.children.push(childComponent);
 };
 
 Component.prototype.getChildAt = function(index) {
@@ -352,9 +335,7 @@ Component.prototype.getChildAt = function(index) {
 Component.prototype.getChildById = function(childComponentId) {
 	if (!this.children) return null;
 	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i].getId() == childComponentId) {
-			return this.children[i];
-		}
+		if (this.children[i].getId() == childComponentId) return this.children[i];
 	}
 	return null;
 };
@@ -367,8 +348,8 @@ Component.prototype.getId = function() {
 	return this.componentId;
 };
 
-Component.prototype.getComponent = function() {
-	return this;
+Component.prototype.setHtmlContent = function(htmlContent) {
+	if (isElement(this.scope)) this.scope.innerHTML = htmlContent;
 };
 
 Component.prototype.getElement = function() {
@@ -384,12 +365,8 @@ Component.prototype.findElements = function(selector, scopeElement) {
 };
 
 Component.prototype.removeNode = function(node) {
-	if (isString(node)) {
-		node = this.findElement(node);
-	}
-	if (isNode(node) && node.parentNode == this.parentElement) {
-		this.parentElement.removeChild(node);
-	}
+	if (isString(node)) node = this.findElement(node);
+	if (isNode(node) && node.parentNode == this.parentElement) this.parentElement.removeChild(node);
 };
 
 Component.prototype.getParentElement = function() {
@@ -408,9 +385,7 @@ Component.prototype.addListener = function(target, eventType, handler) {
 	if (isElement(target)) {
 		this.eventHandler = this.eventHandler || new EventHandler();
 		this.eventHandler.listen(target, eventType, handler.bind(this));
-	} else {
-		target.subscribe(eventType, handler, this);
-	}
+	} else target.subscribe(eventType, handler, this);
 };
 
 Component.prototype.subscribe = function(eventType, handler, subscriber) {
@@ -419,9 +394,7 @@ Component.prototype.subscribe = function(eventType, handler, subscriber) {
 };
 
 Component.prototype.setAppended = function(isAppended) {
-	if (this.level) {
-		this.level.setAppended(isAppended);
-	}
+	if (this.level) this.level.setAppended(isAppended);
 };
 
 Component.prototype.setScope = function(scope) {
@@ -480,6 +453,7 @@ Component.prototype.dispose = function() {
 	this.loader = null;
 	this.initials = null;
 	this.followers = null;
+	this.correctors = null;
 	this.receivedArgs = null;
 };
 

@@ -1,15 +1,28 @@
-.app-datatable-standart-row {
-	$(block rel pl12 pb1 pointer)
-}
 .app-datatable-standart-row-top {
-	$(rel c#333A52 pt7 pb5 h20)
+	$(rel pt7 pb7 h20 nowrap ovh)
 }
 .app-datatable-standart-row-name {
-	$(segoebold lh17 fs16 c#53638f)
+	$(segoebold lh17 fs16 c#53638f pr220)
 }
 .app-datatable-standart-row.viewed .app-datatable-standart-row-name {
 	$segoe
 }
-.app-datatable-standart-row-fz {
-	$(fleft br2 bold pr4 c#333A52 lh22 mr10 mt-4)
+.app-datatable-standart-row-price {
+	$(abs r5 t34 w200 right bold c#303B58 fs16)
+}
+.app-datatable-standart-row-top-item {
+	$(inb pr10 pl10 rel vtop)
+}
+.app-datatable-standart-row-top-item:first-child {
+	$(bold pl0 pr4)
+}
+.app-datatable-standart-row-top-item:after {
+	$(cnt abs r t4 b2 w1 bc#8D9AB1)
+}
+.app-datatable-standart-row-top-item:first-child:after,
+.app-datatable-standart-row-top-item:last-child:after {
+	$none
+}
+.app-datatable-standart-row-bottom {
+	$(mt10 nowrap h18 pb6)
 }

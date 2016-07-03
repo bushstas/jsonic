@@ -1,19 +1,12 @@
-{template .colorMark}
-	<div class="app-datatable-color-mark">
-	mark
-	</div>	
-{/template}
-
 {template .controls}
-	<div class="app-datatable-checkbox-container">
-		checkbox
+	<div class="app-datatable-color-mark datatable-control"></div>	
+	<div class="app-datatable-checkbox-container datatable-control">
+		<include checkbox>
 	</div>
-	<div class="app-datatable-star-container">
-		star
-	</div>
+	<div class="app-datatable-star datatable-control"></div>
 {/template}
 
-{template .hotMark}
+{template .hotMark as .name}
 	<div data-title="fuck" class="tooltiped datatable-tooltiped datatable-hot-tender" data-timeout="true"></div>
 {/template}
 

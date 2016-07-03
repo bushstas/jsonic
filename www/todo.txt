@@ -1,5 +1,9 @@
+доделать template .name as .name
+
 проверить FOREACH
 
-{let a = 545}
-
 #tooltip className ->> float-right ошибка при обфускации css
+
+файлы include ошибка если нет {template .tmpname}
+
+валидация кода let, только &var

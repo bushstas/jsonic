@@ -1,8 +1,17 @@
-<div class="app-tooltip-popup {$className}{$shown?' shown':''}" scope="1" style="left:{$left}px;top:{$top}px;">
+<div class="app-tooltip-popup {$className}{$shown?' shown'}" style="left:{$left}px;top:{$top}px;">
 	<div class="app-tooltip-popup-caption">
 		{$caption}
 	</div>
 	<div class="app-tooltip-popup-text">
-		{$text}
-	</div>	
+		{switch $corrector}
+			{case 'list'}
+				{foreach $text as &item}
+					<div class="app-tooltip-list-item">
+						{&item}
+					</div>
+				{/foreach}
+			{default}
+				{$text}
+		{/switch}
+	</div>
 </div>

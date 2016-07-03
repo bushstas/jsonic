@@ -1,10 +1,10 @@
 function Tooltiper() {
 	var target, eventHandler, event;
-	var request, tooltipElement;
-	var tooltip = __TC;
-	var tooltipApi = __TA;
+	var request, tooltipElement, timer;
+	var tooltip = __TC, tooltipApi = __TA;
 	var tooltipClass = '->> tooltiped';
-	var addClass, text, position, key, caption;
+	var addClass, text, position, key,
+		caption, delay, corrector;
 	
 	var onBodyMouseOver = function(e) {
 		event = e;
@@ -12,13 +12,18 @@ function Tooltiper() {
 		if (target.hasClass(tooltipClass)) {
 			init();
 			if (text) {
-				show();
+				if (delay) {
+					showWithDelay()
+				} else {
+					show();
+				}
 			} else if (key) {
 				load();
 			}
 		}
 	};
 	var init = function() {
+		window.clearTimeout(timer);
 		if (isFunction(tooltip)) {
 			createPopup();
 		}
@@ -27,26 +32,32 @@ function Tooltiper() {
 		addClass = target.attr('cls');
 		position = target.attr('pos');
 		caption = target.attr('cap');
+		delay = target.attr('del');
+		corrector = target.attr('cor');
 
 		if (!text) {
 			key = target.attr('key');
 		}
+		eventHandler.listenOnce(target, 'mouseleave', onLeave);
 	};
 	var createPopup = function() {
 		tooltip = new tooltip();
 		tooltip.render(document.body);
 		tooltipElement = tooltip.getElement();
 	};
+	var showWithDelay = function() {
+		timer = window.setTimeout(show, 500);
+	};
 	var show = function() {
 		tooltip.set('shown', true);
 		var coords = getCoords();
 		tooltip.set({
+			'corrector': corrector,
 			'caption': caption,
 			'text': text,
 			'left': coords.x,
 			'top': coords.y
 		});
-		eventHandler.listenOnce(target, 'mouseleave', onLeave);
 	};
 	var getCoords = function() {
 		var marginLeft = 0, marginTop = 0;		
@@ -108,6 +119,7 @@ function Tooltiper() {
 		return coords;		
 	};
 	var onLeave = function() {
+		window.clearTimeout(timer);
 		tooltip.set('shown', false);
 	};
 	var load = function() {

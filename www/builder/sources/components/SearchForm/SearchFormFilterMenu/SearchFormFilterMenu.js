@@ -27,10 +27,6 @@ initial helpers = [
 	}
 ];
 
-function onRendered() {
-	super(PopupMenu);
-}
-
 function onLoadFilters(filters) {
 	this.renderButtons(filters);
 }

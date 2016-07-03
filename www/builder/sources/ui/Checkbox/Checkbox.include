@@ -1,0 +1,3 @@
+{template .checkbox}
+	<div class="app-ui-checkbox" data-value="{~value}"></div>
+{/template}

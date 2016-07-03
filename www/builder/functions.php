@@ -1,5 +1,6 @@
 <?php
 	
+	$isSwitchContext = false;
 	$cssCounters = array(0,0,0);	
 	$cssClassA = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m');
 	$cssClassB = array('q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m','0','1','2','3','4','5','6','7','8','9');
@@ -351,7 +352,7 @@
 	}
 
 	function parseClassInitials(&$components) {
-		$availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'args', 'helpers', 'followers');
+		$availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'args', 'helpers', 'followers', 'correctors');
 
 		foreach ($components as &$component) {
 			$component['controllers'] = array();
@@ -417,6 +418,10 @@
 
 			case 'controllers':
 				validateControllersInitials($initials, $initialValue, $initialType, $component);
+			break;
+
+			case 'correctors':
+				validateCorrectorsInitials($initials, $initialValue, $initialType, $component);
 			break;
 		}
 
@@ -563,6 +568,15 @@
 		}
 	}
 
+	function validateCorrectorsInitials($initials, $initialValue, $initialType, &$component) {
+		if (!isAssocArray($initials, $initialValue)) {
+			initialAssocArrayTypeError($initialValue, $initialType, $component);
+		}
+		validateObjectFields($initials, $initialValue, $initialType, $component);
+		foreach ($initials as $key => $value) {
+			validateCallback($value, $initialValue, $initialType, $component, $key, '', $value);
+		}
+	}
 
 	function validateHelpersInitials($initials, $initialValue, $initialType, &$component) {
 		global $componentLikeClassTypes;
@@ -744,11 +758,6 @@
 			$component['functions'] = $functions;
 			$component['functionList'] = $functionList;
 			unset($component['content']);
-			foreach ($component['callbacks'] as $callback) {
-				if (!hasComponentMethod($callback, $component)) {
-					error("Обработчик события <b>".$callback."</b> не найден среди методов класса <b>".$component['name']."</b>");
-				}
-			}
 		}
 	}
 
@@ -915,6 +924,13 @@
 				$data = preg_replace("/\['<foreach ([^>]+)>',/", "function($1){return[", $data);
 				$data = preg_replace("/,*'<\/foreach>'\]/", ']}', $data);
 
+				
+				$data = str_replace("<=let>,<let>", ";", $data);
+				$data = preg_replace("/(,'<\/let>'){2,}/", ",'</let>'", $data);
+				$data = str_replace("<let>", "function(){", $data);
+				$data = preg_replace("/<=let>,*/", ";return[", $data);
+				$data = preg_replace("/,'<\/let>'/", "]}", $data);
+
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				
 				$data = preg_replace("/([^\d])\.(\d+)/", "$1[$2]", $data);
@@ -931,7 +947,7 @@
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
 
-		$regexp = "/(<\/*[a-z]+[^>]*>|\{\/*foreach[^\}]*\}|\{\/*if[^\}]*\}|\{else\})/i";
+		$regexp = "/(<\/*[a-z]+[^>]*>|\{\s*\/*foreach[^\}]*\}|\{\s*\/*if[^\}]*\}|\{\s*else\}|\{\s*\/*switch[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
 		$tags = $matches[1];			
 		$parts = preg_split($regexp, $html);
@@ -943,22 +959,55 @@
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
 			if (isset($tags[$j])) {
-				preg_match("/^[<\{]\/*([a-z]+\d*) */i", $tags[$j], $match);
+				preg_match('/^[<\{]\s*\/*([a-z]\w*) */i', $tags[$j], $match);
 				$tagName = strtolower($match[1]);
 				$tagContent = $tags[$j];
 				$isClosing = isTagClosing($tagName, $tagContent);
 				$list[] = array('type' => 'tag', 'content' => $tagContent, 'tagName' => $tagName, 'isClosing' => $isClosing);
 			}
 		}
-		return array('name' => $name, 'children' => getHtmlChildren($list, $component));
+		$isLet = 0;
+		checkTagsPairing($list, $component);
+		$children = getHtmlChildren($list, $component, $isLet);
+		return array('name' => $name, 'children' => $children);
+	}
+
+	function checkTagsPairing($list, $component) {
+		$closed = array();
+		$opened = array();
+		foreach ($list as $item) {
+			$tn = $item['tagName'];
+			if (!empty($tn)) {
+				if (!isSimpleTag($tn) && $tn != 'template' && $tn != 'include' && $tn != 'component' && $tn != 'else') {
+					if ($item['isClosing'] == 0) {
+						if (!isset($opened[$tn])) {
+							$opened[$tn] = 0;
+						}
+						$opened[$tn]++;
+					} else {
+						if (!isset($closed[$tn])) {
+							$closed[$tn] = 0;
+						}
+						$closed[$tn]++;
+					}
+				}
+			}
+		}
+		foreach ($opened as $tn => $count) {
+			if ($count != $closed[$tn]) {
+				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'операторов' : 'тегов';
+				error('Ошибка валидации шаблонов класса <b>'.$component['name'].'</b>. Один из '.$object.' <b>'.$tn.'</b> не имеет закрывающего тега');
+			}
+		}
 	}
 
 	function isTagClosing($tagName, $tagContent) {
 		if (isSimpleTag($tagName)) return false;
-		return preg_match("/^[<\{]\//", $tagContent);
+		return preg_match("/^[<\{]\//", $tagContent) ? 1 : 0;
 	}
 
-	function getHtmlChildren($list, &$component) {
+	function getHtmlChildren($list, &$component, &$let, $isSwitch = false) {
+		global $isSwitchContext;
 		if (empty($list)) {
 			return array();
 		}
@@ -967,14 +1016,15 @@
 		$currentList = array();
 		$isElse = false;
 		$currentIf = null;
+		
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
-			$tagName = $item['tagName'];
+			$tagName = trim($item['tagName']);
 			if ($item['type'] == 'text') {
-				parseTextNode($item['content'], $children, $component);
+				parseTextNode($item['content'], $children, $component, $let);
 			} elseif ($tagName == 'br') {
 				$children[] = '<br>';
-			} elseif (!$item['isClosing']) {
+			} elseif ($item['isClosing'] != 1) {
 				if ($tagName == 'else') {
 					$isElse = true;
 				}
@@ -987,8 +1037,15 @@
 				elseif ($tagName == 'template')
 				{
 					preg_match("/<template +[\"']*(\w+)[\"']*/i",  $content, $match);
-					$child = array('tmp' => '<nq>this.getTemplate'.ucfirst($match[1]).'<nq>');
+					$child = array('tmp' => '<nq><this>getTemplate'.ucfirst($match[1]).'<nq>');
 					getTemplateProperties($item['content'], $child, $component);
+					if (is_array($child['p']) && !empty($child['p']['tmpkey'])) {
+						$child['tmp'] = '<nq>'.strip_tags($child['p']['tmpkey']).'<nq>';
+						unset($child['p']['tmpkey']);
+						if (count(array_keys($child['p'])) == 0) {
+							unset($child['p']);
+						}
+					}
 				}
 				elseif ($tagName == 'include')
 				{
@@ -1022,8 +1079,22 @@
 							break;
 						}
 					}
+					if ($tagName == 'if') {
+						preg_match("/^\{\s*if\b\s*([^\}]+)\}/i",  $item['content'], $match);
+						if (!is_string($match[1])) $match[1] = '';
+						$ifContent = $match[1];
+						$ifContentIsEmpty = preg_replace('/\s/', '', $ifContent) === '';
+					}
+					$isSwitchContext = $tagName == 'switch' || ($tagName == 'if' && $ifContentIsEmpty);
+					if ($isSwitch) $isSwitchContext = true;
 					$child = array();
-					$data = getHtmlChildren($childrenList, $component);
+					$isLet = 0;
+					$data = getHtmlChildren($childrenList, $component, $isLet, $isSwitchContext);
+					if ($isLet > 0) {
+						for ($ii = 0; $ii < $isLet; $ii++) {
+							$data[] = '</let>';
+						}
+					}
 					if (!empty($data)) {
 						if (!isset($data['c'])) {
 							$child['c'] = $data;
@@ -1035,22 +1106,34 @@
 					if (!is_array($child['c'])) {
 						$child['c'] = array();
 					}
-					if ($tagName != 'foreach' && $tagName != 'if') {						
+					if ($tagName == 'switch') {
+						getSwitch($item, $child, $component);
+					} elseif ($tagName != 'foreach' && $tagName != 'if') {
 						$child['t'] = getTagIndex($tagName);
 						getTagProperties($item['content'], $child, $component);
 					} else {
-						if ($tagName == 'if') {
-							preg_match("/^\{if +([^\}]+)\}/i",  $item['content'], $match);
-							checkIfConditionForContainigProps($match[1], $child, $component);
+						if ($tagName == 'if') {							
+							if ($ifContentIsEmpty) {
+								getIfSwitch($item, $child, $component);
+							} else {
+								checkIfConditionForContainigProps($match[1], $child, $component);
+							}
 						} elseif ($tagName == 'foreach') {
 							getForeach($item, $child, $component);
 						}	
 					}
 				}
-				if (empty($child['c'])) {
+				$keys = array();
+				if (is_array($child['c'])) {
+					$keys = array_keys($child['c']);
+				}
+				if (!isset($keys[0])) {
 					unset($child['c']);
-				} elseif (count($child['c']) == 1) {
+				} elseif ($keys[0] === 0 && count($child['c']) == 1) {
 					$child['c'] = $child['c'][0];
+				}
+				if (isset($child['c'])) {
+					
 				}
 				if (!$isElse) {
 					$children[] = $child;
@@ -1064,12 +1147,171 @@
 			}
 		}
 		if (!empty($elseChildren) && is_array($elseChildren[0]['c'])) {
-			array_unshift($elseChildren[0]['c'], '<function_returns_array>');
-			array_push($elseChildren[0]['c'], '</function_returns_array>');
-			return array('c' => $children, 'e' => $elseChildren[0]['c']);
+			$elseChildren = array($elseChildren[0]['c']);
+			array_unshift($elseChildren, '<nq><function_returns_array>');
+			array_push($elseChildren, '</function_returns_array><nq>');
+			return array('c' => $children, 'e' => $elseChildren);
 		} else {
 			return $children;
-		}		
+		}
+	}
+
+	function getIfSwitch($item, &$child, &$component) {
+		$params = array();		
+		$error = 'Обнаружена ошибка в коде оператора <b>if</b> в шаблоне класса <b>'.$component['name'].'</b>. Ожидается оператор <b>case</b>'."<xmp>{case $index == 1}</xmp>или<xmp>{case isBool(~isValid)}</xmp>";
+		$cases = array();
+		$children = array();
+		$default = array();
+		$isDefault = false;
+		$count = -1;
+		$shouldBeCase = true;
+		foreach ($child['c'] as $item) {
+			$isString = is_string($item);
+			if ($shouldBeCase && !$isString) {
+				error($error);
+			}
+			if ($isString) {
+				$it = trim(strip_tags($item));
+				if ($it == 'default') {
+					if (!empty($default)) {
+						error('Обнаружено более одного условия <b>default</b> в коде оператора <b>if</b> в шаблоне класса <b>'.$component['name'].'</b>');
+					}
+					if (!empty($shouldBeContent)) {
+						error('Обнаружена ошибка в коде оператора <b>if</b> в шаблоне класса <b>'.$component['name'].'</b>. Оператор <b>'.$shouldBeContent.'</b> не содержит контента');
+					}
+					$isDefault = true;
+					$shouldBeCase = false;
+					$shouldBeContent = $item;
+					continue;
+				}
+				$pos = strpos($it, 'case');
+				if (is_int($pos)) {
+					if ($pos !== 0) {
+						error('Обнаружена ошибка в коде оператора <b>if</b> в шаблоне класса <b>'.$component['name'].'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+					}
+					if (!empty($shouldBeContent)) {
+						error('Обнаружена ошибка в коде оператора <b>if</b> в шаблоне класса <b>'.$component['name'].'</b>. Условие <b>'.$shouldBeContent.'</b> не содержит контента');
+					}
+
+					$it = trim(preg_replace('/\s*case\s*/', '', $it));
+					preg_match_all('/\$(\w+)/', $it, $matches);
+					$params = array_merge($params, $matches[1]);
+					$cases[] = parseCode($it, $component, 'ifsw');
+					$shouldBeCase = false;
+					$shouldBeContent = $item;
+					$count++;
+					continue;
+				} elseif ($shouldBeCase) {
+					error($error);
+				}
+			}
+			if ($isDefault) {
+				$default[] = $item;
+			} else {
+				if (!is_array($children[$count])) {
+					$children[$count] = array();
+				}
+				$children[$count][] = $item;
+			}
+			$shouldBeContent = false;
+		}
+		$child['is'] = $cases;
+		$child['c'] = $children;
+		if (!empty($default)) {
+			$child['d'] = $default;
+		}
+		if (!empty($params)) {
+			$child['p'] = array_unique($params);
+			array_unshift($child['c'], '<nq><function_returns_array>');
+			array_push($child['c'], '</function_returns_array><nq>');
+			array_unshift($child['is'], '<nq><function_returns_array>');
+			array_push($child['is'], '</function_returns_array><nq>');
+		}
+	}
+
+	function getSwitch($item, &$child, &$component) {
+		preg_match('/^\{\s*switch\s*([^\s\}]+)\s*\}$/', $item['content'], $match);
+		$switch = $match[1];
+		if (empty($switch)) {
+			error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>'."<xmp>".$item['content']."</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>");
+		}
+		preg_match('/\$(\w+)/', $switch, $match);
+		$param = $match[1];
+		$switch = parseCode($switch, $component, 'sw');
+
+		$error = 'Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>. Ожидается оператор <b>case</b>'."<xmp>{case 'triangle'}</xmp>или<xmp>{case 2}</xmp>";
+		$cases = array();
+		$children = array();
+		$default = array();
+		$isDefault = false;
+		$count = -1;
+		$shouldBeCase = true;
+		foreach ($child['c'] as $item) {
+			$isString = is_string($item);
+			if ($shouldBeCase && !$isString) {
+				error($error);
+			}
+			if ($isString) {
+				$it = trim(strip_tags($item));
+				if ($it == 'default') {
+					if (!empty($default)) {
+						error('Обнаружено более одного условия <b>default</b> в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>');
+					}
+					if (!empty($shouldBeContent)) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>. Оператор <b>'.$shouldBeContent.'</b> не содержит контента');
+					}
+					$isDefault = true;
+					$shouldBeCase = false;
+					$shouldBeContent = $item;
+					continue;
+				}
+				$pos = strpos($it, 'case');
+				if (is_int($pos)) {
+					if ($pos !== 0) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+					}
+					if (!empty($shouldBeContent)) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>. Условие <b>'.$shouldBeContent.'</b> не содержит контента');
+					}
+					if (!preg_match('/^\s*case\s*\'[^\']*\'\s*$/', $it) && !preg_match('/^\s*case\s*"[^"]*"\s*$/', $it) && !preg_match('/^\s*case\s+\-*\d+\s*$/', $it) && !preg_match('/^\s*case\s+(true|false|null|undefined)\s*$/', $it)) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.$component['name'].'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+					}
+					$it = trim(preg_replace('/\s*case\s*/', '', $it));
+					if (!is_numeric($it) && $it[0] != '"' && $it[0] != "'") {
+						$it = '<nq>'.$it.'<nq>';
+					} elseif (!is_numeric($it)) {
+						$it = preg_replace('/[\'"]/', '', $it);
+					}
+					$cases[] = $it;
+					$shouldBeCase = false;
+					$shouldBeContent = $item;
+					$count++;
+					continue;
+				} elseif ($shouldBeCase) {
+					error($error);
+				}
+			}
+			if ($isDefault) {
+				$default[] = $item;
+			} else {
+				if (!is_array($children[$count])) {
+					$children[$count] = array();
+				}
+				$children[$count][] = $item;
+			}
+			$shouldBeContent = false;
+		}
+		$child['sw'] = $switch;
+		$child['s'] = $cases;
+		$child['c'] = $children;
+		if (!empty($default)) {
+			$child['d'] = $default;
+		}
+		if (!empty($param)) {
+			$child['p'] = $param;
+			array_unshift($child['c'], '<nq><function_returns_array>');
+			array_push($child['c'], '</function_returns_array><nq>');
+		}
 	}
 
 	function getForeach($item, &$child, $component) {
@@ -1133,9 +1375,9 @@
 		return $child;
 	}
 
-	function parseTextNode($content, &$children, &$component) {
+	function parseTextNode($content, &$children, &$component, &$let) {
 		if (!empty($content)) {
-			$items = checkTextForContainigProps($content, $component);
+			$items = checkTextForContainigProps($content, $component, $let);
 			foreach ($items as $item) {
 				if (is_array($item)) {
 					$children[] = $item[0];
@@ -1234,13 +1476,14 @@
 		$names = array();
 		$ifCondition = false;
 		$else = null;
-		preg_match_all("/ +([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
-		preg_match_all("/ +([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
+		$html = preg_replace('/([\'"])(\w)/', "$1 $2", $html);
+		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
+		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
 		$propValues = array_merge($matches1[2], $matches2[2]);
 		for ($i = 0; $i < count($propNames); $i++) {			
 			$propName = $propNames[$i];
-			$propValue = $propValues[$i];
+			$propValue = trim($propValues[$i]);
 			$hasCode = hasCode($propValue);
 			$fullPropName = $propName;
 			$isObfClName = $obfuscate === true && $fullPropName == 'class';
@@ -1317,6 +1560,7 @@
 					}
 					if (isset($codes[$idx])) {
 						$code = $codes[$idx];
+						$code = checkTernary($code, $component);
 						if ($isObfClName) {
 							$code = getObfuscatedClassName($code, true);
 						}
@@ -1396,6 +1640,7 @@
 		}
 		$ifCondition = ltrim($ifCondition, '{');
 		$ifCondition = rtrim($ifCondition, '}');
+
 		$child = array('c' => $child);
 		if (!empty($else)) {
 			$else = ltrim($else, '{');
@@ -1403,7 +1648,7 @@
 			if (preg_match('/\$\w+[\.\[]/', $else)) {
 				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$else.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
 			}
-			$child['e'] = parseCode($else, $component, true);
+			$child['e'] = parseCode($else, $component, 'else');
 		}
 		checkIfConditionForContainigProps($ifCondition, $child, $component);
 	}
@@ -1413,6 +1658,7 @@
 		if (!$isCode) {
 			$value = "'".$value."'";
 		}
+		$value = preg_replace('/\[\s*[\'"]([^\'"]+)[\'"]\s*\]/', "[#$1#]", $value);
 		$regexp = '/"[^"]+"|\'[^\']+\'/';
 		preg_match_all($regexp, $value, $matches);
 		$strings = $matches[0];
@@ -1440,6 +1686,7 @@
 		if (!$isCode) {
 			$obfuscatedValue = trim($obfuscatedValue, "'");
 		}
+		$obfuscatedValue = preg_replace('/\[\#([^\#]+)\#\]/', "['$1']", $obfuscatedValue);
 		return preg_replace('/ {2,}/', ' ', $obfuscatedValue);
 	}
 
@@ -1447,15 +1694,16 @@
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
 		$names = array();
-		preg_match_all("/ +([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
-		preg_match_all("/ +([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
+		$html = preg_replace('/([\'"])(\w)/', "$1 $2", $html);
+		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
+		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
 		$propValues = array_merge($matches1[2], $matches2[2]);
 		$ifCondition = false;
 		$else = null;
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
-			$propValue = $propValues[$i];
+			$propValue = trim($propValues[$i]);
 			if ($propName == 'if') {
 				$ifCondition = $propValue;
 				continue;
@@ -1482,7 +1730,7 @@
 							$content[] = $part;
 						}
 						if (isset($codes[$j])) {
-							$content[] = '<plus>'.parseCode($codes[$j], $component, true).'</plus>';
+							$content[] = '<plus>'.parseCode($codes[$j], $component, 'tmp').'</plus>';
 						}
 					}
 					$propValue = implode($content);
@@ -1527,7 +1775,7 @@
 		return $text;
 	}
 
-	function checkTextForContainigProps($text, &$component) {
+	function checkTextForContainigProps($text, &$component, &$let) {
 		$regexp = '/\{([^\}]+)\}/';
 		preg_match_all($regexp, $text, $matches);
 		$codes = $matches[1];
@@ -1548,23 +1796,80 @@
 				$content[] = $part;
 			}
 			if (isset($codes[$i])) {
-				$content[] = array(parseCode($codes[$i], $component));
+				if (preg_match('/^\s*let &/', $codes[$i])) {
+					$codes[$i] = preg_replace('/^\s*let &(\w+)\s*[:=]\s*(.+)/', "<let>var $1=$2<=let>", $codes[$i]);
+					$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
+					$let++;
+				}
+				$content[] = array(parseCode($codes[$i], $component, 'prop', true));
 			}
 		}
 		return $content;
 	}
 
-	function parseCode($code, &$component, $noClassVars = false) {
+	function parseCode($code, &$component, $role, $toPropNodes = false) {
 		$code = trim($code);
 		parseClassMethodCalls($code, $component);
+		$code = checkTernary($code, $component);
 		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
-		if (!$noClassVars) {
+		if ($toPropNodes) {
+			if (preg_match('/\bcase\b/', $code)) {
+				global $isSwitchContext;
+				if (!$isSwitchContext) error('Обнаружен оператор <b>case</b> вне оператора <b>switch</b> или подобного ему <b>if</b> в шаблоне класса <b>'.$component['name'].'</b><br><br><b>Используйте код вида</b>'."<xmp>{switch ~value}\n\t{case 10}\n\t\t<div class=\"ten\">10</div>}\n\n\t{default}\n\t\tdefault text\n{/switch}</xmp><b>или</b><xmp>{if}\n\t{case !isUndefined(\$var)}\n\t\tvariant 1\n\n\t{case \$var2 === true}\n\t\tvariant 2\n\n\t{default}\n\t\tdefault text\n{/if}</xmp>");
+			}
+			if (preg_match('/\#\w/', $code)) {
+				error('Обнаружено использование контстанты данных <b>'.$code.'</b> внутри текстового нода в шаблоне класса <b>'.$component['name'].'</b><br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>');
+			}
 			$code = preg_replace('/^\s*\$(\w+)\s*$/', "{'pr':'$1','p':\<this>g('$1')}", $code);
+		} else {
+			$code = preg_replace('/\$(\w+)/i', "<this>g('$1')", $code);	
 		}
 		$code = preg_replace('/^&([a-z])/i', "$1", $code);
 		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
 		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
 		return '<nq>'.preg_replace('/\s+([\?:\+\-><=\!]{1,3})\s+/', "$1", $code).'<nq>';
+	}
+
+	function checkTernary($code, $component) {
+		$originalCode = $code;
+		if (preg_match('/\?/', $code)) {
+			$strings = array();
+			$signs = array("'", '"');
+			for ($i = 0; $i < 2; $i++) {
+				$strings[$i] = array();
+				$parts = explode($signs[$i], $code);
+				$code = '';
+				$isString = false;
+				foreach ($parts as $part) {
+					if ($isString) {
+						$strings[$i][] = $part;
+						$code .= '__S'.$i.'__';
+					} else {
+						$code .= $part;
+					}
+					$isString = !$isString;
+				}
+			}
+			if (preg_match('/\?[^:]+$/', $code)) {
+				$strings = array_reverse($strings);
+				$code = trim($code).":''";
+				$signs = array('__S1__', '__S0__');
+				$signs2 = array('"', "'");
+				for ($i = 0; $i < 2; $i++) {
+					$parts = explode($signs[$i], $code);
+					$code = '';
+					foreach ($parts as $j => $part) {
+						$code .= $part;
+						if (isset($strings[$i][$j])) {
+							$code .= $signs2[$i].$strings[$i][$j].$signs2[$i];
+						}
+					}
+
+				}
+				$originalCode = $code;
+			}
+		}
+		return $originalCode;
 	}
 
 	function addConstructorFunction(&$js, $class, $isComponent) {
@@ -1811,13 +2116,18 @@
 
 	function getComponentClassData() {
 		global $config;
-		$pathToComponentClass = $config['sources'].'/components/Component.js';
-		if (!file_exists($pathToComponentClass)) {
-			error('Класс <b>Component</b> не найден по указанному пути <b>'.$pathToComponentClass.'</b>');
+		$data = array();
+		$classes = array('Component', 'Control', 'Form');
+		foreach ($classes as $class) {
+			$pathToComponentClass = $config['sources'].'/components/'.$class.'.js';
+			if (!file_exists($pathToComponentClass)) {
+				error('Класс <b>'.$class.'</b> не найден по указанному пути <b>'.$pathToComponentClass.'</b>');
+			}
+			$content = file_get_contents($pathToComponentClass);
+			preg_match_all('/\b'.$class.'\.prototype\.(\w+)\s*=\s*function\s*\(/', $content, $matches);
+			$data[$class] = array('functionList' => $matches[1]);
 		}
-		$content = file_get_contents($pathToComponentClass);
-		preg_match_all('/\bComponent\.prototype\.(\w+)\s*=\s*function\s*\(/', $content, $matches);
-		return array('Component' => array('functionList' => $matches[1]));
+		return $data;
 	}	
 
 ?>

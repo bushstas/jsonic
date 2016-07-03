@@ -1,24 +1,5 @@
-<!DOCTYPE>
-	<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
-		<meta name="description" content="" />
-	    <title>Builder</title>
-	    <style>
-			body {
-				font-family: Segoe UI, Georgia, Arial;
-			}
-			b {
-				display: inline-block;
-				padding: 0 3px;
-				background-color: #f1e600;
-				border-radius: 2px;
-			}
-		</style>
-	</head>
-	<body>
 	<?php
-
+		include_once 'header.php';
 		$advancedMode = !empty($_GET['advanced']);
 		$create = !empty($_GET['create']);
 		$obfuscate = !empty($_GET['obfuscate']);
@@ -265,7 +246,7 @@
 			'Component', 'Controller', 'Application', 'View', 'Level',
 			'Form', 'Control', 'AjaxRequest', 'Router', 'Objects',
 			'Condition', 'Core', 'Menu', 'EventHandler', 'Dialoger', 'Foreach',
-			'Globals', 'User', 'StoreKeeper',
+			'Globals', 'User', 'StoreKeeper', 'Switch', 'Tooltiper', 'IfSwitch',
 
 			'__', '__T', '__ROUTES', '__TAGS', '__A', '__EVENTTYPES', '__HASHROUTER', '__DEFAULTROUTE', '__ERRORROUTES',
 			'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V'
@@ -316,7 +297,7 @@
 					parseJsClass($content, $classes, $file);
 				}
 			} elseif ($file['ext'] == 'template') {
-				$templates[$file['name']] = $content;
+				$templates[$file['name']] = preg_replace("/<\!--.*?-->/", "", $content);
 			} elseif ($file['ext'] == 'css') {
 				$cssData[] = $file;
 				$css[] =  '/* '.$file['name'].' */'.preg_replace("/\/\*[^\*]*\*\//", "", $content);
@@ -350,13 +331,13 @@
 				if (count($matches[1]) > 0) {
 					$pathToImages = rtrim($matches[1][0], '/').'/';
 					$cssFile = preg_replace($regexp, '', $cssFile);
-					$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)\s*=\s*([^\s]+)/i', "background-image:url(".$pathToImages."$2.$1);", $cssFile);
+					$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)\s*=\s*([^\s\)]+)/i', "background-image:url##".$pathToImages."$2.$1##;", $cssFile);
 				}
 			}
 			$compiledCss = implode("\n", $css);
 			$regexp = '/\$\s*\(([^\)]+)\)/';
 			preg_match_all($regexp, $compiledCss, $matches);
-			$matches = $matches[1];			
+			$matches = $matches[1];
 			$parts = preg_split($regexp, $compiledCss);
 			$compiledCss = '';
 			foreach ($parts as $i => $part) {
@@ -374,6 +355,7 @@
 					}
 				}
 			}
+			$compiledCss = str_replace('url##', 'url(', str_replace('##;', ');', $compiledCss));
 			$shorts = array(
 				'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
 				'p' => 'padding', 'pl' => 'padding-left', 'pr' => 'padding-right', 'pt' => 'padding-top', 'pb' => 'padding-bottom',
@@ -549,6 +531,7 @@
 		$types = array_keys($classes);
 		foreach ($types as $type) {
 			foreach ($classes[$type] as $className => $component) {
+				$classesList[$className] = $component;
 				if (array_search($className, $reservedNames) !== false) {
 					error("Название класса <b>".$className."</b> зарезервировано системой");
 				}
@@ -689,6 +672,13 @@
 				if ($type == 'view') {
 					addLoadControllerFunction($compiledJs, $className);
 				}
+				if (is_array($component['callbacks'])) {
+					foreach ($component['callbacks'] as $callback) {
+						if (!hasComponentMethod($callback, $component)) {
+							error("Обработчик события <b>".$callback."</b> не найден среди методов класса <b>".$component['name']."</b>");
+						}
+					}
+				}
 			}
 		}
 
@@ -718,7 +708,8 @@
 		
 		$inherited = array(
 			'Core' => array('Component','Foreach','Condition'),
-			'Component' => array('Application','View','Form','Control','Menu')
+			'Component' => array('Application','View','Form','Control','Menu'),
+			'Foreach' => array('Switch', 'IfSwitch')
 		);
 		while (count($addedClasses) < $usedClassesCount) {
 			foreach ($inherits as $usedClass => $extClasses) {
@@ -875,6 +866,5 @@
 			generateTree($routes, $pathToIndexFile, $indexFileContent);
 		}
 
+		include_once 'footer.php';
 	?>
-	</body>
-</html>

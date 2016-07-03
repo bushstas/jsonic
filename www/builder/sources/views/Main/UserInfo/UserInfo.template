@@ -21,7 +21,7 @@
 	</tr>
 	<tr>
 		<td>{@to}:</td>
-		<td class="{$needToProlong?'red':''}">{$endAccessDate}</td>
+		<td class="{$needToProlong?'red'}">{$endAccessDate}</td>
 	</tr>
 </table>
 {if $prolongButtonText}

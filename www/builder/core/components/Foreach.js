@@ -11,9 +11,13 @@ Foreach.prototype.render = function(parentElement, parentLevel) {
 };
 
 Foreach.prototype.createLevels = function(isUpdating) {
-	if (this.items instanceof Array) {
+	if (isArray(this.items)) {
 		for (var i = 0; i < this.items.length; i++) {
 			this.createLevel(this.handler(this.items[i], i), isUpdating);
+		}
+	} else if (isObject(this.items)) {
+		for (var k in this.items) {
+			this.createLevel(this.handler(this.items[k], k), isUpdating);
 		}
 	}
 };
@@ -30,12 +34,6 @@ Foreach.prototype.update = function(items) {
 	this.items = items;
 	this.disposeLevels();
 	this.createLevels(true);
-};
-
-Foreach.prototype.propagatePropertyChange = function(propName, propValue) {
-	for (var i = 0; i < this.levels.length; i++) {
-		this.levels[i].propagatePropertyChange(propName, propValue);
-	}
 };
 
 Foreach.prototype.getFirstNodeChild = function() {

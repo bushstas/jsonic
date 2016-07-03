@@ -1,64 +1,40 @@
 .app-mainpage-user-info {
-	margin-top: 10px;
+	$mt10
 }
 .app-mainpage-user-info td {
-    line-height: 14px;
+    $(lh14 vmid)
     padding: 6px 0;
-    vertical-align: middle;
 }
 .app-mainpage-user-info td:first-child {
-    width: 55%;
-    color: #7f828a;
+    $(w55% c#7f828a)
 }
 .app-mainpage-user-info td:last-child {
-    width: 45%;
-    color: #4c546b;
+    $(w45% c#4c546b)
 }
 .app-mainpage-user-info td:last-child.red {
-	color: #cd380a;
-    font-family: ptsansbold;
+	$(c#cd380a bold)
 }
 .app-mainpage-left-column .standart-button {
- 	width: 140px;
-    display: inline-block;
-    margin-top: 10px;
+ 	$(w140 inb mt10)
 }
 .standart-button.access {
-    margin-right: 10px;
+    $mr10
 }
 .mainpage-manager-name {
-	color: #4c546b;
-    font-size: 14px;
-    padding-top: 5px;
+	$(c#4c546b fs14 pt5)
 }
 .mainpage-manager-phone {
-	position: relative;
-    padding-top: 5px;
-    color: #4c546b;
-    font-size: 14px;
-    line-height: 14px;
-    padding-bottom: 5px;
+	$(rel pt5 c#4c546b fs14 lh14 pb5)
 }
 .mainpage-free-call {
-    position: absolute;
-    right: 0;
-    top: 5px;
-    width: 120px;
+    $(abs r t5 w120)
 }
 .mainpage-manager-free {
-    font-size: 12px;
-    color: #8b8e97;
-    padding-top: 7px;
+    $(fs12 c#8b8e97 pt7)
 }
 .mainpage-manager-email {
-    font-size: 14px;
-    color: #536b9f;
-    line-height: 14px;
-    margin-bottom: 3px;
-    display: inline-block;
-    border-bottom: 1px solid #c3ccde;
+    $(fs14 c#536b9f lh14 mb3 inb bob#c3ccde)
 }
 .mainpage-manager-phone small {
-    color: #8b8e97;
-    font-size: 12px;
+    $(c#8b8e97 fs12)
 }

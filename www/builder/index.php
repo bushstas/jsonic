@@ -14,6 +14,10 @@
 		padding: 5px 0;
 		line-height: 16px;
 	}
+	select {
+		font-family: Segoe UI, Georgia, Arial;
+		padding: 4px 10px;
+	}
 	input[type="checkbox"] {
 		float: left;
 		margin-right: 10px;
@@ -30,9 +34,24 @@
 		top: 50px;
 		box-sizing: border-box;
 	}
+	.hint-form {
+		position: absolute;
+		top: 10px;
+		right: 30%;
+	}
+	.topic-select {
+		width: 200px;
+	}
 </style>
 </head>
 <body>
+	<form class="hint-form" method="GET" target="iframe" action="hint.php">
+		<input type="submit" value="Подсказка по" style="padding: 5px 10px;">
+		<select class="topic-select" name="topic">
+			<option value="tmp">шаблонам</option>
+			<option value="tmpcode">коду в шаблонах</option>
+		</select>
+	</form>
 	<form metod="GET" target="iframe" action="build.php">
 		<div class="top">
 			<input type="submit" value="Скомпилировать" style="padding: 5px 10px;">
