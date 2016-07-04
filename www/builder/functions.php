@@ -1797,7 +1797,7 @@
 			}
 			if (isset($codes[$i])) {
 				if (preg_match('/^\s*let\s/', $codes[$i])) {
-					if (preg_match('/^\s*let &[a-z]/i', $codes[$i])) {
+					if (preg_match('/^\s*let &[a-z][\w\.\'"\[\]]*\s*[=:]\s*[^\s]+\s*$/i', $codes[$i])) {
 						$codes[$i] = preg_replace('/^\s*let &(\w+)\s*[:=]\s*(.+)/', "<let>var $1=$2<=let>", $codes[$i]);
 						$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
 						$let++;
