@@ -3110,7 +3110,7 @@ SearchForm.prototype.toggleExpand = function() {
 	this.dispatchEvent('expand');
 };
 SearchForm.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
+	return[let &_,{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
 };
 SearchForm.prototype.getInitials = function() {
 	return {
