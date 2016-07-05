@@ -1,2 +1,15 @@
-<div class="app-tab-panel">
+<div class="app-tab-panel" scope="1">
+	{foreach ~tabs as &tab}
+		<div class="app-tab">
+			{&tab['title']}
+		</div>
+	{/foreach}
+	{if isObject(~rest)}
+		<div class="app-tab app-tab-rest{$count?' shown'}">
+			{~rest['title']||@restTabs}
+			{if ~rest['showCount']}
+				 ({$count})
+			{/if}
+		</div>
+	{/if}
 </div>

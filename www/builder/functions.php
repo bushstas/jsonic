@@ -1338,13 +1338,13 @@
 				$val = $parts[1];
 			}
 		}
-		if (!preg_match_all('/^([\$&])(\w[\w\.]*)$/', $variable, $matches)) {
+		if (!preg_match_all('/^([\$&~])(\w[\w\.]*)$/', $variable, $matches)) {
 			error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 		}
 		$sign = $matches[1][0];
 		$variableParts = explode('.', $matches[2][0]);
 		$variable = $variableParts[0];
-		if ($sign == '&') {
+		if ($sign == '&' || $sign == '~') {
 			$variableParts[0] = '';
 			$variableParts = implode('.', $variableParts);
 			$variable .= $variableParts;
@@ -1360,7 +1360,9 @@
 		if (!empty($key) && !preg_match('/^\&\w+$/', $key)) {
 			error('Невалидный код <b>foreach</b> в шаблоне класса <b>'.$component['name'].'</b>: <b>'.$item['content'].'</b>');
 		}
-		if ($sign == '&') {
+		if ($sign == '~') {
+			$child['p'] = "<nq>_['".$variable."']<nq>";
+		} elseif ($sign == '&') {
 			$child['p'] = '<nq>'.$variable.'<nq>';
 		} else {
 			$child['p'] = "<nq>\<this>g('".$variable."')<nq>";

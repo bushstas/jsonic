@@ -1,0 +1,16 @@
+#mainPageTabs = {
+	'tabs': [
+		{
+			'title': @commonInfo
+		},
+		{
+			'title': @mailingParams
+		},
+		{
+			'title': @settings
+		}
+	],
+	'rest': {
+		'showCount': true
+	}
+}

@@ -1,7 +1,7 @@
 $imgsrc = ../images/mainpage
 
 .main-view-content {
-	$rel $width $ma
+	$(rel width ma)
 }
 .main-view-content table {
 	$w100%
@@ -10,23 +10,22 @@ $imgsrc = ../images/mainpage
 	$vtop
 }
 .app-mainpage-table .app-mainpage-left-column {
-	$w354 $p12    
+	$(w354 p12)
 }
 .app-mainpage-left-column-area {
-	$rel $mih180 $br3 $fs14
-    padding: 49px 20px 12px 20px;
+	$(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
 .app-mainpage-left-column-title {
-    $abs $l $r $t $lh39 $h37 $c#edf0f4 $bc#51648d $pl43 $bold $norep $png = person-icon
-    border-radius: 3px 3px 0 0;
-    background-position: 17px 50%;
+    $(abs l r t lh39 h37 c#edf0f4 bc#51648d pl43 bold norep png = person-icon br3_3_0_0 bp17_50%)
 }
 .app-mainpage-left-column > div:last-child {
-    $rel $mih180 $br3 $fs14
-    padding: 49px 20px 12px 20px;
+    $(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
 .mainpage-leftcolumn-title {
-    $mt27 $fs16 $c#4c546b $pb7
+    $(mt27 fs16 c#4c546b pb7)
+}
+.app-mainpage-table .app-mainpage-content-column {
+    $(pt12)
 }

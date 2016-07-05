@@ -83,6 +83,12 @@ Element.prototype.getData = function(name) {
 Element.prototype.getRect = function() {
 	return this.getBoundingClientRect();
 };
+Element.prototype.getWidth = function() {
+	return this.getRect().width;
+};
+Element.prototype.getHeight = function() {
+	return this.getRect().height;
+};
 Element.prototype.setStyle = function(style) {
 	var element = this;
 	var set = function(value, style) {
@@ -122,4 +128,8 @@ Element.prototype.attr = function(attrName) {
 	} else {
 		return this.getAttribute(attrName);
 	}
+};
+Element.prototype.show = function(isShown) {
+	var display = isString(isShown) ? isShown : (isShown ? 'block' : 'none');
+	this.style.display = display;
 };

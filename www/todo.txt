@@ -6,6 +6,4 @@
 
 файлы include ошибка если нет {template .tmpname}
 
-валидация кода let, только &var
-
 {from &i = 10 to 20 step 1}

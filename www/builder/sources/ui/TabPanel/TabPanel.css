@@ -1,0 +1,20 @@
+$imgsrc = ../images/tabpanel 
+
+.app-tab-panel {
+	$(rel h34)
+}
+.app-tab {
+	$(w200 center abs h34 lh34 bc#e2e4ea c#40485F pointer br2_2_0_0 fs14)
+}
+.app-tab:hover {
+    $bc#eee
+}
+.app-tab:after {
+    $(abs cnt b l r h4 png=shade repx z2)
+}
+.app-tab.app-tab-rest {
+	$(wa p0_20 z1 hid)
+}
+.app-tab.app-tab-rest.shown {
+	$(vis)
+}
