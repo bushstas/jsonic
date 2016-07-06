@@ -19,6 +19,8 @@ function User() {
 	};
 	this.load = function(application) {
 		if (!loaded) {
+			initOptions();
+			loadDictionary();
 			app = application;
 			if (loadRequest) {
 				loadRequest.execute();
@@ -86,6 +88,4 @@ function User() {
 			'accessLevel': 0
 		};
 	};
-	initOptions();
-	loadDictionary();
 }

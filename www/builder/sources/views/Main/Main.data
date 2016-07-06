@@ -1,13 +1,19 @@
 #mainPageTabs = {
+	'scope': '->> app-mainpage-content',
 	'tabs': [
 		{
-			'title': @commonInfo
+			'title': @commonInfo,
+			'container': '->> app-mainpage-tab1-content',
+			'active': true
 		},
 		{
-			'title': @mailingParams
+			'title': @mailingParams,
+			'container': '->> app-mainpage-tab2-content'
+
 		},
 		{
-			'title': @settings
+			'title': @settings,
+			'container': '->> app-mainpage-tab3-content'
 		}
 	],
 	'rest': {

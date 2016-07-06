@@ -120,7 +120,8 @@ Component.prototype.onReadyToRender = function() {
 
 Component.prototype.doRendering = function() {
 	this.level = new Level();
-	var content = this.getTemplateMain(this, this.getCombinedArgs());
+	this.args = this.getCombinedArgs();
+	var content = this.getTemplateMain(this, this.args);
 	if (isArray(content)) {
 		this.level.setComponent(this);
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
@@ -326,6 +327,15 @@ Component.prototype.removeChild = function(child) {
 Component.prototype.registerChildComponent = function(childComponent) {
 	this.children = this.children || [];
 	if (this.children.indexOf(childComponent) == -1) this.children.push(childComponent);
+	childComponent.setParent(this);
+};
+
+Component.prototype.setParent = function(parentalComponent) {
+	this.parentalComponent = parentalComponent;
+};
+
+Component.prototype.getParent = function() {
+	return this.parentalComponent;
 };
 
 Component.prototype.getChildAt = function(index) {
@@ -358,6 +368,14 @@ Component.prototype.getElement = function() {
 
 Component.prototype.findElement = function(selector, scopeElement) {
 	return (scopeElement || this.getElement()).querySelector(selector);
+};
+
+Component.prototype.findElementWithinParent = function(selector) {
+	return this.getParent().findElement(selector);
+};
+
+Component.prototype.findElementsWithinParent = function(selector) {
+	return this.getParent().findElements(selector);
 };
 
 Component.prototype.findElements = function(selector, scopeElement) {
@@ -455,6 +473,8 @@ Component.prototype.dispose = function() {
 	this.followers = null;
 	this.correctors = null;
 	this.receivedArgs = null;
+	this.args = null;
+	this.parentalComponent = null;
 };
 
 Component.prototype.disposeInternal = function() {};

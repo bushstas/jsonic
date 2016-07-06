@@ -43,6 +43,9 @@ function isString(a) {
 function isNumber(a) {
 	return typeof a == 'number';
 }
+function isNumeric(a) {
+	return isNumber(a) || (isString(a) && (/^\d+$/).test(a));
+}
 function isUndefined(a) {
 	return a === undefined;
 }

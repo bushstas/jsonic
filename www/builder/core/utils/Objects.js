@@ -78,3 +78,4 @@ function Objects() {
 		return isUndefined(obj[0]);
 	};
 }
+Objects = new Objects();

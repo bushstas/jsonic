@@ -738,15 +738,13 @@
 		}
 		
 		$compiledJs[] = "Initialization.inherits([".implode(',', $inherits).']);';
-
-		$controllers = array('Objects', 'Router', 'User');
+		$controllers = array('Router', 'User');
 		$controllers = array_merge($controllers, array_keys($classes['controller']));
 		if (!empty($controllers)) {
 			foreach ($controllers as $controller) {
 				$compiledJs[] = $controller." = new ".$controller."();";
 			}
 		}
-
 		$compiledJs[] = "User.load(".$config['entry'].");";
 		$compiledJs[] = "})();";
 

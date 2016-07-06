@@ -1,5 +1,15 @@
 component TabPanel
 
+initial helpers = [
+	{
+		'helper': ClickHandler,
+		'options': {
+			'app-tab-rest': this.onRestTabClick,
+			'app-tab': this.onTabClick
+		}
+	}
+]
+
 function initiate() {
 	this.margin = 4;
 }
@@ -36,3 +46,27 @@ function getControlsWidth() {
 	if (plusButton) width += plusButton.getWidth() + this.margin;
 	return width;
 }
+
+function onRestTabClick() {
+
+}
+
+function onTabClick(e, target) {
+	if (isNumeric(this.activeTab)) this.activateTab(this.activeTab, false);
+	this.activateTab(target.getData('index'), true);
+}
+
+function activateTab(tabIndex, isShown) {
+	var container = this.findElement('.' + Objects.get(this.getTabParamsByIndex(tabIndex), 'container'), this.getScopeElement());
+	if (container) container.show(isShown);
+	if (isShown) this.activeTab = tabIndex;
+}
+
+function getScopeElement() {
+	if (!this.scopeElement && isString(this.args['scope'])) this.scopeElement = this.findElementWithinParent('.' + this.args['scope']) || document.body;
+	return this.scopeElement;
+}
+
+function getTabParamsByIndex(tabIndex) {
+	return this.args['tabs'][tabIndex];
+};

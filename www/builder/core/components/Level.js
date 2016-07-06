@@ -229,7 +229,7 @@ Level.prototype.registerChild = function(child, isComponent) {
 		if (!this.firstNodeChild) this.firstNodeChild = child;
 		this.lastNodeChild = child;
 	} else this.children.push(child);
-	if (isComponent) this.registerChildComponent(child);
+	if (isComponent) this.component.registerChildComponent(child);
 };
 
 Level.prototype.includeTemplate = function(item) {
@@ -295,10 +295,6 @@ Level.prototype.registerPropComps = function(component, names, props) {
 Level.prototype.registerPropComp = function(pn, data) {
 	this.propComps[pn] = this.propComps[pn] || [];
 	this.propComps[pn].push(this.component.registerPropActivity('cmp', pn, data));
-};
-
-Level.prototype.registerChildComponent = function(childComponent) {
-	this.parentLevel.registerChildComponent(childComponent);
 };
 
 Level.prototype.getParentElement = function() {
