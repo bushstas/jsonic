@@ -4,8 +4,8 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'app-tab-rest': this.onRestTabClick,
-			'app-tab': this.onTabClick
+			'->> app-tab-rest': this.onRestTabClick,
+			'->> app-tab': this.onTabClick
 		}
 	}
 ]
@@ -15,14 +15,21 @@ function initiate() {
 }
 
 function onRendered() {
+	this.doOnParentReady(this.onParentReady);
 	this.redraw();
+}
+
+function onParentReady() {
+	for (var i = 0; i < this.args['tabs'].length; i++) {
+		this.activateTab(i, !!this.args['tabs'][i]['active']);
+	}
 }
 
 function redraw() {
 	this.hiddenTabs = [];
 	var tabPanelWidth = this.getElement().getWidth();
 	var controlWidth = this.getControlsWidth();
-	var tabs = this.findElements('.app-tab');
+	var tabs = this.findElements('.->> app-tab');
 	var totalWidth = 0, buttonWidth;
 	for (var i = 0; i < tabs.length; i++) {
 		buttonWidth = tabs[i].getWidth();
@@ -39,10 +46,10 @@ function redraw() {
 
 function getControlsWidth() {
 	var width = 0;
-	var restButton = this.findElement('.app-tab-rest');
+	var restButton = this.findElement('.->> app-tab-rest');
 	if (restButton) width += restButton.getWidth() + this.margin;
 
-	var plusButton = this.findElement('.app-tab-plus');
+	var plusButton = this.findElement('.->> app-tab-plus');
 	if (plusButton) width += plusButton.getWidth() + this.margin;
 	return width;
 }
@@ -60,6 +67,11 @@ function activateTab(tabIndex, isShown) {
 	var container = this.findElement('.' + Objects.get(this.getTabParamsByIndex(tabIndex), 'container'), this.getScopeElement());
 	if (container) container.show(isShown);
 	if (isShown) this.activeTab = tabIndex;
+	this.getTab(tabIndex).toggleClass('->> active', isShown);
+}
+
+function getTab(tabIndex) {
+	return this.findElements('.->> app-content-tab')[tabIndex];
 }
 
 function getScopeElement() {

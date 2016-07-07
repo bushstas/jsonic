@@ -129,6 +129,14 @@ Component.prototype.doRendering = function() {
 	this.rendered = true;
 	this.onRenderComplete();
 	this.onRendered();
+	if (isArray(this.callbacks)) {
+		for (var i = 0; i < this.callbacks.length; i++) {
+			if (isFunction(this.callbacks[i])) {
+				this.callbacks[i]();
+			}
+		}
+		this.callbacks = null;
+	}
 };
 
 Component.prototype.getArgs = function() {
@@ -327,7 +335,6 @@ Component.prototype.removeChild = function(child) {
 Component.prototype.registerChildComponent = function(childComponent) {
 	this.children = this.children || [];
 	if (this.children.indexOf(childComponent) == -1) this.children.push(childComponent);
-	childComponent.setParent(this);
 };
 
 Component.prototype.setParent = function(parentalComponent) {
@@ -348,6 +355,15 @@ Component.prototype.getChildById = function(childComponentId) {
 		if (this.children[i].getId() == childComponentId) return this.children[i];
 	}
 	return null;
+};
+
+Component.prototype.doOnParentReady = function(callback, params) {
+	this.getParent().addCallback(callback.bind(this, params));
+};
+
+Component.prototype.addCallback = function(callback) {
+	this.callbacks = this.callbacks || [];
+	this.callbacks.push(callback);
 };
 
 Component.prototype.setId = function(id) {

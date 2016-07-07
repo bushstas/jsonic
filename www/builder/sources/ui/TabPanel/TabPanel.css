@@ -4,13 +4,20 @@ $imgsrc = ../images/tabpanel
 	$(rel h34)
 }
 .app-tab {
-	$(w200 center abs h34 lh34 bc#e2e4ea c#40485F pointer br2_2_0_0 fs14)
+	$(w200 center abs h34 lh34 bc#e2e4ea c#40485F pointer br2_2_0_0 fs14 z1)
 }
-.app-tab:hover {
+.app-tab.active {
+    $(c#515869 bgwhite bold t-3 h36 lh36 ml-4 w208 z2)
+	box-shadow: 0 0 5px #c1c5d1;
+}
+.app-tab:not(.active):hover {
     $bc#eee
 }
-.app-tab:after {
+.app-tab:not(.active):after {
     $(abs cnt b l r h4 png=shade repx z2)
+}
+.app-tab.active:after {
+    $(abs cnt t100% h3 bgwhite l r)
 }
 .app-tab.app-tab-rest {
 	$(wa p0_20 z1 hid)

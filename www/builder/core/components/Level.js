@@ -260,6 +260,7 @@ Level.prototype.renderComponent = function(item, parentElement) {
 			}
 		}
 		var component = new item['cmp'](props);
+		component.setParent(this.component);
 		component.render(parentElement);
 		this.registerChild(component, true);
 		if (isProps) this.registerPropComps(component, item['n'], item['p']);

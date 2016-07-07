@@ -1,6 +1,6 @@
 <div class="app-tab-panel" scope="1">
 	{foreach ~tabs as &idx => &tab}
-		<div class="app-tab" data-index="{&idx}">
+		<div class="app-tab app-content-tab" data-index="{&idx}">
 			{&tab['title']}
 		</div>
 	{/foreach}

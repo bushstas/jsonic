@@ -2051,7 +2051,7 @@
 			$indexArr[$class] = generateObfiscatedCssClassName();
 		}
 		foreach ($indexArr as $k => $v) {
-			$css = preg_replace('/\.'.$k.'([\s\.\#,\{:])/', '.'.$v."$1", $css);
+			$css = preg_replace('/\.'.$k.'([\s\.\#,\{:\)])/', '.'.$v."$1", $css);
 		}
 		$parts = explode('__URL__', $css);
 		$css = '';

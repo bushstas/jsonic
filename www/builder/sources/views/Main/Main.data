@@ -9,7 +9,6 @@
 		{
 			'title': @mailingParams,
 			'container': '->> app-mainpage-tab2-content'
-
 		},
 		{
 			'title': @settings,
