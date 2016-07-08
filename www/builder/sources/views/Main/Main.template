@@ -18,7 +18,7 @@
 				<component TabPanel args="{#mainPageTabs}">
 				<div class="app-mainpage-content">
 					<div class="app-mainpage-tab1-content">
-						
+						<component FilterStatistics args="{#mainPageFilterStat}">
 					</div>
 					<div class="app-mainpage-tab2-content">
 						

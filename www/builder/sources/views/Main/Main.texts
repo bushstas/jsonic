@@ -19,3 +19,11 @@
 @commonInfo: Общая информация
 @mailingParams: Параметры рассылки
 @settings: Настройки
+@filterStatTitle: Статистика по моим фильтрам
+@refresh: Обновить
+@name: Название
+@forToday: За сегодня
+@forYesterday: За вчера
+@forCurrent: Текущих
+@forWeek: За неделю
+@forMonth: За месяц

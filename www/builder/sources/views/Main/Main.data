@@ -19,3 +19,9 @@
 		'showCount': true
 	}
 }
+
+#mainPageFilterStat = {
+	'title': @filterStatTitle,
+	'extended': true,
+	'className': '->> main-page-filter-stat'
+}

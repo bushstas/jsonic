@@ -46,6 +46,7 @@ $opac4      : opacity: 0.4;
 $opac0      : opacity: 0;
 $cnt        : content: '';
 $ovh        : overflow: hidden;
+$ova        : overflow: auto;
 $ma         : margin: auto;
 $i          : !important
 $vtop       : vertical-align: top;

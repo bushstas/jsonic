@@ -23,7 +23,7 @@
 				"view": "Main",
 				"accessLevel": 10,
 				"title": "Home",
-				"load": ["Favorites"],
+				"load": ["Favorites", "Filters"],
 				"params": {
 					"text": "blablabla",
 					"name": "$2"
