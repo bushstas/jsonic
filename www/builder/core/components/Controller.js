@@ -85,14 +85,14 @@ Controller.prototype.getItem = function(nameOrIndex, actionName) {
 	return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
 };
 
-Controller.prototype.load = function() {
-	this.doAction('load');
+Controller.prototype.load = function(options) {
+	this.doAction('load', options);
 };
 
 Controller.prototype.doAction = function(actionName, options, url) {
 	var action = this.getAction(actionName);
 	this.action = action;	
-	if (actionName == 'load' && this.gotFromStore()) {
+	if (actionName == 'load' && this.gotFromStore(options)) {
 		return;
 	}
 	if (!isObject(options)) {
@@ -110,13 +110,13 @@ Controller.prototype.doAction = function(actionName, options, url) {
 	this.request.send(method, options, url);
 };
 
-Controller.prototype.gotFromStore = function() {
+Controller.prototype.gotFromStore = function(options) {
 	if (this.shouldStore()) {
-		var storeAs = Objects.get(this.options, 'storeAs');
+		var storeAs = this.getStoreAs(options);
 		if (isString(storeAs)) {
 			var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 			if (isArrayLike(storedData)) {
-				this.onActionComplete(storedData);
+				this.onActionComplete(storedData, true);
 				return true;
 			}
 		}
@@ -135,7 +135,7 @@ Controller.prototype.makeUrl = function(url, options) {
 	return url;
 };
 
-Controller.prototype.onActionComplete = function(data) {
+Controller.prototype.onActionComplete = function(data, isFromStorage) {
 	var actionName = this.action['name'];
 	this.data = this.data || {};
 	this.data[actionName] = data;
@@ -143,7 +143,7 @@ Controller.prototype.onActionComplete = function(data) {
 		this.action['callback'].call(this, data);
 	}
 	this.dispatchEvent(actionName, data);
-	if (actionName == 'load' && this.shouldStore()) {
+	if (!isFromStorage && actionName == 'load' && this.shouldStore()) {
 		this.store(true, data);
 	}
 };
@@ -154,12 +154,26 @@ Controller.prototype.shouldStore = function() {
 	return Objects.has(this.options, 'storeAs');
 };
 
-Controller.prototype.store = function(isAdding, data) {
-	if (isAdding) {
-		StoreKeeper.set(this.options['storeAs'], data);
+Controller.prototype.store = function(isAdding, data) {console.log('store')
+	var storeAs = this.getStoreAs(data);
+	if (isAdding) {		
+		StoreKeeper.set(storeAs, data);
 	} else {
-		StoreKeeper.remove(this.options['storeAs']);
+		StoreKeeper.remove(storeAs);
 	}
+};
+
+Controller.prototype.getStoreAs = function(data) {
+	var storeAs = Objects.get(this.options, 'storeAs');
+	if (isArrayLike(data) && isString(storeAs) && (/\$[a-z_]/i).test(storeAs)) {
+		var parts = storeAs.split('$');
+		storeAs = parts[0];
+		for (var i = 1; i < parts.length; i++) {
+			if (data[parts[i]]) storeAs += data[parts[i]];
+			else storeAs += parts[i];				
+		}
+	}
+	return storeAs;
 };
 
 Controller.prototype.getPrimaryKey = function() {

@@ -10,6 +10,9 @@ $imgsrc = ../images/tabpanel
     $(c#515869 bgwhite bold t-3 h36 lh36 ml-4 w208 z2)
 	box-shadow: 0 0 5px #c1c5d1;
 }
+.app-tab.first.active {
+	$ml0
+}
 .app-tab:not(.active):hover {
     $bc#eee
 }

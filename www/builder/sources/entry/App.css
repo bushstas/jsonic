@@ -28,8 +28,11 @@
     font-weight: normal;
     font-style: normal;
 }
+html {
+  $h100%
+}
 body {
-	$p0 $m0 $regular $c#505b6e
+	$(p0 m0 regular c#505b6e abs w100% h100%)
 }
 h1 {
 	$normal

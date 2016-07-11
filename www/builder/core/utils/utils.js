@@ -31,6 +31,9 @@ function isElement(a) {
 function isNode(a) {
 	return a instanceof Node;
 }
+function isText(a) {
+	return a instanceof Text;
+}
 function isFunction(a) {
 	return a instanceof Function;
 }

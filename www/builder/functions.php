@@ -1478,7 +1478,7 @@
 		$names = array();
 		$ifCondition = false;
 		$else = null;
-		$html = preg_replace('/([\'"])(\w)/', "$1 $2", $html);
+		$html = preg_replace('/([^\[])([\'"])(\w)/', "$1$2 $3", $html);
 		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
 		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
@@ -1545,7 +1545,6 @@
 				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
 				$regexp = '/\{([^\}]*)\}/';
 				$hasClassVar = hasClassVar($propValue);
-				
 				preg_match_all($regexp, $propValue, $matches);
 				$codes = $matches[1];
 				$parts = preg_split($regexp, $propValue);
@@ -1586,13 +1585,10 @@
 				if ($hasClassVar) {
 					$attrContent = implode('"+"', $attrParts);
 				}
-
 				parseClassMethodCalls($attrContent, $component);
-
 				if ($hasClassVar) {
 					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
-				}
-
+				}				
 				$props[$propName] = correctTagAttributeText($propName, $attrContent);
 				$names[$propName] = array_unique($names[$propName]);
 				if (count($names[$propName]) == 1) {
@@ -1818,6 +1814,9 @@
 		parseClassMethodCalls($code, $component);
 		$code = checkTernary($code, $component);
 		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
+		$code = preg_replace('/^\s*:(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
+		$code = preg_replace('/^\s*:(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
+		$code = str_replace('<noeq>=', '', $code);
 		if ($toPropNodes) {
 			if (preg_match('/\bcase\b/', $code)) {
 				global $isSwitchContext;

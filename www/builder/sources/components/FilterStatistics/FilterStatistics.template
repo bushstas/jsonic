@@ -1,35 +1,34 @@
 <div class="app-filter-stat {~className}" scope="1">
-	<div class="app-filter-stat-title" if="{~title}">
-		{~title}
-	</div>
-	<div class="app-filter-stat-refresh">
-		{@refresh}
-	</div>
+	<div class="app-filter-stat-title">
+		{~title?~title}
+		<div class="app-filter-stat-refresh">
+			{@refresh}
+		</div>
+	</div>	
+	<table class="app-filter-stat-head" cellpadding="0" cellspacing="0">
+		<tr>
+			<th>{@name}</th>
+			<th>{@forToday}</th>
+			<th>{@forYesterday}</th>
+			<th>{@forCurrent}</th>
+			{if ~extended}
+				<th>{@forWeek}</th>
+				<th>{@forMonth}</th>
+			{/if}
+		</tr>
+	</table>
 	<div class="app-filter-stat-content">
-		<table class="app-filter-stat-head">
-			<tr>
-				<th>{@name}</th>
-				<th>{@forToday}</th>
-				<th>{@forYesterday}</th>
-				<th>{@forCurrent}</th>
+		{foreach $filters as &filter}
+			<div class="app-filter-stat-row row{&filter['filterId']}">
+				<span class="app-filter-stat-row-name">{&filter['header']}</span>
+				<span>+{:today=0}</span>
+				<span>+{:yesterday=0}</span>
+				<span>{:current=0}</span>
 				{if ~extended}
-					<th>{@forWeek}</th>
-					<th>{@forMonth}</th>
+					<span>{:week=0}</span>
+					<span>{:month=0}</span>
 				{/if}
-			</tr>
-		</table>
-			{foreach $filters as &filter}
-				<div class="app-filter-stat-row row{&filter['filterId']}">
-					<span>{&filter['header']}</span>
-					<span>{:0}</span>
-					<span>{:1}</span>
-					<span>{:2}</span>
-					{if ~extended}
-						<span>{:3}</span>
-						<span>{:4}</span>
-					{/if}
-				</div>
-			{/foreach}
-
+			</div>
+		{/foreach}
 	</div>
 </div>

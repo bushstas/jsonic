@@ -5,16 +5,11 @@ initial options = {
 	'store': true,
 	'storeAs': 'filterStat_$filterId',
 	'storePeriod': '4hour'
-};
+}
 
 initial actions = {
 	'load': {
-		'url'     : CONFIG.filterStat.load,
-		'method'  : 'GET',
-		'callback': this.onLoad.bind(this)
+		'url': CONFIG.filterStat.load,
+		'method': 'GET'
 	}
-};
-
-function onLoad(data) {
-	
 }

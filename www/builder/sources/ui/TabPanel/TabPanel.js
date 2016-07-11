@@ -32,6 +32,7 @@ function redraw() {
 	var tabs = this.findElements('.->> app-tab');
 	var totalWidth = 0, buttonWidth;
 	for (var i = 0; i < tabs.length; i++) {
+		tabs[i].toggleClass('->> first', i == 0);
 		buttonWidth = tabs[i].getWidth();
 		if (totalWidth + controlWidth + buttonWidth + this.margin > tabPanelWidth) {
 			tabs[i].show(false);

@@ -195,9 +195,11 @@ Component.prototype.set = function(propName, propValue) {
 		this.props[k] = props[k];
 		changedProps[k] = props[k];
 	}	
-	if (isChanged) this.propagatePropertyChange(changedProps);
-	for (var k in changedProps) {
-		if (Objects.has(this.followers, k)) this.followers[k].call(this);
+	if (this.isRendered()) {
+		if (isChanged) this.propagatePropertyChange(changedProps);
+		for (var k in changedProps) {
+			if (Objects.has(this.followers, k)) this.followers[k].call(this);
+		}
 	}
 	changedProps = null;
 };
@@ -396,6 +398,22 @@ Component.prototype.findElementsWithinParent = function(selector) {
 
 Component.prototype.findElements = function(selector, scopeElement) {
 	return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
+};
+
+Component.prototype.fill = function(element, data) {
+	if (isString(element)) element = this.findElement(element);
+	if (isElement(element)) {
+		var callback = function(el) {
+			for (var i = 0; i < el.childNodes.length; i++) {
+				if (isElement(el.childNodes[i])) {
+					callback(el.childNodes[i]);
+				} else if (isText(el.childNodes[i]) && el.childNodes[i].hasOwnProperty('placeholderName') && !isUndefined(data[el.childNodes[i]['placeholderName']])) {
+					el.childNodes[i].textContent = data[el.childNodes[i]['placeholderName']];
+				}
+			}
+		};
+		callback(element);
+	}
 };
 
 Component.prototype.removeNode = function(node) {

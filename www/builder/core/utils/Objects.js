@@ -58,7 +58,7 @@ function Objects() {
 		return this.has(obj, key) ? obj[key] : defaultValue;
 	};
 	this.has = function(obj, key, value) {
-		if (!isObject(obj)) return false;
+		if (!isArrayLike(obj)) return false;
 		var has = !isUndefined(obj[key]);
 		if (has && !isUndefined(value)) {
 			return obj[key] == value;

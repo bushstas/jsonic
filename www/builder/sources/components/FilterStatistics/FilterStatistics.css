@@ -1,0 +1,43 @@
+$imgsrc = ../images/filterstat
+
+.app-filter-stat-title {
+    $(bc#f1f4f9 p10_15 br3 mb10 rel fs16 c#4c546b bold)
+}
+.app-filter-stat-refresh {
+	$(abs r20 t pointer norep lh40 bold png=refresh bp0_50% pl20)
+}
+.app-filter-stat-refresh:hover {
+	$c#5c6ea0
+}
+.app-filter-stat-head th {
+	$(c#4c546b fs14 normal left p10_0 bob#E0E6F3 w12% box)
+}
+.app-filter-stat-row span:nth-child(1),
+.app-filter-stat-head th:nth-child(1) {
+    $(pl19 pr20 w40% wrap)
+}
+.app-filter-stat-row span:nth-child(2),
+.app-filter-stat-row span:nth-child(3),
+.app-filter-stat-head th:nth-child(2),
+.app-filter-stat-head th:nth-child(3) {
+    $c#3EB562
+}
+.app-filter-stat-row span:nth-child(4),
+.app-filter-stat-head th:nth-child(4) {
+	$pl10
+}
+.app-filter-stat-row {
+	$(nowrap p12_0 bob#E0E6F3)
+}
+.app-filter-stat-row span {
+	$(inb w12% box bold)
+}
+.app-filter-stat-row span:nth-child(1) {
+	$(pointer regular)
+}
+.app-filter-stat-row span:nth-child(1):hover {
+	$c#6484ca
+}
+.app-filter-stat-content {
+	$(abs t100 b60 l15 r5 ova)
+}

@@ -794,7 +794,7 @@
 			}
 		}
 		if ($obfuscate === true) {
-			$regexp = '/->>\s*([a-z][\w\-]{3,})/';
+			$regexp = '/\s*->>\s*([a-z][\w\-]+)/';
 			preg_match_all($regexp, $compiledJs, $matches);
 			$cssClasses = $matches[1];
 			$parts = preg_split($regexp, $compiledJs);
@@ -816,7 +816,7 @@
 			}
 		}
 		
-		$compiledJs = preg_replace('/->> {0,1}/', '', $compiledJs);
+		$compiledJs = preg_replace('/ *->> */', '', $compiledJs);
 		if ($advancedMode) {
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);

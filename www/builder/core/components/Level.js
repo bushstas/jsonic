@@ -41,6 +41,7 @@ Level.prototype.renderItem = function(item) {
 	else if (item.hasOwnProperty('cmp')) this.renderComponent(item);
 	else if (item.hasOwnProperty('is')) this.createIfSwitch(item);
 	else if (item.hasOwnProperty('sw')) this.createSwitch(item);
+	else if (item.hasOwnProperty('pl')) this.createPlaceholder(item);
 };
 
 Level.prototype.createLevel = function(items, parentElement) {
@@ -58,7 +59,7 @@ Level.prototype.createTextNode = function(content) {
 Level.prototype.createPropertyNode = function(props) {
 	var propName = props['pr'];
 	var propNode = document.createTextNode(props['p'] || '');
-	this.appendChild(propNode);	
+	this.appendChild(propNode);
 	this.propNodes = this.propNodes || {};
 	this.propNodes[propName] = this.propNodes[propName] || [];
 	this.propNodes[propName].push(this.component.registerPropActivity('nod', propName, propNode));
@@ -218,6 +219,13 @@ Level.prototype.createSwitch = function(params) {
 		}
 		if (isArray(this.params['d'])) this.renderItems(this.params['d']);
 	}
+};
+
+Level.prototype.createPlaceholder = function(params) {
+	var placeholderNode = document.createTextNode('');
+	if (isString(params['d'])) placeholderNode.textContent = params['d'];
+	placeholderNode.placeholderName = params['pl'];
+	this.appendChild(placeholderNode);	
 };
 
 Level.prototype.registerChild = function(child, isComponent) {

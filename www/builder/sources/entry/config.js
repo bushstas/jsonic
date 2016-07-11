@@ -17,5 +17,8 @@ var CONFIG = {
 		'get': 'favorites/get.php',
 		'add': 'favorites/add.php',
 		'remove': 'favorites/remove.php'
+	},
+	'filterStat': {
+		'load': 'filters/count.php'
 	}
 };
