@@ -2,11 +2,24 @@ view Main
 
 initial helpers = [
 	{
-		'helper': SizeFixer,
+		'helper': ResizeHandler,
 		'options': {
-			'param': 'height',
-			'value': 100,
-			'selector': '.->> app-mainpage-content'
+			'callback': this.onResize
 		}
 	}
 ]
+
+function onRendered() {
+	this.onResize();
+}
+
+function onResize() {
+	var element = this.findElement('.->> app-mainpage-content');
+	element.setHeight('');
+	var height = element.getHeight();
+	var bodyHeight = document.body.getHeight();
+	var diff = bodyHeight - 100 - height;
+	if (diff > 0) {
+		element.setHeight(bodyHeight - 100);
+	}
+}

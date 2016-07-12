@@ -83,11 +83,23 @@ Element.prototype.getData = function(name) {
 Element.prototype.getRect = function() {
 	return this.getBoundingClientRect();
 };
+Element.prototype.setWidth = function(width) {
+	this.style.width = isNumber(width) ? width + 'px' : width;
+};
+Element.prototype.setHeight = function(height) {
+	this.style.height = isNumber(height) ? height + 'px' : height;
+};
 Element.prototype.getWidth = function() {
 	return this.getRect().width;
 };
 Element.prototype.getHeight = function() {
 	return this.getRect().height;
+};
+Element.prototype.getTop = function() {
+	return this.getRect().top;
+};
+Element.prototype.getLeft = function() {
+	return this.getRect().left;
 };
 Element.prototype.setStyle = function(style) {
 	var element = this;

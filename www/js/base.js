@@ -1,7 +1,7 @@
 ;(function() {
 var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442',' \u00A0 ','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
-var __ = ['\u0420\u0435\u0433\u0438\u043e\u043d\u044b','\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438','\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u0438 \u0440\u0435\u0433\u0438\u043e\u043d\u044b','\u044c','\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u0422\u0435\u043d\u0434\u0435\u0440\u044b \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0430\u044e\u0442\u0441\u044f','dd month yyyy','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','standart-button','standart-buttongreen-button','standart-buttonred-button','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u0415\u0449\u0435','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u041e\u0431\u0449\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f','\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438','\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0417\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0417\u0430 \u0432\u0447\u0435\u0440\u0430','\u0422\u0435\u043a\u0443\u0449\u0438\u0445','\u0417\u0430 \u043d\u0435\u0434\u0435\u043b\u044e','\u0417\u0430 \u043c\u0435\u0441\u044f\u0446'];
-var __V = [{'cmpid':'name','type':'text','name':'name','caption':__[27],'class':'half-width'},{'cmpid':'phone','type':'text','name':'phone','caption':__[28],'class':'half-width'},{'cmpid':'email','type':'text','name':'email','caption':__[29],'class':'half-width'},{'key':'calendar','className':'float-right'},{'scope':'app-mainpage-content','tabs':[{'title':__[66],'container':'app-mainpage-tab1-content','active':true},{'title':__[67],'container':'app-mainpage-tab2-content'},{'title':__[68],'container':'app-mainpage-tab3-content'}],'rest':{'showCount':true}},{'title':__[69],'extended':true,'className':'main-page-filter-stat'}];
+var __ = ['\u0420\u0435\u0433\u0438\u043e\u043d\u044b','\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438','\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u0438 \u0440\u0435\u0433\u0438\u043e\u043d\u044b','\u044c','\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u0422\u0435\u043d\u0434\u0435\u0440\u044b \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0430\u044e\u0442\u0441\u044f','dd month yyyy','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','ar3','ar3 arp','ar3 ard','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u0415\u0449\u0435','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u041e\u0431\u0449\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f','\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438','\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0417\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0417\u0430 \u0432\u0447\u0435\u0440\u0430','\u0422\u0435\u043a\u0443\u0449\u0438\u0445','\u0417\u0430 \u043d\u0435\u0434\u0435\u043b\u044e','\u0417\u0430 \u043c\u0435\u0441\u044f\u0446'];
+var __V = [{'cmpid':'name','type':'text','name':'name','caption':__[27],'class':'arn'},{'cmpid':'phone','type':'text','name':'phone','caption':__[28],'class':'arn'},{'cmpid':'email','type':'text','name':'email','caption':__[29],'class':'arn'},{'key':'calendar','className':'arj'},{'scope':'a3i','tabs':[{'title':__[66],'container':'a38','active':true},{'title':__[67],'container':'a3v'},{'title':__[68],'container':'a30'}],'rest':{'showCount':true}},{'title':__[69],'extended':true,'className':'a3b'}];
 var __DICTURL = 'dictionary/get.php';
 var __TAGS = ['div','span','table','tbody','thead','tr','td','th','ul','ol','li','p','a','form','input','img','video','audio','aside','article','b','big','blockquote','button','canvas','caption','center','code','col','colgroup','footer','font','h1','h2','h3','h4','h5','h6','header','hr','i','iframe','label','menu','pre','s','section','select','strong','textarea','u','small'];
 var __A = {'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'};
@@ -11,7 +11,7 @@ var __ERRORROUTES = {'404':Error404,'401':Error401};
 var __HASHROUTER = true;
 var __INDEXROUTE = 'main';
 var __DEFAULTROUTE = null;
-var __VIEWCONTAINER = 'app-view-container';
+var __VIEWCONTAINER = 'ar1';
 var __I = 'initiate';
 var __GI = 'getInitials';
 var __TC = TooltipPopup;
@@ -19,7 +19,7 @@ var __TA = 'tooltip/get.php';
 var __APIDIR = 'api';
 var __PAGETITLE = 'Page title';
 var __USEROPTIONS = {'login':'user/login.php','logout':'user/logout.php','save':'user/save.php','fullAccess':11};
-var CONFIG = {'user': {'get': 'user/get.php'},'filters': {'load': 'filters/get.php','save': 'filters/add.php','set': 'filters/set.php'},'support': {'send': 'support/send.php'},'orderCall': {'send': 'orderCall/send.php'},'favorites': {'get': 'favorites/get.php','add': 'favorites/add.php','remove': 'favorites/remove.php'},'filterStat': {'load': 'filters/count.php'}};
+var CONFIG = {'user': {'get': 'user/get.php'},'filters': {'load': 'filters/get.php','save': 'filters/add.php','set': 'filters/set.php'},'support': {'send': 'support/send.php'},'orderCall': {'send': 'orderCall/send.php'},'favorites': {'get': 'favorites/get.php','add': 'favorites/add.php','remove': 'favorites/remove.php'},'filterStat': {'load': 'filters/count.php'},'settings': {'subscr': 'settings/getSubscriptionSettings.php'}};
 function Application() {}
 Application.prototype.initiate = function() {
 	this.views = {};
@@ -319,6 +319,20 @@ Component.prototype.g = function(propName) {
 };
 Component.prototype.get = function(propName) {
 	return this.propsToSet[propName] || this.props[propName];
+};
+Component.prototype.showElement = function(element, isShown) {
+	if (isString(element)) element = this.findElement(element);
+	if (isElement(element)) element.show(isShown);
+};
+Component.prototype.each = function(propName, callback) {
+	var ar = this.get(propName);
+	if (isArrayLike(ar) && isFunction(callback)) {
+		if (isArray(ar)) {
+			for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
+		} else {
+			for (var k in ar) callback.call(this, ar[k], k, ar);
+		}
+	}
 };
 Component.prototype.toggle = function(propName) {
 	this.set(propName, !this.get(propName));
@@ -1670,7 +1684,7 @@ Menu.prototype.getButton = function(viewName) {
 	return this.findElement('a[role="' + viewName + '"]');
 };
 Menu.prototype.setButtonActive = function(button, isActive) {
-	var activeClassName = this.activeButtonClass || 'active';
+	var activeClassName = this.activeButtonClass || 'awz';
 	button.toggleClass(activeClassName, isActive);
 	if (isActive) {
 		this.activeButton = button;
@@ -1750,8 +1764,8 @@ View.prototype.getControllersToLoad = function() {
 function CheckboxHandler() {
 	var subscribers = [];
 	var options = [];
-	var defaultCheckboxClass = 'app-ui-checkbox';
-	var defaultCheckboxCheckedClass = 'checked';
+	var defaultCheckboxClass = 'aw7';
+	var defaultCheckboxCheckedClass = 'ary';
 	var currentOptions, currentObject,
 		currentClasses, currentCheckedClass, currentTarget;
 	this.subscribe = function(subscriber, opts) {
@@ -2062,33 +2076,23 @@ function Popuper() {
 	body.addEventListener('mousedown', onBodyMouseDown, false);
 }
 Popuper = new Popuper();
-function SizeFixer() {
-	var subscribers = [], bodySize;	
+function ResizeHandler() {
+	var subscribers = [], timer;	
 	this.subscribe = function(subscriber, options) {
-		if (subscribers.indexOf(subscriber) == -1) {
-			subscriber = [subscriber, options];
-			subscribers.push(subscriber);
-			initBodySize();
-			resize(subscriber);
-		}
+		subscribers.push([subscriber, options]);
 	};
-	var resize = function(subscriber) {
-		var element = subscriber[0].findElement(subscriber[1]['selector']);
-		if (isElement(element)) {
-		}
-	}
 	var onResize = function() {
-		for (var i = 0; i < subscribers.length; i++) {
-			resize(subscribers[i]);
-		}
-	};
-	var initBodySize = function() {
-		bodySize = document.body.getRect();
-		console.log(bodySize)
+		window.clearTimeout(timer);
+		timer = window.setTimeout(function() {
+			for (var i = 0; i < subscribers.length; i++) {
+				var callback = Objects.get(subscribers[i][1], 'callback');
+				if (isFunction(callback)) callback.call(subscribers[i][0]);
+			}
+		}, 200);
 	};
 	window.addEventListener('resize', onResize, false);
 }
-SizeFixer = new SizeFixer();
+ResizeHandler = new ResizeHandler();
 function StoreKeeper() {
 	var prefix = 'stored_';
 	var secondsInMeasures = {
@@ -2159,7 +2163,7 @@ function Tooltiper() {
 	var target, eventHandler, event;
 	var request, tooltipElement, timer;
 	var tooltip = __TC, tooltipApi = __TA;
-	var tooltipClass = 'tooltiped';
+	var tooltipClass = 'a3t';
 	var addClass, text, position, key,
 		caption, delay, corrector;
 	var onBodyMouseOver = function(e) {
@@ -2397,11 +2401,23 @@ Element.prototype.getData = function(name) {
 Element.prototype.getRect = function() {
 	return this.getBoundingClientRect();
 };
+Element.prototype.setWidth = function(width) {
+	this.style.width = isNumber(width) ? width + 'px' : width;
+};
+Element.prototype.setHeight = function(height) {
+	this.style.height = isNumber(height) ? height + 'px' : height;
+};
 Element.prototype.getWidth = function() {
 	return this.getRect().width;
 };
 Element.prototype.getHeight = function() {
 	return this.getRect().height;
+};
+Element.prototype.getTop = function() {
+	return this.getRect().top;
+};
+Element.prototype.getLeft = function() {
+	return this.getRect().left;
 };
 Element.prototype.setStyle = function(style) {
 	var element = this;
@@ -3129,13 +3145,13 @@ App.prototype.onError = function(errorCode) {
 	menu.setAppended(false);
 };
 App.prototype.getTemplateMain = function($,_) {
-	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]
+	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'p':{'c':'ar1'}}]
 };
 function Analytics(props) {
 	Initialization.initiate.call(this, props);
 };
 Analytics.prototype.getTemplateMain = function($,_) {
-	return[{'t':0,'p':{'c':'view-content'}}]
+	return[{'t':0,'p':{'c':'awf'}}]
 };
 function Error401(props) {
 	Initialization.initiate.call(this, props);
@@ -3143,7 +3159,7 @@ function Error401(props) {
 Error401.prototype.onRendered = function() {
 };
 Error401.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'app-auth-form-container'}}]
+	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'acb'}}]
 };
 function Error404(props) {
 	Initialization.initiate.call(this, props);
@@ -3151,7 +3167,7 @@ function Error404(props) {
 Error404.prototype.onRendered = function() {
 };
 Error404.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':'404','t':0,'p':{'c':'app-404-title'}},{'c':__T[0],'t':0,'p':{'c':'app-404-text'}}],'t':0,'p':{'c':'app-404-container'}}]
+	return[{'c':[{'c':'404','t':0,'p':{'c':'acr'}},{'c':__T[0],'t':0,'p':{'c':'acc'}}],'t':0,'p':{'c':'acq'}}]
 };
 function Favorite(props) {
 	Initialization.initiate.call(this, props);
@@ -3159,17 +3175,30 @@ function Favorite(props) {
 Favorite.prototype.onRendered = function() {
 };
 Favorite.prototype.getTemplateMain = function($,_) {
-	return[{'t':0,'p':{'c':'view-content'}}]
+	return[{'t':0,'p':{'c':'awf'}}]
 };
 function Main(props) {
 	Initialization.initiate.call(this, props);
 };
+Main.prototype.onRendered = function() {
+	this.onResize();
+};
+Main.prototype.onResize = function() {
+	var element = this.findElement('.a3i');
+	element.setHeight('');
+	var height = element.getHeight();
+	var bodyHeight = document.body.getHeight();
+	var diff = bodyHeight - 100 - height;
+	if (diff > 0) {
+		element.setHeight(bodyHeight - 100);
+	}
+};
 Main.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[48],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[65],{'cmp':Tooltip,'p':{'args':__V[3]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'args':__V[4]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'args':__V[5]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
+	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[48],'t':0,'p':{'c':'a3e'}},{'cmp':UserInfo},{'c':[__[65],{'cmp':Tooltip,'p':{'args':__V[3]}}],'t':0,'p':{'c':'a3a arx'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'a39'}},'t':6,'p':{'c':'a3k'}},{'c':[{'cmp':TabPanel,'p':{'args':__V[4]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'args':__V[5]}},'t':0,'p':{'c':'a38'}},{'c':{'cmp':FilterSubscriptionOptions},'t':0,'p':{'c':'a3v'}},{'t':0,'p':{'c':'a30'}}],'t':0,'p':{'c':'a3i'}}],'t':6,'p':{'c':'a3h'}}],'t':5},'t':2,'p':{'c':'a3f','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'awf a3y','sc':1}}]
 };
 Main.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': SizeFixer,'options': {'param': 'height','value': 100,'selector': '.app-mainpage-content'}}]
+		'helpers':[{'helper': ResizeHandler,'options': {'callback': this.onResize}}]
 	};
 };
 Main.prototype.getControllersToLoad = function() {
@@ -3190,7 +3219,7 @@ Search.prototype.onFormExpand = function() {
 	this.toggle('expanded');
 };
 Search.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'cmpid':'form'}},{'cmp':TendersDataTable,'p':{'cmpid':'datatable'}}],'t':0,'p':{'c':function(){return 'view-content'+($.g('expanded')?' form-expanded':'')},'sc':1},'n':{'c':'expanded'}}]
+	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'cmpid':'form'}},{'cmp':TendersDataTable,'p':{'cmpid':'datatable'}}],'t':0,'p':{'c':function(){return 'awf'+($.g('expanded')?' awk':'')},'sc':1},'n':{'c':'expanded'}}]
 };
 Search.prototype.getInitials = function() {
 	return {
@@ -3204,7 +3233,7 @@ function DataTable(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTable.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}}]
+	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'awy'}}]
 };
 function DataTableTabPanel(props) {
 	Initialization.initiate.call(this, props);
@@ -3216,16 +3245,16 @@ function DataTableRow(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTableRow.prototype.getTemplateControls = function($,_) {
-	return[{'t':0,'p':{'c':'app-datatable-color-mark datatable-control'}},{'c':{'tmp':includeGeneralTemplateCheckbox},'t':0,'p':{'c':'app-datatable-checkbox-container datatable-control'}},{'t':0,'p':{'c':'app-datatable-star datatable-control'}}]
+	return[{'t':0,'p':{'c':'awh awa'}},{'c':{'tmp':includeGeneralTemplateCheckbox},'t':0,'p':{'c':'aw5 awa'}},{'t':0,'p':{'c':'awi awa'}}]
 };
 DataTableRow.prototype.getTemplateCount = function($,_) {
-	return[{'c':_['count'],'t':1,'p':{'c':'app-datatable-standart-row-count'}}]
+	return[{'c':_['count'],'t':1,'p':{'c':'awm'}}]
 };
 function DataTableStandartRow(props) {
 	Initialization.initiate.call(this, props);
 };
 DataTableStandartRow.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':{'tmp':$.getTemplateControls},'i':!_['nocontrols']},{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'app-datatable-standart-row-top-item'}},{'c':{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}},'e':function(){return[{'c':_['regionName'],'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}]},'i':!!_['multiregion']},{'c':{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}},'e':function(){return[{'c':_['subcategory'],'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}]},'i':!!_['multicategory']},{'c':{'c':{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}},'e':_['razm'],'i':_['razm']==' N/A'},'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}],'t':0,'p':{'c':'app-datatable-standart-row-top'}},{'c':_['price'],'t':0,'p':{'c':'app-datatable-standart-row-price'}},{'c':[{'c':{'tmp':$.getTemplateHotMark},'i':!!_['hot']},_['name']],'t':0,'p':{'c':'app-datatable-standart-row-name'}},{'t':0,'p':{'c':'app-datatable-standart-row-bottom'}},{'c':{'cmp':DataTableFragmets,'p':{'data':_['fragments']}},'i':!!_['fragments']}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'app-datatable-row','sc':1,'_id':_['Id']}}]
+	return[{'c':[{'c':{'tmp':$.getTemplateControls},'i':!_['nocontrols']},{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'aw0'}},{'c':{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'aw0 a3t','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}},'e':function(){return[{'c':_['regionName'],'t':0,'p':{'c':'aw0'}}]},'i':!!_['multiregion']},{'c':{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'aw0 a3t','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}},'e':function(){return[{'c':_['subcategory'],'t':0,'p':{'c':'aw0'}}]},'i':!!_['multicategory']},{'c':{'c':{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}},'e':_['razm'],'i':_['razm']==' N/A'},'t':0,'p':{'c':'aw0'}}],'t':0,'p':{'c':'awn'}},{'c':_['price'],'t':0,'p':{'c':'awv'}},{'c':[{'c':{'tmp':$.getTemplateHotMark},'i':!!_['hot']},_['name']],'t':0,'p':{'c':'awg'}},{'t':0,'p':{'c':'awt'}},{'c':{'cmp':DataTableFragmets,'p':{'data':_['fragments']}},'i':!!_['fragments']}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'aw9','sc':1,'_id':_['Id']}}]
 };
 function TendersDataTable(props) {
 	Initialization.initiate.call(this, props);
@@ -3237,12 +3266,16 @@ FilterStatistics.prototype.onRendered = function() {
 	this.refresh();
 };
 FilterStatistics.prototype.onRefreshButtonClick = function() {
-	alert('refresh')
+	this.each('filters', function(filter) {
+		StoreKeeper.remove('filterStat_' + filter['filterId']);
+	});
+	this.refresh();
 };
 FilterStatistics.prototype.onFilterClick = function() {
 	alert('filter')
 };
 FilterStatistics.prototype.refresh = function() {
+	this.showElement('.aws', false);
 	this.currentFilterIndex = 0;
 	this.getCountForFilterWithIndex(0);	
 };
@@ -3250,7 +3283,7 @@ FilterStatistics.prototype.onLoaded = function(filters) {
 	this.set('filters', filters);
 };
 FilterStatistics.prototype.updateFilterCount = function(data) {
-	this.fill(this.findElement('.row' + data['filterId']), data['numbers']);
+	this.fill(this.findElement('.a3s' + data['filterId']), data['numbers']);
 	this.currentFilterIndex++;
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 };
@@ -3258,16 +3291,18 @@ FilterStatistics.prototype.getCountForFilterWithIndex = function(index) {
 	var filter = Objects.get(this.get('filters'), index);
 	if (isObject(filter)) {
 		FiltersStat.load({'filterId': filter['filterId']});
+	} else {
+		this.showElement('.aws', true);
 	}
 };
 FilterStatistics.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':[_['title']?_['title']:'',{'c':__[70],'t':0,'p':{'c':'app-filter-stat-refresh'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[71],'t':7},{'c':__[72],'t':7},{'c':__[73],'t':7},{'c':__[74],'t':7},{'c':[{'c':__[75],'t':7},{'c':__[76],'t':7}],'i':!!_['extended']}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}],'i':!!_['extended']}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
+	return[{'c':[{'c':[_['title']?_['title']:'',{'c':__[70],'t':0,'p':{'c':'aws'}}],'t':0,'p':{'c':'aw4'}},{'c':{'c':[{'c':__[71],'t':7},{'c':__[72],'t':7},{'c':__[73],'t':7},{'c':__[74],'t':7},{'c':[{'c':__[75],'t':7},{'c':__[76],'t':7}],'i':!!_['extended']}],'t':5},'t':2,'p':{'c':'aw3','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'a34'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}],'i':!!_['extended']}],'t':0,'p':{'c':'awo a3s'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'aw1'}}],'t':0,'p':{'c':'a33 '+_['className'],'sc':1}}]
 };
 FilterStatistics.prototype.getInitials = function() {
 	return {
 		'loader':{'controller': Filters,'async': false},
 		'controllers':[{'controller': FiltersStat,'on': {'load': this.updateFilterCount}}],
-		'helpers':[{helper: ClickHandler,options: {'app-filter-stat-refresh': this.onRefreshButtonClick,'app-filter-stat-row-name': this.onFilterClick}}]
+		'helpers':[{helper: ClickHandler,options: {'aws': this.onRefreshButtonClick,'a34': this.onFilterClick}}]
 	};
 };
 function SearchForm(props) {
@@ -3277,7 +3312,7 @@ SearchForm.prototype.toggleExpand = function() {
 	this.dispatchEvent('expand');
 };
 SearchForm.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
+	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'awp'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'awd'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'aw2'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'awx','sc':1}}]
 };
 SearchForm.prototype.getInitials = function() {
 	return {
@@ -3295,7 +3330,7 @@ SearchFormCreateFilterMenu.prototype.onWizardButtonClick = function() {
 };
 SearchFormCreateFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'create-filters-menu'},
+		'args':{'className': 'awb'},
 		'props':{'buttons': [{'name': __[5],'handler': this.onCreateButtonClick},{'name': __[6],'handler': this.onWizardButtonClick}]}
 	};
 };
@@ -3319,13 +3354,13 @@ SearchFormFilterMenu.prototype.handleClick = function(value, button) {
 	Globals.getView('search').openFilter(value);
 };
 SearchFormFilterMenu.prototype.getTemplateContent = function($,_) {
-	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['item']['isAutoOpen']?' checked':''),'_value':_['item']['value']}}]
+	return[{'t':0,'p':{'c':'aw7'+(_['item']['isAutoOpen']?' ary':''),'_value':_['item']['value']}}]
 };
 SearchFormFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'filters-menu','maxHeight': 400},
+		'args':{'className': 'awr','maxHeight': 400},
 		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
-		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true,'checkboxClass': 'app-ui-checkbox','checkboxCheckedClass': 'checked','labelClass': null}}]
+		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true,'checkboxClass': 'aw7','checkboxCheckedClass': 'ary','labelClass': null}}]
 	};
 };
 function SearchFormFilters(props) {
@@ -3338,7 +3373,7 @@ SearchFormFilters.prototype.onSaveFilterClick = function() {
 	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
 };
 SearchFormFilters.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':[{'c':__[7],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'app-search-form-filters-create-button'}},{'c':[{'c':__[8],'t':0,'p':{'c':'app-search-form-filters-button-inner'}},{'c':[{'c':{'pr':'quantity','p':$.g('quantity')},'t':42,'p':{'c':'app-search-form-filters-button-quantity'}},{'t':0,'p':{'c':'app-search-form-filters-button-plus'}}],'t':0,'p':{'c':'app-search-form-filters-button-side'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'app-search-form-filters-button'+(!$.g('quantity')?' with-plus':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':$.g('filterName')},'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-name'}},{'c':__[9],'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-save-button'}}],'t':0,'p':{'c':'app-search-form-filters','sc':1}}]
+	return[{'c':[{'c':[{'c':__[7],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'ark'}},{'c':[{'c':__[8],'t':0,'p':{'c':'are'}},{'c':[{'c':{'pr':'quantity','p':$.g('quantity')},'t':42,'p':{'c':'arh'}},{'t':0,'p':{'c':'ari'}}],'t':0,'p':{'c':'ara'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'ar9'+(!$.g('quantity')?' ar5':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':$.g('filterName')},'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'ar7'}},{'c':__[9],'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'arz'}}],'t':0,'p':{'c':'arf','sc':1}}]
 };
 SearchFormFilters.prototype.getInitials = function() {
 	return {
@@ -3350,16 +3385,16 @@ function TenderSearchForm(props) {
 	Initialization.initiate.call(this, props);
 };
 TenderSearchForm.prototype.onResetButtonClick = function(e) {
-	var button = e.target.getAncestor('.app-search-form-reset');
-	button.addClass('active');
+	var button = e.target.getAncestor('.awl');
+	button.addClass('awz');
 	this.delay(function() {
-		button.removeClass('active');
+		button.removeClass('awz');
 	}, 2500);
 };
 TenderSearchForm.prototype.onResetConfirmed = function() {
 };
 TenderSearchForm.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'hover-label'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'confirm-reset-filter'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'confirm-label'}}],'t':0,'p':{'c':'app-search-form-reset'}},{'c':{'cmp':SearchFormFilters},'t':0,'p':{'c':'app-tender-search-form','sc':1}}]
+	return[{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'aww'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'a3o'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'awj'}}],'t':0,'p':{'c':'awl'}},{'c':{'cmp':SearchFormFilters},'t':0,'p':{'c':'a31','sc':1}}]
 };
 function Submit(props) {
 	Initialization.initiate.call(this, props);
@@ -3368,7 +3403,7 @@ Submit.prototype.onSubmit = function() {
 	this.dispatchEvent('submit');
 };
 Submit.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,$.onSubmit],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
+	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,$.onSubmit],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'ar4'}}]
 };
 function Calendar(props) {
 	Initialization.initiate.call(this, props);
@@ -3438,7 +3473,7 @@ Calendar.prototype.changeMonth = function(value) {
 	this.redraw();
 };
 Calendar.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[39],'t':1},{'c':__[40],'t':1},{'c':__[41],'t':1},{'c':__[42],'t':1},{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?' another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
+	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'aca'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'ac5'}}],'t':0,'p':{'c':'aci'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'ach'}}],'t':0,'p':{'c':'ace'}},{'c':[{'c':[{'c':__[39],'t':1},{'c':__[40],'t':1},{'c':__[41],'t':1},{'c':__[42],'t':1},{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1}],'t':0,'p':{'c':'ac7'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?' acn':'')+' '+(day.current?' acu':'')+' '+(day.marked?' acg':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'acm'}}],'t':0,'p':{'c':'acz'}}],'t':0,'p':{'c':'ac9'}}]
 };
 function FavoritesCalendar(props) {
 	Initialization.initiate.call(this, props);
@@ -3474,7 +3509,7 @@ FavoritesCalendar.prototype.onMarkedDayClick = function(e) {
 FavoritesCalendar.prototype.getInitials = function() {
 	return {
 		'controllers':[{'controller': Favorites,'on': {'load': this.onLoadFavorites}}],
-		'helpers':[{'helper': ClickHandler,'options': {'marked': this.onMarkedDayClick}}]
+		'helpers':[{'helper': ClickHandler,'options': {'acg': this.onMarkedDayClick}}]
 	};
 };
 function Dialog(props) {
@@ -3505,7 +3540,7 @@ Dialog.prototype.onShow = function() {
 Dialog.prototype.onHide = function() {
 };
 Dialog.prototype.getTemplateMain = function($,_) {
-	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}},'i':!!_['closable']},{'c':{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}},'i':!!_['expandable']},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
+	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'ac8'+($.g('shown')?' acv':'')}},'n':{'c':'shown'}},{'c':[{'c':{'t':0,'e':[0,$.hide],'p':{'c':'ac3'}},'i':!!_['closable']},{'c':{'t':0,'e':[0,$.expand],'p':{'c':'aco'}},'i':!!_['expandable']},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'ac4'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'acs','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'ac0'+($.g('expanded')?' act':'')+($.g('shown')?' acv':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
 };
 Dialog.prototype.getTemplateContent = function($,_) {
 	return null
@@ -3526,7 +3561,7 @@ PopupMenu.prototype.onRendered = function() {
 	this.addListener(this.button, 'click', this.onShowButtonClick);
 };
 PopupMenu.prototype.onClick = function(e) {
-	var target = e.getTarget('.app-popup-menu-button');
+	var target = e.getTarget('.awc');
 	if (!isNull(target)) {
 		var idx = target.getData('index');
 		var value = target.getData('value');
@@ -3548,7 +3583,7 @@ PopupMenu.prototype.onBeforeShow = function() {
 };
 PopupMenu.prototype.show = function() {
 	var outerElement = this.getElement();
-	var innerElement = this.findElement('.app-popup-menu-inner-container');
+	var innerElement = this.findElement('.awq');
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
 	outerElement.setStyle({'max-height': height + 'px', 'height': height + 'px'});
@@ -3574,7 +3609,7 @@ PopupMenu.prototype.getButtonData = function(item) {
 	};
 };
 PopupMenu.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'c':{'h':function(button,idx){return[{'c':[button['name'],{'tmp':$.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'app-popup-menu-button','_value':button['value'],'_index':idx}}]},'p':$.g('buttons'),'f':'buttons'},'t':0,'e':[0,$.onClick],'p':{'c':'app-popup-menu-inner-container','st':(_['maxHeight']?' max-height:'+_['maxHeight']+' px;':'')}},'t':0,'p':{'c':'app-popup-menu-outer-container '+_['className'],'sc':1}}]
+	return[{'c':{'c':{'h':function(button,idx){return[{'c':[button['name'],{'tmp':$.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'awc','_value':button['value'],'_index':idx}}]},'p':$.g('buttons'),'f':'buttons'},'t':0,'e':[0,$.onClick],'p':{'c':'awq','st':(_['maxHeight']?' max-height:'+_['maxHeight']+' px;':'')}},'t':0,'p':{'c':'aw6 '+_['className'],'sc':1}}]
 };
 PopupMenu.prototype.getTemplateContent = function($,_) {
 	return null
@@ -3598,10 +3633,10 @@ TabPanel.prototype.redraw = function() {
 	this.hiddenTabs = [];
 	var tabPanelWidth = this.getElement().getWidth();
 	var controlWidth = this.getControlsWidth();
-	var tabs = this.findElements('.app-tab');
+	var tabs = this.findElements('.acx');
 	var totalWidth = 0, buttonWidth;
 	for (var i = 0; i < tabs.length; i++) {
-		tabs[i].toggleClass('first', i == 0);
+		tabs[i].toggleClass('acp', i == 0);
 		buttonWidth = tabs[i].getWidth();
 		if (totalWidth + controlWidth + buttonWidth + this.margin > tabPanelWidth) {
 			tabs[i].show(false);
@@ -3615,9 +3650,9 @@ TabPanel.prototype.redraw = function() {
 };
 TabPanel.prototype.getControlsWidth = function() {
 	var width = 0;
-	var restButton = this.findElement('.app-tab-rest');
+	var restButton = this.findElement('.acd');
 	if (restButton) width += restButton.getWidth() + this.margin;
-	var plusButton = this.findElement('.app-tab-plus');
+	var plusButton = this.findElement('.a3q');
 	if (plusButton) width += plusButton.getWidth() + this.margin;
 	return width;
 };
@@ -3631,10 +3666,10 @@ TabPanel.prototype.activateTab = function(tabIndex, isShown) {
 	var container = this.findElement('.' + Objects.get(this.getTabParamsByIndex(tabIndex), 'container'), this.getScopeElement());
 	if (container) container.show(isShown);
 	if (isShown) this.activeTab = tabIndex;
-	this.getTab(tabIndex).toggleClass('active', isShown);
+	this.getTab(tabIndex).toggleClass('awz', isShown);
 };
 TabPanel.prototype.getTab = function(tabIndex) {
-	return this.findElements('.app-content-tab')[tabIndex];
+	return this.findElements('.a3x')[tabIndex];
 };
 TabPanel.prototype.getScopeElement = function() {
 	if (!this.scopeElement && isString(this.args['scope'])) this.scopeElement = this.findElementWithinParent('.' + this.args['scope']) || document.body;
@@ -3644,18 +3679,18 @@ TabPanel.prototype.getTabParamsByIndex = function(tabIndex) {
 	return this.args['tabs'][tabIndex];
 };
 TabPanel.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'app-tab app-content-tab','_index':idx}}]},'p':_['tabs']},{'c':{'c':[_['rest']['title']||__[47],{'c':[' (',{'pr':'count','p':$.g('count')},')'],'i':!!_['rest']['showCount']}],'t':0,'p':{'c':function(){return 'app-tab app-tab-rest'+($.g('count')?' shown':'')}},'n':{'c':'count'}},'i':!!isObject(_['rest'])}],'t':0,'p':{'c':'app-tab-panel','sc':1}}]
+	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'acx a3x','_index':idx}}]},'p':_['tabs']},{'c':{'c':[_['rest']['title']||__[47],{'c':[' (',{'pr':'count','p':$.g('count')},')'],'i':!!_['rest']['showCount']}],'t':0,'p':{'c':function(){return 'acx acd'+($.g('count')?' acv':'')}},'n':{'c':'count'}},'i':!!isObject(_['rest'])}],'t':0,'p':{'c':'ac1','sc':1}}]
 };
 TabPanel.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ClickHandler,'options': {'app-tab-rest': this.onRestTabClick,'app-tab': this.onTabClick}}]
+		'helpers':[{'helper': ClickHandler,'options': {'acd': this.onRestTabClick,'acx': this.onTabClick}}]
 	};
 };
 function Tooltip(props) {
 	Initialization.initiate.call(this, props);
 };
 Tooltip.prototype.getTemplateMain = function($,_) {
-	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
+	return[{'t':0,'p':{'c':'a3t ac2 '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
 };
 Tooltip.prototype.getInitials = function() {
 	return {
@@ -3683,11 +3718,22 @@ TooltipPopup.prototype.correctAndSetText = function(text, changedProps) {
 	return text;
 };
 TooltipPopup.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-tooltip-popup-caption'}},{'c':{'c':function(){return[[{'h':function(item){return[{'c':item,'t':0,'p':{'c':'app-tooltip-list-item'}}]},'p':$.g('text'),'f':'text'}]]},'sw':$.g('corrector'),'s':['list'],'d':[{'pr':'text','p':$.g('text')}],'p':'corrector'},'t':0,'p':{'c':'app-tooltip-popup-text'}}],'t':0,'p':{'c':function(){return 'app-tooltip-popup '+$.g('className')+($.g('shown')?' shown':'')},'st':function(){return 'left:'+$.g('left')+'px;top:'+$.g('top')+'px;'},'sc':1},'n':{'c':['className','shown'],'st':['left','top']}}]
+	return[{'c':[{'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'acw'}},{'c':{'c':function(){return[[{'h':function(item){return[{'c':item,'t':0,'p':{'c':'ac6'}}]},'p':$.g('text'),'f':'text'}]]},'sw':$.g('corrector'),'s':['list'],'d':[{'pr':'text','p':$.g('text')}],'p':'corrector'},'t':0,'p':{'c':'acj'}}],'t':0,'p':{'c':function(){return 'acl '+$.g('className')+($.g('shown')?' acv':'')},'st':function(){return 'left:'+$.g('left')+'px;top:'+$.g('top')+'px;'},'sc':1},'n':{'c':['className','shown'],'st':['left','top']}}]
 };
 TooltipPopup.prototype.getInitials = function() {
 	return {
 		'correctors':{'text': this.correctAndSetText}
+	};
+};
+function FilterSubscriptionOptions(props) {
+	Initialization.initiate.call(this, props);
+};
+FilterSubscriptionOptions.prototype.onLoaded = function(data) {
+	console.log(data)
+};
+FilterSubscriptionOptions.prototype.getInitials = function() {
+	return {
+		'loader':{'controller': Subscription}
 	};
 };
 function UserInfo(props) {
@@ -3705,7 +3751,7 @@ UserInfo.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);	
 };
 UserInfo.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':[{'c':[__[49],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[50],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[51],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[52],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'bold'}}],'t':5},{'c':[{'c':[__[53],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[54],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?' red':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[58],'tr':'_blank','c':'access standart-button red-button'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[56],'t':12,'p':{'h':__[55],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[57],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[61],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[62],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[1],{'c':__[63],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[64],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button green-button'}}]
+	return[{'c':[{'c':[{'c':[__[49],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[50],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[51],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[52],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'arx'}}],'t':5},{'c':[{'c':[__[53],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[54],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?' a3p':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'a35','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[58],'tr':'_blank','c':'a3z ar3 ard'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[56],'t':12,'p':{'h':__[55],'tr':'_blank','c':'a3d ar3 arl'}},{'c':__[57],'t':0,'p':{'c':'a3a arx'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'a37'}},{'c':[{'c':[' ',{'c':__[61],'t':0,'p':{'c':'a32'}},{'c':__[62],'t':0,'p':{'c':'a3g'}}],'t':0,'p':{'c':'a3n'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[1],{'c':__[63],'t':51}],'t':0,'p':{'c':'a3m'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'a3u'}}],'t':0,'p':{'c':'a3l'}},{'c':__[64],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'ar3 arp'}}]
 };
 UserInfo.prototype.getInitials = function() {
 	return {
@@ -3747,6 +3793,15 @@ FiltersStat.prototype.getInitials = function() {
 		'actions':{'load': {'url': CONFIG.filterStat.load,'method': 'GET'}}
 	};
 };
+function Subscription() {
+	Initialization.initiate.call(this);
+	this.processInitials();
+};
+Subscription.prototype.getInitials = function() {
+	return {
+		'actions':{'load': {'url': CONFIG.settings.subscr,'method': 'GET'}}
+	};
+};
 function UserInfoLoader() {
 	Initialization.initiate.call(this);
 	this.processInitials();
@@ -3763,7 +3818,7 @@ CalendarFavorites.prototype.getArgs2 = function(data) {
 	return data;
 };
 CalendarFavorites.prototype.getTemplateContent = function($,_) {
-	return[{'c':{'h':function(tender){return[function(){tender['nocontrols']=1;return[{'cmp':DataTableStandartRow,'p':{'args':tender}}]}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'simple-datatable calendar-favorites-datatable'}}]
+	return[{'c':{'h':function(tender){return[function(){tender['nocontrols']=1;return[{'cmp':DataTableStandartRow,'p':{'args':tender}}]}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'awe ars'}}]
 };
 CalendarFavorites.prototype.getInitials = function() {
 	return {
@@ -3799,7 +3854,7 @@ OrderCall.prototype.onHide = function() {
 	clearInterval(this.interval);
 };
 OrderCall.prototype.getTemplateContent = function($,_) {
-	return[{'cmp':OrderCallForm},{'c':__[16],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':OrderCallForm},{'c':__[16],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'ar3 aro'}}]
 };
 OrderCall.prototype.getInitials = function() {
 	return {
@@ -3814,7 +3869,7 @@ Support.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);
 };
 Support.prototype.getTemplateContent = function($,_) {
-	return[{'cmp':SupportForm},{'c':__[18],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':SupportForm},{'c':__[18],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'ar3 aro'}}]
 };
 Support.prototype.getInitials = function() {
 	return {
@@ -3828,11 +3883,11 @@ AuthForm.prototype.onSuccess = function() {
 	window.location.reload();
 };
 AuthForm.prototype.getTemplateMain = function($,_) {
-	return[{'c':__T[2],'t':0,'p':{'c':'app-authform-logo'}},{'t':0,'p':{'c':'app-authform-inputs'}}]
+	return[{'c':__T[2],'t':0,'p':{'c':'ar6'}},{'t':0,'p':{'c':'arb'}}]
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'options':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'app-authform-inputs','controls': [{'cmpid': 'login','type': 'text','name': 'login','placeholder': __[22],'caption': __[23]},{'cmpid': 'password','type': 'password','name': 'password','placeholder': __[24],'caption': __[25]}],'submit': {'value': __[26],'class': 'app-submit'}}
+		'options':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'arb','controls': [{'cmpid': 'login','type': 'text','name': 'login','placeholder': __[22],'caption': __[23]},{'cmpid': 'password','type': 'password','name': 'password','placeholder': __[24],'caption': __[25]}],'submit': {'value': __[26],'class': 'a3r'}}
 	};
 };
 function OrderCallForm(props) {
@@ -3910,11 +3965,11 @@ OrderCallForm.prototype.validateTime = function() {
 	}
 };
 OrderCallForm.prototype.getTemplateMain = function($,_) {
-	return[{'t':0,'p':{'c':'app-order-call'}}]
+	return[{'t':0,'p':{'c':'arq'}}]
 };
 OrderCallForm.prototype.getInitials = function() {
 	return {
-		'options':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'app-order-call','controls': [__V[0],__V[1],__V[2],{'cmpid': 'topic','type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[30],'class': 'half-width'},{'cmpid': 'date','type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[31],'class': 'half-width'},{'cmpid': 'time','type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[32],'class': 'half-width'},{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[33]}],'submit': {'value': __[64],'class': __[20] + 'send-button'}}
+		'options':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'arq','controls': [__V[0],__V[1],__V[2],{'cmpid': 'topic','type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[30],'class': 'arn'},{'cmpid': 'date','type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[31],'class': 'arn'},{'cmpid': 'time','type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[32],'class': 'arn'},{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[33]}],'submit': {'value': __[64],'class': __[20] + ' arr'}}
 	};
 };
 function SupportForm(props) {
@@ -3922,7 +3977,7 @@ function SupportForm(props) {
 };
 SupportForm.prototype.getInitials = function() {
 	return {
-		'options':{'action': CONFIG.support.send,'controls': [__V[0],__V[1],__V[2],{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[36]},{'cmpid': 'screenshot','type': 'file','name': 'screenshot','accept': 'image/*','caption': __[37]}],'submit': {'value': __[38],'class': __[20] + 'send-button'}}
+		'options':{'action': CONFIG.support.send,'controls': [__V[0],__V[1],__V[2],{'cmpid': 'comment','type': 'textarea','name': 'comment','caption': __[36]},{'cmpid': 'screenshot','type': 'file','name': 'screenshot','accept': 'image/*','caption': __[37]}],'submit': {'value': __[38],'class': __[20] + ' arr'}}
 	};
 };
 function Input(props) {
@@ -3934,7 +3989,7 @@ Input.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
 Input.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'t':14,'e':[18,$.onChange],'p':{'tp':function(){return $.g('type')},'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'v':function(){return $.g('value')},'readonly':function(){return ($.g('enabled')?' readonly':'')},'accept':function(){return $.g('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'arg'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'t':14,'e':[18,$.onChange],'p':{'tp':function(){return $.g('type')},'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'v':function(){return $.g('value')},'readonly':function(){return ($.g('enabled')?' readonly':'')},'accept':function(){return $.g('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return 'arm '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
 function Select(props) {
 	Initialization.initiate.call(this, props);
@@ -3976,16 +4031,16 @@ Select.prototype.selectByIndex = function(index) {
 	}
 };
 Select.prototype.enableOption = function(index, isEnabled) {
-	var optionsContainer = this.findElement('.app-select-options');
+	var optionsContainer = this.findElement('.arv');
 	var optionElement = optionsContainer.getChildAt(index);
-	optionElement.toggleClass('disabled', !isEnabled);
+	optionElement.toggleClass('art', !isEnabled);
 	if (index == this.selectedIndex) {
 		this.selectByIndex(index == 0 ? index + 1 : 0);
     }
 };
 Select.prototype.onOptionsClick = function(e) {
-	var target = e.getTarget('.app-select-option');
-	if (target && !target.hasClass('disabled')) {
+	var target = e.getTarget('.ar0');
+	if (target && !target.hasClass('art')) {
 		var value = target.getData('value');
 		this.selectByValue(value);
 		this.dispatchEvent('change', {'value': value});
@@ -3997,13 +4052,13 @@ Select.prototype.getControlValue = function() {
 };
 Select.prototype.onClick = function() {
 	this.set('active', true);
-	Popuper.watch(this, this.findElement('.app-select'));
+	Popuper.watch(this, this.findElement('.aru'));
 };
 Select.prototype.hide = function() {
 	this.set('active', false);
 };
 Select.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('active')?' active':'')}},'n':{'c':'active'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'arg'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'ar8'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'ar0','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'arv'}}],'t':0,'p':{'c':function(){return 'aru'+($.g('active')?' awz':'')}},'n':{'c':'active'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'arm '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
 function Textarea(props) {
 	Initialization.initiate.call(this, props);
@@ -4014,7 +4069,7 @@ Textarea.prototype.getControlValue = function() {
 	return this.findElement('textarea').value;
 };
 Textarea.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':{'pr':'value','p':$.g('value')},'t':49,'e':[18,$.onChange],'p':{'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'readonly':function(){return ($.g('enabled')?' readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'arg'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':{'pr':'value','p':$.g('value')},'t':49,'e':[18,$.onChange],'p':{'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'readonly':function(){return ($.g('enabled')?' readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return 'arm '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
 function TopMenu(props) {
 	Initialization.initiate.call(this, props);
@@ -4022,20 +4077,21 @@ function TopMenu(props) {
 	this.isRouteMenu = true;
 };
 TopMenu.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[3],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[4],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[5],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[6],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[7],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
+	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'ack'}},{'c':__T[3],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[4],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[5],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[6],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[7],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'acy'}},'t':0,'p':{'c':'arc','sc':1}}]
 };
 function includeGeneralTemplateUnavailable(_) {
-	return[{'t':0,'p':{'c':'app-unavailable-info '+(_['tariff']?' unavailable':' auth'),'st':(_['width']?' width:'+_['width']:'')}}]
+	return[{'t':0,'p':{'c':'a3w '+(_['tariff']?' a3j':' a36'),'st':(_['width']?' width:'+_['width']:'')}}]
 }
 function includeGeneralTemplateCheckbox(_) {
-	return[{'t':0,'p':{'c':'app-ui-checkbox','_value':_['value']}}]
+	return[{'t':0,'p':{'c':'aw7','_value':_['value']}}]
 }
-Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormFilters,TenderSearchForm,Submit,Calendar,Dialog,PopupMenu,TabPanel,Tooltip,TooltipPopup,UserInfo],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormFilters,TenderSearchForm,Submit,Calendar,Dialog,PopupMenu,TabPanel,Tooltip,TooltipPopup,FilterSubscriptionOptions,UserInfo],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
 Router = new Router();
 User = new User();
 Favorites = new Favorites();
 Filters = new Filters();
 FiltersStat = new FiltersStat();
+Subscription = new Subscription();
 UserInfoLoader = new UserInfoLoader();
 User.load(App);
 })();

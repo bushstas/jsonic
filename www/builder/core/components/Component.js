@@ -173,6 +173,22 @@ Component.prototype.get = function(propName) {
 	return this.propsToSet[propName] || this.props[propName];
 };
 
+Component.prototype.showElement = function(element, isShown) {
+	if (isString(element)) element = this.findElement(element);
+	if (isElement(element)) element.show(isShown);
+};
+
+Component.prototype.each = function(propName, callback) {
+	var ar = this.get(propName);
+	if (isArrayLike(ar) && isFunction(callback)) {
+		if (isArray(ar)) {
+			for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
+		} else {
+			for (var k in ar) callback.call(this, ar[k], k, ar);
+		}
+	}
+};
+
 Component.prototype.toggle = function(propName) {
 	this.set(propName, !this.get(propName));
 };

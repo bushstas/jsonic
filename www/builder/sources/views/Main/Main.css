@@ -30,6 +30,6 @@ $imgsrc = ../images/mainpage
     $(pt12 rel)
 }
 .app-mainpage-content {
-    $(abs b12 t46 l r12 br3 ova p12_15)
+    $(abs b12 t46 l r12 br3 ova p12_15 box)
     box-shadow: 0 0 6px #c1c5d1;
 }

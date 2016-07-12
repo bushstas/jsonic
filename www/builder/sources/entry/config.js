@@ -20,5 +20,8 @@ var CONFIG = {
 	},
 	'filterStat': {
 		'load': 'filters/count.php'
+	},
+	'settings': {
+		'subscr': 'settings/getSubscriptionSettings.php'
 	}
 };

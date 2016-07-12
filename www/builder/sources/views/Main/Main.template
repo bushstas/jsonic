@@ -21,7 +21,7 @@
 						<component FilterStatistics args="{#mainPageFilterStat}">
 					</div>
 					<div class="app-mainpage-tab2-content">
-						
+						<component FilterSubscriptionOptions>
 					</div>
 					<div class="app-mainpage-tab3-content">
 						
