@@ -1,0 +1,157 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: ActionScript
+file_extensions:
+  - as
+scope: source.actionscript.2
+contexts:
+  main:
+    - match: \b(try|catch|Math|this|dynamic|extends|prototype|import|implements|let|document|interface|public|delete|private|new|static|super|var|for|in|break|continue|while|do|return|if|else|case|switch|typeof)\b
+      scope: keyword.control.actionscript.2
+
+    - match: \b(initial)\s+(loader|props|controllers|dialogs|globals|actions|options|followers|args|helpers|correctors)\s*(=)
+      captures: 
+       1: keyword.control.actionscript.2
+       2: storage.type.class.actionscript.2
+       3: keyword.control.actionscript.2
+
+    - match: '(@\w+)'
+      captures: 
+       1: support.class.actionscript.2
+
+    - match: '\b(\w+\.\w+\.)(\w+\.)*(prototype)(\.\w+)\s*(=)\s*(function)\s*\(([^\)]*)\)'
+      scope: meta.class.actionscript.2
+      captures:
+        1: entity.name.class.actionscript.2
+        2: entity.name.class.actionscript.2
+        3: support.constant.actionscript.2
+        4: entity.name.class.actionscript.2
+        5: keyword.control.actionscript.2
+        6: support.class.actionscript.2
+        7: variable.parameter.function.actionscript.2
+
+    - match: '\b(function)\s*\(([^\)]*)\)'
+      scope: meta.class.actionscript.2
+      captures:
+        1: support.class.actionscript.2
+        2: variable.parameter.function.actionscript.2        
+
+    - match: '\b(\w+\.\w+)(\.\w+)*\s*(=)\s*(function)\s*\(([^\)]*)\)'
+      scope: meta.class.actionscript.2
+      captures:
+        1: entity.name.class.actionscript.2
+        2: entity.name.class.actionscript.2
+        3: keyword.control.actionscript.2
+        4: support.class.actionscript.2
+        5: variable.parameter.function.actionscript.2
+
+    - match: (function\s*(?=\()|\b(Array|Object|String|Number|Boolean|Element|Node|Function|FormData)\b)
+      scope: support.class.actionscript.2
+
+
+    - match: \b(call|constructor|superClass_|window|\w+(?=\())\b
+      scope: support.constant.actionscript.2
+    - match: \.(target|length|width|height|value|innerHTML|outerHTML|className)\b
+      scope: support.constant.actionscript.2
+
+    - match: \b(null|undefined|true|false)\b
+      scope: constant.language.actionscript.2
+    - match: '\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?\b'
+      scope: constant.numeric.actionscript.2
+    
+    - match: '"*\w+"*:'
+      scope: comment.block.actionscript.2
+
+    
+
+
+    - match: '\/\/'
+      captures:
+        0: comment2.block.actionscript.2
+      push:
+        - match: '[^\r\n]'
+          captures:
+            0: comment2.block.actionscript.2
+        - match: '[\r\n]'
+          captures:
+            0: comment2.block.actionscript.2
+          pop: true
+
+    - match: \((\/)(?!\*)
+      captures:
+        1: constant.language.actionscript.2
+      push:
+        - match: '[^\/]+'
+          captures:
+            0: constant.language.actionscript.2
+        - match: '\/[gi,]*'
+          captures:
+            0: constant.language.actionscript.2
+          pop: true
+
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.actionscript.2
+      push:
+        - meta_scope: string.quoted.double.actionscript.2
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.end.actionscript.2
+          pop: true
+        - match: \\.
+          scope: constant.character.escape.actionscript.2
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.actionscript.2
+      push:
+        - meta_scope: string.quoted.single.actionscript.2
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.actionscript.2
+          pop: true
+        - match: \\.
+          scope: constant.character.escape.actionscript.2
+    - match: \b(BACKSPACE|CAPSLOCK|CONTROL|DELETEKEY|DOWN|END|ENTER|HOME|INSERT|LEFT|LN10|LN2|LOG10E|LOG2E|MAX_VALUE|MIN_VALUE|NEGATIVE_INFINITY|NaN|PGDN|PGUP|PI|POSITIVE_INFINITY|RIGHT|SPACE|SQRT1_2|SQRT2|UP)\b
+      scope: support.constant.actionscript.2
+    - match: /\*
+      captures:
+        0: punctuation.definition.comment2.actionscript.2
+      push:
+        - meta_scope: comment2.block.actionscript.2
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment2.actionscript.2
+          pop: true
+    - match: (//).*$\n?
+      scope: comment2.line.double-slash.actionscript.2
+      captures:
+        1: punctuation.definition.comment2.actionscript.2
+    - match: \b(instanceof)\b
+      scope: keyword.operator.actionscript.2
+    - match: "[-!%&*+=/?:><]"
+      scope: keyword.operator.symbolic.actionscript.2
+    - match: '^[ \t]*(#)[a-zA-Z]+'
+      scope: meta.preprocessor.actionscript.2
+      captures:
+        1: punctuation.definition.preprocessor.actionscript.2
+    - match: '\b(function)\s+([a-zA-Z_]\w*)\s*(\()'
+      captures:
+        1: storage.type.function.actionscript.2
+        2: entity.name.function.actionscript.2
+        3: punctuation.definition.parameters.begin.actionscript.2
+      push:
+        - meta_scope: meta.function.actionscript.2
+        - match: \)
+          captures:
+            0: punctuation.definition.parameters.end.actionscript.2
+          pop: true
+        - match: '[^,)\n]+'
+          scope: variable.parameter.function.actionscript.2
+    - match: '\b(application|component|view|controller|form|menu|control|plugin|dialog|class)\s+(\w+)(?:\w|\.)*(?:\s+(extends)\s+([a-zA-Z\d, ]+(?:\w|\.)*))?'
+      scope: meta.class.actionscript.2
+      captures:
+        1: storage.type.class.actionscript.2
+        2: entity.name.class.actionscript.2
+        3: storage.modifier.extends.actionscript.2
+        4: entity.other.inherited-class.actionscript.2

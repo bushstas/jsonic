@@ -910,6 +910,8 @@
 				$data = preg_replace("/'<nq>/", '', $data);
 				$data = preg_replace("/<nq>'/", '', $data);
 				$data = preg_replace("/<nq>/", '', $data);
+				$data = preg_replace("/,*<nc>,*/", '', $data);
+				$data = preg_replace("/\[*<nb>\]*/", '', $data);
 
 				$data = str_replace('<plus>', "'+", $data);
 				$data = str_replace('<\/plus>', "+'", $data);
@@ -1016,14 +1018,21 @@
 		$currentList = array();
 		$isElse = false;
 		$currentIf = null;
-		
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
 			$tagName = trim($item['tagName']);
 			if ($item['type'] == 'text') {
-				parseTextNode($item['content'], $children, $component, $let);
+				if (!$isElse) {
+					parseTextNode($item['content'], $children, $component, $let);
+				} else {
+					parseTextNode($item['content'], $elseChildren, $component, $let);
+				}
 			} elseif ($tagName == 'br') {
-				$children[] = '<br>';
+				if (!$isElse) {
+					$children[] = '<br>';
+				} else {
+					$elseChildren[] = '<br>';
+				}
 			} elseif ($item['isClosing'] != 1) {
 				if ($tagName == 'else') {
 					$isElse = true;
@@ -1112,11 +1121,20 @@
 						$child['t'] = getTagIndex($tagName);
 						getTagProperties($item['content'], $child, $component);
 					} else {
-						if ($tagName == 'if') {							
+						if ($tagName == 'if') {
 							if ($ifContentIsEmpty) {
 								getIfSwitch($item, $child, $component);
 							} else {
 								checkIfConditionForContainigProps($match[1], $child, $component);
+							}
+							if (!empty($child['e'])) {
+								if ($child['e'][0]['t'] == 'else') {
+									$child['e'] = array($child['e'][0]['c']);
+								}
+								if (!empty($child['p']) && !empty($child['e'])) {
+									array_unshift($child['e'], '<nq><function_returns_array>');
+									array_push($child['e'], '</function_returns_array><nq>');				
+								}
 							}
 						} elseif ($tagName == 'foreach') {
 							getForeach($item, $child, $component);
@@ -1127,13 +1145,29 @@
 				if (is_array($child['c'])) {
 					$keys = array_keys($child['c']);
 				}
+				$isSimpleArray = isset($keys[0]) && $keys[0] === 0;
+				if (isset($child['c'])) {
+					if (!empty($child['i']) && empty($child['p'])) {
+						if (empty($child['aic'])) {
+							array_unshift($child['c'], '<nq><nb>'.preg_replace('/<nq>$/', '?[<nc><nq>', $child['i']));
+							if (empty($child['e'])) {
+								array_push($child['c'], '<nq><nc>]:""<nb><nq>');
+							} else {
+								array_push($child['c'], '<nq><nc>]:'.str_replace('\\', '', json_encode($child['e'][0])).'<nb><nq>');
+							}
+							$child['i'] = true;
+							unset( $child['aic'], $child['e']);
+						} else {
+							$ch = '<nq>'.str_replace('<nq>', '', $child['i']).'?'.str_replace('\\', '', json_encode($child['c'])).':'.(empty($child['e']) ? '""' : $child['e']).'<nq>';
+							$child = $ch;
+						}
+					}
+				}
+
 				if (!isset($keys[0])) {
 					unset($child['c']);
-				} elseif ($keys[0] === 0 && count($child['c']) == 1) {
+				} elseif ($isSimpleArray && count($child['c']) == 1) {
 					$child['c'] = $child['c'][0];
-				}
-				if (isset($child['c'])) {
-					
 				}
 				if (!$isElse) {
 					$children[] = $child;
@@ -1146,10 +1180,10 @@
 				}
 			}
 		}
-		if (!empty($elseChildren) && is_array($elseChildren[0]['c'])) {
-			$elseChildren = array($elseChildren[0]['c']);
-			array_unshift($elseChildren, '<nq><function_returns_array>');
-			array_push($elseChildren, '</function_returns_array><nq>');
+		if (!empty($elseChildren)) {
+			if (is_array($elseChildren[0]['c'])) {
+				$elseChildren = array($elseChildren[0]['c']);
+			}
 			return array('c' => $children, 'e' => $elseChildren);
 		} else {
 			return $children;
@@ -1401,7 +1435,7 @@
 		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
 	}
 
-	function checkIfConditionForContainigProps($ifCondition, &$child, &$component) {
+	function checkIfConditionForContainigProps($ifCondition, &$child, &$component, $addingIntoChild = false) {
 		if (is_array($component) && preg_match('/\$\w+[\.\[]/', $ifCondition)) {
 			error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$ifCondition.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
 		}
@@ -1435,6 +1469,7 @@
 			} else {
 				$child['i'] = '<nq>'.$ifCondition.'<nq>';
 			}
+			$child['aic'] = $addingIntoChild;
 		}
 	}
 
@@ -1648,7 +1683,7 @@
 			}
 			$child['e'] = parseCode($else, $component, 'else');
 		}
-		checkIfConditionForContainigProps($ifCondition, $child, $component);
+		checkIfConditionForContainigProps($ifCondition, $child, $component, true);
 	}
 
 	function getObfuscatedClassName($value, $isCode = false) {
