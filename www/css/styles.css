@@ -122,6 +122,7 @@ body{padding:0;margin:0;font-family:ptsans;color:#505b6e;position:absolute;width
 h1{font-weight:normal;}
 a{cursor:pointer;color:#505b6e;text-decoration:none;}
 textarea{resize:none;}
+b{font-family:ptsansbold;font-weight:normal;}
 .app-view-container{position:absolute;padding:0;z-index:1;top:43px;left:0;right:0;bottom:0;}
 .bold{font-family:ptsansbold;}
 .standart-button{position:relative;display:block;line-height:38px;max-height:38px;min-height:38px;font-size:14px;background-color:#5c729e;color:#fff;font-family:ptsansbold;border-radius:3px;text-align:center;cursor:pointer;box-sizing:border-box;background-image:url(../images/buttons/blue.png);background-position:0 0;}
@@ -219,6 +220,9 @@ body.main-page .app-top-menu-inner{width:1350px;margin:auto;}
 .app-404-container{position:fixed;left:50%;top:50%;width:500px;margin-left:-250px;margin-top:-160px;text-align:center;}
 .app-404-title{font-size:180px;line-height:180px;font-weight:bold;color:#AAAAAA;}
 .app-404-text{font-size:18px;margin-top:10px;}
+/* FilterSubscriptionOptions */
+.app-subscription-option{margin-bottom:12px;border-radius:3px;border:1px solid #E0E6F3;padding:10px;cursor:pointer;}
+.app-subscription-option .app-ui-checkbox{margin-top:2px;}
 /* Main */
 .main-view-content{position:relative;width:1350px;margin:auto;}
 .main-view-content table{width:100%;}

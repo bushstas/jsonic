@@ -1,0 +1,6 @@
+.app-subscription-option {
+	$(mb12 br3 bo#E0E6F3 p10 pointer)
+}
+.app-subscription-option .app-ui-checkbox {
+	$(mt2)
+}

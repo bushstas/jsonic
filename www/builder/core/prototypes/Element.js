@@ -145,3 +145,6 @@ Element.prototype.show = function(isShown) {
 	var display = isString(isShown) ? isShown : (isShown ? 'block' : 'none');
 	this.style.display = display;
 };
+Element.prototype.find = function(selector) {
+	return this.querySelector(selector);
+};

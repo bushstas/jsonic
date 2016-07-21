@@ -22,6 +22,7 @@ var CONFIG = {
 		'load': 'filters/count.php'
 	},
 	'settings': {
-		'subscr': 'settings/getSubscriptionSettings.php'
+		'subscr': 'settings/get.php',
+		'set': 'settings/set.php'
 	}
 };

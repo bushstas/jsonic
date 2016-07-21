@@ -20,8 +20,10 @@ function onRendered() {
 }
 
 function onParentReady() {
-	for (var i = 0; i < this.args['tabs'].length; i++) {
-		this.activateTab(i, !!this.args['tabs'][i]['active']);
+	if (isArray(this.args['tabs'])) {
+		for (var i = 0; i < this.args['tabs'].length; i++) {
+			this.activateTab(i, !!this.args['tabs'][i]['active']);
+		}
 	}
 }
 

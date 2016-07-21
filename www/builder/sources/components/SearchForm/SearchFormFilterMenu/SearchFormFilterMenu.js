@@ -19,10 +19,7 @@ initial helpers = [
 		'helper': CheckboxHandler,
 		'options': {
 			'callback': this.onCheckboxChange,
-			'intValue': true,
-			'checkboxClass': '->> app-ui-checkbox',
-			'checkboxCheckedClass': '->> checked',
-			'labelClass': null
+			'intValue': true
 		}
 	}
 ];

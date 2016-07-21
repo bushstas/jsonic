@@ -1945,7 +1945,7 @@
 	function addGeneralTemplateFunction(&$js, $templateHtml, $file) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $file);
 		foreach ($templateFunctions as $templateFunction) {
-			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(_) {';
+			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'($,_) {';
 			$js[] = "\n\treturn".$templateFunction['content']."\n}";
 		}
 	}

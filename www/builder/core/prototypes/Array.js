@@ -10,3 +10,11 @@ Array.prototype.removeDuplicates = function() {
 	});
 	return this;
 };
+Array.prototype.getIntersections = function(arr) {
+	return this.filter(function(n) {
+	    return arr.indexOf(n) != -1;
+	});
+};
+Array.prototype.hasIntersections = function(arr) {
+	return !isUndefined(this.getIntersections(arr)[0]);
+};

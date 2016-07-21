@@ -27,3 +27,7 @@
 @forCurrent: Текущих
 @forWeek: За неделю
 @forMonth: За месяц
+@notifyMe: Уведомлять меня о появлении 
+@favTenderChange: изменений по тендерам в Избранном
+@protocolChange: протоколов по тендерам в Избранном
+@newProtocols: новых протоколов по моим фильтрам

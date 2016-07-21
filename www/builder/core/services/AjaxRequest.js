@@ -70,8 +70,8 @@ function AjaxRequest(url, callback, params) {
 			return pars;
 		} else if (method == 'GET') {
 			var content = [];
-			for (var k in pars) {
-				content.push(k + '=' + (pars[k] || '').toString());
+			for (var k in pars) {				
+				content.push(k + '=' + (!!pars[k] || pars[k] == 0 ? pars[k] : '').toString());
 			}
 			return '?' + content.join('&');
 		}
