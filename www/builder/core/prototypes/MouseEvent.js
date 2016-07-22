@@ -1,6 +1,10 @@
 MouseEvent.prototype.getTarget = function(selector) {
 	return this.target.getAncestor(selector);
 };
+MouseEvent.prototype.getTargetData = function(selector, dataAttr) {
+	var target = this.getTarget(selector);
+	return !!target ? target.getData(dataAttr) : '';
+};
 MouseEvent.prototype.targetHasAncestor = function(element) {
 	if (isElement(element)) {
 		var target = this.target;		

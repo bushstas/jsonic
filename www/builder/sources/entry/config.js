@@ -5,7 +5,8 @@ var CONFIG = {
 	'filters': {
 		'load': 'filters/get.php',
 		'save': 'filters/add.php',
-		'set': 'filters/set.php'
+		'set': 'filters/set.php',
+		'subscribe': 'filters/subscribe.php'
 	},
 	'support': {
 		'send': 'support/send.php'

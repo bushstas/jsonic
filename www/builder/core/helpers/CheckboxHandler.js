@@ -3,7 +3,7 @@ function CheckboxHandler() {
 	var options = [];
 	var defaultCheckboxClass = '->> app-ui-checkbox';
 	var defaultCheckboxCheckedClass = '->> checked';
-	var currentOptions, currentObject, currentScope, checkbox,
+	var currentOptions, currentObject, currentScope, checkbox, labelClass,
 		checkboxClass, targetClasses, currentCheckedClass, currentTarget;
 	this.subscribe = function(subscriber, opts) {
 		if (isFunction(opts['callback']) && subscribers.indexOf(subscriber) == -1) {
@@ -24,15 +24,17 @@ function CheckboxHandler() {
 			defineCheckbox();
 			defineCheckedClass();			
 			var checked = !isChecked();
-			currentTarget.toggleClass(currentCheckedClass, checked);
-			if (checkbox) checkbox.toggleClass(currentCheckedClass, checked);
-			currentOptions['callback'].call(currentObject, {
-				'target': currentTarget,
-				'name': getName(),
-				'value': getValue(),
-				'checked': checked,
-				'intChecked': checked ? 1 : 0
-			});
+			if (currentTarget) currentTarget.toggleClass(currentCheckedClass, checked);
+			if (checkbox) {
+				checkbox.toggleClass(currentCheckedClass, checked);
+				currentOptions['callback'].call(currentObject, {
+					'target': checkbox,
+					'name': getName(),
+					'value': getValue(),
+					'checked': checked,
+					'intChecked': checked ? 1 : 0
+				});
+			}
 		}
 	};
 	var defineOptions = function(index) {
@@ -44,7 +46,7 @@ function CheckboxHandler() {
 		targetClasses = [];
 		defineCheckboxClass();
 		if (checkboxClass) targetClasses.push(checkboxClass);
-		var labelClass = Objects.get(currentOptions, 'labelClass');
+		labelClass = Objects.get(currentOptions, 'labelClass');
 		if (isString(labelClass)) targetClasses.push(labelClass);
 		else if (isArray(labelClass)) targetClasses = targetClasses.concat(labelClass);
 	};
@@ -60,7 +62,17 @@ function CheckboxHandler() {
 		return false;
 	};
 	var defineCheckbox = function() {
-		checkbox = currentTarget.find('.' + checkboxClass);
+		if (currentTarget.hasClass(checkboxClass)) {
+			checkbox = currentTarget;
+			currentTarget = null;
+			if (isString(labelClass)) currentTarget = checkbox.getAncestor('.' + labelClass);
+			else if (isArray(labelClass))  {
+				for (var i = 0; i < labelClass.length; i++) {
+					currentTarget = checkbox.getAncestor('.' + labelClass[i]);
+					if (currentTarget) break;
+				}
+			}
+		} else checkbox = currentTarget.find('.' + checkboxClass);
 	};
 	var defineCheckedClass = function() {
 		currentCheckedClass = Objects.get(currentOptions, 'checkboxCheckedClass', defaultCheckboxCheckedClass);

@@ -53,7 +53,7 @@ function onOptionsClick(e) {
 	if (target && !target.hasClass('->> disabled')) {
 		var value = target.getData('value');
 		this.selectByValue(value);
-		this.dispatchEvent('change', {'value': value});
+		this.dispatchEvent('change', {'value': value, 'instance': this});
 		this.hide();
 	}
 }

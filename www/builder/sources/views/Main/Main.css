@@ -6,7 +6,7 @@ $imgsrc = ../images/mainpage
 .main-view-content table {
 	$w100%
 }
-.app-mainpage-table td {
+.app-mainpage-table > tr > td {
 	$vtop
 }
 .app-mainpage-table .app-mainpage-left-column {

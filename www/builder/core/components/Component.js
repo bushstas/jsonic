@@ -154,6 +154,7 @@ Component.prototype.instanceOf = function(parent) {
 Component.prototype.dispatchEvent = function(eventType, eventParams) {
 	if (isArray(this.listeners)) {
 		for (var i = 0; i < this.listeners.length; i++) {
+			if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];
 			if (this.listeners[i]['type'] == eventType) this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
 		}
 	}

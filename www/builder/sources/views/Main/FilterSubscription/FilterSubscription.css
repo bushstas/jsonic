@@ -1,0 +1,59 @@
+.app-subscription:after {
+
+}
+.app-subscription-title {
+	$(rel fs16 c#4c546b p10_5)
+}
+.app-subscription-head {
+	$(bob#e4e4e4 pt5 bold lh32)
+}
+.app-subscription-head-total {
+	$(inb bob#b65f5f_2 ml10)
+}
+.app-subscription-head-subscribed {
+	$(fright bob#38986a_2 mr45)
+}
+.app-subscription-table {
+	$w100%
+}
+.app-subscription-table th {
+    $(normal c#8b8e97 p10_0 fs14 center box bob#e4e4e4)
+}
+.app-subscription-table td {
+	$(vmid p6 bob#E0E6F3 lh14 box)
+}
+.app-subscription-table th:first-child,
+.app-subscription-table td:first-child {
+	$(left wa pl6)
+}
+.app-subscription-table th:nth-child(2),
+.app-subscription-table td:nth-child(2) {
+	$w160
+}
+.app-subscription-table th:nth-child(3),
+.app-subscription-table td:nth-child(3) {
+	$w180
+}
+.app-subscription-table th:nth-child(4),
+.app-subscription-table td:nth-child(4) {
+	$(w30 pl0 pr0)
+}
+.app-subscription-table td:first-child span {
+	$(c#384767 fs16 pointer)
+}
+.app-subscription-table td:first-child span:hover {
+	$c#6484ca
+}
+.app-subscription .subscr-button:after {
+    content: 'Подписаться';
+}
+.app-subscription .subscr-button.green-button:after {
+    content: 'Подписка оформлена';
+}
+.app-subscription .subscr-button.green-button:hover {
+	$bc#b65f5f
+  	background-image: url(../images/buttons/red.png);
+}
+.app-subscription .subscr-button.green-button:hover:after {
+    content: 'Отписаться';
+}

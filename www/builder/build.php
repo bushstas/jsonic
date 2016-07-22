@@ -249,7 +249,7 @@
 			'Globals', 'User', 'StoreKeeper', 'Switch', 'Tooltiper', 'IfSwitch',
 
 			'__', '__T', '__ROUTES', '__TAGS', '__A', '__EVENTTYPES', '__HASHROUTER', '__DEFAULTROUTE', '__ERRORROUTES',
-			'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V'
+			'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V', '__DW'
 		);
 
 		$classes = array(
@@ -278,6 +278,7 @@
 		$templates = array();
 		$includes = array();
 		$css = array();
+		$decls = array();
 		$cssData = array();
 		$apiConfig = '';
 		$isConfigJsFile = false;
@@ -310,8 +311,15 @@
 			} elseif ($file['ext'] == 'include') {
 				$file['content'] = $content;
 				$includes[] = $file;
+			} elseif ($file['ext'] == 'decl') {
+				$decls[] = $content;
 			}
 		}
+		$declensions = array();
+		if (!empty($decls)) {
+			$declensions = getDeclensions($decls);
+		}
+
 		if (!$isConfigJsFile) {
 			error("Файл конфигурации путей к api <b>config.js</b> не найден.<br>Поместите его в любую директорию вашего приложения.<br><b>Содержимое файла должно иметь вид:</b>
 				<xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp><br><b>Использование:</b><br><br>CONFIG.items.get
@@ -376,9 +384,11 @@
 			}
 			$shorts = array('bo' => 'border', 'bol' => 'border-left', 'bot' => 'border-top', 'bor' => 'border-right', 'bob' => 'border-bottom');
 			foreach ($shorts as $k => $v) {
-				$regexp = '/\$'.$k.'\# *(\w{3,6})/';
-				$compiledCss = preg_replace($regexp, $v.":1px solid #$1;", $compiledCss);
+				$regexp = '/\$'.$k.'\# *(\w{3,6})(_\d+)*/';
+				$compiledCss = preg_replace($regexp, $v.":$2px solid #$1;", $compiledCss);
 			}
+			$compiledCss = str_replace(':px solid', ':1px solid', $compiledCss);
+			$compiledCss = preg_replace('/:_(\d+)px solid/', ":$1px solid", $compiledCss);
 
 			$compiledCss = preg_replace('/\$rot(-*\d+)/', "transform:rotate($1deg);", $compiledCss);
 			$compiledCss = preg_replace('/\$wh(\d+)(%)*/', "width:$1px$2;height:$1px$2;", $compiledCss);
@@ -611,6 +621,7 @@
 		$globals[] = "var __DICTURL = '".$dictionaryUrl."';";
 		$globals[] = "var __TAGS = ".str_replace('"', "'", json_encode(getTagShortcuts())).';';
 		$globals[] = "var __A = ".str_replace('"', "'", json_encode($propsShortcutsFlipped)).';';
+		$globals[] = "var __DW = ".str_replace('"', "'", json_encode($declensions)).';';
 		$globals[] = "var __EVENTTYPES = ".str_replace('"', "'", json_encode($eventTypesShortcuts)).';';
 		$globals[] = createObjectString('__ROUTES', $routes, array('/view":"([^"]+)"/', "view':$1"));
 		$globals[] = createObjectString('__ERRORROUTES', $errorRoutes, array('/":"([^"]+)"/', "':$1"));

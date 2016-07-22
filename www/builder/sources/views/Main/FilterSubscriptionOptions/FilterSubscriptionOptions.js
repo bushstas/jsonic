@@ -17,9 +17,9 @@ initial helpers = [
 function onLoaded(data) {
 	var options = data['options'];
 	this.set({
-		'opt1': options['protocolOfFavorite'],
-		'opt2': options['protocolOfFilter'],
-		'opt3': options['tenderOfFavorite']
+		'opt1': options['tenderOfFavorite'],
+		'opt2': options['protocolOfFavorite'],
+		'opt3': options['protocolOfFilter']		
 	});
 }
 

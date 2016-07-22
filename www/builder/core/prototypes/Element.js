@@ -9,6 +9,16 @@ Element.prototype.toggleClass = function(className, isAdding) {
 		this.removeClass(className);
 	}
 };
+Element.prototype.switchClasses = function(className1, className2) {
+	var classes = this.getClasses();
+	if (classes.contains(className1)) { 
+		this.removeClass(className1);
+		this.addClass(className2);
+	} else if (classes.contains(className2)) {
+		this.removeClass(className2);
+		this.addClass(className1);
+	}
+};
 Element.prototype.addClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();

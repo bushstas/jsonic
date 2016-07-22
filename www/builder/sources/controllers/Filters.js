@@ -12,7 +12,7 @@ initial actions = {
 	'load': {
 		'url'     : CONFIG.filters.load,
 		'method'  : 'GET',
-		'callback': this.onLoad.bind(this)
+		'callback': this.onLoad
 	},
 	'save': {
 		'url'     : CONFIG.filters.save,
@@ -22,6 +22,11 @@ initial actions = {
 	'set': {
 		'url'   : CONFIG.filters.set,
 		'method': 'POST'
+	},
+	'subscribe': {
+		'url'   : CONFIG.filters.subscribe,
+		'method': 'POST',
+		'callback': this.onSubscribe
 	}
 };
 
@@ -36,4 +41,8 @@ function onLoad(data) {
 
 function onAdd(data) {
 
+}
+
+function onSubscribe() {
+	this.load();
 }

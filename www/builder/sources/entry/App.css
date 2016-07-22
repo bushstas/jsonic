@@ -1,3 +1,5 @@
+@charset "utf-8";
+
 *::-webkit-scrollbar { $wh10 } 
 *::-webkit-scrollbar-button { $none } 
 *::-webkit-scrollbar-track { $bc#bec5cf } 
@@ -32,7 +34,7 @@ html {
   $h100%
 }
 body {
-	$(p0 m0 regular c#505b6e abs w100% h100%)
+	$(p0 m0 regular c#505b6e abs w100% h100% fs14)
 }
 h1 {
 	$normal
@@ -48,15 +50,18 @@ b {
   $(bold normal)
 }
 .app-view-container {
-	$abs $p0 $z1 $t43 $l $r $b
+	$(abs p0 z1 t43 l r b)
 }
 .bold {
   $bold
 }
 .standart-button {
-  $rel $block $lh38 $mah38 $mih38 $fs14 $bc#5c729e $white $bold $br3 $center $pointer $box
+  $(rel block lh38 mah38 mih38 fs14 bc#5c729e white bold br3 center pointer box)
   background-image: url(../images/buttons/blue.png);
   background-position: 0 0;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 .standart-button:hover {
   background-position: 0 100% $i;
@@ -70,16 +75,16 @@ b {
   background-image: url(../images/buttons/red.png);
 }
 .standart-button.gray-button {
-  $noimg $bc#e1e1e2 $c#40434e $bo#b7b6b6 $lh36
+  $(noimg bc#e1e1e2 c#40434e bo#b7b6b6 lh36)
 }
 .standart-button.gray-button:hover {
-  $bo#919498 $bc#d3d5dd $c#2c3b5a
+  $(bo#919498 bc#d3d5dd c#2c3b5a)
 }
 .standart-button.white-button {
-  $noimg $c#535f77 $bgwhite  $bo#a6b3cb $lh36 $regular
+  $(noimg c#535f77 bgwhite  bo#a6b3cb lh36 regular)
 }
 .standart-button.white-button:hover {
-  $bo#677CA7 $c#3D485F
+  $(bo#677CA7 c#3D485F)
 }
 .standart-button.disabled {
   $bc#aaa

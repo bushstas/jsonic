@@ -81,7 +81,7 @@
 	}
 
 	function gatherFiles($dir, $list, $getContent = false) {
-		$extensions = array('js', 'css', 'template', 'texts', 'data', 'cssconst', 'include');
+		$extensions = array('js', 'css', 'template', 'texts', 'data', 'cssconst', 'include', 'decl');
 		if (is_dir($dir)) {
 			$files = scandir($dir);
 			if (is_array($files)) {
@@ -1538,7 +1538,7 @@
 					$else = $propValue;
 					continue;
 				}
-				if (isset($propsShortcuts[$propName])) {
+				if (!isset($child['cmp']) && !isset($child['tmp']) && isset($propsShortcuts[$propName])) {
 					$propName = $propsShortcuts[$propName];
 				} else {
 					$propName = preg_replace('/^data-/', '_', $propName);
@@ -2033,6 +2033,23 @@
 		}
 		$dataIndex = array_keys($dataIndex);
 		return array_values($data);
+	}
+
+	function getDeclensions($decls) {
+		$declensions = array();
+		$regexp = '/@(\w+)\s*:\s*/';
+		foreach ($decls as $decl) {
+			preg_match_all($regexp, $decl, $matches);
+			$varNames = $matches[1];
+			if (!empty($varNames)) {
+				$parts = preg_split($regexp, $decl);
+				array_shift($parts);
+				foreach ($parts as $i => $part) {
+					$declensions[$varNames[$i]] = trim($part);
+				}
+			}
+		}
+		return $declensions;
 	}
 
 	function getTextConstants($texts, &$textsIndex) {

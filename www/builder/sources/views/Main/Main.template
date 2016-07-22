@@ -22,6 +22,7 @@
 					</div>
 					<div class="app-mainpage-tab2-content">
 						<component FilterSubscriptionOptions>
+						<component FilterSubscription>
 					</div>
 					<div class="app-mainpage-tab3-content">
 						

@@ -1,3 +1,4 @@
 @button: ->> standart-button
 @greenButton: ->> standart-button ->> green-button
 @redButton: ->> standart-button ->> red-button
+@whiteButton: ->> standart-button ->> white-button

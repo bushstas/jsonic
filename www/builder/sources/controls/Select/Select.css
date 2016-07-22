@@ -1,3 +1,5 @@
+$imgsrc = ../images/ui
+
 .app-select {
     $(rel box bold c#6f7b9a fs14 bo#bec8da br3 pointer)
     box-shadow: inset 2px 1px 3px #d7deec;
@@ -5,6 +7,12 @@
 .app-select:hover {
     $boc#68758c
     box-shadow: 1px 1px 6px #bfc7d8;
+}
+.app-select:after {
+    $(cnt abs r8 t15 png=select-arrow w10 h5 opac8)
+}
+.app-select:hover:after {
+    $opac10
 }
 .app-select.active {
     $z10
