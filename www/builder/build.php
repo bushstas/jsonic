@@ -339,10 +339,11 @@
 				if (count($matches[1]) > 0) {
 					$pathToImages = rtrim($matches[1][0], '/').'/';
 					$cssFile = preg_replace($regexp, '', $cssFile);
-					$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)\s*=\s*([^\s\)]+)/i', "background-image:url##".$pathToImages."$2.$1##;", $cssFile);
+					$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)\s*=\s*([^\s\)]+)/i', "background-image:url<obr>".$pathToImages."$2.$1<cbr>;", $cssFile);
 				}
 			}
 			$compiledCss = implode("\n", $css);
+			$compiledCss = preg_replace('/\bgr_(left|right|top|bottom)_(\#\w{3,6}|transparent)_(\#\w{3,6}|transparent)/', "background-image:linear-gradient(to<sp>$1,$2,$3<cbr>;", $compiledCss);
 			$regexp = '/\$\s*\(([^\)]+)\)/';
 			preg_match_all($regexp, $compiledCss, $matches);
 			$matches = $matches[1];
@@ -363,7 +364,10 @@
 					}
 				}
 			}
-			$compiledCss = str_replace('url##', 'url(', str_replace('##;', ');', $compiledCss));
+			$compiledCss = str_replace('<obr>', '(', $compiledCss);
+			$compiledCss = str_replace('<cbr>', ')', $compiledCss);
+			$compiledCss = str_replace('<sp>', ' ', $compiledCss);
+
 			$shorts = array(
 				'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
 				'p' => 'padding', 'pl' => 'padding-left', 'pr' => 'padding-right', 'pt' => 'padding-top', 'pb' => 'padding-bottom',
@@ -596,6 +600,9 @@
 				}
 			}
 		}
+		foreach ($classesList as &$class) {
+			$class['extends'] = array_unique(getAllExtendClasses($class['extends']));
+		}
 		foreach ($routeControllersToLoad as $routeControllersToLoad) {
 			if (!is_array($classes['controller'][$routeControllersToLoad])) {
 				error("Контроллер <b>".$routeControllersToLoad."</b> упомянутый в конфигурации роутера не найден");
@@ -702,9 +709,9 @@
 		}
 
 		$inherits = array();
-		foreach ($classes as $classedByType) {
-			foreach ($classedByType as $usedClass => $class) {
-				$inherits[$usedClass] = $class['extends'];
+		foreach ($classesList as $name => $class) {
+			if (is_array($class['extends']) && !empty($class['extends'])) {
+				$inherits[$name] = $class['extends'];
 			}
 		}
 		$addedClasses = array();
@@ -833,7 +840,16 @@
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);
 		}
-	
+		
+
+		
+		$tempJs = preg_replace('/\\\"/', '<sldq>', $compiledJs);
+		$tempJs = preg_replace("/\\\'/", '<slq>', $tempJs);
+
+
+
+		$compiledJs = preg_replace('/\$(\w+)[\s\t]*=[\s\t]*([^\r\n,;]+)/', "this.set('$1', $2)", $compiledJs);
+		$compiledJs = preg_replace('/\$(\w+)/', "this.get('$1')", $compiledJs);
 		if ($advancedMode) {
 			createFile('base.js', $compiledJs);
 			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js');

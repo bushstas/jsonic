@@ -1066,7 +1066,7 @@
 				{
 					preg_match("/<component +[\"']*(\w+)[\"']*/i",  $content, $match);
 					$child = array('cmp' => '<nq>'.$match[1].'<nq>');
-					getTagProperties($item['content'], $child, $component);
+					getTagProperties($item['content'], $child, $component, true);
 				}
 				else
 				{					
@@ -1505,7 +1505,7 @@
 		return $funcs;
 	}
 
-	function getTagProperties($html, &$child, &$component) {
+	function getTagProperties($html, &$child, &$component, $isComponentTag = false) {
 		global $obfuscate;
 		global $propsShortcuts;
 		global $eventTypesShortcuts;
@@ -1641,6 +1641,25 @@
 		}
 		if (!empty($names)) {
 			$child['n'] = $names;
+		}
+		if ($isComponentTag) {
+			if (is_array($child['p'])) {
+				foreach ($child['p'] as $k => $v) {
+					$v = strip_tags(trim($v));
+					preg_match('/^\^(\w+)$/', $v, $match);
+					if (!empty($match[1])) {
+						unset($child['p'][$k]);
+						if (!is_array($child['w'])) {
+							$child['w'] = array();
+						}
+						$child['w'][] = $k;
+						$child['w'][] = $match[1];
+					}
+				}
+				if (empty($child['p'])) {
+					unset($child['p']);
+				}
+			}
 		}
 		if (!empty($ifCondition) || !empty($else)) {
 			addIfConditionToChild(trim($ifCondition), trim($else), $child, $component);
@@ -2186,5 +2205,19 @@
 		}
 		return $data;
 	}	
+
+	function getAllExtendClasses($extends) {
+		if (!is_array($extends)) return array();
+		global $classesList;
+		foreach ($extends as $class) {
+			if (is_array($classesList[$class])) {
+				$extClasses = $classesList[$class]['extends'];
+				if (is_array($extClasses)) {
+					$extends = array_merge($extends, getAllExtendClasses($extClasses));	
+				}
+			}
+		}
+		return $extends;
+	}
 
 ?>

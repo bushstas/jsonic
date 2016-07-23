@@ -137,6 +137,7 @@ Component.prototype.doRendering = function() {
 		}
 		this.callbacks = null;
 	}
+	this.waiting = null;
 };
 
 Component.prototype.getArgs = function() {
@@ -168,6 +169,20 @@ Component.prototype.forEachChild = function(callback) {
 
 Component.prototype.g = function(propName) {
 	return this.get(propName);
+};
+
+Component.prototype.provideWithComponent = function(propName, componentName, waitingChild) {
+	var cmp = this.getChildById(componentName);
+	if (cmp) waitingChild.set(propName, cmp);
+	else {
+		this.waiting = this.waiting || {};
+		this.waiting[componentName] = this.waiting[componentName] || [];
+		this.waiting[componentName].push([waitingChild, propName]);
+	}
+};
+
+Component.prototype.getWaitingChild = function(componentName) {
+	return Objects.get(this.waiting, componentName);
 };
 
 Component.prototype.get = function(propName) {

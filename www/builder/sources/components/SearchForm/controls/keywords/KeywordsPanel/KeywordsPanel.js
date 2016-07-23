@@ -1,0 +1,1 @@
+component KeywordsPanel extends SearchFormPanel

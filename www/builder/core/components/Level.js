@@ -268,11 +268,22 @@ Level.prototype.renderComponent = function(item, parentElement) {
 			}
 		}
 		var component = new item['cmp'](props);
+		if (isArray(item['w'])) {
+			for (i = 0; i < item['w'].length; i+=2) this.component.provideWithComponent(item['w'][i], item['w'][i + 1], component);
+		}
 		component.setParent(this.component);
 		component.render(parentElement);
 		this.registerChild(component, true);
 		if (isProps) this.registerPropComps(component, item['n'], item['p']);
-		if (cmpid) component.setId(cmpid);
+		if (cmpid) {
+			component.setId(cmpid);
+			var waiting = this.component.getWaitingChild(cmpid);
+			if (isArray(waiting)) {
+				for (i = 0; i < waiting.length; i++) {
+					waiting[i][0].set(waiting[i][1], component);
+				}
+			}
+		}
 		var events = item['e'];
 		if (isArray(events)) {
 			for (i = 0; i < events.length; i++) {

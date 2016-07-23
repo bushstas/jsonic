@@ -1,0 +1,8 @@
+{template .main}
+	<div class="app-search-form-button {~className}">
+		<template content>
+	</div>
+{/template}
+
+{template .content}
+{/template}
