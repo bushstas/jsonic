@@ -733,7 +733,7 @@
 					$closing++;
 				}
 				if ($opening > 0 && $opening == $closing) {
-					$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => $temp);
+					$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => parseJsFunctionCode($temp));
 					$functionList[] = $functionName;
 					$nextPart = $properParts[$i + 1];
 					if (preg_replace("/[\s;]/", "", $nextPart) != "") {
@@ -760,6 +760,108 @@
 			unset($component['content']);
 		}
 	}
+
+	function parseJsFunctionCode($code) {
+		if (preg_match('/\$[a-z]/i', $code)) {
+			$code = preg_replace('/\\\"/', '<sldq>', $code);
+			$code = preg_replace("/\\\'/", '<slq>', $code);
+			$regexp = '/[\'"]/';
+			preg_match_all($regexp, $code, $matches);
+			$matches = $matches[0];
+			$parts = preg_split($regexp, $code);
+			$codeParts = '';
+			$isText = false;
+			$texts = array();
+			$currentText = '';
+			foreach ($parts as $i => $part) {
+				if (!$isText) {
+					$codeParts .= $part;
+					if (isset($matches[$i])) {
+						$isText = true;
+						$currentQuote = $matches[$i];
+						$currentText = $currentQuote;
+					}
+				} else {
+					$currentText .= $part;
+					if (isset($matches[$i])) {
+						if ($matches[$i] == $currentQuote) {
+							$isText = false;
+							$currentText .= $currentQuote;
+							$currentQuote = '';
+							$texts[] = $currentText;
+							$currentText = '';
+							$codeParts .= '<text>';
+						} else {
+							$currentText .= $matches[$i];
+						}
+					}
+				}
+			}
+			$codeParts = preg_replace('/\$(\w+)[\s\t]*=[\s\t]*([^\r\n,;]+)/', "this.set('$1',$2)", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)/', "this.get('$1')", $codeParts);			
+			
+			$regexp = '/[;\n]/';
+			preg_match_all($regexp, $codeParts, $matches);
+			$signs = $matches[0];
+			$parts = preg_split($regexp, $codeParts);
+			$isSet = false;
+			$codeParts = '';
+			$prevPart = '';
+			foreach ($parts as $i => $part) {
+				$p = preg_replace('/\s/', '', $part);
+				if (!empty($p)) {
+					if (preg_match_all('/^(\s*)this\.set\(\'(\w+)\',(.+?)\)\s*,*\s*$/', $part, $matches)) {
+						if (!$isSet) {
+							$set = array();
+							$isSet = true;
+						}
+						$set[] = array($matches[1][0], $matches[2][0], trim($matches[3][0]));
+						$match = trim($matches[0][0]);
+						if (preg_match('/,$/', $match)) {
+							$prevPart = $part;
+							continue;
+						}
+
+					}						
+
+					if (!empty($set)) {
+						if (count($set) > 1) {
+							$codeParts .= $set[0][0].'this.set({';
+							$setts = array();
+							foreach ($set as $item) {
+								$setts[] = "'".$item[1]."':".$item[2];
+							}
+							$codeParts .= implode(',', $setts)."});\n";
+							continue;
+						} elseif (!empty($prevPart)) {
+							$codeParts .= $prevPart;
+							$codeParts .= $signs[$i - 1];
+							$prevPart = '';
+						}
+						$set = null;
+						$isSet = false;
+					}
+				}
+				$codeParts .= $part;
+				if (isset($signs[$i])) {
+					$codeParts .= $signs[$i];
+				}
+			}
+			printArr($codeParts);
+			$parts = explode('<text>', $codeParts);
+			$code = '';
+			foreach ($parts as $i => $part) {
+				$code .= $part;
+				if (isset($texts[$i])) {
+					$code .= $texts[$i];
+				}
+			}
+
+			$code = str_replace('<sldq>', '\"', $code);
+			$code = str_replace("<slq>", "\'", $code);
+		}
+		return $code;
+	};
 
 	function checkSolidMethodsUsing($functions, $component) {
 		global $componentLikeClassTypes, $solidMethods, $methods;

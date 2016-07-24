@@ -840,16 +840,6 @@
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);
 		}
-		
-
-		
-		$tempJs = preg_replace('/\\\"/', '<sldq>', $compiledJs);
-		$tempJs = preg_replace("/\\\'/", '<slq>', $tempJs);
-
-
-
-		$compiledJs = preg_replace('/\$(\w+)[\s\t]*=[\s\t]*([^\r\n,;]+)/', "this.set('$1', $2)", $compiledJs);
-		$compiledJs = preg_replace('/\$(\w+)/', "this.get('$1')", $compiledJs);
 		if ($advancedMode) {
 			createFile('base.js', $compiledJs);
 			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js');

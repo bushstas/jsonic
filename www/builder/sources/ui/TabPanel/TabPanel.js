@@ -44,7 +44,7 @@ function redraw() {
 			totalWidth += buttonWidth + this.margin;
 		}
 	}
-	this.set('count', this.hiddenTabs.length);
+	$count = this.hiddenTabs.length;
 }
 
 function getControlsWidth() {

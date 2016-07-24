@@ -32,11 +32,9 @@ function redraw() {
 	for (var i = 1; i <= more; i++) {
 		days.push({num: i, another: true});
 	}
-	this.set({
-		'year' : year,
-		'month': Dates.getMonthName(month),
-		'days' : days
-	});
+	$year = year,
+	$month = Dates.getMonthName(month),
+	$days = days;
 }
 
 function isCurrentMonth() {

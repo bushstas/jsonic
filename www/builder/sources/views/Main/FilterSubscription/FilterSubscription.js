@@ -15,15 +15,13 @@ initial helpers = [
 
 
 function onLoaded(filters) {
-	this.set('filters', filters);
-	this.set({		
-		'total': this.getTotalCount(),
-		'subscribed': this.getSubscribedCount()
-	});
+	$filters = filters;
+	$total = this.getTotalCount(),
+	$subscribed = this.getSubscribedCount();	
 }
 
 function getTotalCount() {
-	return Decliner.getCount('filter', this.get('filters'));
+	return Decliner.getCount('filter', $filters);
 }
 
 function getSubscribedCount() {

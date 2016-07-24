@@ -16,11 +16,9 @@ initial helpers = [
 
 function onLoaded(data) {
 	var options = data['options'];
-	this.set({
-		'opt1': options['tenderOfFavorite'],
-		'opt2': options['protocolOfFavorite'],
-		'opt3': options['protocolOfFilter']		
-	});
+	$opt1 = options['tenderOfFavorite'],
+	$opt2 = options['protocolOfFavorite'],
+	$opt3 = options['protocolOfFilter']
 }
 
 function onCheckboxChange(e) {

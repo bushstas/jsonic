@@ -14,21 +14,19 @@ initial props = {
 };
 
 function show() {
-	this.set('shown', true);
+	$shown = true;
 	this.reposition();	
 	this.onShow();
 };
 
 function reposition() {
 	var element = this.getElement();
-	var rect = element.getRect();
-	this.set({
-		'marginTop': Math.round(rect.height / -2) + 'px',
-		'marginLeft': Math.round(rect.width / -2) + 'px'
-	});
+	var rect = element.getRect();	
+	$marginTop = Math.round(rect.height / -2) + 'px',
+	$marginLeft = Math.round(rect.width / -2) + 'px';	
 };
 function hide() {
-	this.set('shown', false);
+	$shown = false;
 	this.onHide();
 };
 

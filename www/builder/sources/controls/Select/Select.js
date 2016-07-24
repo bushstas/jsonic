@@ -1,7 +1,7 @@
 control Select
 
 function onRendered() {
-	var value = this.get('value');
+	var value = $value;
 	var selected;
 	if (!isUndefined(value)) {
 		selected = this.selectByValue(value);
@@ -12,15 +12,13 @@ function onRendered() {
 }
 
 function selectByValue(value) {	
-	var options = this.get('options');
+	var options = $options;
 	if (isArray(options)) {
 		for (var i = 0; i < options.length; i++) {
 			if (options[i]['value'] == value) {
 				this.selectedIndex = i;
-				this.set({
-					'value': value,
-					'title': options[i]['title']
-				});
+				$value = value,
+				$title = options[i]['title'];
 				return true;
 			}
 		}
@@ -30,12 +28,10 @@ function selectByValue(value) {
 
 function selectByIndex(index) {
 	this.selectedIndex = index;
-	var options = this.get('options');
+	var options = $options;
 	if (isObject(options[index])) {
-		this.set({
-			'value': options[index]['value'],
-			'title': options[index]['title']
-		});
+		$value = options[index]['value'],
+		$title = options[index]['title'];
 	}
 }
 
@@ -63,10 +59,10 @@ function getControlValue() {
 }
 
 function onClick() {
-	this.set('active', true);
+	$active = true;
 	Popuper.watch(this, this.findElement('.->> app-select'));
 }
 
 function hide() {
-	this.set('active', false);
+	$active = false;
 };

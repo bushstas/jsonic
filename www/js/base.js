@@ -7,7 +7,7 @@ var __TAGS = ['div','span','table','tbody','thead','tr','td','th','ul','ol','li'
 var __A = {'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'};
 var __DW = {'filter':'\u0444\u0438\u043b\u044c\u0442\u0440,\u0444\u0438\u043b\u044c\u0442\u0440\u0430,\u0444\u0438\u043b\u044c\u0442\u0440\u043e\u0432','subscr':'\u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443,\u043f\u043e\u0434\u043f\u0438\u0441\u043a\u0438 \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443,\u043f\u043e\u0434\u043f\u0438\u0441\u043e\u043a \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443'};
 var __EVENTTYPES = ['click','mouseover','mouseout','mouseenter','mouseleave','mousemove','contextmenu','dblclick','mousedown','mouseup','keydown','keyup','keypress','blur','change','focus','focusin','focusout','input','invalid','reset','search','select','submit','drag','dragend','dragenter','dragleave','dragover','dragstart','drop','copy','cut','paste','popstate','wheel','storage','show','toggle','touchend','touchmove','touchstart','touchcancel','message','error','open','transitionend','abort','play','pause','load','durationchange','progress','resize','scroll','unload','hashchange','beforeunload','pageshow','pagehide'];
-var __ROUTES = [{'name':'main','view':Main,'accessLevel':10,'title':'Home','load':['Favorites','Filters'],'params':{'text':'blablabla','name':'this.get('2')'}},{'name':'search','view':Search,'accessLevel':0,'title':'\u041f\u043e\u0438\u0441\u043a','load':['Filters']},{'name':'favorite','view':Favorite,'accessLevel':0,'title':'\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435'},{'name':'analytics','view':Analytics,'accessLevel':0,'title':'\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'}];
+var __ROUTES = [{'name':'main','view':Main,'accessLevel':10,'title':'Home','load':['Favorites','Filters'],'params':{'text':'blablabla','name':'$2'}},{'name':'search','view':Search,'accessLevel':0,'title':'\u041f\u043e\u0438\u0441\u043a','load':['Filters']},{'name':'favorite','view':Favorite,'accessLevel':0,'title':'\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435'},{'name':'analytics','view':Analytics,'accessLevel':0,'title':'\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'}];
 var __ERRORROUTES = {'404':Error404,'401':Error401};
 var __HASHROUTER = true;
 var __INDEXROUTE = 'main';
@@ -3467,12 +3467,6 @@ SearchFormPanelButton.prototype.getTemplateMain = function($,_) {
 function KeywordsButton(props) {
 	Initialization.initiate.call(this, props);
 };
-KeywordsButton.prototype.onRendered = function() {
-	this.set('name', 23);
-	this.set('price', 2 - 56);
-	this.set('a', 'sdsad\'');
-	var name = this.get('name');
-};
 KeywordsButton.prototype.getTemplateContent = function($,_) {
 	return[{'c':__[13],'t':0}]
 };
@@ -3606,11 +3600,7 @@ Calendar.prototype.redraw = function() {
 	for (var i = 1; i <= more; i++) {
 		days.push({num: i, another: true});
 	}
-	this.set({
-		'year' : year,
-		'month': Dates.getMonthName(month),
-		'days' : days
-	});
+	this.set({'year':year,'month':Dates.getMonthName(month),'days':days});
 };
 Calendar.prototype.isCurrentMonth = function() {
 	return this.month == Dates.getMonth() && this.year == Dates.getYear();
@@ -3658,7 +3648,7 @@ FavoritesCalendar.prototype.onLoadFavorites = function(data) {
 	this.tenderByDates = {};
 	for (var i = 0; i < data.length; i++) {
 		if (data[i]['phase_'] == 1) {
-			timestamp = data[i]['finishdocdate'].replace(/\.(\d+)$/, ".20this.get('1')").replace(/0(?=\d\.)/g, '');
+			timestamp = data[i]['finishdocdate'].replace(/\.(\d+)$/, ".20$1").replace(/0(?=\d\.)/g, '');
 			this.tenderByDates[timestamp] = this.tenderByDates[timestamp] || [];
 			this.tenderByDates[timestamp].push(data[i]);
 		}
@@ -3684,20 +3674,17 @@ function Dialog(props) {
 	Initialization.initiate.call(this, props);
 };
 Dialog.prototype.show = function() {
-	this.set('shown', true);
+	this.set('shown',true);
 	this.reposition();	
 	this.onShow();
 };
 Dialog.prototype.reposition = function() {
 	var element = this.getElement();
-	var rect = element.getRect();
-	this.set({
-		'marginTop': Math.round(rect.height / -2) + 'px',
-		'marginLeft': Math.round(rect.width / -2) + 'px'
-	});
+	var rect = element.getRect();	
+	this.set({'marginTop':Math.round(rect.height / -2) + 'px','marginLeft':Math.round(rect.width / -2) + 'px'});
 };
 Dialog.prototype.hide = function() {
-	this.set('shown', false);
+	this.set('shown',false);
 	this.onHide();
 };
 Dialog.prototype.expand = function() {
@@ -3768,7 +3755,7 @@ PopupMenu.prototype.renderButtons = function(items) {
 	for (var i = 0; i < items.length; i++) {	
 		buttons.push(this.getButtonData(items[i]));
 	}
-	this.set('buttons', buttons);
+	this.set('buttons',buttons);
 };
 PopupMenu.prototype.getButtonData = function(item) {
 	return {
@@ -3816,7 +3803,7 @@ TabPanel.prototype.redraw = function() {
 			totalWidth += buttonWidth + this.margin;
 		}
 	}
-	this.set('count', this.hiddenTabs.length);
+	this.set('count',this.hiddenTabs.length);
 };
 TabPanel.prototype.getControlsWidth = function() {
 	var width = 0;
@@ -3899,11 +3886,8 @@ function FilterSubscription(props) {
 	Initialization.initiate.call(this, props);
 };
 FilterSubscription.prototype.onLoaded = function(filters) {
-	this.set('filters', filters);
-	this.set({		
-		'total': this.getTotalCount(),
-		'subscribed': this.getSubscribedCount()
-	});
+	this.set('filters',filters);
+	this.set({'total':this.getTotalCount(),'subscribed':this.getSubscribedCount()});
 };
 FilterSubscription.prototype.getTotalCount = function() {
 	return Decliner.getCount('filter', this.get('filters'));
@@ -3940,11 +3924,7 @@ function FilterSubscriptionOptions(props) {
 };
 FilterSubscriptionOptions.prototype.onLoaded = function(data) {
 	var options = data['options'];
-	this.set({
-		'opt1': options['tenderOfFavorite'],
-		'opt2': options['protocolOfFavorite'],
-		'opt3': options['protocolOfFilter']		
-	});
+	this.set({'opt1':options['tenderOfFavorite'],'opt2':options['protocolOfFavorite'],'opt3':options['protocolOfFilter']});
 };
 FilterSubscriptionOptions.prototype.onCheckboxChange = function(e) {
 	var params = {};
@@ -4016,7 +3996,7 @@ function FiltersStat() {
 };
 FiltersStat.prototype.getInitials = function() {
 	return {
-		'options':{'key': 'filterId','store': true,'storeAs': 'filterStat_this.get('filterId')','storePeriod': '4hour'},
+		'options':{'key': 'filterId','store': true,'storeAs': 'filterStat_$filterId','storePeriod': '4hour'},
 		'actions':{'load': {'url': CONFIG.filterStat.load,'method': 'GET'}}
 	};
 };
@@ -4237,25 +4217,19 @@ Select.prototype.selectByValue = function(value) {
 		for (var i = 0; i < options.length; i++) {
 			if (options[i]['value'] == value) {
 				this.selectedIndex = i;
-				this.set({
-					'value': value,
-					'title': options[i]['title']
-				});
-				return true;
-			}
-		}
-	}
-	return false;
+				this.set({'value':value,'title':options[i]['title']});
+				this.set({'value':value,'title':options[i][]});
+				this.set({'value':value,'title':options[i][]});
+				this.set({'value':value,'title':options[i][]});
+				this.set({'value':value,'title':options[i][]});
+				this.set({'value':value,'title':options[i][]});
 };
 Select.prototype.selectByIndex = function(index) {
 	this.selectedIndex = index;
 	var options = this.get('options');
 	if (isObject(options[index])) {
-		this.set({
-			'value': options[index]['value'],
-			'title': options[index]['title']
-		});
-	}
+		this.set({'value':options[index]['value'],'title':options[index]['title']});
+		this.set({'value':options[index][],'title':options[index][]});
 };
 Select.prototype.enableOption = function(index, isEnabled) {
 	var optionsContainer = this.findElement('.app-select-options');
@@ -4278,11 +4252,11 @@ Select.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
 Select.prototype.onClick = function() {
-	this.set('active', true);
+	this.set('active',true);
 	Popuper.watch(this, this.findElement('.app-select'));
 };
 Select.prototype.hide = function() {
-	this.set('active', false);
+	this.set('active',false);
 };
 Select.prototype.getTemplateMain = function($,_) {
 	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('active')?' active':'')}},'n':{'c':'active'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]

@@ -11,7 +11,7 @@ function onClick(e) {
 	if (!isNull(target)) {
 		var idx = target.getData('index');
 		var value = target.getData('value');
-		var buttons = this.get('buttons');
+		var buttons = $buttons;
 		if (isArray(buttons) && isObject(buttons[idx]) && isFunction(buttons[idx]['handler'])) {
 			buttons[idx]['handler'].call(this, e);
 			return;
@@ -49,7 +49,7 @@ function renderButtons(items) {
 	for (var i = 0; i < items.length; i++) {	
 		buttons.push(this.getButtonData(items[i]));
 	}
-	this.set('buttons', buttons);
+	$buttons = buttons;
 }
 
 function getButtonData(item) {
