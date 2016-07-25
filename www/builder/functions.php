@@ -825,21 +825,22 @@
 					}						
 
 					if (!empty($set)) {
-						if (count($set) > 1) {
+						$moreTheOne = count($set) > 1;
+						if ($moreTheOne) {
 							$codeParts .= $set[0][0].'this.set({';
 							$setts = array();
 							foreach ($set as $item) {
 								$setts[] = "'".$item[1]."':".$item[2];
 							}
 							$codeParts .= implode(',', $setts)."});\n";
-							continue;
 						} elseif (!empty($prevPart)) {
 							$codeParts .= $prevPart;
 							$codeParts .= $signs[$i - 1];
-							$prevPart = '';
 						}
+						$prevPart = '';
 						$set = null;
 						$isSet = false;
+						if ($moreTheOne) continue;
 					}
 				}
 				$codeParts .= $part;
@@ -847,7 +848,7 @@
 					$codeParts .= $signs[$i];
 				}
 			}
-			printArr($codeParts);
+			
 			$parts = explode('<text>', $codeParts);
 			$code = '';
 			foreach ($parts as $i => $part) {

@@ -4218,18 +4218,18 @@ Select.prototype.selectByValue = function(value) {
 			if (options[i]['value'] == value) {
 				this.selectedIndex = i;
 				this.set({'value':value,'title':options[i]['title']});
-				this.set({'value':value,'title':options[i][]});
-				this.set({'value':value,'title':options[i][]});
-				this.set({'value':value,'title':options[i][]});
-				this.set({'value':value,'title':options[i][]});
-				this.set({'value':value,'title':options[i][]});
+				return true;
+			}
+		}
+	}
+	return false;
 };
 Select.prototype.selectByIndex = function(index) {
 	this.selectedIndex = index;
 	var options = this.get('options');
 	if (isObject(options[index])) {
 		this.set({'value':options[index]['value'],'title':options[index]['title']});
-		this.set({'value':options[index][],'title':options[index][]});
+	}
 };
 Select.prototype.enableOption = function(index, isEnabled) {
 	var optionsContainer = this.findElement('.app-select-options');
