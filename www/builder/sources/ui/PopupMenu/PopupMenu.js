@@ -29,18 +29,16 @@ function handleClick(value, button) {}
 function onBeforeShow() {}
 
 function show() {
-	var outerElement = this.getElement();
 	var innerElement = this.findElement('.->> app-popup-menu-inner-container');
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
-	outerElement.setStyle({'max-height': height + 'px', 'height': height + 'px'});
+	this.setStyle({'max-height': height + 'px', 'height': height + 'px'});
     this.button.addClass('active');
-    Popuper.watch(this, outerElement);
+    Popuper.watch(this);
 }
 
 function hide() {
-	var outerElement = this.getElement();
-	outerElement.setStyle({'max-height': '0', 'height': '0'});
+	this.setStyle({'max-height': '0', 'height': '0'});
 	this.button.removeClass('active');
 }
 

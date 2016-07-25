@@ -194,6 +194,17 @@ Component.prototype.showElement = function(element, isShown) {
 	if (isElement(element)) element.show(isShown);
 };
 
+Component.prototype.setStyle = function(styles) {
+	if (this.isRendered()) this.getElement().setStyle(styles);
+};
+
+Component.prototype.addClass = function(className, isAdding) {
+	if (this.isRendered()) {
+		if (isAdding || isUndefined(isAdding)) this.getElement().addClass(className);
+		else this.getElement().removeClass(className);
+	}
+};
+
 Component.prototype.each = function(propName, callback) {
 	var ar = this.get(propName);
 	if (isArrayLike(ar) && isFunction(callback)) {

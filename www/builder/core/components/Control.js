@@ -2,6 +2,15 @@ function Control() {}
 Control.prototype.getInitials = function() {
 	return {'enabled': true};
 };
+Control.prototype.attachControl = function(control) {
+	if (isString(control)) control = this.getChildById(control);
+	if (control.instanceOf(Control)) {
+		this.controls = this.controls || {};
+		this.controls[control.getId()] = control;
+		this.addListener(control, 'change', this.onChangeChildControl);
+
+	}
+};
 Control.prototype.getName = function() {
 	return this.props.name;
 };
@@ -68,7 +77,14 @@ Control.prototype.isEnabled = function() {
 Control.prototype.setEnabled = function(isEnabled) {
 	this.set('enabled', isEnabled);
 };
+Control.prototype.dispatchChange = function() {
+	this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
+};
+Control.prototype.onChangeChildControl = function(e) {
+	console.log(e)
+};
 Control.prototype.disposeInternal = function() {
+	this.controls = null;
 	this.options = null;
 	this.value = null;
 };

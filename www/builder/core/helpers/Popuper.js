@@ -8,7 +8,7 @@ function Popuper() {
 	this.watch = function(component, element) {
 		if (components.indexOf(component) == -1) {
 			components.push(component);
-			elements.push(element || null);
+			elements.push(element || component.getElement() || null);
 		}
 	};
 	var onBodyMouseDown = function(e) {

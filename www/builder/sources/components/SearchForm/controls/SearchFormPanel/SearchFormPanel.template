@@ -1,0 +1,12 @@
+{template .main}
+	<div class="app-search-form-panel {~className}" scope="1">
+		<div class="app-search-form-panel-close" onClick="hide"></div>
+		<div class="app-search-form-panel-title">
+			{~title}
+		</div>
+		<template content>
+	</div>
+{/template}
+
+{template .content}
+{/template}

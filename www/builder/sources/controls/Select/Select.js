@@ -11,7 +11,8 @@ function onRendered() {
 	}
 }
 
-function selectByValue(value) {	
+function selectByValue(value) {
+	if ($value == value) return;
 	var options = $options;
 	if (isArray(options)) {
 		for (var i = 0; i < options.length; i++) {
@@ -30,6 +31,7 @@ function selectByIndex(index) {
 	this.selectedIndex = index;
 	var options = $options;
 	if (isObject(options[index])) {
+		if ($value == options[index]['value']) return;
 		$value = options[index]['value'],
 		$title = options[index]['title'];
 	}
@@ -48,8 +50,7 @@ function onOptionsClick(e) {
 	var target = e.getTarget('.->> app-select-option');
 	if (target && !target.hasClass('->> disabled')) {
 		var value = target.getData('value');
-		this.selectByValue(value);
-		this.dispatchEvent('change', {'value': value, 'instance': this});
+		if (this.selectByValue(value)) this.dispatchChange();
 		this.hide();
 	}
 }

@@ -1,0 +1,10 @@
+#keywordsNonMorphOptions = [
+	{
+		'value': '0',
+		'title': @isMorph
+	},
+	{
+		'value': '1',
+		'title': @isNonMorph
+	}
+]

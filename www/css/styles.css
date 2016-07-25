@@ -61,6 +61,13 @@
 .app-search-form-button{cursor:pointer;}
 .app-search-form-button.search-keywords{padding:5px 25px 5px 25px;}
 .app-search-form-button.search-keywords div{background-color:#fff;line-height:38px;border-radius:3px;border:1px solid #38414f;color:#72798c;box-sizing:border-box;padding-left:15px;}
+/* SearchFormPanel */
+.app-search-form-panel{position:absolute;left:-60px;top:10px;bottom:10px;z-index:200;width:330px;background-color:#fbfbfc;border-radius:3px;visibility:hidden;opacity:0;box-shadow:0 0 7px #b1b1b1;-moz-box-shadow:0 0 7px #b1b1b1;-webkit-box-shadow:0 0 7px #b1b1b1;transition:visibility 0.4s,left 0.4s,opacity 0.4s;}
+.app-search-form-panel.shown{visibility:visible;opacity:1;left:10px;}
+.app-search-form-panel-title{font-size:18px;padding:0 20px;margin-bottom:8px;line-height:46px;height:46px;color:#505b6e;border-bottom:1px solid #d9ddea;font-family:ptsansbold;background-image:linear-gradient(to bottom,#fbfbfc,#edf1f6);}
+.app-search-form-panel-close{position:absolute;right:12px;top:14px;width:20px;height:20px;cursor:pointer;background-image:url(../images/form/close-panel.png);background-position:center center;background-repeat:no-repeat;z-index:10;}
+.app-search-form-panel-close:hover{opacity:0.6;}
+.app-search-form-panel.keywords-panel{width:1000px;}
 /* SearchFormCreateFilterMenu */
 .app-popup-menu-outer-container.create-filters-menu .app-popup-menu-inner-container{border:none;}
 .app-popup-menu-outer-container.create-filters-menu{margin-top:3px;-webkit-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);-moz-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);border:none;width:278px;}
@@ -94,6 +101,7 @@
 .app-input-container textarea:focus,.app-input-container input:focus{border-color:#38986a;box-shadow:1px 1px 6px #93C7AE;outline:none;}
 /* Select */
 .app-select{position:relative;box-sizing:border-box;font-family:ptsansbold;color:#6f7b9a;font-size:14px;border:1px solid #bec8da;border-radius:3px;cursor:pointer;box-shadow:inset 2px 1px 3px #d7deec;}
+.app-select.frameless{border:0;}
 .app-select:hover{border-color:#68758c;box-shadow:1px 1px 6px #bfc7d8;}
 .app-select:after{content:'';position:absolute;right:8px;top:15px;background-image:url(../images/ui/select-arrow.png);width:10px;height:5px;opacity:0.8;}
 .app-select:hover:after{opacity:1;}

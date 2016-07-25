@@ -4,6 +4,9 @@ $imgsrc = ../images/ui
     $(rel box bold c#6f7b9a fs14 bo#bec8da br3 pointer)
     box-shadow: inset 2px 1px 3px #d7deec;
 }
+.app-select.frameless {
+    $(nob)
+}
 .app-select:hover {
     $boc#68758c
     box-shadow: 1px 1px 6px #bfc7d8;

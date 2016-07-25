@@ -797,7 +797,7 @@
 					}
 				}
 			}
-			$codeParts = preg_replace('/\$(\w+)[\s\t]*=[\s\t]*([^\r\n,;]+)/', "this.set('$1',$2)", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n,;]+)/', "this.set('$1',$2)", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)/', "this.get('$1')", $codeParts);			
 			
 			$regexp = '/[;\n]/';
