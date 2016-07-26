@@ -2,6 +2,7 @@ function Form() {}
 
 Form.prototype.initiate = function() {
 	this.options = {};
+	this.controls = {};
 };
 
 Form.prototype.initOptions = function(options) {
@@ -67,20 +68,29 @@ Form.prototype.onRenderComplete = function() {
 };
 
 Form.prototype.createControl = function(options, parentElement) {
-	var control;
+	var field;
 	switch (options['type']) {
 		case 'select':
-			control = this.createSelect(options);
+			field = this.createSelect(options);
 		break;
 
 		case 'textarea':
-			control = this.createTextarea(options);
+			field = this.createTextarea(options);
 		break;
 
 		default:
-			control = this.createInput(options);
+			field = this.createInput(options);
 	}
-	this.addChild(control, parentElement);
+	this.addChild(field, parentElement);
+	this.addControls(field.getChildrenOfClass(Control));
+};
+
+Form.prototype.addControls = function(controls) {
+	for (var i = 0; i < controls.length; i++) {
+		var name = controls[i].getName();
+		this.controls[name] = controls[i];
+	}
+	console.log(this.controls)
 };
 
 Form.prototype.createInput = function(options) {
@@ -88,7 +98,7 @@ Form.prototype.createInput = function(options) {
 };
 
 Form.prototype.createSelect = function(options) {
-	return new Select(options);
+	return new SelectField(options);
 };
 
 Form.prototype.createTextarea = function(options) {
@@ -142,21 +152,10 @@ Form.prototype.isValid = function() {
 
 Form.prototype.getData = function() {
 	var data = {};
-	this.forEachControlChild(function(child) {
-		var name = child.getName();
-		if (!!name && isString(name)) {
-			data[name] = child.getValue();
-		}
-	});
+	for (var k in this.controls) {
+		data[k] = this.controls[k].getValue();
+	}
 	return data;
-};
-
-Form.prototype.forEachControlChild = function(callback) {
-	this.forEachChild(function(child, index) {
-		if (child.instanceOf(Control)) {
-			callback.call(this, child, index);
-		}
-	});
 };
 
 Form.prototype.handleResponse = function(data) {
@@ -184,26 +183,31 @@ Form.prototype.onFailure = function(data) {
 	this.log(error, 'onFailure', data);
 };
 
+Form.prototype.getControl = function(name) {
+	return this.controls[name];
+};
+
 Form.prototype.setControlValue = function(name, value) {
 	if (isString(name)) {
-		var child = this.getChildById(name);
-		if (child) {
-			child.setValue(value);
+		var control = this.getControl(name);
+		if (control) {
+			control.setValue(value);
 		}
 	}
 };
 
 Form.prototype.enableControl = function(name, isEnabled) {
 	if (isString(name)) {
-		var child = this.getChildById(name);
-		if (child) {
-			child.setEnabled(isEnabled);
+		var control = this.getControl(name);
+		if (control) {
+			control.setEnabled(isEnabled);
 		}
 	}
 };
 
 Form.prototype.disposeInternal = function() {
 	this.options = null;
+	this.controls = null;
 	this.request = null;
 	this.formElement = null;
 };

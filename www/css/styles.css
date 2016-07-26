@@ -101,8 +101,9 @@
 .app-input-container textarea:focus,.app-input-container input:focus{border-color:#38986a;box-shadow:1px 1px 6px #93C7AE;outline:none;}
 /* Select */
 .app-select{position:relative;box-sizing:border-box;font-family:ptsansbold;color:#6f7b9a;font-size:14px;border:1px solid #bec8da;border-radius:3px;cursor:pointer;box-shadow:inset 2px 1px 3px #d7deec;}
-.app-select.frameless{border:0;}
+.app-select.frameless{border:0;box-shadow:none;}
 .app-select:hover{border-color:#68758c;box-shadow:1px 1px 6px #bfc7d8;}
+.app-select.frameless:hover{box-shadow:none;}
 .app-select:after{content:'';position:absolute;right:8px;top:15px;background-image:url(../images/ui/select-arrow.png);width:10px;height:5px;opacity:0.8;}
 .app-select:hover:after{opacity:1;}
 .app-select.active{z-index:10;}

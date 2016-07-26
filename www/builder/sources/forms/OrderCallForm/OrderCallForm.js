@@ -92,8 +92,8 @@ function getDateOptions() {
 }
 
 function validateTime() {
-	var dateSelect = this.getChildById('date');
-	var timeSelect = this.getChildById('time');
+	var dateSelect = this.getControl('date');
+	var timeSelect = this.getControl('time');
 	var dateValue = dateSelect.getValue();
     var isToday = (new RegExp(@today)).test(dateValue);
     if (isToday) {

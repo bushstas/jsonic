@@ -55,6 +55,10 @@ function onOptionsClick(e) {
 	}
 }
 
+function setProperValue(value) {
+	this.selectByValue(value);
+}
+
 function getControlValue() {
 	return this.findElement('input').value;
 }

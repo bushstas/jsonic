@@ -394,6 +394,16 @@ Component.prototype.getChildAt = function(index) {
 	return this.children[index];
 };
 
+Component.prototype.getChildrenOfClass = function(classFunc) {
+	var children = [];
+	this.forEachChild(function(child) {
+		if (isComponentLike(child) && child.instanceOf(classFunc)) {
+			children.push(child);
+		}
+	});
+	return children;
+};
+
 Component.prototype.getChildById = function(childComponentId) {
 	if (!this.children) return null;
 	for (var i = 0; i < this.children.length; i++) {

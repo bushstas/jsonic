@@ -4,7 +4,7 @@ Control.prototype.getInitials = function() {
 };
 Control.prototype.attachControl = function(control) {
 	if (isString(control)) control = this.getChildById(control);
-	if (control.instanceOf(Control)) {
+	if (isControl(control)) {
 		this.controls = this.controls || {};
 		this.controls[control.getId()] = control;
 		this.addListener(control, 'change', this.onChangeChildControl);
@@ -16,7 +16,7 @@ Control.prototype.getName = function() {
 };
 Control.prototype.getValue = function() {
 	var value;
-	if (!Objects.empty(this.controls)) {
+	if (this.hasControls()) {
 		value = {};
 		for (var k in this.controls) value[k] = this.controls[k].getValue();
 	} else value = this.getCorrectedValue(this.getControlValue());
@@ -69,12 +69,21 @@ Control.prototype.getProperValue = function(value) {
 	return value;
 };
 Control.prototype.setValue = function(value) {
-	this.value = value;
-	this.setProperValue(value);
+	if (this.hasControls() && isObject(value)) {
+		for (var k in value) {
+			if (isControl(this.controls[k])) this.controls[k].setValue(this.controls[k].hasControls() ? value : value[k]);
+		}
+	} else {
+		this.value = value;
+		this.setProperValue(value);
+	}
 };
 Control.prototype.setProperValue = function(value) {
 	this.set('value', value);
 };
+Control.prototype.hasControls = function() {
+	return !Objects.empty(this.controls);
+}
 Control.prototype.isEnabled = function() {
 	return !!this.get('enabled');
 };

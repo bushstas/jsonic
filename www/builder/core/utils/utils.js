@@ -16,6 +16,15 @@ function toCamelCase(str) {
 		return match.toUpperCase();
 	});
 }
+function isComponentLike(a) {
+	return isObject(a) && isFunction(a.instanceOf);
+}
+function isComponent(a) {
+	return isComponentLike(a) && a.instanceOf(Component);
+}
+function isControl(a) {
+	return isComponentLike(a) && a.instanceOf(Control);
+}
 function isObject(a) {
 	return !!a && typeof a == 'object' && !isNode(a) && !isArray(a);
 }

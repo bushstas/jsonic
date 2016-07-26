@@ -5,11 +5,14 @@ $imgsrc = ../images/ui
     box-shadow: inset 2px 1px 3px #d7deec;
 }
 .app-select.frameless {
-    $(nob)
+    $(nob nosh)
 }
 .app-select:hover {
     $boc#68758c
     box-shadow: 1px 1px 6px #bfc7d8;
+}
+.app-select.frameless:hover {
+    $nosh
 }
 .app-select:after {
     $(cnt abs r8 t15 png=select-arrow w10 h5 opac8)
