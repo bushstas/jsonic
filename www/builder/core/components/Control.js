@@ -15,8 +15,12 @@ Control.prototype.getName = function() {
 	return this.props.name;
 };
 Control.prototype.getValue = function() {
-	var value = this.getControlValue();
-	return this.getCorrectedValue(value);
+	var value;
+	if (!Objects.empty(this.controls)) {
+		value = {};
+		for (var k in this.controls) value[k] = this.controls[k].getValue();
+	} else value = this.getCorrectedValue(this.getControlValue());
+	return value;
 }
 Control.prototype.getControlValue = function() {
 	return (!isUndefined(this.value) ? this.value : this.props.value) || '';
@@ -81,7 +85,7 @@ Control.prototype.dispatchChange = function() {
 	this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
 };
 Control.prototype.onChangeChildControl = function(e) {
-	console.log(e)
+	this.dispatchChange();
 };
 Control.prototype.disposeInternal = function() {
 	this.controls = null;
