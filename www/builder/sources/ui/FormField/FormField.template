@@ -4,5 +4,5 @@
 			{$caption}
 		</div>
 	{/if}
-	<component Select cmpid="select" value="{$value}" options="{$options}" name="{$name}">
+	<control class="{~controlClass}" props="{~controlProps}">
 </div>

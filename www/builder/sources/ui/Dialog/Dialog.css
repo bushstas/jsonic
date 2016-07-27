@@ -1,7 +1,7 @@
 $imgsrc = ../images/ui/
 
 .app-dialog-mask {
-	$none $fix $rubber $z699 $bc#212D42
+	$(none fix rubber z699 bc#212D42)
     opacity: 0.65;	
 }
 .app-dialog-mask.shown {

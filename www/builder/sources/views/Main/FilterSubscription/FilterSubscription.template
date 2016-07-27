@@ -13,9 +13,9 @@
 	<table class="app-subscription-table" cellpadding="0px" cellspacing="0px">
 		<thead>
 			<tr>
-				<th class="settings-filter-name">Название фильтра</th>
-				<th class="settings-filter-freq">Периодичность рассылки</th>
-				<th class="settings-filter-subscrbttn">Подписка на рассылку</th>
+				<th class="settings-filter-name">{@filterName}</th>
+				<th class="settings-filter-freq">{@subscrFreq}</th>
+				<th class="settings-filter-subscrbttn">{@mailSubscr}</th>
 				<th class="settings-filter-delete">&nbsp;</th>
 			</tr>
 		</thead>
@@ -26,7 +26,7 @@
 						<span class="settings-filter">{&filter['header']}</span>
 					</td>
 					<td>
-						<component Select options="{#subscrFreqOptions}" value="{&filter['freqSubs']}" onChange="onFreqChange">
+						<control class="Select" options="{#subscrFreqOptions}" value="{&filter['freqSubs']}" onChange="onFreqChange">
 					</td>
 					<td>
 						<div class="subscr-button {&filter['isSubs']==1?@greenButton+' subscribed':@whiteButton}"></div>

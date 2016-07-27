@@ -1165,9 +1165,15 @@
 					$child = array('tmp' => '<nq>includeGeneralTemplate'.ucfirst($match[1]).'<nq>');
 					getTemplateProperties($item['content'], $child, $component);
 				}
+				elseif ($tagName == 'control')
+				{
+					preg_match("/<control +[\"']*(\w+)[\"']*/i",  $content, $match);
+					$child = array('cmp' => '<nq>'.$match[1].'<nq>');
+					getTagProperties($item['content'], $child, $component, true);
+				}
 				elseif ($tagName == 'component')
 				{
-					preg_match("/<component +[\"']*(\w+)[\"']*/i",  $content, $match);
+					preg_match("/<component +(\w+)/i",  $content, $match);
 					$child = array('cmp' => '<nq>'.$match[1].'<nq>');
 					getTagProperties($item['content'], $child, $component, true);
 				}
@@ -1971,8 +1977,8 @@
 		parseClassMethodCalls($code, $component);
 		$code = checkTernary($code, $component);
 		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
-		$code = preg_replace('/^\s*:(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
-		$code = preg_replace('/^\s*:(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
+		$code = preg_replace('/^\s*::(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
+		$code = preg_replace('/^\s*::(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
 		$code = str_replace('<noeq>=', '', $code);
 		if ($toPropNodes) {
 			if (preg_match('/\bcase\b/', $code)) {

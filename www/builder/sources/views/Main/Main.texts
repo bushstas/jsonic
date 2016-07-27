@@ -36,3 +36,6 @@
 @per2hours: каждые 2 часа
 @per1day: каждый день
 @per2days: через день
+@filterName: Название фильтра
+@subscrFreq: Периодичность рассылки
+@mailSubscr: Подписка на рассылку

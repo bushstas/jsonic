@@ -1,19 +1,9 @@
 .app-404-container {
-	position: fixed;
-	left: 50%;
-	top: 50%;
-	width: 500px;
-	margin-left: -250px;
-	margin-top: -160px;
-	text-align: center;
+	$(fix l50% t50% w500 ml-250 mt-160 center)
 }
 .app-404-title {
-	font-size: 180px;
-	line-height: 180px;
-	font-weight: bold;
-	color: #AAAAAA;
+	$(fs180 lh180 bold c#aaa)
 }
 .app-404-text {
-	font-size: 18px;
-	margin-top: 10px;
+	$(fs18 mt10)
 }

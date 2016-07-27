@@ -1,4 +1,4 @@
-<component KeywordsPanel cmpid="keywordsPanel">
+<component class="KeywordsPanel" cmpid="keywordsPanel">
 
 <div class="app-search-form-reset">
 	<div class="hover-label" onClick="onResetButtonClick">
@@ -9,8 +9,8 @@
 	</div>
 </div>
 <div class="app-tender-search-form" scope="1">
-	<component SearchFormFilters>
+	<component class="SearchFormFilters">
 	<div class="app-tender-search-form-content">
-		<component KeywordsButton panel="{^keywordsPanel}">
+		<component class="KeywordsButton" panel="{^keywordsPanel}">
 	</div>
 </div>

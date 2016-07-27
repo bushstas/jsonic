@@ -6,23 +6,23 @@
 					<div class="app-mainpage-left-column-title">
 						{@personal}
 					</div>
-					<component UserInfo>
+					<component class="UserInfo">
 					<div class="mainpage-leftcolumn-title bold">
 						{@calendar}
-						<component Tooltip args="{#calendarTooltip}">
+						<component class="Tooltip" args="{#calendarTooltip}">
 					</div>
-					<component FavoritesCalendar>
+					<component class="FavoritesCalendar">
 				</div>
 			</td>
 			<td class="app-mainpage-content-column">
-				<component TabPanel args="{#mainPageTabs}">
+				<component class="TabPanel" args="{#mainPageTabs}">
 				<div class="app-mainpage-content">
 					<div class="app-mainpage-tab1-content">
-						<component FilterStatistics args="{#mainPageFilterStat}">
+						<component class="FilterStatistics" args="{#mainPageFilterStat}">
 					</div>
 					<div class="app-mainpage-tab2-content">
-						<component FilterSubscriptionOptions>
-						<component FilterSubscription>
+						<component class="FilterSubscriptionOptions">
+						<component class="FilterSubscription">
 					</div>
 					<div class="app-mainpage-tab3-content">
 						

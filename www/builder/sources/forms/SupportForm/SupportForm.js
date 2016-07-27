@@ -1,19 +1,17 @@
 form SupportForm extends OrderCallForm
 
-initial options = {
+initial args = {
 	'action': CONFIG.support.send,
 	'controls': [
 		#nameInput,
 		#emailInput,
 		#phoneInput,
 		{
-			'cmpid': 'comment',
 			'type': 'textarea',
 			'name': 'comment',
 			'caption': @descrProblem
 		},
 		{
-			'cmpid': 'screenshot',
 			'type': 'file',
 			'name': 'screenshot',
 			'accept': 'image/*',

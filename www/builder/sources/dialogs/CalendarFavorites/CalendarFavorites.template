@@ -1,8 +1,7 @@
 {template .content}
 	<div class="simple-datatable calendar-favorites-datatable">
 		{foreach $tenders as &tender}
-			{let &tender['nocontrols'] = 1}
-			<component DataTableStandartRow args="{&tender}">
+			<component class="DataTableStandartRow" args="{&tender}" arg:nocontrols="1">
 		{/foreach}
 	</div>
 {/template}

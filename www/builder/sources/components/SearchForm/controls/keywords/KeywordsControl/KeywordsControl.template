@@ -1,3 +1,3 @@
 <div class="app-keywords-options">
-	<component Select cmpid="nonmorph" options="{#keywordsNonMorphOptions}" class="frameless">
+	<control class="Select" name="nonmorph" options="{#keywordsNonMorphOptions}" className="frameless">
 </div>

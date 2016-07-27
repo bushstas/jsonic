@@ -90,11 +90,10 @@ Form.prototype.addControls = function(controls) {
 		var name = controls[i].getName();
 		this.controls[name] = controls[i];
 	}
-	console.log(this.controls)
 };
 
 Form.prototype.createInput = function(options) {
-	return new Input(options);
+	return new InputField(options);
 };
 
 Form.prototype.createSelect = function(options) {
@@ -185,6 +184,10 @@ Form.prototype.onFailure = function(data) {
 
 Form.prototype.getControl = function(name) {
 	return this.controls[name];
+};
+
+Form.prototype.getCotrolAt = function(index) {
+	return Objects.getByIndex(this.controls, index);
 };
 
 Form.prototype.setControlValue = function(name, value) {

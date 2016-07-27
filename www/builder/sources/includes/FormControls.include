@@ -1,0 +1,13 @@
+{template .formControls}
+	<div class="app-form-controls">
+		{foreach ~controls as &control}
+			<component class="FormField" args="{&control}">
+		{/foreach}
+	</div>
+{/template}
+
+{template .formSubmit}
+	{if ~submit}
+		<component class="Submit" props="{~submit}">
+	{/if}
+{/template}

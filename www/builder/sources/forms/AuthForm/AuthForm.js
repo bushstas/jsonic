@@ -1,20 +1,18 @@
 form AuthForm
 
-initial options = {
+initial args = {
 	'action': 'user/login.php',
 	'method': 'POST',
 	'ajax': true,
 	'container': '->> app-authform-inputs',
 	'controls': [
 		{
-			'cmpid': 'login',
 			'type': 'text',
 			'name': 'login',
 			'placeholder': @enterLogin,
 			'caption': @login
 		},
 		{
-			'cmpid': 'password',
 			'type': 'password',
 			'name': 'password',
 			'placeholder': @enterPassword,

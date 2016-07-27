@@ -1,4 +1,4 @@
-доделать template .name as .name
+﻿доделать template .name as .name
 
 проверить FOREACH
 
@@ -6,4 +6,8 @@
 
 файлы include ошибка если нет {template .tmpname}
 
+неверный вывод ошибок в шаблонах include (не определен класс)
+
 {from &i = 10 to 20 step 1}
+
+реализовать args="{~a}" arg:value="1" -> value extends args (CalendarFavorites)

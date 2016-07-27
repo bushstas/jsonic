@@ -1,6 +1,6 @@
 form OrderCallForm
 
-initial options = {
+initial args = {
 	'action': CONFIG.orderCall.send,
 	'method': 'POST',
 	'container': '->> app-order-call',
@@ -9,7 +9,6 @@ initial options = {
 		#emailInput,
 		#phoneInput,
 		{
-			'cmpid': 'topic',
 			'type': 'select',
 			'name': 'topic',
 			'options': Dictionary.get('orderCallTopics'),
@@ -17,7 +16,6 @@ initial options = {
 			'class': '->> half-width'
 		},
 		{
-			'cmpid': 'date',
 			'type': 'select',
 			'name': 'date',
 			'options': this.getDateOptions(),
@@ -25,7 +23,6 @@ initial options = {
 			'class': '->> half-width'
 		},
 		{
-			'cmpid': 'time',
 			'type': 'select',
 			'name': 'time',
 			'options': Dictionary.get('timeOptions'),
@@ -33,7 +30,6 @@ initial options = {
 			'class': '->> half-width'
 		},
 		{
-			'cmpid': 'comment',
 			'type': 'textarea',
 			'name': 'comment',
 			'caption': @descr

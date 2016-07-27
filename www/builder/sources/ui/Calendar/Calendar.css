@@ -1,40 +1,41 @@
 $imgsrc = ../images/arrows
+
 .app-calendar {
-	$br3 $mt4 $bo#e4eaf3 $fs14    
+	$(br3 mt4 bo#e4eaf3 fs14)
     box-shadow: 0 0 6px #dde4ef;
 }
 .app-calendar-header {
-    $rel $bc#f5f8fc $h42 $br3 $bob#d6e1f0
+    $(rel bc#f5f8fc h42 br3 bob#d6e1f0)
 }
 .app-calendar-prev,
 .app-calendar-next {
-	$abs $w30 $t $b $bg $pointer $z2
+	$(abs w30 t b bg pointer z2)
 }
 .app-calendar-prev {
-	$l19% $png = left1
+	$(l19% png=left1)
 }
 .app-calendar-next {
-	$r19% $png = right1
+	$(r19% png=right1)
 }
 .app-calendar-prev:hover,
 .app-calendar-next:hover {
 	$opac7
 }
 .app-calendar-month {
-    $abs $c#5d687a $lh42 $l $r $bold $center
+    $(abs c#5d687a lh42 l r bold center)
 }
 .app-calendar-year {
-	$inb $ml4
+	$(inb ml4)
 }
 .app-calendar-content {
 	$p7
 }
 .app-calendar-day-names {
-	$lh30 $bold $nowrap $c#6d798f
+	$(lh30 bold nowrap c#6d798f)
 }
 .app-calendar-days span,
 .app-calendar-day-names span {
-	$inb $w9.2% $center
+	$(inb w9.2% center)
 	margin: 2px 2.5%;
 }
 .app-calendar-days span {
@@ -44,12 +45,12 @@ $imgsrc = ../images/arrows
 	$c#bbb
 }
 .app-calendar-days span.marked {
-    $white $br3 $pointer
+    $(white br3 pointer)
     background-color: $red !important;
 }
 .app-calendar-days span.marked:hover {
     $opac7
 }
 .app-calendar-days span.current {
-	$bc#7e8fad $white $br3
+	$(bc#7e8fad white br3)
 }

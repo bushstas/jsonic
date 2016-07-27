@@ -1,4 +1,4 @@
-<div class="app-select{$class?' '+$class}{$active?' active'}" scope="1">
+<div class="app-select{$className?' '+$className}{$active?' active'}" scope="1">
 	<div class="app-select-value" onClick="onClick">
 		{$title}
 	</div>

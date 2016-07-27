@@ -1,2 +1,3 @@
 <div class="app-authform-logo">LOGO</div>
-<div class="app-authform-inputs"></div>
+<include FormControls controls="{~controls}">
+<include FormSubmit submit="{~submit}">

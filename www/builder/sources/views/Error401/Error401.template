@@ -1,5 +1,5 @@
 {template .main}
 	<div class="app-auth-form-container">
-		<component AuthForm>
+		<form class="AuthForm">
 	</div>
 {/template}

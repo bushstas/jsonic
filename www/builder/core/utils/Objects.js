@@ -57,6 +57,15 @@ function Objects() {
 	this.get = function(obj, key, defaultValue) {
 		return this.has(obj, key) ? obj[key] : defaultValue;
 	};
+	this.getByIndex = function(obj, idx) {
+		if (!isArrayLike(obj)) return;
+		if (isArray(obj)) return obj[idx];
+		var count = 0;
+		for (var k in obj) {
+			if (count == idx) return idx[k];
+			count++;
+		}
+	};
 	this.has = function(obj, key, value) {
 		if (!isArrayLike(obj)) return false;
 		var has = !isUndefined(obj[key]);
