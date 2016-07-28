@@ -240,11 +240,11 @@
 		$files = gatherFiles($pathToSrc, array());
 
 		$coreClasses = array(
-			'Component', 'Controller', 'Application', 'View', 'Dialog', 'Form', 'Menu'
+			'Component', 'Controller', 'Application', 'View', 'Dialog', 'Menu'
 		);
 		$reservedNames = array(
 			'Component', 'Controller', 'Application', 'View', 'Level',
-			'Form', 'Control', 'AjaxRequest', 'Router', 'Objects',
+			'Control', 'AjaxRequest', 'Router', 'Objects',
 			'Condition', 'Core', 'Menu', 'EventHandler', 'Dialoger', 'Foreach',
 			'Globals', 'User', 'StoreKeeper', 'Switch', 'Tooltiper', 'IfSwitch',
 

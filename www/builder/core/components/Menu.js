@@ -1,6 +1,7 @@
 function Menu() {};
 
-Menu.prototype.onRenderComplete = function() {
+Menu.prototype.doRendering = function() {
+	Component.prototype.doRendering.call(this);
 	if (Router.hasMenu(this)) {
 		this.onNavigate(Router.getCurrentRouteName());
 	}

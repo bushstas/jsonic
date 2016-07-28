@@ -1220,6 +1220,7 @@
 					if ($tagName == 'switch') {
 						getSwitch($item, $child, $component);
 					} elseif ($tagName != 'foreach' && $tagName != 'if') {
+						if ($tagName == 'forma') $tagName = 'form';
 						$child['t'] = getTagIndex($tagName);
 						getTagProperties($item, $child, $component);
 					} else {
@@ -2337,7 +2338,7 @@
 	function getComponentClassData() {
 		global $config;
 		$data = array();
-		$classes = array('Component', 'Control', 'Form');
+		$classes = array('Component', 'Control');
 		foreach ($classes as $class) {
 			$pathToComponentClass = $config['sources'].'/components/'.$class.'.js';
 			if (!file_exists($pathToComponentClass)) {

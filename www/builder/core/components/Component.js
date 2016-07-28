@@ -102,9 +102,7 @@ Component.prototype.renderTempPlaceholder = function() {
 
 Component.prototype.onDataLoad = function(isAsync, data) {
 	this.onLoaded(data);
-	if (!isAsync) {
-		this.onReadyToRender();
-	}
+	if (!isAsync) this.onReadyToRender();
 };
 
 Component.prototype.onReadyToRender = function() {
@@ -127,16 +125,13 @@ Component.prototype.doRendering = function() {
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 	}
 	this.rendered = true;
-	this.onRenderComplete();
 	this.onRendered();
 	if (isArray(this.callbacks)) {
 		for (var i = 0; i < this.callbacks.length; i++) {
-			if (isFunction(this.callbacks[i])) {
-				this.callbacks[i]();
-			}
+			if (isFunction(this.callbacks[i])) this.callbacks[i]();
 		}
-		this.callbacks = null;
 	}
+	this.callbacks = null;
 	this.waiting = null;
 };
 
@@ -348,8 +343,6 @@ Component.prototype.stopDelay = function() {
 Component.prototype.onRendered = function() {};
 
 Component.prototype.onLoaded = function() {};
-
-Component.prototype.onRenderComplete = function() {};
 
 Component.prototype.getTemplateMain = function() {
 	return null;

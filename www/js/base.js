@@ -260,9 +260,7 @@ Component.prototype.renderTempPlaceholder = function() {
 };
 Component.prototype.onDataLoad = function(isAsync, data) {
 	this.onLoaded(data);
-	if (!isAsync) {
-		this.onReadyToRender();
-	}
+	if (!isAsync) this.onReadyToRender();
 };
 Component.prototype.onReadyToRender = function() {
 	if (!this.isRendered()) {
@@ -283,16 +281,13 @@ Component.prototype.doRendering = function() {
 		this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 	}
 	this.rendered = true;
-	this.onRenderComplete();
 	this.onRendered();
 	if (isArray(this.callbacks)) {
 		for (var i = 0; i < this.callbacks.length; i++) {
-			if (isFunction(this.callbacks[i])) {
-				this.callbacks[i]();
-			}
+			if (isFunction(this.callbacks[i])) this.callbacks[i]();
 		}
-		this.callbacks = null;
 	}
+	this.callbacks = null;
 	this.waiting = null;
 };
 Component.prototype.getArgs = function() {
@@ -480,7 +475,6 @@ Component.prototype.stopDelay = function() {
 };
 Component.prototype.onRendered = function() {};
 Component.prototype.onLoaded = function() {};
-Component.prototype.onRenderComplete = function() {};
 Component.prototype.getTemplateMain = function() {
 	return null;
 };
@@ -1122,196 +1116,6 @@ Foreach.prototype.dispose = function() {
 	this.nextSiblingChild = null;
 	this.prevSiblingChild = null;
 };
-function Form() {}
-Form.prototype.initiate = function() {
-	this.options = {};
-	this.controls = {};
-};
-Form.prototype.initOptions = function(options) {
-	if (isObject(options)) {
-		this.options = options;
-		if (!options['ajax']) {
-			this.createFormElement();
-		} else {
-			this.createAjaxRequest();
-		}
-	} else {
-		log('no form options');
-	}
-};
-Form.prototype.createFormElement = function() {
-	var formElement = document.createElement('form');
-	if (isString(this.options['method'])) {
-		formElement.setAttribute('method', this.options['method']);
-	}
-	if (isString(this.options['action'])) {
-		var action = this.correctAction(this.options['action']);
-		formElement.setAttribute('action', action);
-	}
-	this.parentElement.appendChild(formElement);
-	this.setScope(formElement);
-	this.parentElement = formElement;
-	var iframeId = generateRandomKey();
-	this.createTargetIframe(iframeId);
-	formElement.setAttribute('target', iframeId);
-	this.formElement = formElement;
-};
-Form.prototype.correctAction = function(url) {
-	url = url.replace(/^[\.\/]+/, '');
-	if (isString(__APIDIR)) {
-		var regExp = new RegExp('^' + __APIDIR + "\/");
-		url = __APIDIR + '/' + url.replace(regExp, '');
-	}
-	return '/' + url;
-};
-Form.prototype.onRenderComplete = function() {
-	var controlsContainer = this.options['container'];
-	if (controlsContainer && isString(controlsContainer)) {
-		controlsContainer = this.findElement('.' + controlsContainer);
-	}
-	controlsContainer = controlsContainer || this.parentElement;
-	if (this.options['ajax']) {
-		this.setScope(controlsContainer);
-	}	
-	if (isArray(this.options['controls'])) {
-		var control;
-		for (var i = 0; i < this.options['controls'].length; i++) {
-			if (isObject(this.options['controls'][i])) {
-				this.createControl(this.options['controls'][i], controlsContainer);
-			}
-		}
-	}
-	if (isObject(this.options['submit'])) {
-		this.createSubmit(controlsContainer);
-	}
-};
-Form.prototype.createControl = function(options, parentElement) {
-	var field;
-	switch (options['type']) {
-		case 'select':
-			field = this.createSelect(options);
-		break;
-		case 'textarea':
-			field = this.createTextarea(options);
-		break;
-		default:
-			field = this.createInput(options);
-	}
-	this.addChild(field, parentElement);
-	this.addControls(field.getChildrenOfClass(Control));
-};
-Form.prototype.addControls = function(controls) {
-	for (var i = 0; i < controls.length; i++) {
-		var name = controls[i].getName();
-		this.controls[name] = controls[i];
-	}
-};
-Form.prototype.createInput = function(options) {
-	return new InputField(options);
-};
-Form.prototype.createSelect = function(options) {
-	return new SelectField(options);
-};
-Form.prototype.createTextarea = function(options) {
-	return new Textarea(options);
-};
-Form.prototype.createSubmit = function(parentElement) {
-	var control = new Submit(this.options['submit']);
-	this.addChild(control, parentElement);
-	this.addListener(control, 'submit', this.onSubmit);
-};
-Form.prototype.createTargetIframe = function(id) {
-	var iframe = document.createElement('iframe');
-	iframe.setAttribute('id', id);
-	iframe.setAttribute('name', id);
-	iframe.style.display = 'none';
-	this.parentElement.appendChild(iframe);
-};
-Form.prototype.createAjaxRequest = function() {
-	this.request = new AjaxRequest(this.options['action'], this.handleResponse.bind(this));
-};
-Form.prototype.onSubmit = function() {
-	if (this.isValid()) {
-		if (this.formElement) {
-			this.setFormKey();
-			this.formElement.submit();
-		} else if (this.request) {
-			this.request.send(this.options['method'] || 'POST', this.getData());
-		}
-	}
-};
-Form.prototype.setFormKey = function() {
-	this.formKey = generateRandomKey();
-	window[this.formKey] = this;
-	if (!isElement(this.keyInput)) {
-		this.keyInput = document.createElement('input');
-		this.keyInput.setAttribute('name', 'formKey');
-		this.keyInput.setAttribute('type', 'hidden');
-		this.keyInput.value = this.formKey;
-		this.getElement().appendChild(this.keyInput);
-	}
-};
-Form.prototype.isValid = function() {
-	return true;
-};
-Form.prototype.getData = function() {
-	var data = {};
-	for (var k in this.controls) {
-		data[k] = this.controls[k].getValue();
-	}
-	return data;
-};
-Form.prototype.handleResponse = function(data) {
-	if (isString(data)) {
-		try {
-			data = JSON.parse(data);
-		} catch (e) {
-			log('incorrect form response', 'handleResponse', this, {'data': data});
-		}
-	}
-	if (isObject(data) && data['success']) {
-		this.onSuccess(data);
-	} else {
-		this.onFailure(data);
-	}
-	if (isString(this.formKey)) {
-		this.formKey = null;
-		delete window[this.formKey];
-	}
-};
-Form.prototype.onSuccess = function(data) {};
-Form.prototype.onFailure = function(data) {
-	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
-	this.log(error, 'onFailure', data);
-};
-Form.prototype.getControl = function(name) {
-	return this.controls[name];
-};
-Form.prototype.getCotrolAt = function(index) {
-	return Objects.getByIndex(this.controls, index);
-};
-Form.prototype.setControlValue = function(name, value) {
-	if (isString(name)) {
-		var control = this.getControl(name);
-		if (control) {
-			control.setValue(value);
-		}
-	}
-};
-Form.prototype.enableControl = function(name, isEnabled) {
-	if (isString(name)) {
-		var control = this.getControl(name);
-		if (control) {
-			control.setEnabled(isEnabled);
-		}
-	}
-};
-Form.prototype.disposeInternal = function() {
-	this.options = null;
-	this.controls = null;
-	this.request = null;
-	this.formElement = null;
-};
 function IfSwitch(params) {
 	this.values = params['is'];
 	this.default = params['d'];
@@ -1741,7 +1545,8 @@ Level.prototype.dispose = function() {
 	this.component = null;
 };
 function Menu() {};
-Menu.prototype.onRenderComplete = function() {
+Menu.prototype.doRendering = function() {
+	Component.prototype.doRendering.call(this);
 	if (Router.hasMenu(this)) {
 		this.onNavigate(Router.getCurrentRouteName());
 	}
@@ -3786,6 +3591,101 @@ Dialog.prototype.getInitials = function() {
 		'props':{'width': 600}
 	};
 };
+function Form(props) {
+	Initialization.initiate.call(this, props);
+};
+Form.prototype.initiate = function() {
+	this.controls = {};
+};
+Form.prototype.onSubmit = function() {
+	if (this.isValid()) {
+		if (this.formElement) {
+			this.setFormKey();
+			this.formElement.submit();
+		} else if (this.request) {
+			this.request.send(this.options['method'] || 'POST', this.getData());
+		}
+	}
+};
+Form.prototype.setFormKey = function() {
+	this.formKey = generateRandomKey();
+	window[this.formKey] = this;
+	if (!isElement(this.keyInput)) {
+		this.keyInput = document.createElement('input');
+		this.keyInput.setAttribute('name', 'formKey');
+		this.keyInput.setAttribute('type', 'hidden');
+		this.keyInput.value = this.formKey;
+		this.getElement().appendChild(this.keyInput);
+	}
+};
+Form.prototype.isValid = function() {
+	return true;
+};
+Form.prototype.getData = function() {
+	var data = {};
+	for (var k in this.controls) {
+		data[k] = this.controls[k].getValue();
+	}
+	return data;
+};
+Form.prototype.handleResponse = function(data) {
+	if (isString(data)) {
+		try {
+			data = JSON.parse(data);
+		} catch (e) {
+			log('incorrect form response', 'handleResponse', this, {'data': data});
+		}
+	}
+	if (isObject(data) && data['success']) {
+		this.onSuccess(data);
+	} else {
+		this.onFailure(data);
+	}
+	if (isString(this.formKey)) {
+		this.formKey = null;
+		delete window[this.formKey];
+	}
+};
+Form.prototype.onSuccess = function(data) {
+};
+Form.prototype.onFailure = function(data) {
+	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
+	this.log(error, 'onFailure', data);
+};
+Form.prototype.getControl = function(name) {
+	return this.controls[name];
+};
+Form.prototype.getCotrolAt = function(index) {
+	return Objects.getByIndex(this.controls, index);
+};
+Form.prototype.setControlValue = function(name, value) {
+	if (isString(name)) {
+		var control = this.getControl(name);
+		if (control) {
+			control.setValue(value);
+		}
+	}
+};
+Form.prototype.enableControl = function(name, isEnabled) {
+	if (isString(name)) {
+		var control = this.getControl(name);
+		if (control) {
+			control.setEnabled(isEnabled);
+		}
+	}
+};
+Form.prototype.disposeInternal = function() {
+	this.options = null;
+	this.controls = null;
+	this.request = null;
+	this.formElement = null;
+};
+Form.prototype.getTemplateMain = function($,_) {
+	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'args':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'p':{'props':_['submit']}}]:'','i':true}],'t':13,'e':[23,$.onSubmit],'p':{'c':'app-form-controls','m':_['method'],'a':_['action']}}]
+};
+Form.prototype.getTemplateContent = function($,_) {
+	return null
+};
 function FormField(props) {
 	Initialization.initiate.call(this, props);
 };
@@ -4184,8 +4084,8 @@ function AuthForm(props) {
 AuthForm.prototype.onSuccess = function() {
 	window.location.reload();
 };
-AuthForm.prototype.getTemplateMain = function($,_) {
-	return[{'c':__T[4],'t':0,'p':{'c':'app-authform-logo'}},{'tmp':includeGeneralTemplateFormControls,'p':{'controls':_['controls']}},{'tmp':includeGeneralTemplateFormSubmit,'p':{'submit':_['submit']}}]
+AuthForm.prototype.getTemplateContent = function($,_) {
+	return[{'c':__T[4],'t':0,'p':{'c':'app-authform-logo'}}]
 };
 AuthForm.prototype.getInitials = function() {
 	return {
@@ -4265,9 +4165,6 @@ OrderCallForm.prototype.validateTime = function() {
 		timeSelect.enableOption(1, true);
 		timeSelect.enableOption(2, true);
 	}
-};
-OrderCallForm.prototype.getTemplateMain = function($,_) {
-	return[{'t':0,'p':{'c':'app-order-call'}}]
 };
 OrderCallForm.prototype.getInitials = function() {
 	return {
@@ -4388,19 +4285,13 @@ function TopMenu(props) {
 TopMenu.prototype.getTemplateMain = function($,_) {
 	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[5],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[6],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[7],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[8],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[9],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
 };
-function includeGeneralTemplateFormControls($,_) {
-	return[{'c':{'h':function(control){return[{'cmp':FormField,'p':{'args':control}}]},'p':_['controls']},'t':0,'p':{'c':'app-form-controls'}}]
-}
-function includeGeneralTemplateFormSubmit($,_) {
-	return[{'c':!!_['submit']?[{'cmp':Submit,'p':{'props':_['submit']}}]:'','i':true}]
-}
 function includeGeneralTemplateUnavailable($,_) {
 	return[{'t':0,'p':{'c':'app-unavailable-info '+(_['tariff']?' unavailable':' auth'),'st':(_['width']?' width:'+_['width']:'')}}]
 }
 function includeGeneralTemplateCheckbox($,_) {
 	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['checked']?' checked':''),'_name':_['name'],'_value':_['value']}}]
 }
-Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,TenderSearchForm,SearchFormFilters,Calendar,Dialog,FormField,PopupMenu,Submit,TabPanel,Tooltip,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea,TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,TenderSearchForm,SearchFormFilters,Calendar,Dialog,Form,FormField,PopupMenu,Submit,TabPanel,Tooltip,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea,TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
 Router = new Router();
 User = new User();
 Favorites = new Favorites();
