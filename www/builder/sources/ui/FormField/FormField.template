@@ -1,7 +1,7 @@
-<div class="app-input-container {$class}" scope="1">
-	{if $caption}
+<div class="app-input-container {~class}" scope="1">
+	{if ~caption}
 		<div class="app-input-caption">
-			{$caption}
+			{~caption}
 		</div>
 	{/if}
 	<control class="{~controlClass}" name="{~controlProps['name']}" props="{~controlProps}">

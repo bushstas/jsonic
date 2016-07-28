@@ -7,16 +7,22 @@ initial args = {
 	'container': '->> app-authform-inputs',
 	'controls': [
 		{
-			'type': 'text',
-			'name': 'login',
-			'placeholder': @enterLogin,
-			'caption': @login
+			'caption': @login,
+			'controlClass': Input,
+			'controlProps': {
+				'type': 'text',
+				'name': 'login',
+				'placeholder': @enterLogin
+			}
 		},
 		{
-			'type': 'password',
-			'name': 'password',
-			'placeholder': @enterPassword,
-			'caption': @password
+			'caption': @password,
+			'controlClass': Input,
+			'controlProps': {
+				'type': 'password',
+				'name': 'password',
+				'placeholder': @enterPassword
+			}			
 		}
 	],
 	'submit': {

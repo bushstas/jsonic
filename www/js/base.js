@@ -3793,7 +3793,7 @@ FormField.prototype.getValue = function() {
 	return this.getCotrolAt(0).getValue();
 };
 FormField.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'props':_['controlProps']}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
+	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'props':_['controlProps']}}],'t':0,'p':{'c':'app-input-container '+_['class'],'sc':1}}]
 };
 function PopupMenu(props) {
 	Initialization.initiate.call(this, props);
@@ -4189,7 +4189,7 @@ AuthForm.prototype.getTemplateMain = function($,_) {
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'app-authform-inputs','controls': [{'type': 'text','name': 'login','placeholder': __[26],'caption': __[27]},{'type': 'password','name': 'password','placeholder': __[28],'caption': __[29]}],'submit': {'value': __[30],'class': 'app-submit'}}
+		'args':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'app-authform-inputs','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'app-submit'}}
 	};
 };
 function OrderCallForm(props) {
