@@ -115,8 +115,6 @@
 .app-select-option:hover{color:#5f6b7f;background-color:#e7ecf4;}
 .app-select-option.disabled{color:#a5aec0;cursor:default;}
 .app-select-option.disabled:hover{background-color:#fff;}
-/* Submit */
-.app-submit-container{margin-top:15px;}
 /* CalendarFavorites */
 .calendar-favorites-datatable{padding-bottom:20px;min-height:300px;}
 /* Support */
@@ -208,6 +206,8 @@ body.main-page .app-top-menu-inner{width:1350px;margin:auto;}
 .app-popup-menu-outer-container{position:absolute;z-index:500;width:200px;margin-top:1px;text-align:left;top:100%;border-radius:3px;background-color:#fff;border-left:1px solid #6C7992;border-right:1px solid #6C7992;max-height:0;overflow:hidden;transition:all 0.2s;}
 .app-popup-menu-inner-container{position:absolute;left:0;right:0;bottom:0;border-top:1px solid #6C7992;border-bottom:1px solid #6C7992;background-color:#fff;border-radius:3px;padding:5px 0;}
 .app-popup-menu-button{position:relative;padding-left:15px;line-height:30px;font-size:14px;color:#424b57;cursor:pointer;white-space:nowrap;overflow:hidden;height:30px;}
+/* Submit */
+.app-submit-container{margin-top:15px;}
 /* TabPanel */
 .app-tab-panel{position:relative;height:34px;}
 .app-tab{width:200px;text-align:center;position:absolute;height:34px;line-height:34px;background-color:#e2e4ea;color:#40485F;cursor:pointer;border-radius:2px 2px 0 0;font-size:14px;z-index:1;}
@@ -230,11 +230,11 @@ body.main-page .app-top-menu-inner{width:1350px;margin:auto;}
 .app-tooltip-popup-text{padding:15px 18px;}
 .app-tooltip-list-item{position:relative;line-height:16px;padding:4px 0 4px 12px;}
 .app-tooltip-list-item:before{content:'';width:5px;height:5px;border-radius:50%;position:absolute;left:0;top:10px;background-color:#47536c;}
-/* style */
+/* Error401 */
 .app-auth-form-container{position:absolute;left:50%;top:50%;width:300px;height:300px;margin-left:-150px;margin-top:-150px;}
 /* Error404 */
 .app-404-container{position:fixed;left:50%;top:50%;width:500px;margin-left:-250px;margin-top:-160px;text-align:center;}
-.app-404-title{font-size:180px;line-height:180px;font-weight:bold;color:#AAAAAA;}
+.app-404-title{font-size:180px;line-height:180px;font-family:ptsansbold;color:#aaa;}
 .app-404-text{font-size:18px;margin-top:10px;}
 /* FilterSubscription */
 .app-subscription:after{}

@@ -4,5 +4,5 @@
 			{$caption}
 		</div>
 	{/if}
-	<control class="{~controlClass}" props="{~controlProps}">
+	<control class="{~controlClass}" name="{~controlProps['name']}" props="{~controlProps}">
 </div>

@@ -488,14 +488,18 @@
 		$calledComponents = array();
 		$filesOfUsedComponents = array();
 		foreach ($templates as $filename => $file) {
-			preg_match_all("/<component +[\"']*([^\"'\s>]+)/i", $file, $matches);
-			foreach ($matches[1] as $match) {
-				$usedComponents[] = $match;
-				$calledComponents[$match] = 1;
-				if (!is_array($filesOfUsedComponents[$match])) {
-					$filesOfUsedComponents[$match] = array();
+			preg_match_all("/<(component|control|form|menu)([^>]+)>/i", $file, $matches);
+			$tagContents = $matches[2];
+			foreach ($tagContents as $cnt) {
+				preg_match_all("/class=[\"'](\w+)[\"']/i", $cnt, $matches);
+				foreach ($matches[1] as $match) {
+					$usedComponents[] = $match;
+					$calledComponents[$match] = 1;
+					if (!is_array($filesOfUsedComponents[$match])) {
+						$filesOfUsedComponents[$match] = array();
+					}
+					$filesOfUsedComponents[$match][] = $filename;
 				}
-				$filesOfUsedComponents[$match][] = $filename;
 			}
 		}
 		foreach ($classes['component'] as $class) {

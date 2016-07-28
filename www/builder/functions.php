@@ -1083,7 +1083,7 @@
 		foreach ($list as $item) {
 			$tn = $item['tagName'];
 			if (!empty($tn)) {
-				if (!isSimpleTag($tn) && $tn != 'template' && $tn != 'include' && $tn != 'component' && $tn != 'else') {
+				if (!isSimpleTag($tn) && $tn != 'template' && $tn != 'include' && $tn != 'component' && $tn != 'control' && $tn != 'form' && $tn != 'menu' && $tn != 'else') {
 					if ($item['isClosing'] == 0) {
 						if (!isset($opened[$tn])) {
 							$opened[$tn] = 0;
@@ -1122,6 +1122,7 @@
 		$isElse = false;
 		$currentIf = null;
 		for ($i = 0; $i < count($list); $i++) {
+			$child = array();
 			$item = $list[$i];
 			$tagName = trim($item['tagName']);
 			if ($item['type'] == 'text') {
@@ -1144,7 +1145,7 @@
 				if (isSimpleTag($tagName))
 				{
 					$child = array('t' => getTagIndex($tagName));
-					getTagProperties($item['content'], $child, $component);
+					getTagProperties($item, $child, $component);
 				}
 				elseif ($tagName == 'template')
 				{
@@ -1165,17 +1166,9 @@
 					$child = array('tmp' => '<nq>includeGeneralTemplate'.ucfirst($match[1]).'<nq>');
 					getTemplateProperties($item['content'], $child, $component);
 				}
-				elseif ($tagName == 'control')
+				elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
 				{
-					preg_match("/<control +[\"']*(\w+)[\"']*/i",  $content, $match);
-					$child = array('cmp' => '<nq>'.$match[1].'<nq>');
-					getTagProperties($item['content'], $child, $component, true);
-				}
-				elseif ($tagName == 'component')
-				{
-					preg_match("/<component +(\w+)/i",  $content, $match);
-					$child = array('cmp' => '<nq>'.$match[1].'<nq>');
-					getTagProperties($item['content'], $child, $component, true);
+					getTagProperties($item, $child, $component, true);
 				}
 				else
 				{					
@@ -1228,7 +1221,7 @@
 						getSwitch($item, $child, $component);
 					} elseif ($tagName != 'foreach' && $tagName != 'if') {
 						$child['t'] = getTagIndex($tagName);
-						getTagProperties($item['content'], $child, $component);
+						getTagProperties($item, $child, $component);
 					} else {
 						if ($tagName == 'if') {
 							if ($ifContentIsEmpty) {
@@ -1549,7 +1542,7 @@
 			error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$ifCondition.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
 		}
 		$hasCode = preg_match('/\$\w/', $ifCondition);
-		if (is_string($component)) {
+		if (is_string($component) && $hasCode) {
 			error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$ifCondition.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
 		}
 		parseClassMethodCalls($ifCondition, $component);
@@ -1614,7 +1607,8 @@
 		return $funcs;
 	}
 
-	function getTagProperties($html, &$child, &$component, $isComponentTag = false) {
+	function getTagProperties($item, &$child, &$component, $isComponentTag = false) {
+		$html = $item['content'];
 		global $obfuscate;
 		global $propsShortcuts;
 		global $eventTypesShortcuts;
@@ -1627,14 +1621,14 @@
 		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
 		$propValues = array_merge($matches1[2], $matches2[2]);
-		for ($i = 0; $i < count($propNames); $i++) {			
+		for ($i = 0; $i < count($propNames); $i++) {		
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
 			$hasCode = hasCode($propValue);
 			$fullPropName = $propName;
 			$isObfClName = $obfuscate === true && $fullPropName == 'class';
 
-			if (is_numeric($child['t']) || !empty($child['cmp'])) {
+			if (is_numeric($child['t']) || $isComponentTag) {
 				if ($propName == 'scope') {
 					$props[$propsShortcuts[$propName]] = 1;
 					continue;
@@ -1647,10 +1641,20 @@
 					$else = $propValue;
 					continue;
 				}
-				if (!isset($child['cmp']) && !isset($child['tmp']) && isset($propsShortcuts[$propName])) {
+				
+				if (!$isComponentTag && !isset($child['tmp']) && isset($propsShortcuts[$propName])) {
 					$propName = $propsShortcuts[$propName];
 				} else {
 					$propName = preg_replace('/^data-/', '_', $propName);
+					if ($isComponentTag) {
+						if ($propName == 'class') {
+							$child['cmp'] = parseComponentClassName($propValue, $component, $item['content']);
+							continue;
+						} elseif ($item['tagName'] == 'control' && $propName == 'name') {
+							$child['nm'] = parseComponentClassName($propValue, $component, $item['content'], true);
+							continue;
+						}
+					}
 				}
 				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
 					if ($hasCode) {
@@ -1745,6 +1749,22 @@
 				$props[$propName] = getObfuscatedClassName($propValue);
 			}
 		}
+		if ($isComponentTag) {
+			$comp = '<component class="ComponentClassName">';
+			if ($item['tagName'] == 'control') {
+				$comp = '<control class="ControlClassName" name="controlName">';
+			} elseif ($item['tagName'] == 'menu') {
+				$comp = '<menu class="MenuClassName">';
+			} elseif ($item['tagName'] == 'form') {
+				$comp = '<form class="FormClassName">';
+			}
+			if (empty($child['cmp'])) {
+				error('Неопределенный компонент в шаблоне класса <b>'.$component['name'].'</b><xmp>'.$item['content'].'</xmp>Ожидается запись вида<xmp>'.$comp.'</xmp>');
+			}
+			if ($item['tagName'] == 'control' && empty($child['nm'])) {
+				error('Контрол <b>'.$child['cmp'].'</b> в шаблоне класса <b>'.$component['name'].'</b> не имеет атрибута <b>name</b><xmp>'.$item['content'].'</xmp>Ожидается запись вида<xmp>'.$comp.'</xmp>');
+			}
+		}
 		if (!empty($props)) {
 			$child['p'] = $props;
 		}
@@ -1773,6 +1793,21 @@
 		if (!empty($ifCondition) || !empty($else)) {
 			addIfConditionToChild(trim($ifCondition), trim($else), $child, $component);
 		}
+	}
+
+	function parseComponentClassName($value, &$component, $content, $isControlName = false) {
+		if (!hasCode($value)) return !$isControlName ? '<nq>'.$value.'<nq>' : $value;
+		$hasReactive = preg_match('/\$\w/', $value);
+		if ($hasReactive) {
+			if (!$isControlName) {
+				error('Название компонента в шаблоне класса <b>'.$component['name'].'</b> не может определяться реактивной переменной<xmp>'.$content.'</xmp>Допускается запись вида<xmp><component class="{~class}"></xmp>или<xmp><component class="{&class}"></xmp>');
+			} else {
+				error('Атрибут <b>name</b> контрола в шаблоне класса <b>'.$component['name'].'</b> не может определяться реактивной переменной<xmp>'.$content.'</xmp>Допускается запись вида<xmp><control name="{~class}"></xmp>или<xmp><control name="{&class}"></xmp>');
+			}
+		}
+		$value = ltrim($value, '{');
+		$value = rtrim($value, '}');
+		return parseCode($value, $component);
 	}
 
 	function parseClassMethodCalls(&$code, &$component) {
@@ -1972,7 +2007,7 @@
 		return $content;
 	}
 
-	function parseCode($code, &$component, $role, $toPropNodes = false) {
+	function parseCode($code, &$component, $role = null, $toPropNodes = false) {
 		$code = trim($code);
 		parseClassMethodCalls($code, $component);
 		$code = checkTernary($code, $component);
