@@ -187,6 +187,11 @@ Component.prototype.processInitials = function() {
 		this.receivedArgs = this.props['args'];
 		delete this.props['args'];
 	}
+	if (isObject(this.props['props'])) {
+		Objects.merge(this.props, this.props['props']);
+		delete this.props['props'];
+	}
+	console.log(this.props)
 	var initials = this.initials;
 	if (isObject(initials)) {
 		for (var k in initials) {
@@ -341,11 +346,8 @@ Component.prototype.addClass = function(className, isAdding) {
 Component.prototype.each = function(propName, callback) {
 	var ar = this.get(propName);
 	if (isArrayLike(ar) && isFunction(callback)) {
-		if (isArray(ar)) {
-			for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
-		} else {
-			for (var k in ar) callback.call(this, ar[k], k, ar);
-		}
+		if (isArray(ar)) for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
+		else for (var k in ar) callback.call(this, ar[k], k, ar);
 	}
 };
 Component.prototype.toggle = function(propName) {
@@ -461,12 +463,9 @@ Component.prototype.refresh = function(args) {
 	this.unrender();
 	this.doRendering();
 };
-Component.prototype.delay = function() {
-	this.stopDelay();
-	if (isFunction(arguments[0])) this.timeout = window.setTimeout(arguments[0].bind(this), arguments[1] || 200);
-};
-Component.prototype.stopDelay = function() {
+Component.prototype.delay = function(f, n) {
 	window.clearTimeout(this.timeout);
+	if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this), n || 200);
 };
 Component.prototype.onRendered = function() {};
 Component.prototype.onLoaded = function() {};
@@ -505,12 +504,10 @@ Component.prototype.getParent = function() {
 Component.prototype.getChildAt = function(index) {
 	return Objects.getByIndex(this.children, index);
 };
-Component.prototype.getChildrenOfClass = function(classFunc) {
+Component.prototype.getChildren = function(classFunc) {
 	var children = [];
 	this.forEachChild(function(child) {
-		if (isComponentLike(child) && child.instanceOf(classFunc)) {
-			children.push(child);
-		}
+		if (isComponentLike(child) && child.instanceOf(classFunc)) children.push(child);
 	});
 	return children;
 };
