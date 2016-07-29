@@ -156,12 +156,6 @@ Component.prototype.dispatchEvent = function(eventType, eventParams) {
 	}
 };
 
-Component.prototype.forEachChild = function(callback) {
-	if (isArray(this.children)) {
-		for (var i = 0; i < this.children.length; i++) callback.call(this, this.children[i], i);
-	} else log('this.children is not an array');
-};
-
 Component.prototype.g = function(propName) {
 	return this.get(propName);
 };
@@ -358,21 +352,22 @@ Component.prototype.addChild = function(child, parentElement) {
 
 Component.prototype.removeChild = function(child) {
 	if (!child) return;
-	if (isString(child)) {
-		var child = this.getChildById(child);
-		if (child) child.dispose();
-	} else if (isObject(child)) {
-		var childIndex = this.children.indexOf(child);
-		if (childIndex > -1) {
-			this.children.splice(childIndex, 1);
-			child.dispose();
-		}
-	}
+	var childId = child;
+	if (isString(child)) child = this.getChild(child);
+	else childId = Objects.getKey(this.children, child);
+	if (isComponentLike(child)) child.dispose();
+	if ((isString(childId) || isNumber(childId)) && isObject(this.children)) delete this.children[childId];	
  };
 
-Component.prototype.registerChildComponent = function(childComponent) {
-	this.children = this.children || [];
-	if (this.children.indexOf(childComponent) == -1) this.children.push(childComponent);
+Component.prototype.forEachChild = function(callback) {	
+	if (isObject(this.children)) Objects.each(this.children, callback, this);
+};
+
+Component.prototype.registerChildComponent = function(child) {
+	this.childrenCount = this.childrenCount || 0;
+	this.children = this.children || {};
+	this.children[child.getId() || this.childrenCount] = child;
+	this.childrenCount++;
 };
 
 Component.prototype.setParent = function(parentalComponent) {
@@ -384,25 +379,19 @@ Component.prototype.getParent = function() {
 };
 
 Component.prototype.getChildAt = function(index) {
-	return this.children[index];
+	return Objects.getByIndex(this.children, index);
 };
 
-Component.prototype.getChildrenOfClass = function(classFunc) {
+Component.prototype.getChildren = function(classFunc) {
 	var children = [];
 	this.forEachChild(function(child) {
-		if (isComponentLike(child) && child.instanceOf(classFunc)) {
-			children.push(child);
-		}
+		if (isComponentLike(child) && child.instanceOf(classFunc)) children.push(child);
 	});
 	return children;
 };
 
-Component.prototype.getChildById = function(childComponentId) {
-	if (!this.children) return null;
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i].getId() == childComponentId) return this.children[i];
-	}
-	return null;
+Component.prototype.getChild = function(id) {
+	return Objects.get(this.children, id);
 };
 
 Component.prototype.doOnParentReady = function(callback, params) {
@@ -539,7 +528,7 @@ Component.prototype.unrender = function() {
 	this.listeners = null;
 };
 
-Component.prototype.dispose = function() {
+Component.prototype.dispose = function() {console.log('disposing ' + this.constructor.name)
 	this.unrender();
 	this.propActivities = null;
 	this.parentElement = null;

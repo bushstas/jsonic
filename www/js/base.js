@@ -307,11 +307,6 @@ Component.prototype.dispatchEvent = function(eventType, eventParams) {
 		}
 	}
 };
-Component.prototype.forEachChild = function(callback) {
-	if (isArray(this.children)) {
-		for (var i = 0; i < this.children.length; i++) callback.call(this, this.children[i], i);
-	} else log('this.children is not an array');
-};
 Component.prototype.g = function(propName) {
 	return this.get(propName);
 };
@@ -486,20 +481,20 @@ Component.prototype.addChild = function(child, parentElement) {
 };
 Component.prototype.removeChild = function(child) {
 	if (!child) return;
-	if (isString(child)) {
-		var child = this.getChildById(child);
-		if (child) child.dispose();
-	} else if (isObject(child)) {
-		var childIndex = this.children.indexOf(child);
-		if (childIndex > -1) {
-			this.children.splice(childIndex, 1);
-			child.dispose();
-		}
-	}
+	var childId = child;
+	if (isString(child)) child = this.getChild(child);
+	else childId = Objects.getKey(this.children, child);
+	if (isComponentLike(child)) child.dispose();
+	if ((isString(childId) || isNumber(childId)) && isObject(this.children)) delete this.children[childId];	
  };
-Component.prototype.registerChildComponent = function(childComponent) {
-	this.children = this.children || [];
-	if (this.children.indexOf(childComponent) == -1) this.children.push(childComponent);
+Component.prototype.forEachChild = function(callback) {	
+	if (isObject(this.children)) Objects.each(this.children, callback, this);
+};
+Component.prototype.registerChildComponent = function(child) {
+	this.childrenCount = this.childrenCount || 0;
+	this.children = this.children || {};
+	this.children[child.getId() || this.childrenCount] = child;
+	this.childrenCount++;
 };
 Component.prototype.setParent = function(parentalComponent) {
 	this.parentalComponent = parentalComponent;
@@ -508,7 +503,7 @@ Component.prototype.getParent = function() {
 	return this.parentalComponent;
 };
 Component.prototype.getChildAt = function(index) {
-	return this.children[index];
+	return Objects.getByIndex(this.children, index);
 };
 Component.prototype.getChildrenOfClass = function(classFunc) {
 	var children = [];
@@ -519,12 +514,8 @@ Component.prototype.getChildrenOfClass = function(classFunc) {
 	});
 	return children;
 };
-Component.prototype.getChildById = function(childComponentId) {
-	if (!this.children) return null;
-	for (var i = 0; i < this.children.length; i++) {
-		if (this.children[i].getId() == childComponentId) return this.children[i];
-	}
-	return null;
+Component.prototype.getChild = function(id) {
+	return Objects.get(this.children, id);
 };
 Component.prototype.doOnParentReady = function(callback, params) {
 	this.getParent().addCallback(callback.bind(this, params));
@@ -637,7 +628,7 @@ Component.prototype.unrender = function() {
 	this.level = null;
 	this.listeners = null;
 };
-Component.prototype.dispose = function() {
+Component.prototype.dispose = function() {console.log('disposing ' + this.constructor.name)
 	this.unrender();
 	this.propActivities = null;
 	this.parentElement = null;
@@ -1413,8 +1404,6 @@ Level.prototype.renderComponent = function(item, parentElement) {
 		}
 		component.setParent(this.component);
 		component.render(parentElement);
-		this.registerChild(component, true);
-		if (isProps) this.registerPropComps(component, item['n'], item['p']);
 		if (cmpid) {
 			component.setId(cmpid);
 			var waiting = this.component.getWaitingChild(cmpid);
@@ -1424,6 +1413,8 @@ Level.prototype.renderComponent = function(item, parentElement) {
 				}
 			}
 		}
+		this.registerChild(component, true);
+		if (isProps) this.registerPropComps(component, item['n'], item['p']);
 		var events = item['e'];
 		if (isArray(events)) {
 			for (i = 0; i < events.length; i++) {
@@ -2964,23 +2955,18 @@ function User() {
 	};
 }
 function Objects() {
-	this.each = function(arr, callback) {
-		if (arguments[2]) {
-			callback = callback.bind(arguments[2]);
-		}
-		for (var i = 0; i < arr.length; i++) {
-			var result = callback(arr[i], i);
-			if (result == '__break') break;
+	this.each = function(obj, callback, thisObj) {
+		if (isArrayLike(obj)) {
+			if (thisObj) callback = callback.bind(thisObj);
+			for (var k in obj) if (callback(obj[k], k) == 'break') break;
 		}
 	};
-	this.remove = function(arr, item) {
-		var idx = arr.indexOf(item);
-		if (idx > -1) {
-			this.removeAt(arr, idx);
-		}
+	this.remove = function(obj, item) {
+		if (isArray(obj)) this.removeAt(obj, obj.indexOf(item));
+		else if (isObject(obj)) delete obj[obj.getKey(item)];
 	};
 	this.removeAt = function(arr, idx) {
-		arr.splice(idx, 1);
+		if (isArray(arr) && isNumber(idx) && idx >= 0) arr.splice(idx, 1);
 	};
 	this.equals = function(arr1, arr2) {
 		if (typeof arr1 !== typeof arr2) return false;
@@ -3003,14 +2989,10 @@ function Objects() {
 	};
 	this.merge = function() {
 		var arrs = arguments;
-		if (!isObject(arrs[0])) {
-			arrs[0] = {};
-		}
+		if (!isObject(arrs[0])) arrs[0] = {};
 		for (var i = 1; i < arrs.length; i++) {
 			if (isArrayLike(arrs[i])) {
-				for (var k in arrs[i]) {
-					arrs[0][k] = arrs[i][k];
-				}
+				for (var k in arrs[i]) arrs[0][k] = arrs[i][k];
 			}
 		}
 		return arrs[0];
@@ -3034,22 +3016,19 @@ function Objects() {
 	this.has = function(obj, key, value) {
 		if (!isArrayLike(obj)) return false;
 		var has = !isUndefined(obj[key]);
-		if (has && !isUndefined(value)) {
-			return obj[key] == value;
-		}
+		if (has && !isUndefined(value)) return obj[key] == value;
 		return has;
 	};
 	this.empty = function(obj) {
-		if (!isArrayLike(obj)) {
-			return true;
-		}
+		if (!isArrayLike(obj)) return true;
 		if (isObject(obj)) {
-			for (var k in obj) {
-				return false;
-			}
+			for (var k in obj) return false;
 			return true;
 		}
 		return isUndefined(obj[0]);
+	};
+	this.getKey = function(obj, value) {
+		for (var k in obj) if (obj[k] == value) return k;
 	};
 }
 Objects = new Objects();
@@ -3136,12 +3115,9 @@ function App(props) {
 	Initialization.initiate.call(this, props);
 };
 App.prototype.onNoErrors = function() {
-	var menu = this.getChildById('menu');
-	//menu.setAppended(true);
 };
 App.prototype.onError = function(errorCode) {
-	var menu = this.getChildById('menu');
-	menu.setAppended(false);
+	this.getChild('menu').setAppended(false);
 };
 App.prototype.getTemplateMain = function($,_) {
 	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]

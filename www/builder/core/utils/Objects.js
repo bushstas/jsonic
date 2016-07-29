@@ -1,21 +1,16 @@
 function Objects() {
-	this.each = function(arr, callback) {
-		if (arguments[2]) {
-			callback = callback.bind(arguments[2]);
-		}
-		for (var i = 0; i < arr.length; i++) {
-			var result = callback(arr[i], i);
-			if (result == '__break') break;
+	this.each = function(obj, callback, thisObj) {
+		if (isArrayLike(obj)) {
+			if (thisObj) callback = callback.bind(thisObj);
+			for (var k in obj) if (callback(obj[k], k) == 'break') break;
 		}
 	};
-	this.remove = function(arr, item) {
-		var idx = arr.indexOf(item);
-		if (idx > -1) {
-			this.removeAt(arr, idx);
-		}
+	this.remove = function(obj, item) {
+		if (isArray(obj)) this.removeAt(obj, obj.indexOf(item));
+		else if (isObject(obj)) delete obj[obj.getKey(item)];
 	};
 	this.removeAt = function(arr, idx) {
-		arr.splice(idx, 1);
+		if (isArray(arr) && isNumber(idx) && idx >= 0) arr.splice(idx, 1);
 	};
 	this.equals = function(arr1, arr2) {
 		if (typeof arr1 !== typeof arr2) return false;
@@ -38,14 +33,10 @@ function Objects() {
 	};
 	this.merge = function() {
 		var arrs = arguments;
-		if (!isObject(arrs[0])) {
-			arrs[0] = {};
-		}
+		if (!isObject(arrs[0])) arrs[0] = {};
 		for (var i = 1; i < arrs.length; i++) {
 			if (isArrayLike(arrs[i])) {
-				for (var k in arrs[i]) {
-					arrs[0][k] = arrs[i][k];
-				}
+				for (var k in arrs[i]) arrs[0][k] = arrs[i][k];
 			}
 		}
 		return arrs[0];
@@ -69,22 +60,19 @@ function Objects() {
 	this.has = function(obj, key, value) {
 		if (!isArrayLike(obj)) return false;
 		var has = !isUndefined(obj[key]);
-		if (has && !isUndefined(value)) {
-			return obj[key] == value;
-		}
+		if (has && !isUndefined(value)) return obj[key] == value;
 		return has;
 	};
 	this.empty = function(obj) {
-		if (!isArrayLike(obj)) {
-			return true;
-		}
+		if (!isArrayLike(obj)) return true;
 		if (isObject(obj)) {
-			for (var k in obj) {
-				return false;
-			}
+			for (var k in obj) return false;
 			return true;
 		}
 		return isUndefined(obj[0]);
+	};
+	this.getKey = function(obj, value) {
+		for (var k in obj) if (obj[k] == value) return k;
 	};
 }
 Objects = new Objects();

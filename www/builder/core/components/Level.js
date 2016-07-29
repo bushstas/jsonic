@@ -273,8 +273,6 @@ Level.prototype.renderComponent = function(item, parentElement) {
 		}
 		component.setParent(this.component);
 		component.render(parentElement);
-		this.registerChild(component, true);
-		if (isProps) this.registerPropComps(component, item['n'], item['p']);
 		if (cmpid) {
 			component.setId(cmpid);
 			var waiting = this.component.getWaitingChild(cmpid);
@@ -284,6 +282,8 @@ Level.prototype.renderComponent = function(item, parentElement) {
 				}
 			}
 		}
+		this.registerChild(component, true);
+		if (isProps) this.registerPropComps(component, item['n'], item['p']);
 		var events = item['e'];
 		if (isArray(events)) {
 			for (i = 0; i < events.length; i++) {
