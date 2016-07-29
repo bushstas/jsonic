@@ -1,7 +1,7 @@
 application App
 
-function onNoErrors() {
-
+function onClick() {
+	console.log(this.attachController)
 }
 
 function onError(errorCode) {

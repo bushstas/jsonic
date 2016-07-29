@@ -1,2 +1,2 @@
 <menu class="TopMenu" cmpid="menu">
-<div class="app-view-container"></div>
+<div class="app-view-container" onClick="onClick"></div>
