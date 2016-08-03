@@ -1,4 +1,21 @@
 function Initialization() {
+	var isMethodToInherit = function(method) {
+		return method != __I && method != __GI;
+	};
+	var extendInitials = function(initials1, initials2) {
+		if (isNull(initials1)) {
+			initials1 = initials2;
+		} else {
+			for (var k in initials2) {
+				if (isUndefined(initials1[k])) {
+					initials1[k] = initials2[k];
+				} else {
+					Objects.merge(initials1[k], initials2[k]);
+				}
+			}
+		}
+		return initials1;
+	};
 	this.inherits = function(list) {
 		var children, parent, child, initials;
 		for (var k = 0; k < list.length; k++) {
@@ -20,7 +37,7 @@ function Initialization() {
 			}
 		}
 	};
-	this.initiate = function(props) {
+	this.initiate = function(props, args) {
 		var initials = null;
 		var initiateParental = function(superClasses, object) {
 			for (var i = 0; i < superClasses.length; i++) {
@@ -54,26 +71,7 @@ function Initialization() {
 			}
 		}
 		this.initials = initials;
-		if (props && isString(props['cmpid'])) {
-			this.setId(props['cmpid']);
-		}
-	};
-	var isMethodToInherit = function(method) {
-		return method != __I && method != __GI;
-	};
-	var extendInitials = function(initials1, initials2) {
-		if (isNull(initials1)) {
-			initials1 = initials2;
-		} else {
-			for (var k in initials2) {
-				if (isUndefined(initials1[k])) {
-					initials1[k] = initials2[k];
-				} else {
-					Objects.merge(initials1[k], initials2[k]);
-				}
-			}
-		}
-		return initials1;
+		this.args = args;
 	};
 }
 Initialization = new Initialization();

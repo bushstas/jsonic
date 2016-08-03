@@ -43,6 +43,7 @@ function User() {
 			loaded = true;
 			if (app instanceof Function) {
 				app = new app();
+				Initialization.initiate.call(app);
 				app.run();
 			}
 		}

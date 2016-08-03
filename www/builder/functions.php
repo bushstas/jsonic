@@ -1788,11 +1788,92 @@
 				}
 				if (empty($child['p'])) {
 					unset($child['p']);
+				} else {
+					getProperComponentData($child);
 				}
 			}
 		}
 		if (!empty($ifCondition) || !empty($else)) {
 			addIfConditionToChild(trim($ifCondition), trim($else), $child, $component);
+		}
+	}
+
+	function getProperComponentData(&$child) {
+		$props = $child['p'];
+		$properData = array();
+		if (!empty($props['props'])) {
+			$properData['ap'] = array();	
+		} else {
+			$properData['p'] = array();
+		}
+		if (!empty($props['args'])) {
+			$properData['aa'] = array();	
+		} else {
+			$properData['a'] = array();
+		}
+		foreach ($props as $k => $v) {
+			if ($k == 'cmpid') {
+				$properData['i'] = $v;
+			} elseif ($k == 'props' || $k == 'args') {
+				$properData[$k == 'props' ? 'p' : 'a'] = $v;
+			} else {
+				if (preg_match('/^arg-/', $k)) {
+					$k = preg_replace('/^arg-/', '', $k);
+					if (is_array($properData['aa'])) {
+						$properData['aa'][$k] = $v;
+					} else {
+						$properData['a'][$k] = $v;
+					}
+				} else {
+					if (is_array($properData['ap'])) {
+						$properData['ap'][$k] = $v;
+					} else {
+						$properData['p'][$k] = $v;
+					}
+				}
+			}
+		}
+		if (empty($properData['ap'])) {
+			unset($properData['ap']);
+		}
+		if (empty($properData['p'])) {
+			unset($properData['p']);
+		}
+		if (empty($properData['aa'])) {
+			unset($properData['aa']);
+		}
+		if (empty($properData['a'])) {
+			unset($properData['a']);
+		}
+		$child['p'] = $properData;
+		if (is_array($child['n']) && !empty($child['n'])) {
+			foreach ($child['n'] as $k => $v) {
+				if ($k == 'args' || preg_match('/^arg-/', $k)) {
+					unset($child['n'][$k]);
+					if ($k != 'args') $k = preg_replace('/^arg-/', '', $k);
+					if (!is_array($child['na'])) {
+						$child['na'] = array();
+					}
+					$child['na'][$k] = $v;
+				}
+			}
+			if (empty($child['n'])) unset($child['n']);
+		}
+		if (is_array($child['n']) && is_array($child['na'])) {
+			$properNames = array();
+			foreach ($child['n'] as $n) {
+				if (!in_array($n, $child['na'])) {
+					$properNames[] = $n;
+				}
+			}
+			$child['n'] = $properNames;
+			if (empty($child['n'])) unset($child['n']);
+		}
+		if (is_array($child['n'])) {
+			$child['n'] = array_unique($child['n']);
+		}
+		if (is_array($child['na'])) {
+			$child['na'] = array_unique($child['na']);
 		}
 	}
 
@@ -2079,14 +2160,14 @@
 	function addConstructorFunction(&$js, $class, $isComponent) {
 		global $advancedMode, $routerMenu;
 		$args = $isComponent ? 'props' : '';
-		$js[] = 'function '.$class.'('.$args.') {';
 		if ($isComponent) {
-			$js[] = "\tInitialization.initiate.call(this, props);";
+			$js[] = 'function '.$class.'() {';
 			if (is_array($routerMenu) && in_array($class, $routerMenu)) {
 				$js[] = "\tRouter.addMenu(this);";
 				$js[] = "\tthis.isRouteMenu = true;";
 			}			
 		} else {
+			$js[] = 'function '.$class.'('.$args.') {';
 			$js[] = "\tInitialization.initiate.call(this);";
 			$js[] = "\n\tthis.processInitials();";
 		}

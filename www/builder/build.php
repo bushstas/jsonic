@@ -844,6 +844,7 @@
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);
 		}
+		$compiledJs = preg_replace('/\{\s+\}/', '{}', $compiledJs);
 		if ($advancedMode) {
 			createFile('base.js', $compiledJs);
 			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js');

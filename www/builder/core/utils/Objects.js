@@ -32,14 +32,14 @@ function Objects() {
 	    return true;		
 	};
 	this.merge = function() {
-		var arrs = arguments;
-		if (!isObject(arrs[0])) arrs[0] = {};
-		for (var i = 1; i < arrs.length; i++) {
-			if (isArrayLike(arrs[i])) {
-				for (var k in arrs[i]) arrs[0][k] = arrs[i][k];
+		var objs = arguments;
+		if (!isArrayLike(objs[0])) objs[0] = {};
+		for (var i = 1; i < objs.length; i++) {
+			if (isArrayLike(objs[i])) {
+				for (var k in objs[i]) objs[0][k] = objs[i][k];
 			}
 		}
-		return arrs[0];
+		return objs[0];
 	};
 	this.clone = function(obj) {
 		if (!isArrayLike(obj)) return obj;

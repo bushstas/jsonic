@@ -21,182 +21,174 @@ var __APIDIR = 'api';
 var __PAGETITLE = 'Page title';
 var __USEROPTIONS = {'login':'user/login.php','logout':'user/logout.php','save':'user/save.php','fullAccess':11};
 var CONFIG = {'user': {'get': 'user/get.php'},'filters': {'load': 'filters/get.php','save': 'filters/add.php','set': 'filters/set.php','subscribe': 'filters/subscribe.php'},'support': {'send': 'support/send.php'},'orderCall': {'send': 'orderCall/send.php'},'favorites': {'get': 'favorites/get.php','add': 'favorites/add.php','remove': 'favorites/remove.php'},'filterStat': {'load': 'filters/count.php'},'settings': {'subscr': 'settings/get.php','set': 'settings/set.php'}};
-function Application() {}
-Application.prototype.initiate = function() {
-	this.views = {};
-};
-Application.prototype.run = function() {
-	this.element = document.createElement('div');
-	document.body.appendChild(this.element);
-	this.render(this.element);
-	this.createViewContainer();
-	this.defineViews(__ROUTES);
-	this.initRouter();
-};
-Application.prototype.initRouter = function() {
-	Router.setNavigationHandler(this.handleNavigation.bind(this));
-	Router.init();
-};
-Application.prototype.defineViews = function(routes) {
-	for (var i = 0; i < routes.length; i++) {
-		this.views[routes[i]['name']] = null;
-		if (isArray(routes[i]['children'])) {
-			this.defineViews(routes[i]['children']);
-		}
-	}
-	var errorRoutes = __ERRORROUTES;
-	if (isObject(errorRoutes)) {
-		for (var k in errorRoutes) {
-			this.views[k] = null;
-		}
-	}
-};
-Application.prototype.handleNavigation = function(route, changeTitle) {
-	this.isChangeTitle = changeTitle;
-	this.currentRoute = route;
-	var view = this.views[route['name']];
-	var isSameView = this.currentView == view;
-	if (!isSameView && this.currentView) {
-		this.activateView(this.currentView, false);
-	}
-	this.currentView = view;
-	if (!isUndefined(view) && isFunction(route['view'])) {
-		if (!view) {
-			var viewParams = this.getViewParams(route, true);
-			view = this.currentView = this.views[route['name']] = new route['view'](viewParams);
-			view.setOnReadyHandler(this.onViewReady.bind(this));
-			var viewContentElement = this.createViewContentElement();
-			view.render(viewContentElement);
-			view.initControllers();
-			Globals.addView(view, route['name']);
-		} else {
-			this.activateView(view, true, isSameView);
-		}
-		if (isNumber(route['error'])) {
-			this.onError(route['error']);
-		} else {
-			this.onNoErrors();
-		}
-	} else {
-		this.log('no view to represent given route', 'handleNavigation', route);
-	}
-};
-Application.prototype.getViewParams = function(route, allParams) {
-	var params;
-	if (isObject(route['dinamicParams'])) {
-		params = {};
-		for (var k in route['dinamicParams']) {
-			params[k] = Router.getPathPartAt(route['dinamicParams'][k]);
-		}
-	}
-	if (allParams) {
-		if (isObject(params)) {
-			Objects.merge(params, route['params']);
-		} else {
-			params = route['params'];
-		}
-	}
-	return params;
-};
-Application.prototype.onViewReady = function() {
-	if (this.isChangeTitle) {
-		var title = this.currentRoute['title'];
-		if (isString(title)) {
-			var titleParams = this.currentView.getTitleParams();
-			if (isObject(titleParams)) {
-				var regExp;
-				for (var k in titleParams) {
-					regExp = new RegExp("\\$" + k)
-					title = title.replace(regExp, titleParams[k]);
-				}
+function Application() {
+	var getViewParams = function(route, allParams) {
+		var params;
+		if (isObject(route['dinamicParams'])) {
+			params = {};
+			for (var k in route['dinamicParams']) {
+				params[k] = Router.getPathPartAt(route['dinamicParams'][k]);
 			}
 		}
-		this.setPageTitle(title ||__PAGETITLE || '');
-	}
-};
-Application.prototype.createViewContentElement = function() {
-	var element = document.createElement('div');
-	this.viewContainer.appendChild(element);
-	return element;
-};
-Application.prototype.createViewContainer = function() {
-	var viewContainer;
-	var containerClass = __VIEWCONTAINER;
-	if (containerClass) {
-		viewContainer = document.body.querySelector('.' + containerClass);
-	}
-	if (!viewContainer) {
-	 	viewContainer = document.createElement('div');
+		if (allParams) {
+			if (isObject(params)) {
+				Objects.merge(params, route['params']);
+			} else {
+				params = route['params'];
+			}
+		}
+		return params;
+	};
+	var handleNavigation = function(route, changeTitle) {
+		this.isChangeTitle = changeTitle;
+		this.currentRoute = route;
+		var view = this.views[route['name']];
+		var isSameView = this.currentView == view;
+		if (!isSameView && this.currentView) {
+			activateView.call(this, this.currentView, false);
+		}
+		this.currentView = view;
+		if (!isUndefined(view) && isFunction(route['view'])) {
+			if (!view) {
+				var viewParams = getViewParams.call(this, route, true);
+				view = this.currentView = this.views[route['name']] = new route['view'](viewParams);
+				view.setOnReadyHandler(onViewReady.bind(this));
+				var viewContentElement = createViewContentElement.call(this);
+				view.render(viewContentElement);
+				view.initControllers();
+				Globals.addView(view, route['name']);
+			} else {
+				activateView.call(this, view, true, isSameView);
+			}
+			if (isNumber(route['error'])) {
+				this.onError(route['error']);
+			} else {
+				this.onNoErrors();
+			}
+		} else {
+			this.log('no view to represent given route', 'handleNavigation', route);
+		}
+	};
+	var initRouter = function() {
+		Router.setNavigationHandler(handleNavigation.bind(this));
+		Router.init();
+	};
+	var	defineViews = function() {
+		for (var i = 0; i < __ROUTES.length; i++) {
+			this.views[__ROUTES[i]['name']] = null;
+			if (isArray(__ROUTES[i]['children'])) {
+				this.defineViews(__ROUTES[i]['children']);
+			}
+		}
+		var errorRoutes = __ERRORROUTES;
+		if (isObject(errorRoutes)) {
+			for (var k in errorRoutes) {
+				this.views[k] = null;
+			}
+		}
+	};
+	var	createViewContainer = function() {
+		var viewContainer;
+		var containerClass = __VIEWCONTAINER;
 		if (containerClass) {
-			viewContainer.className = containerClass;
+			viewContainer = document.body.querySelector('.' + containerClass);
 		}
-		this.element.appendChild(viewContainer);
-	}
-	this.viewContainer = viewContainer;
-};
-Application.prototype.activateView = function(view, isActivated, isSameView) {
-	var parentElement = view.getParentElement();
-	if (!isActivated) {
-		this.viewContainer.removeChild(parentElement);
-	} else {
-		var params = this.getViewParams(this.currentRoute);
-		if (isObject(params)) {
-			view.set(params);
+		if (!viewContainer) {
+		 	viewContainer = document.createElement('div');
+			if (containerClass) {
+				viewContainer.className = containerClass;
+			}
+			this.element.appendChild(viewContainer);
 		}
-		if (!isSameView) {
-			this.viewContainer.appendChild(parentElement);
+		this.viewContainer = viewContainer;
+	};
+	var activateView = function(view, isActivated, isSameView) {
+		var parentElement = view.getParentElement();
+		if (!isActivated) {
+			this.viewContainer.removeChild(parentElement);
+		} else {
+			var params = getViewParams.call(this, this.currentRoute);
+			if (isObject(params)) {
+				view.set(params);
+			}
+			if (!isSameView) {
+				this.viewContainer.appendChild(parentElement);
+			}
 		}
-	}
-	view.activate(isActivated);
-};
-Application.prototype.setPageTitle = function(title) {
-	var titleElement = document.getElementsByTagName('title')[0];
-	if (!isElement(titleElement)) {
-		var headElement = document.getElementsByTagName('head')[0];
-		if (!isElement(headElement)) {
-			var htmlElement = document.getElementsByTagName('html')[0];
-			headElement = htmlElement.appendChild(document.createElement('head'));
+		view.activate(isActivated);
+	};
+	var onViewReady = function() {
+		if (this.isChangeTitle) {
+			var title = this.currentRoute['title'];
+			if (isString(title)) {
+				var titleParams = this.currentView.getTitleParams();
+				if (isObject(titleParams)) {
+					var regExp;
+					for (var k in titleParams) {
+						regExp = new RegExp("\\$" + k)
+						title = title.replace(regExp, titleParams[k]);
+					}
+				}
+			}
+			this.setPageTitle(title ||__PAGETITLE || '');
 		}
-		titleElement = headElement.appendChild(document.createElement('title'));
-	}
-	titleElement.innerHTML = title;
-};
-Application.prototype.disposeView = function(viewName) {
-	if (isObject(this.views[viewName])) {
-		this.views[viewName].dispose();
-		this.views[viewName] = null;
-	}
-};
-Application.prototype.onNoErrors = function() {};
-Application.prototype.onError = function(errorCode) {};
+	};
+	var createViewContentElement = function() {
+		var element = document.createElement('div');
+		this.viewContainer.appendChild(element);
+		return element;
+	};
+	Application.prototype.initiate = function() {
+		this.views = {};
+	};
+	Application.prototype.run = function() {
+		this.element = document.createElement('div');
+		document.body.appendChild(this.element);
+		this.render(this.element);
+		createViewContainer.call(this);
+		defineViews.call(this);
+		initRouter.call(this);
+	};
+	Application.prototype.setPageTitle = function(title) {
+		var titleElement = document.getElementsByTagName('title')[0];
+		if (!isElement(titleElement)) {
+			var headElement = document.getElementsByTagName('head')[0];
+			if (!isElement(headElement)) {
+				var htmlElement = document.getElementsByTagName('html')[0];
+				headElement = htmlElement.appendChild(document.createElement('head'));
+			}
+			titleElement = headElement.appendChild(document.createElement('title'));
+		}
+		titleElement.innerHTML = title;
+	};
+	Application.prototype.disposeView = function(viewName) {
+		if (isObject(this.views[viewName])) {
+			this.views[viewName].dispose();
+			this.views[viewName] = null;
+		}
+	};
+	Application.prototype.onNoErrors = function() {};
+	Application.prototype.onError = function(errorCode) {};
+}
+Application();
 function Component() {
-	var $;
 	var processInitials = function() {
-		$.initials = $.initials || {};
-		if (isObject($.props['args'])) {
-			$.receivedArgs = $.props['args'];
-			delete $.props['args'];
-		}
-		if (isObject($.props['props'])) {
-			Objects.merge($.props, $.props['props']);
-			delete $.props['props'];
-		}
-		var initials = $.initials;
+		var initials = this.initials;
 		if (isObject(initials)) {
 			for (var k in initials) {
 				if (isArrayLike(initials[k])) {
 					if (k == 'correctors') {
-						for (var j in initials[k]) addCorrector(j, initials[k][j]);
+						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
 					} else if (k == 'globals') {
-						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], $);
+						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
 					} else if (k == 'followers') {
-						for (var j in initials[k]) addFollower(j, initials[k][j]);
+						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
 					} else if (k == 'controllers') {
-						for (var i = 0; i < initials[k].length; i++) attachController(initials[k][i]);
+						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
 					} else if (k == 'props') {
-						Objects.merge($.props, initials[k]);
+						Objects.merge(this.props, initials[k]);
 					} else if (k == 'options') {
-						$.initOptions(initials[k]);
+						this.initOptions(initials[k]);
 					}
 				}
 			}
@@ -204,93 +196,92 @@ function Component() {
 	};
 	var attachController = function(options) {
 		if (isObject(options['on'])) {
-			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], $);
+			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
 		}
 	};
 	var addCorrector = function(name, handler) {
 		if (isFunction(handler)) {
-			$.correctors = $.correctors || {};
-			$.correctors[name] = handler;
+			this.correctors = this.correctors || {};
+			this.correctors[name] = handler;
 		}
 	};
 	var addFollower = function(name, handler) {
 		if (isFunction(handler)) {
-			$.followers = $.followers || {};
-			$.followers[name] = handler;
+			this.followers = this.followers || {};
+			this.followers[name] = handler;
 		}
 	};
 	var subscribeToHelper = function(options) {
-		if (isObject(options['options'])) options['helper'].subscribe($, options['options']);
+		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
 	};
 	var getInitial = function(initialName) {
-		return Objects.get($.initials, initialName);
+		return Objects.get(this.initials, initialName);
 	};
 	var processPostRenderInitials = function() {
-		var helpers = getInitial('helpers');
+		var helpers = getInitial.call(this, 'helpers');
 		if (isArray(helpers)) {
-			for (var i = 0; i < helpers.length; i++) subscribeToHelper(helpers[i]);
+			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
 		}
 	};
 	var load = function() {
-		var loader = getInitial('loader');
+		var loader = getInitial.call(this, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
-			$.loader = loader['controller'];
+			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
-			$.loader.subscribe('load', onDataLoad.bind($, isAsync), $);
+			this.loader.subscribe('load', onDataLoad.bind(this, isAsync), this);
 			var options = loader['options'];
 			if (isFunction(options)) options = options();
-			$.loader.doAction('load', options);
+			this.loader.doAction('load', options);
 			if (!isAsync) {
-				renderTempPlaceholder();
+				renderTempPlaceholder.call(this);
 				return;
 			}
 		}
-		onReadyToRender();
+		onReadyToRender.call(this);
 	};
 	var renderTempPlaceholder = function() {
-		$.tempPlaceholder = document.createElement('span');
-		$.parentElement.appendChild($.tempPlaceholder);
+		this.tempPlaceholder = document.createElement('span');
+		this.parentElement.appendChild(this.tempPlaceholder);
 	};
 	var onDataLoad = function(isAsync, data) {
-		$.onLoaded(data);
-		if (!isAsync) onReadyToRender();
+		this.onLoaded(data);
+		if (!isAsync) onReadyToRender.call(this);
 	};
 	var onReadyToRender = function() {
-		if (!$.isRendered()) {
-			doRendering();
-			if ($.tempPlaceholder) {
-				$.parentElement.removeChild($.tempPlaceholder);
-				$.tempPlaceholder = null;
+		if (!this.isRendered()) {
+			doRendering.call(this);
+			if (this.tempPlaceholder) {
+				this.parentElement.removeChild(this.tempPlaceholder);
+				this.tempPlaceholder = null;
 			}
-			processPostRenderInitials();
+			processPostRenderInitials.call(this);
 		}
 	};
 	var doRendering = function() {
-		$.level = new Level();
-		$.args = getCombinedArgs();
-		var content = $.getTemplateMain($, $.args);
+		this.level = new Level();
+		var args = getCombinedArgs.call(this);
+		var content = this.getTemplateMain(this, args);
 		if (isArray(content)) {
-			$.level.setComponent($);
-			$.level.render(content, $.parentElement, $, $.tempPlaceholder);
+			this.level.setComponent(this);
+			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 		}
-		$.rendered = true;
-		$.onRendered();
-		if (isArray($.callbacks)) {
-			for (var i = 0; i < $.callbacks.length; i++) {
-				if (isFunction($.callbacks[i])) $.callbacks[i]();
+		this.rendered = true;
+		this.onRendered();
+		if (isArray(this.callbacks)) {
+			for (var i = 0; i < this.callbacks.length; i++) {
+				if (isFunction(this.callbacks[i])) this.callbacks[i]();
 			}
 		}
-		$.callbacks = null;
-		$.waiting = null;
+		this.callbacks = this.waiting = this.args = args = null;
 	};
 	var getCombinedArgs = function() {
-		return Objects.merge({}, $.initials['args'], $.getArgs(), $.receivedArgs); 
+		return Objects.merge(this.args, Objects.get(this.initials, 'args'), this.getArgs()); 
 	};
-	var propagatePropertyChange = function(changedProps) {$=this;
+	var propagatePropertyChange = function(changedProps) {
 		var pn, pv, i, activities, cnds = [], ifsw = [];
 		for (pn in changedProps) {
 			pv = changedProps[pn];
-			activities = $.propActivities['cnd'];
+			activities = this.propActivities['cnd'];
 			if (activities && isArray(activities[pn])) {
 				for (i = 0; i < activities[pn].length; i++) {
 					if (cnds.indexOf(activities[pn][i]) == -1) {
@@ -299,7 +290,7 @@ function Component() {
 					}
 				}
 			}
-			activities = $.propActivities['isw'];
+			activities = this.propActivities['isw'];
 			if (activities && isArray(activities[pn])) {
 				for (i = 0; i < activities[pn].length; i++) {
 					if (ifsw.indexOf(activities[pn][i]) == -1) {
@@ -308,20 +299,20 @@ function Component() {
 					}
 				}
 			}
-			activities = $.propActivities['swt'];
+			activities = this.propActivities['swt'];
 			if (activities && isArray(activities[pn])) {
 				for (i = 0; i < activities[pn].length; i++) activities[pn][i].update(pv);
 			}
-			activities = $.propActivities['for'];
+			activities = this.propActivities['for'];
 			if (activities && isArray(activities[pn])) {
 				for (i = 0; i < activities[pn].length; i++) activities[pn][i].update(pv);
 			}
-			activities = $.propActivities['nod'];
+			activities = this.propActivities['nod'];
 			if (activities && isArray(activities[pn])) {
 				var node;
 				for (i = 0; i < activities[pn].length; i++) activities[pn][i].textContent = pv;
 			}
-			activities = $.propActivities['atr'];
+			activities = this.propActivities['atr'];
 			if (activities && isArray(activities[pn])) {
 				var key, propAttr, attrParts;
 				for (i = 0; i < activities[pn].length; i++) {
@@ -338,7 +329,7 @@ function Component() {
 					activities[pn][i][0].attr(attrName, attrValue);
 				}
 			}
-			activities = $.propActivities['cmp'];
+			activities = this.propActivities['cmp'];
 			if (activities && isArray(activities[pn])) {
 				var component, value;
 				for (i = 0; i < activities[pn].length; i++) {
@@ -351,70 +342,68 @@ function Component() {
 				}
 			}
 		}
-		cnds = null;
-		ifsw = null;
+		cnds = ifsw = null;
 	};
-	Component.prototype.initiate = function() {$=this;
-		$.propActivities = {};
-		$.propsToSet = {};
-		$.rendered = false;
-		$.disposed = false;
+	Component.prototype.initiate = function() {
+		this.propActivities = {};
+		this.propsToSet = {};
+		this.rendered = this.disposed = false;
 	};
-	Component.prototype.render = function(parentElement) {$=this;
-		$.parentElement = parentElement;
-		processInitials();
-		load();
+	Component.prototype.render = function(parentElement) {
+		this.parentElement = parentElement;
+		processInitials.call(this);
+		load.call(this);
 	};
-	Component.prototype.instanceOf = function(parent) {$=this;
-		return $.inheritedSuperClasses && $.inheritedSuperClasses.indexOf(parent) > -1;
+	Component.prototype.instanceOf = function(parent) {
+		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
 	};
-	Component.prototype.dispatchEvent = function(eventType, eventParams) {$=this;
-		if (isArray($.listeners)) {
-			for (var i = 0; i < $.listeners.length; i++) {
-				if (isNumber($.listeners[i]['type'])) $.listeners[i]['type'] = __EVENTTYPES[$.listeners[i]['type']];
-				if ($.listeners[i]['type'] == eventType) $.listeners[i]['handler'].call($.listeners[i]['subscriber'] || null, eventParams);
+	Component.prototype.dispatchEvent = function(eventType, eventParams) {
+		if (isArray(this.listeners)) {
+			for (var i = 0; i < this.listeners.length; i++) {
+				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];
+				if (this.listeners[i]['type'] == eventType) this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
 			}
 		}
 	};
-	Component.prototype.provideWithComponent = function(propName, componentName, waitingChild) {$=this;
-		var cmp = $.getChildById(componentName);
+	Component.prototype.provideWithComponent = function(propName, componentName, waitingChild) {
+		var cmp = this.getChildById(componentName);
 		if (cmp) waitingChild.set(propName, cmp);
 		else {
-			$.waiting = $.waiting || {};
-			$.waiting[componentName] = $.waiting[componentName] || [];
-			$.waiting[componentName].push([waitingChild, propName]);
+			this.waiting = this.waiting || {};
+			this.waiting[componentName] = this.waiting[componentName] || [];
+			this.waiting[componentName].push([waitingChild, propName]);
 		}
 	};
-	Component.prototype.getWaitingChild = function(componentName) {$=this;
-		return Objects.get($.waiting, componentName);
+	Component.prototype.getWaitingChild = function(componentName) {
+		return Objects.get(this.waiting, componentName);
 	};
-	Component.prototype.get = function(propName) {$=this;
-		return $.propsToSet[propName] || $.props[propName];
+	Component.prototype.get = function(propName) {
+		return this.propsToSet[propName] || this.props[propName];
 	};
-	Component.prototype.showElement = function(element, isShown) {$=this;
-		if (isString(element)) element = $.findElement(element);
+	Component.prototype.showElement = function(element, isShown) {
+		if (isString(element)) element = this.findElement(element);
 		if (isElement(element)) element.show(isShown);
 	};
-	Component.prototype.setStyle = function(styles) {$=this;
-		if ($.isRendered()) $.getElement().setStyle(styles);
+	Component.prototype.setStyle = function(styles) {
+		if (this.isRendered()) this.getElement().setStyle(styles);
 	};
-	Component.prototype.addClass = function(className, isAdding) {$=this;
-		if ($.isRendered()) {
-			if (isAdding || isUndefined(isAdding)) $.getElement().addClass(className);
-			else $.getElement().removeClass(className);
+	Component.prototype.addClass = function(className, isAdding) {
+		if (this.isRendered()) {
+			if (isAdding || isUndefined(isAdding)) this.getElement().addClass(className);
+			else this.getElement().removeClass(className);
 		}
 	};
-	Component.prototype.each = function(propName, callback) {$=this;
-		var ar = $.get(propName);
+	Component.prototype.each = function(propName, callback) {
+		var ar = this.get(propName);
 		if (isArrayLike(ar) && isFunction(callback)) {
-			if (isArray(ar)) for (var i = 0; i < ar.length; i++) callback.call($, ar[i], i, ar);
-			else for (var k in ar) callback.call($, ar[k], k, ar);
+			if (isArray(ar)) for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
+			else for (var k in ar) callback.call(this, ar[k], k, ar);
 		}
 	};
-	Component.prototype.toggle = function(propName) {$=this;
-		$.set(propName, !$.get(propName));
+	Component.prototype.toggle = function(propName) {
+		this.set(propName, !this.get(propName));
 	};
-	Component.prototype.set = function(propName, propValue) {$=this;
+	Component.prototype.set = function(propName, propValue) {
 		var props;
 		if (!isUndefined(propValue)) {
 			props = {};
@@ -424,111 +413,111 @@ function Component() {
 		var changedProps = {};
 		var currentValue;
 		for (var k in props) {
-			if (Objects.has($.correctors, k)) props[k] = $.correctors[k].call($, props[k], props);
-			currentValue = $.props[k];
+			if (Objects.has(this.correctors, k)) props[k] = this.correctors[k].call(this, props[k], props);
+			currentValue = this.props[k];
 			if (currentValue == props[k]) continue;
 			if (isArray(currentValue) && isArray(props[k]) && Objects.equals(currentValue, props[k])) continue;
 			isChanged = true;
-			$.props[k] = props[k];
+			this.props[k] = props[k];
 			changedProps[k] = props[k];
 		}	
-		if ($.isRendered()) {
-			if (isChanged) propagatePropertyChange(changedProps);
+		if (this.isRendered()) {
+			if (isChanged) propagatePropertyChange.call(this, changedProps);
 			for (var k in changedProps) {
-				if (Objects.has($.followers, k)) $.followers[k].call($);
+				if (Objects.has(this.followers, k)) this.followers[k].call(this);
 			}
 		}
 		changedProps = null;
 	};
-	Component.prototype.getFirstNodeChild = function() {$=this;
-		if ($.level) return $.level.getFirstNodeChild();
+	Component.prototype.getFirstNodeChild = function() {
+		if (this.level) return this.level.getFirstNodeChild();
 		return null;
 	};
-	Component.prototype.preset = function(propName, propValue) {$=this;
-		$.propsToSet[propName] = propValue;
+	Component.prototype.preset = function(propName, propValue) {
+		this.propsToSet[propName] = propValue;
 	};
-	Component.prototype.update = function() {$=this;
-		$.set($.propsToSet);
-		$.propsToSet = {};
+	Component.prototype.update = function() {
+		this.set(this.propsToSet);
+		this.propsToSet = {};
 	};
-	Component.prototype.refresh = function(args) {$=this;
-		if (args) $.receivedArgs = args;
-		$.unrender();
-		doRendering();
+	Component.prototype.refresh = function(args) {
+		if (args) this.args = args;
+		this.unrender();
+		doRendering.call(this);
 	};
-	Component.prototype.delay = function(f, n) {$=this;
-		window.clearTimeout($.timeout);
-		if (isFunction(f)) $.timeout = window.setTimeout(f.bind($), n || 200);
+	Component.prototype.delay = function(f, n) {
+		window.clearTimeout(this.timeout);
+		if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this), n || 200);
 	};
-	Component.prototype.addChild = function(child, parentElement) {$=this;
-		$.level.renderComponent(child, parentElement);
+	Component.prototype.addChild = function(child, parentElement) {
+		this.level.renderComponent(child, parentElement);
 	};
-	Component.prototype.removeChild = function(child) {$=this;
+	Component.prototype.removeChild = function(child) {
 		if (!child) return;
 		var childId = child;
-		if (isString(child)) child = $.getChild(child);
-		else childId = Objects.getKey($.children, child);
+		if (isString(child)) child = this.getChild(child);
+		else childId = Objects.getKey(this.children, child);
 		if (isComponentLike(child)) child.dispose();
-		if ((isString(childId) || isNumber(childId)) && isObject($.children)) delete $.children[childId];	
+		if ((isString(childId) || isNumber(childId)) && isObject(this.children)) delete this.children[childId];	
 	 };
-	Component.prototype.forEachChild = function(callback) {$=this;
-		if (isObject($.children)) Objects.each($.children, callback, $);
+	Component.prototype.forEachChild = function(callback) {
+		if (isObject(this.children)) Objects.each(this.children, callback, this);
 	};
-	Component.prototype.registerChildComponent = function(child) {$=this;
-		$.childrenCount = $.childrenCount || 0;
-		$.children = $.children || {};
-		$.children[child.getId() || $.childrenCount] = child;
-		$.childrenCount++;
+	Component.prototype.registerChildComponent = function(child) {
+		this.childrenCount = this.childrenCount || 0;
+		this.children = this.children || {};
+		this.children[child.getId() || this.childrenCount] = child;
+		this.childrenCount++;
 	};
-	Component.prototype.setParent = function(parentalComponent) {$=this;
-		$.parentalComponent = parentalComponent;
+	Component.prototype.setParent = function(parentalComponent) {
+		this.parentalComponent = parentalComponent;
 	};
-	Component.prototype.getParent = function() {$=this;
-		return $.parentalComponent;
+	Component.prototype.getParent = function() {
+		return this.parentalComponent;
 	};
-	Component.prototype.getChildAt = function(index) {$=this;
-		return Objects.getByIndex($.children, index);
+	Component.prototype.getChildAt = function(index) {
+		return Objects.getByIndex(this.children, index);
 	};
-	Component.prototype.getChildren = function(classFunc) {$=this;
+	Component.prototype.getChildren = function(classFunc) {
 		var children = [];
-		$.forEachChild(function(child) {
+		this.forEachChild(function(child) {
 			if (isComponentLike(child) && child.instanceOf(classFunc)) children.push(child);
 		});
 		return children;
 	};
-	Component.prototype.getChild = function(id) {$=this;
-		return Objects.get($.children, id);
+	Component.prototype.getChild = function(id) {
+		return Objects.get(this.children, id);
 	};
-	Component.prototype.doOnParentReady = function(callback, params) {$=this;
-		$.getParent().addCallback(callback.bind($, params));
+	Component.prototype.doOnParentReady = function(callback, params) {
+		this.getParent().addCallback(callback.bind(this, params));
 	};
-	Component.prototype.addCallback = function(callback) {$=this;
-		$.callbacks = $.callbacks || [];
-		$.callbacks.push(callback);
+	Component.prototype.addCallback = function(callback) {
+		this.callbacks = this.callbacks || [];
+		this.callbacks.push(callback);
 	};
-	Component.prototype.setId = function(id) {$=this;
-		$.componentId = id;
+	Component.prototype.setId = function(id) {
+		this.componentId = id;
 	};
-	Component.prototype.getId = function() {$=this;
-		return $.componentId;
+	Component.prototype.getId = function() {
+		return this.componentId;
 	};
-	Component.prototype.getElement = function() {$=this;
-		return $.scope || $.parentElement;
+	Component.prototype.getElement = function() {
+		return this.scope || this.parentElement;
 	};
-	Component.prototype.findElement = function(selector, scopeElement) {$=this;
-		return (scopeElement || $.getElement()).querySelector(selector);
+	Component.prototype.findElement = function(selector, scopeElement) {
+		return (scopeElement || this.getElement()).querySelector(selector);
 	};
-	Component.prototype.findElements = function(selector, scopeElement) {$=this;
-		return Array.prototype.slice.call((scopeElement || $.scope || $.parentElement).querySelectorAll(selector));
+	Component.prototype.findElements = function(selector, scopeElement) {
+		return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
 	};
-	Component.prototype.findElementWithinParent = function(selector) {$=this;
-		return $.getParent().findElement(selector);
+	Component.prototype.findElementWithinParent = function(selector) {
+		return this.getParent().findElement(selector);
 	};
-	Component.prototype.findElementsWithinParent = function(selector) {$=this;
-		return $.getParent().findElements(selector);
+	Component.prototype.findElementsWithinParent = function(selector) {
+		return this.getParent().findElements(selector);
 	};
-	Component.prototype.fill = function(element, data) {$=this;
-		if (isString(element)) element = $.findElement(element);
+	Component.prototype.fill = function(element, data) {
+		if (isString(element)) element = this.findElement(element);
 		if (isElement(element)) {
 			var callback = function(el) {
 				for (var i = 0; i < el.childNodes.length; i++) {
@@ -542,47 +531,47 @@ function Component() {
 			callback(element);
 		}
 	};
-	Component.prototype.removeNode = function(node) {$=this;
-		if (isString(node)) node = $.findElement(node);
-		if (isNode(node) && node.parentNode == $.parentElement) $.parentElement.removeChild(node);
+	Component.prototype.removeNode = function(node) {
+		if (isString(node)) node = this.findElement(node);
+		if (isNode(node) && node.parentNode == this.parentElement) this.parentElement.removeChild(node);
 	};
-	Component.prototype.getParentElement = function() {$=this;
-		return $.parentElement;
+	Component.prototype.getParentElement = function() {
+		return this.parentElement;
 	};
-	Component.prototype.isRendered = function() {$=this;
-		return $.rendered;
+	Component.prototype.isRendered = function() {
+		return this.rendered;
 	};
-	Component.prototype.isDisposed = function() {$=this;
-		return $.disposed;
+	Component.prototype.isDisposed = function() {
+		return this.disposed;
 	};
-	Component.prototype.addListener = function(target, eventType, handler) {$=this;
+	Component.prototype.addListener = function(target, eventType, handler) {
 		if (isElement(target)) {
-			$.eventHandler = $.eventHandler || new EventHandler();
-			$.eventHandler.listen(target, eventType, handler.bind($));
-		} else target.subscribe(eventType, handler, $);
+			this.eventHandler = this.eventHandler || new EventHandler();
+			this.eventHandler.listen(target, eventType, handler.bind(this));
+		} else target.subscribe(eventType, handler, this);
 	};
-	Component.prototype.subscribe = function(eventType, handler, subscriber) {$=this;
-		$.listeners = $.listeners || [];
-		$.listeners.push({'type': eventType, 'handler': handler, 'subscriber': subscriber});
+	Component.prototype.subscribe = function(eventType, handler, subscriber) {
+		this.listeners = this.listeners || [];
+		this.listeners.push({'type': eventType, 'handler': handler, 'subscriber': subscriber});
 	};
-	Component.prototype.setAppended = function(isAppended) {$=this;
-		if ($.level) $.level.setAppended(isAppended);
+	Component.prototype.setAppended = function(isAppended) {
+		if (this.level) this.level.setAppended(isAppended);
 	};
-	Component.prototype.setScope = function(scope) {$=this;
-		$.scope = scope;
+	Component.prototype.setScope = function(scope) {
+		this.scope = scope;
 	};
-	Component.prototype.log = function(message, method, opts) {$=this;
-		log(message, method, $, opts);
+	Component.prototype.log = function(message, method, opts) {
+		log(message, method, this, opts);
 	};
-	Component.prototype.registerPropActivity = function(type, name, data) {$=this;
-		$.propActivities = $.propActivities || {};
-		$.propActivities[type] = $.propActivities[type] || {};
-		$.propActivities[type][name] = $.propActivities[type][name] || [];
-		$.propActivities[type][name].push(data);
-		return $.propActivities[type][name].length - 1;
+	Component.prototype.registerPropActivity = function(type, name, data) {
+		this.propActivities = this.propActivities || {};
+		this.propActivities[type] = this.propActivities[type] || {};
+		this.propActivities[type][name] = this.propActivities[type][name] || [];
+		this.propActivities[type][name].push(data);
+		return this.propActivities[type][name].length - 1;
 	};
-	Component.prototype.disposePropActivities = function(type, data) {$=this;
-		var activities = $.propActivities[type];
+	Component.prototype.disposePropActivities = function(type, data) {
+		var activities = this.propActivities[type];
 		if (isObject(data)) {
 			var deleted;
 			for (var pn in data) {
@@ -596,44 +585,41 @@ function Component() {
 			}
 		}
 	};
-	Component.prototype.unrender = function() {$=this;
-		$.disposeLinks();
-		$.disposeInternal();
-		$.level.dispose();
-		if ($.eventHandler) {
-			$.eventHandler.dispose();
-			$.eventHandler = null;
+	Component.prototype.unrender = function() {
+		this.disposeLinks();
+		this.disposeInternal();
+		this.level.dispose();
+		if (this.eventHandler) {
+			this.eventHandler.dispose();
+			this.eventHandler = null;
 		}
-		$.level = null;
-		$.listeners = null;
+		this.level = this.listeners = null;
 	};
-	Component.prototype.dispose = function() {$=this;
-		$.unrender();
-		$.propActivities = null;
-		$.parentElement = null;
-		$.props = null;
-		$.propsToSet = null;	
-		$.provider = null;
-		$.children = null;
-		$.disposed = true;
-		$.loader = null;
-		$.initials = null;
-		$.followers = null;
-		$.correctors = null;
-		$.receivedArgs = null;
-		$.args = null;
-		$.parentalComponent = null;
+	Component.prototype.dispose = function() {
+		this.unrender();
+		this.propActivities = null;
+		this.parentElement = null;
+		this.props = null;
+		this.propsToSet = null;	
+		this.provider = null;
+		this.children = null;
+		this.disposed = true;
+		this.loader = null;
+		this.initials = null;
+		this.followers = null;
+		this.correctors = null;
+		this.parentalComponent = null;
 	};
-	(function(){
-		var f = function(){return null};
-		Component.prototype.initOptions = f;
-		Component.prototype.onRendered = f;
-		Component.prototype.onLoaded = f;
-		Component.prototype.getTemplateMain = f;
-		Component.prototype.getTemplateByKey = f;
-		Component.prototype.disposeInternal = f;
-		Component.prototype.getArgs = f;
-	})();
+	var f = function() {
+		return null;
+	};
+	Component.prototype.initOptions = f;
+	Component.prototype.onRendered = f;
+	Component.prototype.onLoaded = f;
+	Component.prototype.getTemplateMain = f;
+	Component.prototype.getTemplateByKey = f;
+	Component.prototype.disposeInternal = f;
+	Component.prototype.getArgs = f;	
 	Component.prototype.g = Component.prototype.get;
 }
 Component();
@@ -683,329 +669,332 @@ Condition.prototype.dispose = function() {
 	this.params = null;
 	this.nextSiblingChild = null;
 };
-function Control() {}
-Control.prototype.getInitials = function() {
-	return {'enabled': true};
-};
-Control.prototype.attachControl = function(control) {
-	if (isString(control)) control = this.getChildById(control);
-	if (isControl(control)) {
-		this.controls = this.controls || {};
-		this.controls[control.getId()] = control;
-		this.addListener(control, 'change', this.onChangeChildControl);
-	}
-};
-Control.prototype.getName = function() {
-	return this.props.name;
-};
-Control.prototype.getValue = function() {
-	var value;
-	if (this.hasControls()) {
-		value = {};
-		for (var k in this.controls) value[k] = this.controls[k].getValue();
-	} else value = this.getCorrectedValue(this.getControlValue());
-	return value;
-}
-Control.prototype.getControlValue = function() {
-	return (!isUndefined(this.value) ? this.value : this.props.value) || '';
-}
-Control.prototype.getCorrectedValue = function(value) {
-	var type = Objects.get(this.options, 'type');
-	switch (type) {
-		case 'array':
-			if (isString(value)) {
-				value = value.split(',');
-			} else if (!isArray(value)) {
-				value = [value];
-			}
-		break;
-		case 'string':
-			if (isArray(value)) {
-				value = value.join(',');
-			} else if (isObject(value)) {
-				value = JSON.stringify(value);
-			} else if (isNumber(value)) {
-				value = value + '';
-			} else if (!!value) {
-				value = '1';
-			} else {
-				value = '';
-			}
-		break;
-		case 'number':
-			if (isString(value)) {
-				value = stringToNumber(value);
-			} else if (isBool(value)) {
-				value = !!value ? 1 : 0;
-			} else if (isArray(value)) {
-				value = ~~value[0];
-			} else {
-				value = 0;
-			}
-		break;
-		case 'boolean':
-			value = !!value && value === '0';
-		break;
-	}
-	return this.getProperValue(value);
-};
-Control.prototype.getProperValue = function(value) {
-	return value;
-};
-Control.prototype.setValue = function(value) {
-	if (this.hasControls() && isObject(value)) {
-		for (var k in value) {
-			if (isControl(this.controls[k])) this.controls[k].setValue(this.controls[k].hasControls() ? value : value[k]);
+function Control() {
+	var getCorrectedValue = function(value) {
+		var type = Objects.get(this.options, 'type');
+		switch (type) {
+			case 'array':
+				if (isString(value)) {
+					value = value.split(',');
+				} else if (!isArray(value)) {
+					value = [value];
+				}
+			break;
+			case 'string':
+				if (isArray(value)) {
+					value = value.join(',');
+				} else if (isObject(value)) {
+					value = JSON.stringify(value);
+				} else if (isNumber(value)) {
+					value = value + '';
+				} else if (!!value) {
+					value = '1';
+				} else {
+					value = '';
+				}
+			break;
+			case 'number':
+				if (isString(value)) {
+					value = stringToNumber(value);
+				} else if (isBool(value)) {
+					value = !!value ? 1 : 0;
+				} else if (isArray(value)) {
+					value = ~~value[0];
+				} else {
+					value = 0;
+				}
+			break;
+			case 'boolean':
+				value = !!value && value === '0';
+			break;
 		}
-	} else {
-		this.value = value;
-		this.setProperValue(value);
+		return this.getProperValue(value);
+	};
+	var getControlValue = function() {
+		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+	};
+	var dispatchChange = function() {
+		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
+	};
+	var onChangeChildControl = function(e) {
+		dispatchChange.call(this);
+	};
+	Control.prototype.getInitials = function() {
+		return {'enabled': true};
+	};
+	Control.prototype.attachControl = function(control) {
+		if (isString(control)) control = this.getChildById(control);
+		if (isControl(control)) {
+			this.controls = this.controls || {};
+			this.controls[control.getId()] = control;
+			this.addListener(control, 'change', onChangeChildControl.call(this));
+		}
+	};
+	Control.prototype.getName = function() {
+		return this.props.name;
+	};
+	Control.prototype.getValue = function() {
+		var value;
+		if (this.hasControls()) {
+			value = {};
+			for (var k in this.controls) value[k] = this.controls[k].getValue();
+		} else value = getCorrectedValue.call(this, getControlValue.call(this));
+		return value;
+	};
+	Control.prototype.getProperValue = function(value) {
+		return value;
+	};
+	Control.prototype.setValue = function(value) {
+		if (this.hasControls() && isObject(value)) {
+			for (var k in value) {
+				if (isControl(this.controls[k])) this.controls[k].setValue(this.controls[k].hasControls() ? value : value[k]);
+			}
+		} else {
+			this.value = value;
+			this.setProperValue(value);
+		}
+	};
+	Control.prototype.setProperValue = function(value) {
+		this.set('value', value);
+	};
+	Control.prototype.hasControls = function() {
+		return !Objects.empty(this.controls);
 	}
-};
-Control.prototype.setProperValue = function(value) {
-	this.set('value', value);
-};
-Control.prototype.hasControls = function() {
-	return !Objects.empty(this.controls);
+	Control.prototype.isEnabled = function() {
+		return !!this.get('enabled');
+	};
+	Control.prototype.setEnabled = function(isEnabled) {
+		this.set('enabled', isEnabled);
+	};
+	Control.prototype.disposeInternal = function() {
+		this.controls = null;
+		this.options = null;
+		this.value = null;
+	};
 }
-Control.prototype.isEnabled = function() {
-	return !!this.get('enabled');
-};
-Control.prototype.setEnabled = function(isEnabled) {
-	this.set('enabled', isEnabled);
-};
-Control.prototype.dispatchChange = function() {
-	this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
-};
-Control.prototype.onChangeChildControl = function(e) {
-	this.dispatchChange();
-};
-Control.prototype.disposeInternal = function() {
-	this.controls = null;
-	this.options = null;
-	this.value = null;
-};
-function Controller() {}
-Controller.prototype.initiate = function() {
-	this.listeners = [];
-};
-Controller.prototype.processInitials = function() {
-	var initials = this.initials;
-	if (isObject(initials)) {
-		for (var k in initials) {
-			if (initials[k] && isObject(initials[k])) {
-				if (k == 'globals') {
-				} else if (k == 'options') {
-					this.options = initials[k];
-				} else if (k == 'controllers') {
-					for (var i = 0; i < initials[k].length; i++) {
-						this.attachController(initials[k][i]);
+Control();
+function Controller() {
+	Controller.prototype.initiate = function() {
+		this.listeners = [];
+	};
+	Controller.prototype.processInitials = function() {
+		var initials = this.initials;
+		if (isObject(initials)) {
+			for (var k in initials) {
+				if (initials[k] && isObject(initials[k])) {
+					if (k == 'globals') {} else if (k == 'options') {
+						this.options = initials[k];
+					} else if (k == 'controllers') {
+						for (var i = 0; i < initials[k].length; i++) {
+							this.attachController(initials[k][i]);
+						}
 					}
 				}
 			}
 		}
-	}
-};
-Controller.prototype.attachController = function(options) {
-	if (isObject(options['controller'])) {
-		if (isObject(options['on'])) {
-			for (var k in options['on']) {
-				options.controller.subscribe(k, options['on'][k], this);
-			}
-		}
-	}
-};
-Controller.prototype.subscribe = function(eventType, callback, subscriber) {
-	this.listeners.push([eventType, callback, subscriber]);
-};
-Controller.prototype.unsubscribe = function(subscriber, eventType) {
-	var done = false;
-	while (!done) {
-		done = true;
-		for (var i = 0; i < this.listeners.length; i++) {
-			if (this.listeners[i][2] == subscriber && (!eventType || this.listeners[i][0] == eventType)) {
-				this.listeners.splice(i, 1);
-				done = false;
-				break;
-			}
-		}
-	}
-};
-Controller.prototype.dispatchEvent = function(eventType, data) {
-	var dataToDispatch = data;
-	if (Objects.has(this.options, 'clone', true)) {
-		dataToDispatch = Objects.clone(data);
-	}
-	if (isArray(this.listeners)) {
-		for (var i = 0; i < this.listeners.length; i++) {
-			if (this.listeners[i][0] == eventType && isFunction(this.listeners[i][1])) {
-				this.listeners[i][1].call(this.listeners[i][2] || null, dataToDispatch, this);
-			}
-		}
-	}
-};
-Controller.prototype.getData = function(actionName) {
-	return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
-};
-Controller.prototype.getItemById = function(id) {
-	var primaryKey = this.getPrimaryKey();
-	var data = this.data['load'];
-	if (isArray(data)) {
-		for (var i = 0; i < data.length; i++) {
-			if (Objects.has(data[i], primaryKey, id)) return data[i];
-		}
-	}
-	return null;
-};
-Controller.prototype.getItem = function(nameOrIndex, actionName) {
-	actionName = actionName || 'load';
-	return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
-};
-Controller.prototype.load = function(options) {
-	this.doAction('load', options);
-};
-Controller.prototype.doAction = function(actionName, options, url) {
-	var action = this.getAction(actionName);
-	this.action = action;	
-	if (actionName == 'load' && this.gotFromStore(options)) {
-		return;
-	}
-	if (!isObject(options)) {
-		options = {};
-	}
-	if (action && isObject(action) && action['options'] && isObject(action['options'])) {
-		Objects.merge(options, action['options']);
-	}
-	var method = action['method'] || 'POST';
-	url = url || this.makeUrl(action['url'], options);
-	if (!url || !isString(url)) {
-		log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
-	}
-	this.request = this.request || new AjaxRequest(url, this.onActionComplete.bind(this));
-	this.request.send(method, options, url);
-};
-Controller.prototype.gotFromStore = function(options) {
-	if (this.shouldStore()) {
-		var storeAs = this.getStoreAs(options);
-		if (isString(storeAs)) {
-			var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
-			if (isArrayLike(storedData)) {
-				this.onActionComplete(storedData, true);
-				return true;
-			}
-		}
-	}
-	return false;
-};
-Controller.prototype.makeUrl = function(url, options) {
-	var regExp;
-	for (var k in options) {
-		if (isString(options[k]) || isNumber(options[k])) {
-			regExp = new RegExp('\\$' + k)
-			url = url.replace(regExp, options[k]);
-		}
-	}
-	return url;
-};
-Controller.prototype.onActionComplete = function(data, isFromStorage) {
-	var actionName = this.action['name'];
-	this.data = this.data || {};
-	this.data[actionName] = data;
-	if (isFunction(this.action['callback'])) {
-		this.action['callback'].call(this, data);
-	}
-	this.dispatchEvent(actionName, data);
-	if (!isFromStorage && actionName == 'load' && this.shouldStore()) {
-		this.store(true, data);
-	}
-};
-Controller.prototype.shouldStore = function() {
-	var shouldStore = Objects.get(this.options, 'store');
-	if (shouldStore === false) return false;
-	return Objects.has(this.options, 'storeAs');
-};
-Controller.prototype.store = function(isAdding, data) {console.log('store')
-	var storeAs = this.getStoreAs(data);
-	if (isAdding) {		
-		StoreKeeper.set(storeAs, data);
-	} else {
-		StoreKeeper.remove(storeAs);
-	}
-};
-Controller.prototype.getStoreAs = function(data) {
-	var storeAs = Objects.get(this.options, 'storeAs');
-	if (isArrayLike(data) && isString(storeAs) && (/\$[a-z_]/i).test(storeAs)) {
-		var parts = storeAs.split('$');
-		storeAs = parts[0];
-		for (var i = 1; i < parts.length; i++) {
-			if (data[parts[i]]) storeAs += data[parts[i]];
-			else storeAs += parts[i];				
-		}
-	}
-	return storeAs;
-};
-Controller.prototype.getPrimaryKey = function() {
-	return Objects.get(this.options, 'key', 'id');
-};
-Controller.prototype.getAction = function(actionName) {	
-	var actions = Objects.get(this.initials, 'actions');
-	if (isObject(actions)) {
-		var action = actions[actionName];
-		if (isObject(action)) {
-			if (!isString(action['name'])) {
-				if (isObject(action['routeOptions']) && actionName == 'load') {
-					this.initActionRouteOptions(action);
+	};
+	Controller.prototype.attachController = function(options) {
+		if (isObject(options['controller'])) {
+			if (isObject(options['on'])) {
+				for (var k in options['on']) {
+					options.controller.subscribe(k, options['on'][k], this);
 				}
-				action['name'] = actionName;
 			}
-			return action;
 		}
-		log('action is invalid', 'getAction', this, {action: action});
-	} else {
-		log('no actions', 'getAction', this, {actions: actions});
-	}
-	return null;
-};
-Controller.prototype.initActionRouteOptions = function(action) {
-	var value;
-	this.currentRouteOptions = {};
-	var routeOptions = {};
-	for (var k in action['routeOptions']) {
-		value = Router.getPathPartAt(action['routeOptions'][k]);
-		if (isString(value)) {
-			routeOptions[k] = value;
+	};
+	Controller.prototype.subscribe = function(eventType, callback, subscriber) {
+		this.listeners.push([eventType, callback, subscriber]);
+	};
+	Controller.prototype.unsubscribe = function(subscriber, eventType) {
+		var done = false;
+		while (!done) {
+			done = true;
+			for (var i = 0; i < this.listeners.length; i++) {
+				if (this.listeners[i][2] == subscriber && (!eventType || this.listeners[i][0] == eventType)) {
+					this.listeners.splice(i, 1);
+					done = false;
+					break;
+				}
+			}
 		}
-	}
-	this.setCurrentRouteOptions(routeOptions, action);
-	Router.subscribe(action['routeOptions'], this);
-};
-Controller.prototype.setCurrentRouteOptions = function(routeOptions, action) {
-	this.currentRouteOptions = routeOptions;
-	if (!isObject(action['options'])) {
-		action['options'] = {};
-	}
-	for (var k in routeOptions) {
-		action['options'][k] = routeOptions[k];
-	}
-};
-Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
-	if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
-		var action = this.getAction('load');
+	};
+	Controller.prototype.dispatchEvent = function(eventType, data) {
+		var dataToDispatch = data;
+		if (Objects.has(this.options, 'clone', true)) {
+			dataToDispatch = Objects.clone(data);
+		}
+		if (isArray(this.listeners)) {
+			for (var i = 0; i < this.listeners.length; i++) {
+				if (this.listeners[i][0] == eventType && isFunction(this.listeners[i][1])) {
+					this.listeners[i][1].call(this.listeners[i][2] || null, dataToDispatch, this);
+				}
+			}
+		}
+	};
+	Controller.prototype.getData = function(actionName) {
+		return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
+	};
+	Controller.prototype.getItemById = function(id) {
+		var primaryKey = this.getPrimaryKey();
+		var data = this.data['load'];
+		if (isArray(data)) {
+			for (var i = 0; i < data.length; i++) {
+				if (Objects.has(data[i], primaryKey, id)) return data[i];
+			}
+		}
+		return null;
+	};
+	Controller.prototype.getItem = function(nameOrIndex, actionName) {
+		actionName = actionName || 'load';
+		return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
+	};
+	Controller.prototype.load = function(options) {
+		this.doAction('load', options);
+	};
+	Controller.prototype.doAction = function(actionName, options, url) {
+		var action = this.getAction(actionName);
+		this.action = action;	
+		if (actionName == 'load' && this.gotFromStore(options)) {
+			return;
+		}
+		if (!isObject(options)) {
+			options = {};
+		}
+		if (action && isObject(action) && action['options'] && isObject(action['options'])) {
+			Objects.merge(options, action['options']);
+		}
+		var method = action['method'] || 'POST';
+		url = url || this.makeUrl(action['url'], options);
+		if (!url || !isString(url)) {
+			log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
+		}
+		this.request = this.request || new AjaxRequest(url, this.onActionComplete.bind(this));
+		this.request.send(method, options, url);
+	};
+	Controller.prototype.gotFromStore = function(options) {
+		if (this.shouldStore()) {
+			var storeAs = this.getStoreAs(options);
+			if (isString(storeAs)) {
+				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
+				if (isArrayLike(storedData)) {
+					this.onActionComplete(storedData, true);
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	Controller.prototype.makeUrl = function(url, options) {
+		var regExp;
+		for (var k in options) {
+			if (isString(options[k]) || isNumber(options[k])) {
+				regExp = new RegExp('\\$' + k)
+				url = url.replace(regExp, options[k]);
+			}
+		}
+		return url;
+	};
+	Controller.prototype.onActionComplete = function(data, isFromStorage) {
+		var actionName = this.action['name'];
+		this.data = this.data || {};
+		this.data[actionName] = data;
+		if (isFunction(this.action['callback'])) {
+			this.action['callback'].call(this, data);
+		}
+		this.dispatchEvent(actionName, data);
+		if (!isFromStorage && actionName == 'load' && this.shouldStore()) {
+			this.store(true, data);
+		}
+	};
+	Controller.prototype.shouldStore = function() {
+		var shouldStore = Objects.get(this.options, 'store');
+		if (shouldStore === false) return false;
+		return Objects.has(this.options, 'storeAs');
+	};
+	Controller.prototype.store = function(isAdding, data) {console.log('store')
+		var storeAs = this.getStoreAs(data);
+		if (isAdding) {		
+			StoreKeeper.set(storeAs, data);
+		} else {
+			StoreKeeper.remove(storeAs);
+		}
+	};
+	Controller.prototype.getStoreAs = function(data) {
+		var storeAs = Objects.get(this.options, 'storeAs');
+		if (isArrayLike(data) && isString(storeAs) && (/\$[a-z_]/i).test(storeAs)) {
+			var parts = storeAs.split('$');
+			storeAs = parts[0];
+			for (var i = 1; i < parts.length; i++) {
+				if (data[parts[i]]) storeAs += data[parts[i]];
+				else storeAs += parts[i];				
+			}
+		}
+		return storeAs;
+	};
+	Controller.prototype.getPrimaryKey = function() {
+		return Objects.get(this.options, 'key', 'id');
+	};
+	Controller.prototype.getAction = function(actionName) {	
+		var actions = Objects.get(this.initials, 'actions');
+		if (isObject(actions)) {
+			var action = actions[actionName];
+			if (isObject(action)) {
+				if (!isString(action['name'])) {
+					if (isObject(action['routeOptions']) && actionName == 'load') {
+						this.initActionRouteOptions(action);
+					}
+					action['name'] = actionName;
+				}
+				return action;
+			}
+			log('action is invalid', 'getAction', this, {action: action});
+		} else {
+			log('no actions', 'getAction', this, {actions: actions});
+		}
+		return null;
+	};
+	Controller.prototype.initActionRouteOptions = function(action) {
+		var value;
+		this.currentRouteOptions = {};
+		var routeOptions = {};
+		for (var k in action['routeOptions']) {
+			value = Router.getPathPartAt(action['routeOptions'][k]);
+			if (isString(value)) {
+				routeOptions[k] = value;
+			}
+		}
 		this.setCurrentRouteOptions(routeOptions, action);
-		this.doAction('load');
-	}
-};
-Controller.prototype.dispose = function() {
-	this.listeners = null;
-	if (this.request) {
-		this.request.dispose();
-	}
-	this.options = null;
-	this.request = null;
-	this.data = null;
-	this.action = null;
-	this.initials = null;
-};
+		Router.subscribe(action['routeOptions'], this);
+	};
+	Controller.prototype.setCurrentRouteOptions = function(routeOptions, action) {
+		this.currentRouteOptions = routeOptions;
+		if (!isObject(action['options'])) {
+			action['options'] = {};
+		}
+		for (var k in routeOptions) {
+			action['options'][k] = routeOptions[k];
+		}
+	};
+	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
+		if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
+			var action = this.getAction('load');
+			this.setCurrentRouteOptions(routeOptions, action);
+			this.doAction('load');
+		}
+	};
+	Controller.prototype.dispose = function() {
+		this.listeners = null;
+		if (this.request) {
+			this.request.dispose();
+		}
+		this.options = null;
+		this.request = null;
+		this.data = null;
+		this.action = null;
+		this.initials = null;
+	};
+}
+Controller();
 function Core() {}
 Core.prototype.getNextSiblingChild = function() {
 	if (!this.nextSiblingChild) {
@@ -1139,393 +1128,407 @@ IfSwitch.prototype.dispose = function() {
 	this.prevSiblingChild = null;
 };
 function Level() {
-	this.children = [];
-	this.detached = false;
-}
-Level.prototype.render = function(items, parentElement, parentLevel, nextSiblingChild) {
-	this.parentElement = parentElement;
-	this.parentLevel = parentLevel;
-	this.nextSiblingChild = nextSiblingChild;
-	this.renderItems(items);
-	this.prevChild = null;
-	this.nextSiblingChild = null;
-};
-Level.prototype.setComponent = function(component) {
-	this.component = component;
-};
-Level.prototype.getComponent = function() {
-	return this.component;
-};
-Level.prototype.renderItems = function(items) {
-	if (isArray(items)) {
-		for (var i = 0; i < items.length; i++) this.renderItem(items[i]);
-	} else this.renderItem(items);
-};
-Level.prototype.renderItem = function(item) {
-	if (!item && item !== 0) return;
-	if (isFunction(item)) {
-		this.renderItems(item());
-		return;
-	}
-	if (!isObject(item)) this.createTextNode(item);
-	else if (item.hasOwnProperty('t')) this.createElement(item);
-	else if (item.hasOwnProperty('pr')) this.createPropertyNode(item);
-	else if (item.hasOwnProperty('i')) this.createCondition(item);
-	else if (isFunction(item['h'])) this.createForeach(item);	
-	else if (item.hasOwnProperty('tmp')) this.includeTemplate(item);
-	else if (item.hasOwnProperty('cmp')) this.renderComponent(item);
-	else if (item.hasOwnProperty('is')) this.createIfSwitch(item);
-	else if (item.hasOwnProperty('sw')) this.createSwitch(item);
-	else if (item.hasOwnProperty('pl')) this.createPlaceholder(item);
-};
-Level.prototype.createLevel = function(items, parentElement) {
-	var level = new Level();
-	level.setComponent(this.component);
-	level.render(items, parentElement, this);
-	this.children.push(level);
-};
-Level.prototype.createTextNode = function(content) {
-	if (content == '<br>') this.appendChild(document.createElement('br'));
-	else this.appendChild(document.createTextNode(content));
-};
-Level.prototype.createPropertyNode = function(props) {
-	var propName = props['pr'];
-	var propNode = document.createTextNode(props['p'] || '');
-	this.appendChild(propNode);
-	this.propNodes = this.propNodes || {};
-	this.propNodes[propName] = this.propNodes[propName] || [];
-	this.propNodes[propName].push(this.component.registerPropActivity('nod', propName, propNode));
-};
-Level.prototype.createElement = function(props) {
-	var element = document.createElement(__TAGS[props['t']] || 'span');
-	this.appendChild(element);
-	if (isObject(props['p'])) {
-		var attrName, pn, attr;		
-		for (var k in props['p']) {
-			if (isString(props['p'][k]) || isNumber(props['p'][k])) {
-				attrName = __A[k] || k;
-				if (attrName == 'scope') this.component.setScope(element);
-				else element.attr(attrName, props['p'][k]);
-			} else if (isFunction(props['p'][k])) {
-				pn = props['n'][k];
-				if (props['n'] && (isArray(pn) || isString(pn))) {
-					this.propAttrs = this.propAttrs || {};
-					attr = [element, k, props['p'][k]];					
-					if (isString(pn)) {
-						this.propAttrs[pn] = this.propAttrs[pn] || [];
-						this.propAttrs[pn].push(this.component.registerPropActivity('atr', pn, attr));
-					} else {
-						for (var i = 0; i < pn.length; i++) {					
-							this.propAttrs[pn[i]] = this.propAttrs[pn[i]] || [];
-							this.propAttrs[pn[i]].push(this.component.registerPropActivity('atr', pn[i], attr));
+	var self = this, parentElement, realParentElement, parentLevel,
+		nextSiblingChild, children = [], detached = false,
+		prevChild, firstChild, component, propAttrs, propNodes,
+		eventHandler, firstNodeChild, lastNodeChild, foreaches,
+		conditions, ifSwitches, switches, propComps;
+	var renderItems = function(items) {
+		if (isArray(items)) {
+			for (var i = 0; i < items.length; i++) renderItem(items[i]);
+		} else renderItem(items);
+	};
+	var renderItem = function(item) {
+		if (!item && item !== 0) return;
+		if (isFunction(item)) {
+			renderItems(item());
+			return;
+		}
+		if (!isObject(item)) createTextNode(item);
+		else if (item.hasOwnProperty('t')) createElement(item);
+		else if (item.hasOwnProperty('pr')) createPropertyNode(item);
+		else if (item.hasOwnProperty('i')) createCondition(item);
+		else if (isFunction(item['h'])) createForeach(item);	
+		else if (item.hasOwnProperty('tmp')) includeTemplate(item);
+		else if (item.hasOwnProperty('cmp')) renderComponent(item);
+		else if (item.hasOwnProperty('is')) createIfSwitch(item);
+		else if (item.hasOwnProperty('sw')) createSwitch(item);
+		else if (item.hasOwnProperty('pl')) createPlaceholder(item);
+	};
+	var createLevel = function(items, pe) {
+		var level = new Level();
+		level.setComponent(component);
+		level.render(items, pe, self);
+		children.push(level);
+	};
+	var createTextNode = function(content) {
+		if (content == '<br>') appendChild(document.createElement('br'));
+		else appendChild(document.createTextNode(content));
+	};
+	var createPropertyNode = function(props) {
+		var name = props['pr'];
+		var node = document.createTextNode(props['p'] || '');
+		appendChild(node);
+		propNodes = propNodes || {};
+		propNodes[name] = propNodes[name] || [];
+		propNodes[name].push(component.registerPropActivity('nod', name, node));
+	};
+	var createElement = function(props) {
+		var element = document.createElement(__TAGS[props['t']] || 'span');
+		appendChild(element);
+		if (isObject(props['p'])) {
+			var attrName, pn, attr;		
+			for (var k in props['p']) {
+				if (isString(props['p'][k]) || isNumber(props['p'][k])) {
+					attrName = __A[k] || k;
+					if (attrName == 'scope') component.setScope(element);
+					else element.attr(attrName, props['p'][k]);
+				} else if (isFunction(props['p'][k])) {
+					pn = props['n'][k];
+					if (props['n'] && (isArray(pn) || isString(pn))) {
+						propAttrs = propAttrs || {};
+						attr = [element, k, props['p'][k]];					
+						if (isString(pn)) {
+							propAttrs[pn] = propAttrs[pn] || [];
+							propAttrs[pn].push(component.registerPropActivity('atr', pn, attr));
+						} else {
+							for (var i = 0; i < pn.length; i++) {					
+								propAttrs[pn[i]] = propAttrs[pn[i]] || [];
+								propAttrs[pn[i]].push(component.registerPropActivity('atr', pn[i], attr));
+							}
+						}
+					}
+					var attrParts = props['p'][k]();
+					if (!isArray(attrParts)) attrParts = [attrParts];
+					var attrValue = '', partValue;
+					for (i = 0; i < attrParts.length; i++) {
+						partValue = isFunction(attrParts[i]) ? attrParts[i]() : attrParts[i];
+						if (partValue) attrValue += partValue;
+					}
+					if (attrValue) element.attr(__A[k] || k, attrValue);
+				}
+			}
+		}
+		if (isArray(props['e'])) {
+			var eventType, callback;
+			eventHandler = eventHandler || new EventHandler();
+			for (i = 0; i < props['e'].length; i++) {
+				eventType = __EVENTTYPES[props['e'][i]] || eventType;
+				callback = props['e'][i + 1];
+				var isOnce = props['e'][i + 2] === true;
+				if (isString(eventType) && isFunction(callback)) {					
+					if (isOnce) {
+						eventHandler.listenOnce(element, eventType, callback.bind(component));
+						i++;
+					} else eventHandler.listen(element, eventType, callback.bind(component));
+				}
+				i++;
+			}
+		}
+		if (isArray(props['c'])) {
+			if (props['c'].length == 1 && (isString(props['c'][0]) || isNumber(props['c'][0]))) element.innerHTML = props['c'][0];
+			else createLevel(props['c'], element);
+		} else if (isObject(props['c'])) {
+			createLevel(props['c'], element);
+		} else if (!isUndefined(props['c'])) {
+			element.innerHTML = props['c'];
+		}
+	};
+	var appendChild = function(child) {
+		if (nextSiblingChild) parentElement.insertBefore(child, nextSiblingChild);	
+		else parentElement.appendChild(child);	
+		registerChild(child);
+	};
+	var createCondition = function(params) {
+		if (isBool(params['i'])) {
+			if (params['i']) {
+				renderItems(params['c']);
+			} else if (!isUndefined(params['e'])) {
+				renderItem(params['e']);
+			}
+		} else if (isFunction(params['i']) && isFunction(params['c'])) {
+			var propNames = params['p'], pn;
+			if (isArray(propNames)) {
+				conditions = conditions || {};
+				var condition = new Condition(params);
+				condition.render(parentElement, self);
+				for (var i = 0; i < propNames.length; i++) {
+					pn = propNames[i];
+					conditions[pn] = conditions[pn] || [];
+					conditions[pn].push(component.registerPropActivity('cnd', pn, condition));
+				}
+				registerChild(condition);
+			} else if (params['i']()) {
+				renderItems(params['c']());
+			} else if (isFunction(params['e'])) {
+				renderItems(params['e']());
+			}
+		}
+	};
+	var createForeach = function(params) {
+		var propName = params['f'];
+		var isLocal = !propName;
+		if (!isLocal) {
+			var foreach = new Foreach(params);
+			foreach.render(parentElement, self);
+			foreaches = foreaches || {};
+			foreaches[propName] = foreaches[propName] || [];
+			foreaches[propName].push(component.registerPropActivity('for', propName, foreach));
+			registerChild(foreach);
+		} else {
+			if (isArray(params['p'])) {
+				for (var i = 0; i < params['p'].length; i++) renderItems(params['h'](params['p'][i], i));
+			} else if (isObject(params['p'])) {
+				for (var k in params['p']) renderItems(params['h'](params['p'][k], k));
+			}
+		}
+	};
+	var createIfSwitch = function(params) {
+		var propNames = params['p'];
+		var isLocal = !isArray(propNames) || isUndefined(propNames[0]);
+		if (!isLocal) {
+			var swtch = new IfSwitch(params);
+			swtch.render(parentElement, self);
+			ifSwitches = ifSwitches || {};
+			for (var i = 0; i < propNames.length; i++) {
+				ifSwitches[propNames[i]] = ifSwitches[propNames[i]] || [];
+				ifSwitches[propNames[i]].push(component.registerPropActivity('isw', propNames[i], swtch));
+			}
+		} else {
+			for (var i = 0; i < params['is'].length; i++) {
+				if (!!params['is'][i]) {
+					renderItems(params['c'][i]);
+					return;
+				}
+			}
+			if (isArray(params['d'])) renderItems(params['d']);
+		}
+	};
+	var createSwitch = function(params) {
+		var propName = params['p'];
+		var isLocal = !propName;
+		if (!isLocal) {
+			var swtch = new Switch(params);
+			swtch.render(parentElement, self);
+			switches = switches || {};
+			switches[propName] = switches[propName] || [];
+			switches[propName].push(component.registerPropActivity('swt', propName, swtch));
+		} else {
+			for (var i = 0; i < params['s'].length; i++) {
+				if (params['sw'] === params['s'][i]) {
+					renderItems(params['c'][i]);
+					return;
+				}
+			}
+			if (isArray(params['d'])) renderItems(params['d']);
+		}
+	};
+	var createPlaceholder = function(params) {
+		var placeholderNode = document.createTextNode('');
+		if (isString(params['d'])) placeholderNode.textContent = params['d'];
+		placeholderNode.placeholderName = params['pl'];
+		appendChild(placeholderNode);	
+	};
+	var registerChild = function(child, isComponent) {
+		var isNodeChild = isNode(child);
+		if (prevChild) prevChild.setNextSiblingChild(child);
+		prevChild = isNodeChild ? null : child;
+		if (!firstChild) firstChild = child;
+		if (isNodeChild) {
+			if (!firstNodeChild) firstNodeChild = child;
+			lastNodeChild = child;
+		} else children.push(child);
+		if (isComponent) component.registerChildComponent(child);
+	};
+	var includeTemplate = function(item) {
+		if (isString(item['tmp'])) item['tmp'] = component.getTemplateByKey(item['tmp']);
+		if (isFunction(item['tmp'])) {		
+			var items = item['tmp'].call(component, component, item['p']);
+			if (isArray(items)) {
+				for (var i = 0; i < items.length; i++) renderItem(items[i]);
+			}
+		}
+	};
+	var renderComponent = function(item, pe) {
+		pe = pe || parentElement;
+		if (isFunction(item['cmp'])) {
+			var cmp = new item['cmp']();
+			var i, k, p = item['p'];
+			var props, args, data;
+			if (isObject(p)) {
+				props = initComponentProps(p['p'], p['ap'], item['n'], cmp);
+				args = initComponentProps(p['a'], p['aa'], item['na'], cmp, true);
+				if (isString(p['i'])) {
+					cmp.setId(p['i']);
+					var waiting = component.getWaitingChild(p['i']);
+					if (isArray(waiting)) {
+						for (i = 0; i < waiting.length; i++) {
+							waiting[i][0].set(waiting[i][1], cmp);
 						}
 					}
 				}
-				var attrParts = props['p'][k]();
-				if (!isArray(attrParts)) attrParts = [attrParts];
-				var attrValue = '', partValue;
-				for (i = 0; i < attrParts.length; i++) {
-					partValue = isFunction(attrParts[i]) ? attrParts[i]() : attrParts[i];
-					if (partValue) attrValue += partValue;
+			}
+			if (isArray(item['w'])) {
+				for (i = 0; i < item['w'].length; i += 2) {
+					component.provideWithComponent(item['w'][i], item['w'][i + 1], cmp);
 				}
-				if (attrValue) element.attr(__A[k] || k, attrValue);
 			}
-		}
-	}
-	if (isArray(props['e'])) {
-		var eventType, eventHandler;
-		this.eventHandler = this.eventHandler || new EventHandler();
-		for (i = 0; i < props['e'].length; i++) {
-			eventType = __EVENTTYPES[props['e'][i]] || eventType;
-			eventHandler = props['e'][i + 1].bind(this.component);
-			var isOnce = props['e'][i + 2] === true;
-			if (isString(eventType) && isFunction(eventHandler)) {
-				if (isOnce) {
-					this.eventHandler.listenOnce(element, eventType, eventHandler);
-					i++;
-				} else this.eventHandler.listen(element, eventType, eventHandler);
-			}
-			i++;
-		}
-	}
-	if (isArray(props['c'])) {
-		if (props['c'].length == 1 && (isString(props['c'][0]) || isNumber(props['c'][0]))) element.innerHTML = props['c'][0];
-		else this.createLevel(props['c'], element);
-	} else if (isObject(props['c'])) {
-		this.createLevel(props['c'], element);
-	} else if (!isUndefined(props['c'])) {
-		element.innerHTML = props['c'];
-	}
-};
-Level.prototype.appendChild = function(child) {
-	if (this.nextSiblingChild) this.parentElement.insertBefore(child, this.nextSiblingChild);	
-	else this.parentElement.appendChild(child);	
-	this.registerChild(child);
-};
-Level.prototype.createCondition = function(params) {
-	if (isBool(params['i'])) {
-		if (params['i']) {
-			this.renderItems(params['c']);
-		} else if (!isUndefined(params['e'])) {
-			this.renderItem(params['e']);
-		}
-	} else if (isFunction(params['i']) && isFunction(params['c'])) {
-		var propNames = params['p'], pn;
-		if (isArray(propNames)) {
-			this.conditions = this.conditions || {};
-			var condition = new Condition(params);
-			condition.render(this.parentElement, this);
-			for (var i = 0; i < propNames.length; i++) {
-				pn = propNames[i];
-				this.conditions[pn] = this.conditions[pn] || [];
-				this.conditions[pn].push(this.component.registerPropActivity('cnd', pn, condition));
-			}
-			this.registerChild(condition);
-		} else if (params['i']()) {
-			this.renderItems(params['c']());
-		} else if (isFunction(params['e'])) {
-			this.renderItems(params['e']());
-		}
-	}
-};
-Level.prototype.createForeach = function(params) {
-	var propName = params['f'];
-	var isLocal = !propName;
-	if (!isLocal) {
-		var foreach = new Foreach(params);
-		foreach.render(this.parentElement, this);
-		this.foreaches = this.foreaches || {};
-		this.foreaches[propName] = this.foreaches[propName] || [];
-		this.foreaches[propName].push(this.component.registerPropActivity('for', propName, foreach));
-		this.registerChild(foreach);
-	} else {
-		if (isArray(params['p'])) {
-			for (var i = 0; i < params['p'].length; i++) this.renderItems(params['h'](params['p'][i], i));
-		} else if (isObject(params['p'])) {
-			for (var k in params['p']) this.renderItems(params['h'](params['p'][k], k));
-		}
-	}
-};
-Level.prototype.createIfSwitch = function(params) {
-	var propNames = params['p'];
-	var isLocal = !isArray(propNames) || isUndefined(propNames[0]);
-	if (!isLocal) {
-		var swtch = new IfSwitch(params);
-		swtch.render(this.parentElement, this);
-		this.ifSwitches = this.ifSwitches || {};
-		for (var i = 0; i < propNames.length; i++) {
-			this.ifSwitches[propNames[i]] = this.ifSwitches[propNames[i]] || [];
-			this.ifSwitches[propNames[i]].push(this.component.registerPropActivity('isw', propNames[i], swtch));
-		}
-	} else {
-		for (var i = 0; i < params['is'].length; i++) {
-			if (!!params['is'][i]) {
-				this.renderItems(this.params['c'][i]);
-				return;
-			}
-		}
-		if (isArray(this.params['d'])) this.renderItems(this.params['d']);
-	}
-};
-Level.prototype.createSwitch = function(params) {
-	var propName = params['p'];
-	var isLocal = !propName;
-	if (!isLocal) {
-		var swtch = new Switch(params);
-		swtch.render(this.parentElement, this);
-		this.switches = this.switches || {};
-		this.switches[propName] = this.switches[propName] || [];
-		this.switches[propName].push(this.component.registerPropActivity('swt', propName, swtch));
-	} else {
-		for (var i = 0; i < this.params['s'].length; i++) {
-			if (this.params['sw'] === this.params['s'][i]) {
-				this.renderItems(this.params['c'][i]);
-				return;
-			}
-		}
-		if (isArray(this.params['d'])) this.renderItems(this.params['d']);
-	}
-};
-Level.prototype.createPlaceholder = function(params) {
-	var placeholderNode = document.createTextNode('');
-	if (isString(params['d'])) placeholderNode.textContent = params['d'];
-	placeholderNode.placeholderName = params['pl'];
-	this.appendChild(placeholderNode);	
-};
-Level.prototype.registerChild = function(child, isComponent) {
-	var isNodeChild = isNode(child);
-	if (this.prevChild) this.prevChild.setNextSiblingChild(child);
-	this.prevChild = isNodeChild ? null : child;
-	if (!this.firstChild) this.firstChild = child;
-	if (isNodeChild) {
-		if (!this.firstNodeChild) this.firstNodeChild = child;
-		this.lastNodeChild = child;
-	} else this.children.push(child);
-	if (isComponent) this.component.registerChildComponent(child);
-};
-Level.prototype.includeTemplate = function(item) {
-	if (isString(item['tmp'])) item['tmp'] = this.component.getTemplateByKey(item['tmp']);
-	if (isFunction(item['tmp'])) {		
-		var items = item['tmp'].call(this.component, this.component, item['p']);
-		if (isArray(items)) {
-			for (var i = 0; i < items.length; i++) this.renderItem(items[i]);
-		}
-	}
-};
-Level.prototype.renderComponent = function(item, parentElement) {
-	parentElement = parentElement || this.parentElement;
-	if (isFunction(item['cmp'])) {
-		var props = {};
-		var value, i, k, cmpid;
-		var isProps = isObject(item['p']);
-		if (isProps) {
-			for (k in item['p']) {
-				value = item['p'][k];
-				if (k == 'cmpid') {
-					cmpid = value;
-					continue;
+			console.log([cmp, props, args])
+			Initialization.initiate.call(cmp, props, args);
+			cmp.setParent(component);
+			cmp.render(pe);
+			registerChild(cmp, true);			
+			var events = item['e'];
+			if (isArray(events)) {
+				for (i = 0; i < events.length; i++) {
+					cmp.subscribe(events[i], events[i + 1], component);
+					i++;	
 				}
-				if (isFunction(item['p'][k])) value = item['p'][k]();
-				props[k] = value;
 			}
+		} else if (item && isObject(item)) {
+			if (!item.isRendered()) item.render(pe);
+			registerChild(item, true);
 		}
-		var component = new item['cmp'](props);
-		if (isArray(item['w'])) {
-			for (i = 0; i < item['w'].length; i+=2) this.component.provideWithComponent(item['w'][i], item['w'][i + 1], component);
-		}
-		component.setParent(this.component);
-		component.render(parentElement);
-		if (cmpid) {
-			component.setId(cmpid);
-			var waiting = this.component.getWaitingChild(cmpid);
-			if (isArray(waiting)) {
-				for (i = 0; i < waiting.length; i++) {
-					waiting[i][0].set(waiting[i][1], component);
+	};
+	var initComponentProps = function(p, ap, n, cmp, isArgs) {
+		var props = {}, k, isReactive;
+		var f = function(pr) {
+			if (isObject(pr)) {
+				for (k in pr) {
+					isReactive = Objects.has(n, k) && isFunction(pr[k]);
+					props[k] = isReactive ? pr[k]() : pr[k];
+					if (isReactive) {
+						registerPropComp(n[k], [cmp, pr[k], isArgs]);
+					}
+				}
+			}
+		};
+		f(p); f(ap); 
+		return props;
+	};
+	var registerPropComps = function(cmp, propNames, argNames, props) {
+		propComps = propComps || {};
+		var data;
+		for (var k in props) {
+			data = [cmp, props[k], k == 'args'];
+			if (isObject(names) && (isArray(names[k]) || isString(names[k]))) {
+				if (isString(names[k])) {
+					registerPropComp(names[k], data);
+				} else {
+					for (i = 0; i < names[k].length; i++) registerPropComp(names[k][i], data);
 				}
 			}
 		}
-		this.registerChild(component, true);
-		if (isProps) this.registerPropComps(component, item['n'], item['p']);
-		var events = item['e'];
-		if (isArray(events)) {
-			for (i = 0; i < events.length; i++) {
-				component.subscribe(events[i], events[i + 1], this.component);
-				i++;	
+	};
+	var registerPropComp = function(pn, data) {
+		propComps[pn] = propComps[pn] || [];
+		propComps[pn].push(component.registerPropActivity('cmp', pn, data));
+	};
+	var disposeDom = function() {
+		var elementsToDispose = this.getElements();
+		for (var i = 0; i < elementsToDispose.length; i++) parentElement.removeChild(elementsToDispose[i]);
+		elementsToDispose = null;
+	};
+	this.render = function(items, pe, pl, nsc) {
+		parentElement = pe;
+		parentLevel = pl;
+		nextSiblingChild = nsc;
+		renderItems(items);
+		prevChild = null;
+		nextSiblingChild = null;
+	};
+	this.getParentElement = function() {
+		return parentElement;
+	};
+	this.getFirstNodeChild = function() {
+		if (isNode(firstChild)) return firstChild;
+		var firstLevel = children[0];
+		if (firstLevel instanceof Level) {
+			return firstLevel.getParentElement();
+		} else if (firstLevel) {
+			return firstLevel.getFirstNodeChild();
+		}
+		return null;
+	};
+	this.setComponent = function(c) {
+		component = c;
+	};
+	this.getComponent = function() {
+		return component;
+	};
+	this.setAppended = function(isAppended) {
+		var isDetached = !isAppended;
+		if (isDetached === this.detached) return;
+		this.detached = isDetached;
+		var elements = this.getElements();
+		if (isDetached) {
+			realParentElement = parentElement;
+			parentElement = document.createElement('div'); 
+			for (var i = 0; i < elements.length; i++) parentElement.appendChild(elements[i]);
+		} else {
+			nextSiblingChild = parentLevel.getNextSiblingChild();
+			parentElement = realParentElement;
+			realParentElement = null;
+			for (var i = 0; i < elements.length; i++) appendChild(elements[i]);
+		}
+	};
+	this.getElements = function() {
+		var elements = [];
+		if (firstNodeChild && lastNodeChild) {
+			var isAdding = false;
+			for (var i = 0; i < parentElement.childNodes.length; i++) {
+				if (parentElement.childNodes[i] == firstNodeChild) isAdding = true;
+				if (isAdding) elements.push(parentElement.childNodes[i]);
+				if (parentElement.childNodes[i] == lastNodeChild) break;
 			}
 		}
-	} else if (item && isObject(item)) {
-		if (!item.isRendered()) item.render(parentElement);
-		this.registerChild(item, true);
-	}
-};
-Level.prototype.registerPropComps = function(component, names, props) {
-	this.propComps = this.propComps || {};
-	var data;
-	for (var k in props) {
-		data = [component, props[k], k == 'args'];
-		if (isObject(names) && (isArray(names[k]) || isString(names[k]))) {
-			if (isString(names[k])) {
-				this.registerPropComp(names[k], data);
-			} else {
-				for (i = 0; i < names[k].length; i++) this.registerPropComp(names[k][i], data);
-			}
+		return elements;
+	};
+	this.dispose = function() {
+		for (var i = 0; i < children.length; i++) children[i].dispose();
+		if (eventHandler) {
+			eventHandler.dispose();
+			eventHandler = null;
 		}
-	}
-};
-Level.prototype.registerPropComp = function(pn, data) {
-	this.propComps[pn] = this.propComps[pn] || [];
-	this.propComps[pn].push(this.component.registerPropActivity('cmp', pn, data));
-};
-Level.prototype.getParentElement = function() {
-	return this.parentElement;
-};
-Level.prototype.getFirstNodeChild = function() {
-	if (isNode(this.firstChild)) return this.firstChild;
-	var firstLevel = this.children[0];
-	if (firstLevel instanceof Level) {
-		return firstLevel.getParentElement();
-	} else if (firstLevel) {
-		return firstLevel.getFirstNodeChild();
-	}
-	return null;
-};
-Level.prototype.disposeDom = function() {
-	var elementsToDispose = this.getElements();
-	for (var i = 0; i < elementsToDispose.length; i++) this.parentElement.removeChild(elementsToDispose[i]);
-	elementsToDispose = null;
-};
-Level.prototype.setAppended = function(isAppended) {
-	var isDetached = !isAppended;
-	if (isDetached === this.detached) return;
-	this.detached = isDetached;
-	var elements = this.getElements();
-	if (isDetached) {
-		this.realParentElement = this.parentElement;
-		this.parentElement = document.createElement('div'); 
-		for (var i = 0; i < elements.length; i++) this.parentElement.appendChild(elements[i]);
-	} else {
-		this.nextSiblingChild = this.parentLevel.getNextSiblingChild();
-		this.parentElement = this.realParentElement;
-		this.realParentElement = null;
-		for (var i = 0; i < elements.length; i++) this.appendChild(elements[i]);
-	}
-};
-Level.prototype.getElements = function() {
-	var elements = [];
-	if (this.firstNodeChild && this.lastNodeChild) {
-		var isAdding = false;
-		for (var i = 0; i < this.parentElement.childNodes.length; i++) {
-			if (this.parentElement.childNodes[i] == this.firstNodeChild) isAdding = true;
-			if (isAdding) elements.push(this.parentElement.childNodes[i]);
-			if (this.parentElement.childNodes[i] == this.lastNodeChild) break;
+		disposeDom();
+		if (propComps) {
+			component.disposePropActivities('cmp', propComps);
+			propComps = null;
 		}
-	}
-	return elements;
-};
-Level.prototype.dispose = function() {
-	for (var i = 0; i < this.children.length; i++) this.children[i].dispose();
-	if (this.eventHandler) {
-		this.eventHandler.dispose();
-		this.eventHandler = null;
-	}
-	this.disposeDom();
-	if (this.propComps) {
-		this.component.disposePropActivities('cmp', this.propComps);
-		this.propComps = null;
-	}
-	if (this.conditions) {
-		this.component.disposePropActivities('cnd', this.conditions);
-		this.conditions = null;
-	}
-	if (this.foreaches) {
-		this.component.disposePropActivities('for', this.foreaches);
-		this.foreaches = null;
-	}
-	if (this.propNodes) {
-		this.component.disposePropActivities('nod', this.propNodes);
-		this.propNodes = null;
-	}
-	if (this.propAttrs) {
-		this.component.disposePropActivities('atr', this.propAttrs);
-		this.propAttrs = null;
-	}
-	if (this.ifSwitches) {
-		this.component.disposePropActivities('isw', this.ifSwitches);
-		this.ifSwitches = null;
-	}
-	if (this.switches) {
-		this.component.disposePropActivities('swt', this.switches);
-		this.switches = null;
-	}
-	this.children = null;
-	this.parentElement = null;
-	this.parentLevel = null;
-	this.firstChild = null;
-	this.firstNodeChild = null;
-	this.lastNodeChild = null;
-	this.realParentElement = null;
-	this.component = null;
-};
+		if (conditions) {
+			component.disposePropActivities('cnd', conditions);
+			conditions = null;
+		}
+		if (foreaches) {
+			component.disposePropActivities('for', foreaches);
+			foreaches = null;
+		}
+		if (propNodes) {
+			component.disposePropActivities('nod', propNodes);
+			propNodes = null;
+		}
+		if (propAttrs) {
+			component.disposePropActivities('atr', propAttrs);
+			propAttrs = null;
+		}
+		if (ifSwitches) {
+			component.disposePropActivities('isw', ifSwitches);
+			ifSwitches = null;
+		}
+		if (switches) {
+			component.disposePropActivities('swt', switches);
+			switches = null;
+		}
+		children = null;
+		parentElement = null;
+		parentLevel = null;
+		firstChild = null;
+		firstNodeChild = null;
+		lastNodeChild = null;
+		realParentElement = null;
+		component = null;
+	};
+}
 function Menu() {};
 Menu.prototype.doRendering = function() {
 	Component.prototype.doRendering.call(this);
@@ -2580,6 +2583,23 @@ function EventHandler() {
 	};
 }
 function Initialization() {
+	var isMethodToInherit = function(method) {
+		return method != __I && method != __GI;
+	};
+	var extendInitials = function(initials1, initials2) {
+		if (isNull(initials1)) {
+			initials1 = initials2;
+		} else {
+			for (var k in initials2) {
+				if (isUndefined(initials1[k])) {
+					initials1[k] = initials2[k];
+				} else {
+					Objects.merge(initials1[k], initials2[k]);
+				}
+			}
+		}
+		return initials1;
+	};
 	this.inherits = function(list) {
 		var children, parent, child, initials;
 		for (var k = 0; k < list.length; k++) {
@@ -2601,7 +2621,7 @@ function Initialization() {
 			}
 		}
 	};
-	this.initiate = function(props) {
+	this.initiate = function(props, args) {
 		var initials = null;
 		var initiateParental = function(superClasses, object) {
 			for (var i = 0; i < superClasses.length; i++) {
@@ -2635,26 +2655,7 @@ function Initialization() {
 			}
 		}
 		this.initials = initials;
-		if (props && isString(props['cmpid'])) {
-			this.setId(props['cmpid']);
-		}
-	};
-	var isMethodToInherit = function(method) {
-		return method != __I && method != __GI;
-	};
-	var extendInitials = function(initials1, initials2) {
-		if (isNull(initials1)) {
-			initials1 = initials2;
-		} else {
-			for (var k in initials2) {
-				if (isUndefined(initials1[k])) {
-					initials1[k] = initials2[k];
-				} else {
-					Objects.merge(initials1[k], initials2[k]);
-				}
-			}
-		}
-		return initials1;
+		this.args = args;
 	};
 }
 Initialization = new Initialization();
@@ -2899,6 +2900,7 @@ function User() {
 			loaded = true;
 			if (app instanceof Function) {
 				app = new app();
+				Initialization.initiate.call(app);
 				app.run();
 			}
 		}
@@ -2979,14 +2981,14 @@ function Objects() {
 	    return true;		
 	};
 	this.merge = function() {
-		var arrs = arguments;
-		if (!isObject(arrs[0])) arrs[0] = {};
-		for (var i = 1; i < arrs.length; i++) {
-			if (isArrayLike(arrs[i])) {
-				for (var k in arrs[i]) arrs[0][k] = arrs[i][k];
+		var objs = arguments;
+		if (!isArrayLike(objs[0])) objs[0] = {};
+		for (var i = 1; i < objs.length; i++) {
+			if (isArrayLike(objs[i])) {
+				for (var k in objs[i]) objs[0][k] = objs[i][k];
 			}
 		}
-		return arrs[0];
+		return objs[0];
 	};
 	this.clone = function(obj) {
 		if (!isArrayLike(obj)) return obj;
@@ -3102,9 +3104,7 @@ function isNone(a) {
 function stringToNumber(str) {
 	return Number(str);
 }
-function App(props) {
-	Initialization.initiate.call(this, props);
-};
+function App() {};
 App.prototype.onClick = function() {
 	console.log(this.attachController)
 };
@@ -3112,41 +3112,28 @@ App.prototype.onError = function(errorCode) {
 	this.getChild('menu').setAppended(false);
 };
 App.prototype.getTemplateMain = function($,_) {
-	return[{'cmp':TopMenu,'p':{'cmpid':'menu'}},{'t':0,'e':[0,$.onClick],'p':{'c':'app-view-container'}}]
+	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'e':[0,$.onClick],'p':{'c':'app-view-container'}}]
 };
-function Analytics(props) {
-	Initialization.initiate.call(this, props);
-};
+function Analytics() {};
 Analytics.prototype.getTemplateMain = function($,_) {
 	return[{'t':0,'p':{'c':'view-content'}}]
 };
-function Error401(props) {
-	Initialization.initiate.call(this, props);
-};
-Error401.prototype.onRendered = function() {
-};
+function Error401() {};
+Error401.prototype.onRendered = function() {};
 Error401.prototype.getTemplateMain = function($,_) {
 	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'app-auth-form-container'}}]
 };
-function Error404(props) {
-	Initialization.initiate.call(this, props);
-};
-Error404.prototype.onRendered = function() {
-};
+function Error404() {};
+Error404.prototype.onRendered = function() {};
 Error404.prototype.getTemplateMain = function($,_) {
 	return[{'c':[{'c':'404','t':0,'p':{'c':'app-404-title'}},{'c':__T[0],'t':0,'p':{'c':'app-404-text'}}],'t':0,'p':{'c':'app-404-container'}}]
 };
-function Favorite(props) {
-	Initialization.initiate.call(this, props);
-};
-Favorite.prototype.onRendered = function() {
-};
+function Favorite() {};
+Favorite.prototype.onRendered = function() {};
 Favorite.prototype.getTemplateMain = function($,_) {
 	return[{'t':0,'p':{'c':'view-content'}}]
 };
-function Main(props) {
-	Initialization.initiate.call(this, props);
-};
+function Main() {};
 Main.prototype.onRendered = function() {
 	this.onResize();
 };
@@ -3161,7 +3148,7 @@ Main.prototype.onResize = function() {
 	}
 };
 Main.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[52],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[69],{'cmp':Tooltip,'p':{'args':__V[4]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'args':__V[6]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'args':__V[7]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
+	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[52],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[69],{'cmp':Tooltip,'p':{'a':__V[4]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'a':__V[6]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'a':__V[7]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
 };
 Main.prototype.getInitials = function() {
 	return {
@@ -3171,22 +3158,19 @@ Main.prototype.getInitials = function() {
 Main.prototype.getControllersToLoad = function() {
 	return [Favorites,Filters];
 };
-function Search(props) {
-	Initialization.initiate.call(this, props);
-};
+function Search() {};
 Search.prototype.onRendered = function() {
 	this.openInformer();
 };
 Search.prototype.openInformer = function() {
 	var datatable = this.getChildById('datatable');
 };
-Search.prototype.openFilter = function(filterId) {
-};
+Search.prototype.openFilter = function(filterId) {};
 Search.prototype.onFormExpand = function() {
 	this.toggle('expanded');
 };
 Search.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'cmpid':'form'}},{'cmp':TendersDataTable,'p':{'cmpid':'datatable'}}],'t':0,'p':{'c':function(){return 'view-content'+($.g('expanded')?' form-expanded':'')},'sc':1},'n':{'c':'expanded'}}]
+	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'i':'form'}},{'cmp':TendersDataTable,'p':{'i':'datatable'}}],'t':0,'p':{'c':function(){return 'view-content'+($.g('expanded')?' form-expanded':'')},'sc':1},'n':{'c':'expanded'}}]
 };
 Search.prototype.getInitials = function() {
 	return {
@@ -3196,39 +3180,25 @@ Search.prototype.getInitials = function() {
 Search.prototype.getControllersToLoad = function() {
 	return [Filters];
 };
-function DataTable(props) {
-	Initialization.initiate.call(this, props);
-};
+function DataTable() {};
 DataTable.prototype.getTemplateMain = function($,_) {
 	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}}]
 };
-function DataTableTabPanel(props) {
-	Initialization.initiate.call(this, props);
-};
-function DataTableFragmets(props) {
-	Initialization.initiate.call(this, props);
-};
-function DataTableRow(props) {
-	Initialization.initiate.call(this, props);
-};
+function DataTableTabPanel() {};
+function DataTableFragmets() {};
+function DataTableRow() {};
 DataTableRow.prototype.getTemplateControls = function($,_) {
 	return[{'t':0,'p':{'c':'app-datatable-color-mark datatable-control'}},{'c':{'tmp':includeGeneralTemplateCheckbox},'t':0,'p':{'c':'app-datatable-checkbox-container datatable-control'}},{'t':0,'p':{'c':'app-datatable-star datatable-control'}}]
 };
 DataTableRow.prototype.getTemplateCount = function($,_) {
 	return[{'c':_['count'],'t':1,'p':{'c':'app-datatable-standart-row-count'}}]
 };
-function DataTableStandartRow(props) {
-	Initialization.initiate.call(this, props);
-};
+function DataTableStandartRow() {};
 DataTableStandartRow.prototype.getTemplateMain = function($,_) {
-	return[{'c':[!_['nocontrols']?{'tmp':$.getTemplateControls}:'',{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'app-datatable-standart-row-top-item'}},{'c':!!_['multiregion']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}}]:_['regionName'],'i':true},{'c':!!_['multicategory']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}}]:_['subcategory'],'i':true},{'c':_['razm']==' N/A'?{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}}:_['razm'],'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}],'t':0,'p':{'c':'app-datatable-standart-row-top'}},{'c':_['price'],'t':0,'p':{'c':'app-datatable-standart-row-price'}},{'c':[{'c':!!_['hot']?[{'tmp':$.getTemplateHotMark}]:'','i':true},_['name']],'t':0,'p':{'c':'app-datatable-standart-row-name'}},{'t':0,'p':{'c':'app-datatable-standart-row-bottom'}},{'c':!!_['fragments']?[{'cmp':DataTableFragmets,'p':{'data':_['fragments']}}]:'','i':true}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'app-datatable-row','sc':1,'_id':_['Id']}}]
+	return[{'c':[!_['nocontrols']?{'tmp':$.getTemplateControls}:'',{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'app-datatable-standart-row-top-item'}},{'c':!!_['multiregion']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}}]:_['regionName'],'i':true},{'c':!!_['multicategory']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}}]:_['subcategory'],'i':true},{'c':_['razm']==' N/A'?{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}}:_['razm'],'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}],'t':0,'p':{'c':'app-datatable-standart-row-top'}},{'c':_['price'],'t':0,'p':{'c':'app-datatable-standart-row-price'}},{'c':[{'c':!!_['hot']?[{'tmp':$.getTemplateHotMark}]:'','i':true},_['name']],'t':0,'p':{'c':'app-datatable-standart-row-name'}},{'t':0,'p':{'c':'app-datatable-standart-row-bottom'}},{'c':!!_['fragments']?[{'cmp':DataTableFragmets,'p':{'p':{'data':_['fragments']}}}]:'','i':true}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'app-datatable-row','sc':1,'_id':_['Id']}}]
 };
-function TendersDataTable(props) {
-	Initialization.initiate.call(this, props);
-};
-function FilterStatistics(props) {
-	Initialization.initiate.call(this, props);
-};
+function TendersDataTable() {};
+function FilterStatistics() {};
 FilterStatistics.prototype.onRendered = function() {
 	this.refresh();
 };
@@ -3272,9 +3242,7 @@ FilterStatistics.prototype.getInitials = function() {
 		'helpers':[{helper: ClickHandler,options: {'app-filter-stat-refresh': this.onRefreshButtonClick,'app-filter-stat-row-name': this.onFilterClick}}]
 	};
 };
-function SearchForm(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchForm() {};
 SearchForm.prototype.toggleExpand = function() {
 	this.dispatchEvent('expand');
 };
@@ -3286,18 +3254,14 @@ SearchForm.prototype.getInitials = function() {
 		'args':{'title': __[4]}
 	};
 };
-function SearchFormButton(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchFormButton() {};
 SearchFormButton.prototype.getTemplateMain = function($,_) {
 	return[{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-search-form-button '+_['className']}}]
 };
 SearchFormButton.prototype.getTemplateContent = function($,_) {
 	return null
 };
-function SearchFormPanel(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchFormPanel() {};
 SearchFormPanel.prototype.show = function() {
 	this.addClass('shown');
 	Popuper.watch(this);
@@ -3311,18 +3275,14 @@ SearchFormPanel.prototype.getTemplateMain = function($,_) {
 SearchFormPanel.prototype.getTemplateContent = function($,_) {
 	return null
 };
-function SearchFormPanelButton(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchFormPanelButton() {};
 SearchFormPanelButton.prototype.onClick = function() {
 	this.get('panel').show();
 };
 SearchFormPanelButton.prototype.getTemplateMain = function($,_) {
 	return[{'c':{'tmp':$.getTemplateContent},'t':0,'e':[0,$.onClick],'p':{'c':'app-search-form-button '+_['className']}}]
 };
-function KeywordsButton(props) {
-	Initialization.initiate.call(this, props);
-};
+function KeywordsButton() {};
 KeywordsButton.prototype.getTemplateContent = function($,_) {
 	return[{'c':__[13],'t':0}]
 };
@@ -3331,9 +3291,7 @@ KeywordsButton.prototype.getInitials = function() {
 		'args':{'className': 'search-keywords'}
 	};
 };
-function KeywordsPanel(props) {
-	Initialization.initiate.call(this, props);
-};
+function KeywordsPanel() {};
 KeywordsPanel.prototype.getTemplateContent = function($,_) {
 	return[{'cmp':KeywordsControl}]
 };
@@ -3342,9 +3300,7 @@ KeywordsPanel.prototype.getInitials = function() {
 		'args':{'className': 'keywords-panel','title': __[13]}
 	};
 };
-function TenderSearchForm(props) {
-	Initialization.initiate.call(this, props);
-};
+function TenderSearchForm() {};
 TenderSearchForm.prototype.onResetButtonClick = function(e) {
 	var button = e.target.getAncestor('.app-search-form-reset');
 	button.addClass('active');
@@ -3352,14 +3308,11 @@ TenderSearchForm.prototype.onResetButtonClick = function(e) {
 		button.removeClass('active');
 	}, 2500);
 };
-TenderSearchForm.prototype.onResetConfirmed = function() {
-};
+TenderSearchForm.prototype.onResetConfirmed = function() {};
 TenderSearchForm.prototype.getTemplateMain = function($,_) {
-	return[{'cmp':KeywordsPanel,'p':{'cmpid':'keywordsPanel'}},{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'hover-label'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'confirm-reset-filter'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'confirm-label'}}],'t':0,'p':{'c':'app-search-form-reset'}},{'c':[{'cmp':SearchFormFilters},{'c':{'cmp':KeywordsButton,'w':['panel','keywordsPanel']},'t':0,'p':{'c':'app-tender-search-form-content'}}],'t':0,'p':{'c':'app-tender-search-form','sc':1}}]
+	return[{'cmp':KeywordsPanel,'p':{'i':'keywordsPanel'}},{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'hover-label'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'confirm-reset-filter'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'confirm-label'}}],'t':0,'p':{'c':'app-search-form-reset'}},{'c':[{'cmp':SearchFormFilters},{'c':{'cmp':KeywordsButton,'w':['panel','keywordsPanel']},'t':0,'p':{'c':'app-tender-search-form-content'}}],'t':0,'p':{'c':'app-tender-search-form','sc':1}}]
 };
-function SearchFormCreateFilterMenu(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchFormCreateFilterMenu() {};
 SearchFormCreateFilterMenu.prototype.onCreateButtonClick = function() {
 	alert('create filter')
 };
@@ -3372,9 +3325,7 @@ SearchFormCreateFilterMenu.prototype.getInitials = function() {
 		'props':{'buttons': [{'name': __[5],'handler': this.onCreateButtonClick},{'name': __[6],'handler': this.onWizardButtonClick}]}
 	};
 };
-function SearchFormFilterMenu(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchFormFilterMenu() {};
 SearchFormFilterMenu.prototype.onLoadFilters = function(filters) {
 	this.renderButtons(filters);
 };
@@ -3401,9 +3352,7 @@ SearchFormFilterMenu.prototype.getInitials = function() {
 		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true}}]
 	};
 };
-function SearchFormFilters(props) {
-	Initialization.initiate.call(this, props);
-};
+function SearchFormFilters() {};
 SearchFormFilters.prototype.onLoadFilters = function(filters) {
 	this.set('quantity', filters.length);
 };
@@ -3419,9 +3368,7 @@ SearchFormFilters.prototype.getInitials = function() {
 		'props':{'filterName': 'Master'}
 	};
 };
-function Calendar(props) {
-	Initialization.initiate.call(this, props);
-};
+function Calendar() {};
 Calendar.prototype.onRendered = function() {
 	this.reset();
 };
@@ -3485,9 +3432,7 @@ Calendar.prototype.changeMonth = function(value) {
 Calendar.prototype.getTemplateMain = function($,_) {
 	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1},{'c':__[46],'t':1},{'c':__[47],'t':1},{'c':__[48],'t':1},{'c':__[49],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?' another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
 };
-function FavoritesCalendar(props) {
-	Initialization.initiate.call(this, props);
-};
+function FavoritesCalendar() {};
 FavoritesCalendar.prototype.onRendered = function() {
 	this.month = Dates.getMonth();
 	this.year = Dates.getYear();
@@ -3522,9 +3467,7 @@ FavoritesCalendar.prototype.getInitials = function() {
 		'helpers':[{'helper': ClickHandler,'options': {'marked': this.onMarkedDayClick}}]
 	};
 };
-function Dialog(props) {
-	Initialization.initiate.call(this, props);
-};
+function Dialog() {};
 Dialog.prototype.show = function() {
 	this.set('shown',true);
 	this.reposition();	
@@ -3542,10 +3485,8 @@ Dialog.prototype.hide = function() {
 Dialog.prototype.expand = function() {
 	this.toggle('expanded');
 };
-Dialog.prototype.onShow = function() {
-};
-Dialog.prototype.onHide = function() {
-};
+Dialog.prototype.onShow = function() {};
+Dialog.prototype.onHide = function() {};
 Dialog.prototype.getTemplateMain = function($,_) {
 	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
 };
@@ -3559,9 +3500,7 @@ Dialog.prototype.getInitials = function() {
 		'props':{'width': 600}
 	};
 };
-function Form(props) {
-	Initialization.initiate.call(this, props);
-};
+function Form() {};
 Form.prototype.initiate = function() {
 	this.controls = {};
 };
@@ -3614,8 +3553,7 @@ Form.prototype.handleResponse = function(data) {
 		delete window[this.formKey];
 	}
 };
-Form.prototype.onSuccess = function(data) {
-};
+Form.prototype.onSuccess = function(data) {};
 Form.prototype.onFailure = function(data) {
 	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
 	this.log(error, 'onFailure', data);
@@ -3649,23 +3587,19 @@ Form.prototype.disposeInternal = function() {
 	this.formElement = null;
 };
 Form.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'args':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'p':{'props':_['submit']}}]:'','i':true}],'t':13,'e':[23,$.onSubmit],'p':{'c':'app-form-controls','m':_['method'],'a':_['action']}}]
+	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'p':{'p':_['submit']}}]:'','i':true}],'t':13,'e':[23,$.onSubmit],'p':{'c':'app-form-controls','m':_['method'],'a':_['action']}}]
 };
 Form.prototype.getTemplateContent = function($,_) {
 	return null
 };
-function FormField(props) {
-	Initialization.initiate.call(this, props);
-};
+function FormField() {};
 FormField.prototype.getValue = function() {
 	return this.getCotrolAt(0).getValue();
 };
 FormField.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'props':_['controlProps']}}],'t':0,'p':{'c':'app-input-container '+_['class'],'sc':1}}]
+	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'p':_['controlProps']}}],'t':0,'p':{'c':'app-input-container '+_['class'],'sc':1}}]
 };
-function PopupMenu(props) {
-	Initialization.initiate.call(this, props);
-};
+function PopupMenu() {};
 PopupMenu.prototype.onRendered = function() {
 	var element = this.getElement();
 	this.button = element.parentNode;
@@ -3688,10 +3622,8 @@ PopupMenu.prototype.onShowButtonClick = function() {
 	this.onBeforeShow();
 	this.show();
 };
-PopupMenu.prototype.handleClick = function(value, button) {
-};
-PopupMenu.prototype.onBeforeShow = function() {
-};
+PopupMenu.prototype.handleClick = function(value, button) {};
+PopupMenu.prototype.onBeforeShow = function() {};
 PopupMenu.prototype.show = function() {
 	var innerElement = this.findElement('.app-popup-menu-inner-container');
 	var rect = innerElement.getRect();
@@ -3723,18 +3655,14 @@ PopupMenu.prototype.getTemplateMain = function($,_) {
 PopupMenu.prototype.getTemplateContent = function($,_) {
 	return null
 };
-function Submit(props) {
-	Initialization.initiate.call(this, props);
-};
+function Submit() {};
 Submit.prototype.onSubmit = function() {
 	this.dispatchEvent('submit');
 };
 Submit.prototype.getTemplateMain = function($,_) {
 	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,$.onSubmit],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
 };
-function TabPanel(props) {
-	Initialization.initiate.call(this, props);
-};
+function TabPanel() {};
 TabPanel.prototype.initiate = function() {
 	this.margin = 4;
 };
@@ -3776,8 +3704,7 @@ TabPanel.prototype.getControlsWidth = function() {
 	if (plusButton) width += plusButton.getWidth() + this.margin;
 	return width;
 };
-TabPanel.prototype.onRestTabClick = function() {
-};
+TabPanel.prototype.onRestTabClick = function() {};
 TabPanel.prototype.onTabClick = function(e, target) {
 	if (isNumeric(this.activeTab)) this.activateTab(this.activeTab, false);
 	this.activateTab(target.getData('index'), true);
@@ -3806,9 +3733,7 @@ TabPanel.prototype.getInitials = function() {
 		'helpers':[{'helper': ClickHandler,'options': {'app-tab-rest': this.onRestTabClick,'app-tab': this.onTabClick}}]
 	};
 };
-function Tooltip(props) {
-	Initialization.initiate.call(this, props);
-};
+function Tooltip() {};
 Tooltip.prototype.getTemplateMain = function($,_) {
 	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
 };
@@ -3817,9 +3742,7 @@ Tooltip.prototype.getInitials = function() {
 		'args':{'className': ''}
 	};
 };
-function TooltipPopup(props) {
-	Initialization.initiate.call(this, props);
-};
+function TooltipPopup() {};
 TooltipPopup.prototype.correctAndSetText = function(text, changedProps) {
 	var corrector = changedProps['corrector'];
 	if (corrector == 'list') {
@@ -3845,9 +3768,7 @@ TooltipPopup.prototype.getInitials = function() {
 		'correctors':{'text': this.correctAndSetText}
 	};
 };
-function FilterSubscription(props) {
-	Initialization.initiate.call(this, props);
-};
+function FilterSubscription() {};
 FilterSubscription.prototype.onLoaded = function(filters) {
 	this.set('filters',filters);
 	this.set({'total':this.getTotalCount(),'subscribed':this.getSubscribedCount()});
@@ -3862,8 +3783,7 @@ FilterSubscription.prototype.getSubscribedCount = function() {
 	});
 	return Decliner.getCount('subscr', subscribedCount);
 };
-FilterSubscription.prototype.onFreqChange = function(e) {
-};
+FilterSubscription.prototype.onFreqChange = function(e) {};
 FilterSubscription.prototype.onSubscribeButtonClick = function(e, target) {
 	var filterId = e.getTargetData('.app-subscription-filter-row', 'filterId');
 	if (filterId) {
@@ -3874,7 +3794,7 @@ FilterSubscription.prototype.onSubscribeButtonClick = function(e, target) {
 	}
 };
 FilterSubscription.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'c':[__[85],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[90],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[91],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[92],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'options':__V[5],'value':filter['freqSubs']}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[23]+' subscribed':__[25])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
+	return[{'c':[{'c':[__[85],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[90],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[91],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[92],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[5],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[23]+' subscribed':__[25])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
 };
 FilterSubscription.prototype.getInitials = function() {
 	return {
@@ -3882,9 +3802,7 @@ FilterSubscription.prototype.getInitials = function() {
 		'helpers':[{'helper': ClickHandler,'options': {'subscr-button': this.onSubscribeButtonClick}}]
 	};
 };
-function FilterSubscriptionOptions(props) {
-	Initialization.initiate.call(this, props);
-};
+function FilterSubscriptionOptions() {};
 FilterSubscriptionOptions.prototype.onLoaded = function(data) {
 	var options = data['options'];
 	this.set({'opt1':options['tenderOfFavorite'],'opt2':options['protocolOfFavorite'],'opt3':options['protocolOfFilter']});
@@ -3903,9 +3821,7 @@ FilterSubscriptionOptions.prototype.getInitials = function() {
 		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'labelClass': 'app-subscription-option'}}]
 	};
 };
-function UserInfo(props) {
-	Initialization.initiate.call(this, props);
-};
+function UserInfo() {};
 UserInfo.prototype.onLoaded = function(data) {
 	if (!User.hasFullAccess()) {
 		data['prolongButtonText'] = __[63];
@@ -3938,12 +3854,9 @@ function Filters() {
 	Initialization.initiate.call(this);
 	this.processInitials();
 };
-Filters.prototype.onLoadFilters = function(data) {
-};
-Filters.prototype.onLoad = function(data) {
-};
-Filters.prototype.onAdd = function(data) {
-};
+Filters.prototype.onLoadFilters = function(data) {};
+Filters.prototype.onLoad = function(data) {};
+Filters.prototype.onAdd = function(data) {};
 Filters.prototype.onSubscribe = function() {
 	this.load();
 };
@@ -3981,14 +3894,12 @@ UserInfoLoader.prototype.getInitials = function() {
 		'actions':{'load': {'url' : CONFIG.user.get,'method' : 'GET'}}
 	};
 };
-function CalendarFavorites(props) {
-	Initialization.initiate.call(this, props);
-};
+function CalendarFavorites() {};
 CalendarFavorites.prototype.getArgs2 = function(data) {
 	return data;
 };
 CalendarFavorites.prototype.getTemplateContent = function($,_) {
-	return[{'c':{'h':function(tender){return[{'cmp':DataTableStandartRow,'p':{'args':tender}}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'simple-datatable calendar-favorites-datatable'}}]
+	return[{'c':{'h':function(tender){return[{'cmp':DataTableStandartRow,'p':{'aa':{'nocontrols':'1'},'a':tender}}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'simple-datatable calendar-favorites-datatable'}}]
 };
 CalendarFavorites.prototype.getInitials = function() {
 	return {
@@ -3996,9 +3907,7 @@ CalendarFavorites.prototype.getInitials = function() {
 		'props':{'width': 1000}
 	};
 };
-function FilterEdit(props) {
-	Initialization.initiate.call(this, props);
-};
+function FilterEdit() {};
 FilterEdit.prototype.initiate = function() {
 	this.controller = Filters;
 };
@@ -4007,9 +3916,7 @@ FilterEdit.prototype.getInitials = function() {
 		'props':{'title': __[50]}
 	};
 };
-function OrderCall(props) {
-	Initialization.initiate.call(this, props);
-};
+function OrderCall() {};
 OrderCall.prototype.onSupportButtonClick = function() {
 	this.hide();
 	Dialoger.show(Support);
@@ -4031,9 +3938,7 @@ OrderCall.prototype.getInitials = function() {
 		'props':{'title': __[18]}
 	};
 };
-function Support(props) {
-	Initialization.initiate.call(this, props);
-};
+function Support() {};
 Support.prototype.onOrderCallButtonClick = function() {
 	this.hide();
 	Dialoger.show(OrderCall);
@@ -4046,9 +3951,7 @@ Support.prototype.getInitials = function() {
 		'props':{'title': __[20]}
 	};
 };
-function AuthForm(props) {
-	Initialization.initiate.call(this, props);
-};
+function AuthForm() {};
 AuthForm.prototype.onSuccess = function() {
 	window.location.reload();
 };
@@ -4060,9 +3963,7 @@ AuthForm.prototype.getInitials = function() {
 		'args':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'app-authform-inputs','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'app-submit'}}
 	};
 };
-function OrderCallForm(props) {
-	Initialization.initiate.call(this, props);
-};
+function OrderCallForm() {};
 OrderCallForm.prototype.onRendered = function() {
 	this.setControlValue('name', User.getAttribute('name'));
 	this.setControlValue('phone', User.getAttribute('phone'));
@@ -4139,37 +4040,28 @@ OrderCallForm.prototype.getInitials = function() {
 		'args':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'app-order-call','controls': [__V[1],__V[2],__V[3],{'type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[34],'class': 'half-width'},{'type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[35],'class': 'half-width'},{'type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[36],'class': 'half-width'},{'type': 'textarea','name': 'comment','caption': __[37]}],'submit': {'value': __[68],'class': __[23] + ' send-button'}}
 	};
 };
-function SupportForm(props) {
-	Initialization.initiate.call(this, props);
-};
+function SupportForm() {};
 SupportForm.prototype.getInitials = function() {
 	return {
 		'args':{'action': CONFIG.support.send,'controls': [__V[1],__V[2],__V[3],{'type': 'textarea','name': 'comment','caption': __[40]},{'type': 'file','name': 'screenshot','accept': 'image/*','caption': __[41]}],'submit': {'value': __[42],'class': __[23] + ' send-button'}}
 	};
 };
-function KeywordsControl(props) {
-	Initialization.initiate.call(this, props);
-};
+function KeywordsControl() {};
 KeywordsControl.prototype.onRendered = function() {
 	this.attachControl('nonmorph');
 };
 KeywordsControl.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'cmp':Select,'nm':'nonmorph','p':{'options':__V[0],'className':'frameless'}},'t':0,'p':{'c':'app-keywords-options'}}]
+	return[{'c':{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0],'className':'frameless'}}},'t':0,'p':{'c':'app-keywords-options'}}]
 };
-function Input(props) {
-	Initialization.initiate.call(this, props);
-};
-Input.prototype.onChange = function() {
-};
+function Input() {};
+Input.prototype.onChange = function() {};
 Input.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
 Input.prototype.getTemplateMain = function($,_) {
 	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'t':14,'e':[18,$.onChange],'p':{'tp':function(){return $.g('type')},'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'v':function(){return $.g('value')},'readonly':function(){return ($.g('enabled')?' readonly':'')},'accept':function(){return $.g('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
-function Select(props) {
-	Initialization.initiate.call(this, props);
-};
+function Select() {};
 Select.prototype.onRendered = function() {
 	var value = this.get('value');
 	var selected;
@@ -4234,19 +4126,15 @@ Select.prototype.hide = function() {
 Select.prototype.getTemplateMain = function($,_) {
 	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':{'0':'className','2':'active'}}}]
 };
-function Textarea(props) {
-	Initialization.initiate.call(this, props);
-};
-Textarea.prototype.onChange = function() {
-};
+function Textarea() {};
+Textarea.prototype.onChange = function() {};
 Textarea.prototype.getControlValue = function() {
 	return this.findElement('textarea').value;
 };
 Textarea.prototype.getTemplateMain = function($,_) {
 	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':{'pr':'value','p':$.g('value')},'t':49,'e':[18,$.onChange],'p':{'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'readonly':function(){return ($.g('enabled')?' readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
-function TopMenu(props) {
-	Initialization.initiate.call(this, props);
+function TopMenu() {
 	Router.addMenu(this);
 	this.isRouteMenu = true;
 };
