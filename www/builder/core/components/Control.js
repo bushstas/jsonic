@@ -39,11 +39,12 @@ function Control() {
 		}
 		return this.getProperValue(value);
 	};
-	var dispatchChange = function() {
-		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
-	};
 	var onChangeChildControl = function(e) {
-		dispatchChange.call(this);
+		this.dispatchChange();
+	};
+
+	Control.prototype.dispatchChange = function() {
+		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
 	};
 
 	Control.prototype.getControlValue = function() {
@@ -57,7 +58,7 @@ function Control() {
 	Control.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
 	 	this.controls[name] = control;
-	 	this.addListener(control, 'change', onChangeChildControl.call(this));
+	 	this.addListener(control, 'change', onChangeChildControl.bind(this));
 	};
 
 	Control.prototype.getName = function() {

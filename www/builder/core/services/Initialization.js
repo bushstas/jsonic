@@ -109,7 +109,7 @@ function Initialization() {
 		if (isArray(this.inheritedSuperClasses)) {
 			initiateParental(this.inheritedSuperClasses, this);
 		}
-		if (isObject(this.props)) {console.log(this);Objects.merge(this.props, props);}
+		if (isObject(this.props)) Objects.merge(this.props, props);
 		else this.props = props || {};
 		if (isFunction(this.constructor.prototype.initiate)) {
 			this.constructor.prototype.initiate.call(this);

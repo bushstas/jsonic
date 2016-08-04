@@ -1745,6 +1745,7 @@
 				}				
 				$props[$propName] = correctTagAttributeText($propName, $attrContent);
 				$names[$propName] = array_unique($names[$propName]);
+				sort($names[$propName]);
 				if (count($names[$propName]) == 1) {
 					$names[$propName] = $names[$propName][0];
 				}

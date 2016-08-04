@@ -695,11 +695,11 @@ function Control() {
 		}
 		return this.getProperValue(value);
 	};
-	var dispatchChange = function() {
-		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
-	};
 	var onChangeChildControl = function(e) {
-		dispatchChange.call(this);
+		this.dispatchChange();
+	};
+	Control.prototype.dispatchChange = function() {
+		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
 	};
 	Control.prototype.getControlValue = function() {
 		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
@@ -710,7 +710,7 @@ function Control() {
 	Control.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
 	 	this.controls[name] = control;
-	 	this.addListener(control, 'change', onChangeChildControl.call(this));
+	 	this.addListener(control, 'change', onChangeChildControl.bind(this));
 	};
 	Control.prototype.getName = function() {
 		return this.props.name;
@@ -2646,7 +2646,7 @@ function Initialization() {
 		if (isArray(this.inheritedSuperClasses)) {
 			initiateParental(this.inheritedSuperClasses, this);
 		}
-		if (isObject(this.props)) {console.log(this);Objects.merge(this.props, props);}
+		if (isObject(this.props)) Objects.merge(this.props, props);
 		else this.props = props || {};
 		if (isFunction(this.constructor.prototype.initiate)) {
 			this.constructor.prototype.initiate.call(this);
@@ -3497,7 +3497,7 @@ Dialog.prototype.expand = function() {
 Dialog.prototype.onShow = function() {};
 Dialog.prototype.onHide = function() {};
 Dialog.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
+	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['marginLeft','marginTop','width']}}]
 };
 Dialog.prototype.getTemplateContent = function(_,$) {
 	return null
@@ -4092,7 +4092,7 @@ Select.prototype.hide = function() {
 	this.set('active',false);
 };
 Select.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':{'0':'className','2':'active'}}}]
+	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':['active','className']}}]
 };
 function Textarea() {};
 Textarea.prototype.onChange = function() {};
