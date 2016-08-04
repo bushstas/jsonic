@@ -1671,8 +1671,9 @@
 						$eventType = preg_replace("/once$/i", '', $eventType);
 						$once = true;
 					}
+					$isDispatching = preg_match('/^\!/', $propValue);
 					$callback = preg_replace("/[^\w]/", "", $propValue);
-					if (is_array($component) && !hasComponentMethod($callback, $component)) {
+					if (!$isDispatching && is_array($component) && !hasComponentMethod($callback, $component)) {
 						error('Функция обработчик события <b>'.$callback.'</b> не найдена среди методов класса <b>'.$component['name'].'</b>');
 					}
 					$eventTypeIndex = array_search($eventType, $eventTypesShortcuts);
@@ -1680,7 +1681,11 @@
 						$eventType = $eventTypeIndex;
 					}
 					$child['e'][] = $eventType;
-					$child['e'][] = '<nq><this>'.$callback.'<nq>';
+					if (!$isDispatching) {
+						$child['e'][] = '<nq><this>'.$callback.'<nq>';
+					} else {
+						$child['e'][] = $callback;
+					}
 					if ($once) {
 						$child['e'][] = true;
 					}
@@ -2159,18 +2164,11 @@
 
 	function addConstructorFunction(&$js, $class, $isComponent) {
 		global $advancedMode, $routerMenu;
-		$args = $isComponent ? 'props' : '';
-		if ($isComponent) {
-			$js[] = 'function '.$class.'() {';
-			if (is_array($routerMenu) && in_array($class, $routerMenu)) {
-				$js[] = "\tRouter.addMenu(this);";
-				$js[] = "\tthis.isRouteMenu = true;";
-			}			
-		} else {
-			$js[] = 'function '.$class.'('.$args.') {';
-			$js[] = "\tInitialization.initiate.call(this);";
-			$js[] = "\n\tthis.processInitials();";
-		}
+		$js[] = 'function '.$class.'() {';
+		if ($isComponent && is_array($routerMenu) && in_array($class, $routerMenu)) {
+			$js[] = "\tRouter.addMenu(this);";
+			$js[] = "\tthis.isRouteMenu = true;";
+		}		
 		$js[] = '};';
 	}
 
@@ -2183,14 +2181,14 @@
 	function addTemplateFunction(&$js, $class, $templateHtml, &$component) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class);
 		foreach ($templateFunctions as $templateFunction) {
-			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '$,_', "\n\treturn".$templateFunction['content']);
+			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', "\n\treturn".$templateFunction['content']);
 		}
 	}
 
 	function addGeneralTemplateFunction(&$js, $templateHtml, $file) {
 		$templateFunctions = getTemplateFunctions($templateHtml, $file);
 		foreach ($templateFunctions as $templateFunction) {
-			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'($,_) {';
+			$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(_) {';
 			$js[] = "\n\treturn".$templateFunction['content']."\n}";
 		}
 	}

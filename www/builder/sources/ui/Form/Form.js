@@ -1,18 +1,24 @@
 component Form
 
-function initiate() {
-	this.controls = {};
-};
-
-
 function onSubmit() {
 	if (this.isValid()) {
-		if (this.formElement) {
+		this.form = this.form || this.findElement('form');
+		var ajax = this.form.getData('ajax');
+		if (ajax) {
+			this.sendAjaxRequest();
+		} else {
 			this.setFormKey();
-			this.formElement.submit();
-		} else if (this.request) {
-			this.request.send(this.options['method'] || 'POST', this.getData());
+			this.form.submit();
 		}
+	}
+};
+
+function sendAjaxRequest() {
+	var action = this.form.attr('action');
+	var method = this.form.attr('method');
+	if (action) {
+		this.request = this.request || new AjaxRequest(action, this.handleResponse, null, this);
+		this.request.send(method, this.getControlsData());
 	}
 };
 
@@ -30,14 +36,6 @@ function setFormKey() {
 
 function isValid() {
 	return true;
-};
-
-function getData() {
-	var data = {};
-	for (var k in this.controls) {
-		data[k] = this.controls[k].getValue();
-	}
-	return data;
 };
 
 function handleResponse(data) {
@@ -68,35 +66,7 @@ function onFailure(data) {
 	this.log(error, 'onFailure', data);
 };
 
-function getControl(name) {
-	return this.controls[name];
-};
-
-function getCotrolAt(index) {
-	return Objects.getByIndex(this.controls, index);
-};
-
-function setControlValue(name, value) {
-	if (isString(name)) {
-		var control = this.getControl(name);
-		if (control) {
-			control.setValue(value);
-		}
-	}
-};
-
-function enableControl(name, isEnabled) {
-	if (isString(name)) {
-		var control = this.getControl(name);
-		if (control) {
-			control.setEnabled(isEnabled);
-		}
-	}
-};
-
 function disposeInternal() {
-	this.options = null;
-	this.controls = null;
+	this.form = null;
 	this.request = null;
-	this.formElement = null;
 };

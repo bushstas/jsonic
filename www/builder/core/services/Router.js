@@ -21,6 +21,9 @@ function Router() {
 	this.getPathPartAt = function(index) {
 		return isArray(pathParts) ? pathParts[index] : '';
 	};
+	this.reload = function() {
+		window.location.reload();
+	};
 	this.redirect = function(viewName, replState) {
 		var route;
 		var intViewName = ~~viewName;

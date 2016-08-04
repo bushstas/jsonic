@@ -16,6 +16,57 @@ function Initialization() {
 		}
 		return initials1;
 	};
+	this.processInitials = function() {
+		var initials = this.initials;
+		if (isObject(initials)) {
+			for (var k in initials) {
+				if (isArrayLike(initials[k])) {
+					if (k == 'correctors') {
+						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
+					} else if (k == 'globals') {
+						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
+					} else if (k == 'followers') {
+						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
+					} else if (k == 'controllers') {
+						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
+					} else if (k == 'props') {
+						Objects.merge(this.props, initials[k]);
+					} else if (k == 'options') {
+						this.options = initials[k];
+					}
+				}
+			}
+		}
+	};
+	var getInitial = function(initialName) {
+		return Objects.get(this.initials, initialName);
+	};
+	var attachController = function(options) {
+		if (isObject(options['on'])) {
+			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
+		}
+	};
+	var addCorrector = function(name, handler) {
+		if (isFunction(handler)) {
+			this.correctors = this.correctors || {};
+			this.correctors[name] = handler;
+		}
+	};
+	var addFollower = function(name, handler) {
+		if (isFunction(handler)) {
+			this.followers = this.followers || {};
+			this.followers[name] = handler;
+		}
+	};
+	this.processPostRenderInitials = function() {
+		var helpers = getInitial.call(this, 'helpers');
+		if (isArray(helpers)) {
+			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
+		}
+	};
+	var subscribeToHelper = function(options) {
+		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
+	};
 	this.inherits = function(list) {
 		var children, parent, child, initials;
 		for (var k = 0; k < list.length; k++) {
@@ -58,7 +109,8 @@ function Initialization() {
 		if (isArray(this.inheritedSuperClasses)) {
 			initiateParental(this.inheritedSuperClasses, this);
 		}
-		this.props = props || {};
+		if (isObject(this.props)) {console.log(this);Objects.merge(this.props, props);}
+		else this.props = props || {};
 		if (isFunction(this.constructor.prototype.initiate)) {
 			this.constructor.prototype.initiate.call(this);
 		}
@@ -72,6 +124,10 @@ function Initialization() {
 		}
 		this.initials = initials;
 		this.args = args;
+		Initialization.processInitials.call(this);
+	};
+	this.initiateControllers = function(controllers) {
+		for (var i = 0; i < controllers.length; i++) Initialization.initiate.call(controllers[i]);
 	};
 }
 Initialization = new Initialization();

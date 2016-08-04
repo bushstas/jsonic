@@ -28,7 +28,8 @@ function Application() {
 		if (!isUndefined(view) && isFunction(route['view'])) {
 			if (!view) {
 				var viewParams = getViewParams.call(this, route, true);
-				view = this.currentView = this.views[route['name']] = new route['view'](viewParams);
+				view = this.currentView = this.views[route['name']] = new route['view']();
+				Initialization.initiate.call(view, viewParams);
 				view.setOnReadyHandler(onViewReady.bind(this));
 				var viewContentElement = createViewContentElement.call(this);
 				view.render(viewContentElement);

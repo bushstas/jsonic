@@ -2,7 +2,6 @@ form AuthForm
 
 initial args = {
 	'action': 'user/login.php',
-	'method': 'POST',
 	'ajax': true,
 	'container': '->> app-authform-inputs',
 	'controls': [
@@ -32,5 +31,5 @@ initial args = {
 };
 
 function onSuccess() {
-	window.location.reload();
+	Router.reload();
 }

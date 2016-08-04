@@ -1,4 +1,4 @@
-function AjaxRequest(url, callback, params) {
+function AjaxRequest(url, callback, params, thisObj) {
 	var self = this, tempUrl, active = false, 
 		withCredentials = false, headers, request, 
 		responseType;
@@ -89,7 +89,7 @@ function AjaxRequest(url, callback, params) {
 				data = response;
 			}
 			if (isFunction(callback)) {
-				callback(data);
+				callback.call(thisObj || null, data);
 			}
 		}
 	};

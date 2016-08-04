@@ -51,7 +51,8 @@ function Application() {
 		if (!isUndefined(view) && isFunction(route['view'])) {
 			if (!view) {
 				var viewParams = getViewParams.call(this, route, true);
-				view = this.currentView = this.views[route['name']] = new route['view'](viewParams);
+				view = this.currentView = this.views[route['name']] = new route['view']();
+				Initialization.initiate.call(view, viewParams);
 				view.setOnReadyHandler(onViewReady.bind(this));
 				var viewContentElement = createViewContentElement.call(this);
 				view.render(viewContentElement);
@@ -171,60 +172,9 @@ function Application() {
 	Application.prototype.onError = function(errorCode) {};
 }
 Application();
-function Component() {
-	var processInitials = function() {
-		var initials = this.initials;
-		if (isObject(initials)) {
-			for (var k in initials) {
-				if (isArrayLike(initials[k])) {
-					if (k == 'correctors') {
-						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
-					} else if (k == 'globals') {
-						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
-					} else if (k == 'followers') {
-						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
-					} else if (k == 'controllers') {
-						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
-					} else if (k == 'props') {
-						Objects.merge(this.props, initials[k]);
-					} else if (k == 'options') {
-						this.initOptions(initials[k]);
-					}
-				}
-			}
-		}
-	};
-	var attachController = function(options) {
-		if (isObject(options['on'])) {
-			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
-		}
-	};
-	var addCorrector = function(name, handler) {
-		if (isFunction(handler)) {
-			this.correctors = this.correctors || {};
-			this.correctors[name] = handler;
-		}
-	};
-	var addFollower = function(name, handler) {
-		if (isFunction(handler)) {
-			this.followers = this.followers || {};
-			this.followers[name] = handler;
-		}
-	};
-	var subscribeToHelper = function(options) {
-		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
-	};
-	var getInitial = function(initialName) {
-		return Objects.get(this.initials, initialName);
-	};
-	var processPostRenderInitials = function() {
-		var helpers = getInitial.call(this, 'helpers');
-		if (isArray(helpers)) {
-			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
-		}
-	};
+function Component() {	
 	var load = function() {
-		var loader = getInitial.call(this, 'loader');
+		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
 			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
@@ -254,13 +204,13 @@ function Component() {
 				this.parentElement.removeChild(this.tempPlaceholder);
 				this.tempPlaceholder = null;
 			}
-			processPostRenderInitials.call(this);
+			Initialization.processPostRenderInitials.call(this);
 		}
 	};
 	var doRendering = function() {
 		this.level = new Level();
-		var args = getCombinedArgs.call(this);
-		var content = this.getTemplateMain(this, args);
+		this.args = getCombinedArgs.call(this);
+		var content = this.getTemplateMain(this.args, this);
 		if (isArray(content)) {
 			this.level.setComponent(this);
 			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
@@ -272,7 +222,8 @@ function Component() {
 				if (isFunction(this.callbacks[i])) this.callbacks[i]();
 			}
 		}
-		this.callbacks = this.waiting = this.args = args = null;
+		delete this.callbacks;
+		delete this.waiting;
 	};
 	var getCombinedArgs = function() {
 		return Objects.merge(this.args, Objects.get(this.initials, 'args'), this.getArgs()); 
@@ -351,7 +302,6 @@ function Component() {
 	};
 	Component.prototype.render = function(parentElement) {
 		this.parentElement = parentElement;
-		processInitials.call(this);
 		load.call(this);
 	};
 	Component.prototype.instanceOf = function(parent) {
@@ -366,7 +316,7 @@ function Component() {
 		}
 	};
 	Component.prototype.provideWithComponent = function(propName, componentName, waitingChild) {
-		var cmp = this.getChildById(componentName);
+		var cmp = this.getChild(componentName);
 		if (cmp) waitingChild.set(propName, cmp);
 		else {
 			this.waiting = this.waiting || {};
@@ -404,6 +354,7 @@ function Component() {
 		this.set(propName, !this.get(propName));
 	};
 	Component.prototype.set = function(propName, propValue) {
+		this.props = this.props || {};
 		var props;
 		if (!isUndefined(propValue)) {
 			props = {};
@@ -468,6 +419,39 @@ function Component() {
 		this.children = this.children || {};
 		this.children[child.getId() || this.childrenCount] = child;
 		this.childrenCount++;
+	};
+	Component.prototype.registerControl = function(control, name) {
+	 	this.controls = this.controls || {};
+	 	this.controls[name] = control;
+	};
+	Component.prototype.getControl = function(name) {
+		return Objects.get(this.controls, name);
+	};
+	Component.prototype.getCotrolAt = function(index) {
+		return Objects.getByIndex(this.controls, index);
+	};
+	Component.prototype.setControlValue = function(name, value) {
+		var control = this.getControl(name);
+		if (control) control.setValue(value);
+	};
+	Component.prototype.enableControl = function(name, isEnabled) {
+		var control = this.getControl(name);
+		if (control) control.setEnabled(isEnabled);
+	};
+	Component.prototype.forEachControl = function(callback) {
+		if (isObject(this.controls)) Objects.each(this.controls, callback, this);
+	};
+	Component.prototype.getControlsData = function() {
+		var objs = [{}];
+		this.forEachControl(function(control, k) {
+			objs[0][k] = control.getValue();
+		});
+		this.forEachChild(function(child) {
+			if (!isControl(child)) {
+				objs.push(child.getControlsData());
+			}
+		});
+		return Objects.merge.apply(null, objs);
 	};
 	Component.prototype.setParent = function(parentalComponent) {
 		this.parentalComponent = parentalComponent;
@@ -608,6 +592,7 @@ function Component() {
 		this.initials = null;
 		this.followers = null;
 		this.correctors = null;
+		this.controls = null;
 		this.parentalComponent = null;
 	};
 	var f = function() {
@@ -710,25 +695,22 @@ function Control() {
 		}
 		return this.getProperValue(value);
 	};
-	var getControlValue = function() {
-		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
-	};
 	var dispatchChange = function() {
 		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
 	};
 	var onChangeChildControl = function(e) {
 		dispatchChange.call(this);
 	};
+	Control.prototype.getControlValue = function() {
+		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+	};
 	Control.prototype.getInitials = function() {
 		return {'enabled': true};
 	};
-	Control.prototype.attachControl = function(control) {
-		if (isString(control)) control = this.getChildById(control);
-		if (isControl(control)) {
-			this.controls = this.controls || {};
-			this.controls[control.getId()] = control;
-			this.addListener(control, 'change', onChangeChildControl.call(this));
-		}
+	Control.prototype.registerControl = function(control, name) {
+	 	this.controls = this.controls || {};
+	 	this.controls[name] = control;
+	 	this.addListener(control, 'change', onChangeChildControl.call(this));
 	};
 	Control.prototype.getName = function() {
 		return this.props.name;
@@ -738,7 +720,7 @@ function Control() {
 		if (this.hasControls()) {
 			value = {};
 			for (var k in this.controls) value[k] = this.controls[k].getValue();
-		} else value = getCorrectedValue.call(this, getControlValue.call(this));
+		} else value = getCorrectedValue.call(this, this.getControlValue());
 		return value;
 	};
 	Control.prototype.getProperValue = function(value) {
@@ -759,7 +741,7 @@ function Control() {
 	};
 	Control.prototype.hasControls = function() {
 		return !Objects.empty(this.controls);
-	}
+	};
 	Control.prototype.isEnabled = function() {
 		return !!this.get('enabled');
 	};
@@ -773,34 +755,113 @@ function Control() {
 	};
 }
 Control();
-function Controller() {
+function Controller() {	
+	var makeUrl = function(url, options) {
+		var regExp;
+		for (var k in options) {
+			if (isString(options[k]) || isNumber(options[k])) {
+				regExp = new RegExp('\\$' + k)
+				url = url.replace(regExp, options[k]);
+			}
+		}
+		return url;
+	};
+	var gotFromStore = function(options) {
+		if (shouldStore.call(this)) {
+			var storeAs = getStoreAs.call(this, options);
+			if (isString(storeAs)) {
+				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
+				if (isArrayLike(storedData)) {
+					onActionComplete.call(this, storedData, true);
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	var onActionComplete = function(data, isFromStorage) {
+		var actionName = this.action['name'];
+		this.data = this.data || {};
+		this.data[actionName] = data;
+		if (isFunction(this.action['callback'])) {
+			this.action['callback'].call(this, data);
+		}
+		this.dispatchEvent(actionName, data);
+		if (!isFromStorage && actionName == 'load' && shouldStore.call(this)) {
+			store.call(this, true, data);
+		}
+	};
+	var shouldStore = function() {
+		var should = Objects.get(this.options, 'store');
+		if (should === false) return false;
+		return Objects.has(this.options, 'storeAs');
+	};
+	var store = function(isAdding, data) {
+		var storeAs = getStoreAs.call(this, data);
+		if (isAdding) {		
+			StoreKeeper.set(storeAs, data);
+		} else {
+			StoreKeeper.remove(storeAs);
+		}
+	};
+	var getStoreAs = function(data) {
+		var storeAs = Objects.get(this.options, 'storeAs');
+		if (isArrayLike(data) && isString(storeAs) && (/\$[a-z_]/i).test(storeAs)) {
+			var parts = storeAs.split('$');
+			storeAs = parts[0];
+			for (var i = 1; i < parts.length; i++) {
+				if (data[parts[i]]) storeAs += data[parts[i]];
+				else storeAs += parts[i];				
+			}
+		}
+		return storeAs;
+	};
+	var getPrimaryKey = function() {
+		return Objects.get(this.options, 'key', 'id');
+	};
+	var initActionRouteOptions = function(action) {
+		var value;
+		this.currentRouteOptions = {};
+		var routeOptions = {};
+		for (var k in action['routeOptions']) {
+			value = Router.getPathPartAt(action['routeOptions'][k]);
+			if (isString(value)) {
+				routeOptions[k] = value;
+			}
+		}
+		setCurrentRouteOptions.call(this, routeOptions, action);
+		Router.subscribe(action['routeOptions'], this);
+	};
+	var setCurrentRouteOptions = function(routeOptions, action) {
+		this.currentRouteOptions = routeOptions;
+		if (!isObject(action['options'])) {
+			action['options'] = {};
+		}
+		for (var k in routeOptions) {
+			action['options'][k] = routeOptions[k];
+		}
+	};
+	var getAction = function(actionName) {	
+		var actions = Objects.get(this.initials, 'actions');
+		if (isObject(actions)) {
+			var action = actions[actionName];
+			if (isObject(action)) {
+				if (!isString(action['name'])) {
+					if (isObject(action['routeOptions']) && actionName == 'load') {
+						initActionRouteOptions.call(this, action);
+					}
+					action['name'] = actionName;
+				}
+				return action;
+			}
+			log('action is invalid', 'getAction', this, {action: action});
+		} else {
+			log('no actions', 'getAction', this, {actions: actions});
+		}
+		return null;
+	};
 	Controller.prototype.initiate = function() {
 		this.listeners = [];
-	};
-	Controller.prototype.processInitials = function() {
-		var initials = this.initials;
-		if (isObject(initials)) {
-			for (var k in initials) {
-				if (initials[k] && isObject(initials[k])) {
-					if (k == 'globals') {} else if (k == 'options') {
-						this.options = initials[k];
-					} else if (k == 'controllers') {
-						for (var i = 0; i < initials[k].length; i++) {
-							this.attachController(initials[k][i]);
-						}
-					}
-				}
-			}
-		}
-	};
-	Controller.prototype.attachController = function(options) {
-		if (isObject(options['controller'])) {
-			if (isObject(options['on'])) {
-				for (var k in options['on']) {
-					options.controller.subscribe(k, options['on'][k], this);
-				}
-			}
-		}
 	};
 	Controller.prototype.subscribe = function(eventType, callback, subscriber) {
 		this.listeners.push([eventType, callback, subscriber]);
@@ -820,9 +881,7 @@ function Controller() {
 	};
 	Controller.prototype.dispatchEvent = function(eventType, data) {
 		var dataToDispatch = data;
-		if (Objects.has(this.options, 'clone', true)) {
-			dataToDispatch = Objects.clone(data);
-		}
+		if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (this.listeners[i][0] == eventType && isFunction(this.listeners[i][1])) {
@@ -835,7 +894,7 @@ function Controller() {
 		return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
 	};
 	Controller.prototype.getItemById = function(id) {
-		var primaryKey = this.getPrimaryKey();
+		var primaryKey = getPrimaryKey.call(this);
 		var data = this.data['load'];
 		if (isArray(data)) {
 			for (var i = 0; i < data.length; i++) {
@@ -852,133 +911,25 @@ function Controller() {
 		this.doAction('load', options);
 	};
 	Controller.prototype.doAction = function(actionName, options, url) {
-		var action = this.getAction(actionName);
+		var action = getAction.call(this, actionName);
 		this.action = action;	
-		if (actionName == 'load' && this.gotFromStore(options)) {
-			return;
-		}
-		if (!isObject(options)) {
-			options = {};
-		}
+		if (actionName == 'load' && gotFromStore.call(this, options)) return;
+		if (!isObject(options)) options = {};
 		if (action && isObject(action) && action['options'] && isObject(action['options'])) {
 			Objects.merge(options, action['options']);
 		}
 		var method = action['method'] || 'POST';
-		url = url || this.makeUrl(action['url'], options);
+		url = url || makeUrl(action['url'], options);
 		if (!url || !isString(url)) {
 			log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
 		}
-		this.request = this.request || new AjaxRequest(url, this.onActionComplete.bind(this));
+		this.request = this.request || new AjaxRequest(url, onActionComplete.bind(this));
 		this.request.send(method, options, url);
-	};
-	Controller.prototype.gotFromStore = function(options) {
-		if (this.shouldStore()) {
-			var storeAs = this.getStoreAs(options);
-			if (isString(storeAs)) {
-				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
-				if (isArrayLike(storedData)) {
-					this.onActionComplete(storedData, true);
-					return true;
-				}
-			}
-		}
-		return false;
-	};
-	Controller.prototype.makeUrl = function(url, options) {
-		var regExp;
-		for (var k in options) {
-			if (isString(options[k]) || isNumber(options[k])) {
-				regExp = new RegExp('\\$' + k)
-				url = url.replace(regExp, options[k]);
-			}
-		}
-		return url;
-	};
-	Controller.prototype.onActionComplete = function(data, isFromStorage) {
-		var actionName = this.action['name'];
-		this.data = this.data || {};
-		this.data[actionName] = data;
-		if (isFunction(this.action['callback'])) {
-			this.action['callback'].call(this, data);
-		}
-		this.dispatchEvent(actionName, data);
-		if (!isFromStorage && actionName == 'load' && this.shouldStore()) {
-			this.store(true, data);
-		}
-	};
-	Controller.prototype.shouldStore = function() {
-		var shouldStore = Objects.get(this.options, 'store');
-		if (shouldStore === false) return false;
-		return Objects.has(this.options, 'storeAs');
-	};
-	Controller.prototype.store = function(isAdding, data) {console.log('store')
-		var storeAs = this.getStoreAs(data);
-		if (isAdding) {		
-			StoreKeeper.set(storeAs, data);
-		} else {
-			StoreKeeper.remove(storeAs);
-		}
-	};
-	Controller.prototype.getStoreAs = function(data) {
-		var storeAs = Objects.get(this.options, 'storeAs');
-		if (isArrayLike(data) && isString(storeAs) && (/\$[a-z_]/i).test(storeAs)) {
-			var parts = storeAs.split('$');
-			storeAs = parts[0];
-			for (var i = 1; i < parts.length; i++) {
-				if (data[parts[i]]) storeAs += data[parts[i]];
-				else storeAs += parts[i];				
-			}
-		}
-		return storeAs;
-	};
-	Controller.prototype.getPrimaryKey = function() {
-		return Objects.get(this.options, 'key', 'id');
-	};
-	Controller.prototype.getAction = function(actionName) {	
-		var actions = Objects.get(this.initials, 'actions');
-		if (isObject(actions)) {
-			var action = actions[actionName];
-			if (isObject(action)) {
-				if (!isString(action['name'])) {
-					if (isObject(action['routeOptions']) && actionName == 'load') {
-						this.initActionRouteOptions(action);
-					}
-					action['name'] = actionName;
-				}
-				return action;
-			}
-			log('action is invalid', 'getAction', this, {action: action});
-		} else {
-			log('no actions', 'getAction', this, {actions: actions});
-		}
-		return null;
-	};
-	Controller.prototype.initActionRouteOptions = function(action) {
-		var value;
-		this.currentRouteOptions = {};
-		var routeOptions = {};
-		for (var k in action['routeOptions']) {
-			value = Router.getPathPartAt(action['routeOptions'][k]);
-			if (isString(value)) {
-				routeOptions[k] = value;
-			}
-		}
-		this.setCurrentRouteOptions(routeOptions, action);
-		Router.subscribe(action['routeOptions'], this);
-	};
-	Controller.prototype.setCurrentRouteOptions = function(routeOptions, action) {
-		this.currentRouteOptions = routeOptions;
-		if (!isObject(action['options'])) {
-			action['options'] = {};
-		}
-		for (var k in routeOptions) {
-			action['options'][k] = routeOptions[k];
-		}
 	};
 	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
 		if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
-			var action = this.getAction('load');
-			this.setCurrentRouteOptions(routeOptions, action);
+			var action = getAction.call(this, 'load');
+			setCurrentRouteOptions.call(this, routeOptions, action);
 			this.doAction('load');
 		}
 	};
@@ -1216,6 +1167,7 @@ function Level() {
 				eventType = __EVENTTYPES[props['e'][i]] || eventType;
 				callback = props['e'][i + 1];
 				var isOnce = props['e'][i + 2] === true;
+				if (isString(callback)) callback = component.dispatchEvent.bind(component, callback);
 				if (isString(eventType) && isFunction(callback)) {					
 					if (isOnce) {
 						eventHandler.listenOnce(element, eventType, callback.bind(component));
@@ -1343,7 +1295,7 @@ function Level() {
 	var includeTemplate = function(item) {
 		if (isString(item['tmp'])) item['tmp'] = component.getTemplateByKey(item['tmp']);
 		if (isFunction(item['tmp'])) {		
-			var items = item['tmp'].call(component, component, item['p']);
+			var items = item['tmp'].call(component, item['p'], component);
 			if (isArray(items)) {
 				for (var i = 0; i < items.length; i++) renderItem(items[i]);
 			}
@@ -1366,14 +1318,13 @@ function Level() {
 							waiting[i][0].set(waiting[i][1], cmp);
 						}
 					}
-				}
+				}				
 			}
 			if (isArray(item['w'])) {
 				for (i = 0; i < item['w'].length; i += 2) {
 					component.provideWithComponent(item['w'][i], item['w'][i + 1], cmp);
 				}
 			}
-			console.log([cmp, props, args])
 			Initialization.initiate.call(cmp, props, args);
 			cmp.setParent(component);
 			cmp.render(pe);
@@ -1385,6 +1336,7 @@ function Level() {
 					i++;	
 				}
 			}
+			if (item['nm']) component.registerControl(cmp, item['nm']);
 		} else if (item && isObject(item)) {
 			if (!item.isRendered()) item.render(pe);
 			registerChild(item, true);
@@ -1425,9 +1377,21 @@ function Level() {
 		propComps[pn].push(component.registerPropActivity('cmp', pn, data));
 	};
 	var disposeDom = function() {
-		var elementsToDispose = this.getElements();
+		var elementsToDispose = getElements();
 		for (var i = 0; i < elementsToDispose.length; i++) parentElement.removeChild(elementsToDispose[i]);
 		elementsToDispose = null;
+	};
+	var getElements = function() {
+		var elements = [];
+		if (firstNodeChild && lastNodeChild) {
+			var isAdding = false;
+			for (var i = 0; i < parentElement.childNodes.length; i++) {
+				if (parentElement.childNodes[i] == firstNodeChild) isAdding = true;
+				if (isAdding) elements.push(parentElement.childNodes[i]);
+				if (parentElement.childNodes[i] == lastNodeChild) break;
+			}
+		}
+		return elements;
 	};
 	this.render = function(items, pe, pl, nsc) {
 		parentElement = pe;
@@ -1460,7 +1424,7 @@ function Level() {
 		var isDetached = !isAppended;
 		if (isDetached === this.detached) return;
 		this.detached = isDetached;
-		var elements = this.getElements();
+		var elements = getElements();
 		if (isDetached) {
 			realParentElement = parentElement;
 			parentElement = document.createElement('div'); 
@@ -1471,18 +1435,6 @@ function Level() {
 			realParentElement = null;
 			for (var i = 0; i < elements.length; i++) appendChild(elements[i]);
 		}
-	};
-	this.getElements = function() {
-		var elements = [];
-		if (firstNodeChild && lastNodeChild) {
-			var isAdding = false;
-			for (var i = 0; i < parentElement.childNodes.length; i++) {
-				if (parentElement.childNodes[i] == firstNodeChild) isAdding = true;
-				if (isAdding) elements.push(parentElement.childNodes[i]);
-				if (parentElement.childNodes[i] == lastNodeChild) break;
-			}
-		}
-		return elements;
 	};
 	this.dispose = function() {
 		for (var i = 0; i < children.length; i++) children[i].dispose();
@@ -1882,6 +1834,7 @@ function Dialoger() {
 	var defineDialog = function() {
 		if (isUndefined(dialogs[currentDialogId])) {
 			dialogs[currentDialogId] = new currentDialogClass();
+			Initialization.initiate.call(dialogs[currentDialogId]);
 			dialogs[currentDialogId].render(document.body);
 		}
 		currentDialog = dialogs[currentDialogId];
@@ -2452,7 +2405,7 @@ MouseEvent.prototype.getTargetWithClass = function(className) {
 	if (!!this.target.parentNode && this.target.parentNode.hasClass(className)) return this.target.parentNode;
 	return null;
 };
-function AjaxRequest(url, callback, params) {
+function AjaxRequest(url, callback, params, thisObj) {
 	var self = this, tempUrl, active = false, 
 		withCredentials = false, headers, request, 
 		responseType;
@@ -2542,7 +2495,7 @@ function AjaxRequest(url, callback, params) {
 				data = response;
 			}
 			if (isFunction(callback)) {
-				callback(data);
+				callback.call(thisObj || null, data);
 			}
 		}
 	};
@@ -2600,6 +2553,57 @@ function Initialization() {
 		}
 		return initials1;
 	};
+	this.processInitials = function() {
+		var initials = this.initials;
+		if (isObject(initials)) {
+			for (var k in initials) {
+				if (isArrayLike(initials[k])) {
+					if (k == 'correctors') {
+						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
+					} else if (k == 'globals') {
+						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
+					} else if (k == 'followers') {
+						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
+					} else if (k == 'controllers') {
+						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
+					} else if (k == 'props') {
+						Objects.merge(this.props, initials[k]);
+					} else if (k == 'options') {
+						this.options = initials[k];
+					}
+				}
+			}
+		}
+	};
+	var getInitial = function(initialName) {
+		return Objects.get(this.initials, initialName);
+	};
+	var attachController = function(options) {
+		if (isObject(options['on'])) {
+			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
+		}
+	};
+	var addCorrector = function(name, handler) {
+		if (isFunction(handler)) {
+			this.correctors = this.correctors || {};
+			this.correctors[name] = handler;
+		}
+	};
+	var addFollower = function(name, handler) {
+		if (isFunction(handler)) {
+			this.followers = this.followers || {};
+			this.followers[name] = handler;
+		}
+	};
+	this.processPostRenderInitials = function() {
+		var helpers = getInitial.call(this, 'helpers');
+		if (isArray(helpers)) {
+			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
+		}
+	};
+	var subscribeToHelper = function(options) {
+		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
+	};
 	this.inherits = function(list) {
 		var children, parent, child, initials;
 		for (var k = 0; k < list.length; k++) {
@@ -2642,7 +2646,8 @@ function Initialization() {
 		if (isArray(this.inheritedSuperClasses)) {
 			initiateParental(this.inheritedSuperClasses, this);
 		}
-		this.props = props || {};
+		if (isObject(this.props)) {console.log(this);Objects.merge(this.props, props);}
+		else this.props = props || {};
 		if (isFunction(this.constructor.prototype.initiate)) {
 			this.constructor.prototype.initiate.call(this);
 		}
@@ -2656,6 +2661,10 @@ function Initialization() {
 		}
 		this.initials = initials;
 		this.args = args;
+		Initialization.processInitials.call(this);
+	};
+	this.initiateControllers = function(controllers) {
+		for (var i = 0; i < controllers.length; i++) Initialization.initiate.call(controllers[i]);
 	};
 }
 Initialization = new Initialization();
@@ -2681,6 +2690,9 @@ function Router() {
 	};
 	this.getPathPartAt = function(index) {
 		return isArray(pathParts) ? pathParts[index] : '';
+	};
+	this.reload = function() {
+		window.location.reload();
 	};
 	this.redirect = function(viewName, replState) {
 		var route;
@@ -3105,32 +3117,29 @@ function stringToNumber(str) {
 	return Number(str);
 }
 function App() {};
-App.prototype.onClick = function() {
-	console.log(this.attachController)
-};
 App.prototype.onError = function(errorCode) {
 	this.getChild('menu').setAppended(false);
 };
-App.prototype.getTemplateMain = function($,_) {
-	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'e':[0,$.onClick],'p':{'c':'app-view-container'}}]
+App.prototype.getTemplateMain = function(_,$) {
+	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]
 };
 function Analytics() {};
-Analytics.prototype.getTemplateMain = function($,_) {
+Analytics.prototype.getTemplateMain = function(_,$) {
 	return[{'t':0,'p':{'c':'view-content'}}]
 };
 function Error401() {};
 Error401.prototype.onRendered = function() {};
-Error401.prototype.getTemplateMain = function($,_) {
+Error401.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'app-auth-form-container'}}]
 };
 function Error404() {};
 Error404.prototype.onRendered = function() {};
-Error404.prototype.getTemplateMain = function($,_) {
+Error404.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':'404','t':0,'p':{'c':'app-404-title'}},{'c':__T[0],'t':0,'p':{'c':'app-404-text'}}],'t':0,'p':{'c':'app-404-container'}}]
 };
 function Favorite() {};
 Favorite.prototype.onRendered = function() {};
-Favorite.prototype.getTemplateMain = function($,_) {
+Favorite.prototype.getTemplateMain = function(_,$) {
 	return[{'t':0,'p':{'c':'view-content'}}]
 };
 function Main() {};
@@ -3147,7 +3156,7 @@ Main.prototype.onResize = function() {
 		element.setHeight(bodyHeight - 100);
 	}
 };
-Main.prototype.getTemplateMain = function($,_) {
+Main.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[52],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[69],{'cmp':Tooltip,'p':{'a':__V[4]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'a':__V[6]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'a':__V[7]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
 };
 Main.prototype.getInitials = function() {
@@ -3163,13 +3172,13 @@ Search.prototype.onRendered = function() {
 	this.openInformer();
 };
 Search.prototype.openInformer = function() {
-	var datatable = this.getChildById('datatable');
+	var datatable = this.getChild('datatable');
 };
 Search.prototype.openFilter = function(filterId) {};
 Search.prototype.onFormExpand = function() {
 	this.toggle('expanded');
 };
-Search.prototype.getTemplateMain = function($,_) {
+Search.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'i':'form'}},{'cmp':TendersDataTable,'p':{'i':'datatable'}}],'t':0,'p':{'c':function(){return 'view-content'+($.g('expanded')?' form-expanded':'')},'sc':1},'n':{'c':'expanded'}}]
 };
 Search.prototype.getInitials = function() {
@@ -3181,20 +3190,20 @@ Search.prototype.getControllersToLoad = function() {
 	return [Filters];
 };
 function DataTable() {};
-DataTable.prototype.getTemplateMain = function($,_) {
+DataTable.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}}]
 };
 function DataTableTabPanel() {};
 function DataTableFragmets() {};
 function DataTableRow() {};
-DataTableRow.prototype.getTemplateControls = function($,_) {
+DataTableRow.prototype.getTemplateControls = function(_,$) {
 	return[{'t':0,'p':{'c':'app-datatable-color-mark datatable-control'}},{'c':{'tmp':includeGeneralTemplateCheckbox},'t':0,'p':{'c':'app-datatable-checkbox-container datatable-control'}},{'t':0,'p':{'c':'app-datatable-star datatable-control'}}]
 };
-DataTableRow.prototype.getTemplateCount = function($,_) {
+DataTableRow.prototype.getTemplateCount = function(_,$) {
 	return[{'c':_['count'],'t':1,'p':{'c':'app-datatable-standart-row-count'}}]
 };
 function DataTableStandartRow() {};
-DataTableStandartRow.prototype.getTemplateMain = function($,_) {
+DataTableStandartRow.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[!_['nocontrols']?{'tmp':$.getTemplateControls}:'',{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'app-datatable-standart-row-top-item'}},{'c':!!_['multiregion']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}}]:_['regionName'],'i':true},{'c':!!_['multicategory']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}}]:_['subcategory'],'i':true},{'c':_['razm']==' N/A'?{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}}:_['razm'],'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}],'t':0,'p':{'c':'app-datatable-standart-row-top'}},{'c':_['price'],'t':0,'p':{'c':'app-datatable-standart-row-price'}},{'c':[{'c':!!_['hot']?[{'tmp':$.getTemplateHotMark}]:'','i':true},_['name']],'t':0,'p':{'c':'app-datatable-standart-row-name'}},{'t':0,'p':{'c':'app-datatable-standart-row-bottom'}},{'c':!!_['fragments']?[{'cmp':DataTableFragmets,'p':{'p':{'data':_['fragments']}}}]:'','i':true}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'app-datatable-row','sc':1,'_id':_['Id']}}]
 };
 function TendersDataTable() {};
@@ -3232,7 +3241,7 @@ FilterStatistics.prototype.getCountForFilterWithIndex = function(index) {
 		this.showElement('.app-filter-stat-refresh', true);
 	}
 };
-FilterStatistics.prototype.getTemplateMain = function($,_) {
+FilterStatistics.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[_['title']?_['title']:'',{'c':__[74],'t':0,'p':{'c':'app-filter-stat-refresh'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[75],'t':7},{'c':__[76],'t':7},{'c':__[77],'t':7},{'c':__[78],'t':7},{'c':!!_['extended']?[{'c':__[79],'t':7},{'c':__[80],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
 };
 FilterStatistics.prototype.getInitials = function() {
@@ -3246,7 +3255,7 @@ function SearchForm() {};
 SearchForm.prototype.toggleExpand = function() {
 	this.dispatchEvent('expand');
 };
-SearchForm.prototype.getTemplateMain = function($,_) {
+SearchForm.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
 };
 SearchForm.prototype.getInitials = function() {
@@ -3255,10 +3264,10 @@ SearchForm.prototype.getInitials = function() {
 	};
 };
 function SearchFormButton() {};
-SearchFormButton.prototype.getTemplateMain = function($,_) {
+SearchFormButton.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-search-form-button '+_['className']}}]
 };
-SearchFormButton.prototype.getTemplateContent = function($,_) {
+SearchFormButton.prototype.getTemplateContent = function(_,$) {
 	return null
 };
 function SearchFormPanel() {};
@@ -3269,21 +3278,21 @@ SearchFormPanel.prototype.show = function() {
 SearchFormPanel.prototype.hide = function() {
 	this.addClass('shown', false);
 };
-SearchFormPanel.prototype.getTemplateMain = function($,_) {
+SearchFormPanel.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'t':0,'e':[0,$.hide],'p':{'c':'app-search-form-panel-close'}},{'c':_['title'],'t':0,'p':{'c':'app-search-form-panel-title'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'app-search-form-panel '+_['className'],'sc':1}}]
 };
-SearchFormPanel.prototype.getTemplateContent = function($,_) {
+SearchFormPanel.prototype.getTemplateContent = function(_,$) {
 	return null
 };
 function SearchFormPanelButton() {};
 SearchFormPanelButton.prototype.onClick = function() {
 	this.get('panel').show();
 };
-SearchFormPanelButton.prototype.getTemplateMain = function($,_) {
+SearchFormPanelButton.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'tmp':$.getTemplateContent},'t':0,'e':[0,$.onClick],'p':{'c':'app-search-form-button '+_['className']}}]
 };
 function KeywordsButton() {};
-KeywordsButton.prototype.getTemplateContent = function($,_) {
+KeywordsButton.prototype.getTemplateContent = function(_,$) {
 	return[{'c':__[13],'t':0}]
 };
 KeywordsButton.prototype.getInitials = function() {
@@ -3292,7 +3301,7 @@ KeywordsButton.prototype.getInitials = function() {
 	};
 };
 function KeywordsPanel() {};
-KeywordsPanel.prototype.getTemplateContent = function($,_) {
+KeywordsPanel.prototype.getTemplateContent = function(_,$) {
 	return[{'cmp':KeywordsControl}]
 };
 KeywordsPanel.prototype.getInitials = function() {
@@ -3309,7 +3318,7 @@ TenderSearchForm.prototype.onResetButtonClick = function(e) {
 	}, 2500);
 };
 TenderSearchForm.prototype.onResetConfirmed = function() {};
-TenderSearchForm.prototype.getTemplateMain = function($,_) {
+TenderSearchForm.prototype.getTemplateMain = function(_,$) {
 	return[{'cmp':KeywordsPanel,'p':{'i':'keywordsPanel'}},{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'hover-label'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'confirm-reset-filter'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'confirm-label'}}],'t':0,'p':{'c':'app-search-form-reset'}},{'c':[{'cmp':SearchFormFilters},{'c':{'cmp':KeywordsButton,'w':['panel','keywordsPanel']},'t':0,'p':{'c':'app-tender-search-form-content'}}],'t':0,'p':{'c':'app-tender-search-form','sc':1}}]
 };
 function SearchFormCreateFilterMenu() {};
@@ -3342,7 +3351,7 @@ SearchFormFilterMenu.prototype.getButtonData = function(item) {
 SearchFormFilterMenu.prototype.handleClick = function(value, button) {
 	Globals.getView('search').openFilter(value);
 };
-SearchFormFilterMenu.prototype.getTemplateContent = function($,_) {
+SearchFormFilterMenu.prototype.getTemplateContent = function(_,$) {
 	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['item']['isAutoOpen']?' checked':''),'_value':_['item']['value']}}]
 };
 SearchFormFilterMenu.prototype.getInitials = function() {
@@ -3359,7 +3368,7 @@ SearchFormFilters.prototype.onLoadFilters = function(filters) {
 SearchFormFilters.prototype.onSaveFilterClick = function() {
 	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
 };
-SearchFormFilters.prototype.getTemplateMain = function($,_) {
+SearchFormFilters.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'c':__[7],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'app-search-form-filters-create-button'}},{'c':[{'c':__[8],'t':0,'p':{'c':'app-search-form-filters-button-inner'}},{'c':[{'c':{'pr':'quantity','p':$.g('quantity')},'t':42,'p':{'c':'app-search-form-filters-button-quantity'}},{'t':0,'p':{'c':'app-search-form-filters-button-plus'}}],'t':0,'p':{'c':'app-search-form-filters-button-side'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'app-search-form-filters-button'+(!$.g('quantity')?' with-plus':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':$.g('filterName')},'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-name'}},{'c':__[9],'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-save-button'}}],'t':0,'p':{'c':'app-search-form-filters','sc':1}}]
 };
 SearchFormFilters.prototype.getInitials = function() {
@@ -3429,7 +3438,7 @@ Calendar.prototype.changeMonth = function(value) {
 	}
 	this.redraw();
 };
-Calendar.prototype.getTemplateMain = function($,_) {
+Calendar.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1},{'c':__[46],'t':1},{'c':__[47],'t':1},{'c':__[48],'t':1},{'c':__[49],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?' another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
 };
 function FavoritesCalendar() {};
@@ -3487,10 +3496,10 @@ Dialog.prototype.expand = function() {
 };
 Dialog.prototype.onShow = function() {};
 Dialog.prototype.onHide = function() {};
-Dialog.prototype.getTemplateMain = function($,_) {
+Dialog.prototype.getTemplateMain = function(_,$) {
 	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['width','marginLeft','marginTop']}}]
 };
-Dialog.prototype.getTemplateContent = function($,_) {
+Dialog.prototype.getTemplateContent = function(_,$) {
 	return null
 };
 Dialog.prototype.getInitials = function() {
@@ -3501,17 +3510,24 @@ Dialog.prototype.getInitials = function() {
 	};
 };
 function Form() {};
-Form.prototype.initiate = function() {
-	this.controls = {};
-};
 Form.prototype.onSubmit = function() {
 	if (this.isValid()) {
-		if (this.formElement) {
+		this.form = this.form || this.findElement('form');
+		var ajax = this.form.getData('ajax');
+		if (ajax) {
+			this.sendAjaxRequest();
+		} else {
 			this.setFormKey();
-			this.formElement.submit();
-		} else if (this.request) {
-			this.request.send(this.options['method'] || 'POST', this.getData());
+			this.form.submit();
 		}
+	}
+};
+Form.prototype.sendAjaxRequest = function() {
+	var action = this.form.attr('action');
+	var method = this.form.attr('method');
+	if (action) {
+		this.request = this.request || new AjaxRequest(action, this.handleResponse, null, this);
+		this.request.send(method, this.getControlsData());
 	}
 };
 Form.prototype.setFormKey = function() {
@@ -3527,13 +3543,6 @@ Form.prototype.setFormKey = function() {
 };
 Form.prototype.isValid = function() {
 	return true;
-};
-Form.prototype.getData = function() {
-	var data = {};
-	for (var k in this.controls) {
-		data[k] = this.controls[k].getValue();
-	}
-	return data;
 };
 Form.prototype.handleResponse = function(data) {
 	if (isString(data)) {
@@ -3558,45 +3567,21 @@ Form.prototype.onFailure = function(data) {
 	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
 	this.log(error, 'onFailure', data);
 };
-Form.prototype.getControl = function(name) {
-	return this.controls[name];
-};
-Form.prototype.getCotrolAt = function(index) {
-	return Objects.getByIndex(this.controls, index);
-};
-Form.prototype.setControlValue = function(name, value) {
-	if (isString(name)) {
-		var control = this.getControl(name);
-		if (control) {
-			control.setValue(value);
-		}
-	}
-};
-Form.prototype.enableControl = function(name, isEnabled) {
-	if (isString(name)) {
-		var control = this.getControl(name);
-		if (control) {
-			control.setEnabled(isEnabled);
-		}
-	}
-};
 Form.prototype.disposeInternal = function() {
-	this.options = null;
-	this.controls = null;
+	this.form = null;
 	this.request = null;
-	this.formElement = null;
 };
-Form.prototype.getTemplateMain = function($,_) {
-	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'p':{'p':_['submit']}}]:'','i':true}],'t':13,'e':[23,$.onSubmit],'p':{'c':'app-form-controls','m':_['method'],'a':_['action']}}]
+Form.prototype.getTemplateMain = function(_,$) {
+	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'e':[23,$.onSubmit],'p':{'p':_['submit']}}]:'','i':true}],'t':13,'p':{'c':'app-form-controls','m':_['method'],'a':_['action'],'_ajax':(_['ajax']?1:''),'_iframe':(_['iframe']?1:'')}}]
 };
-Form.prototype.getTemplateContent = function($,_) {
+Form.prototype.getTemplateContent = function(_,$) {
 	return null
 };
 function FormField() {};
 FormField.prototype.getValue = function() {
 	return this.getCotrolAt(0).getValue();
 };
-FormField.prototype.getTemplateMain = function($,_) {
+FormField.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'p':_['controlProps']}}],'t':0,'p':{'c':'app-input-container '+_['class'],'sc':1}}]
 };
 function PopupMenu() {};
@@ -3649,18 +3634,18 @@ PopupMenu.prototype.getButtonData = function(item) {
 		'name': item['name']
 	};
 };
-PopupMenu.prototype.getTemplateMain = function($,_) {
+PopupMenu.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'c':{'h':function(button,idx){return[{'c':[button['name'],{'tmp':$.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'app-popup-menu-button','_value':button['value'],'_index':idx}}]},'p':$.g('buttons'),'f':'buttons'},'t':0,'e':[0,$.onClick],'p':{'c':'app-popup-menu-inner-container','st':(_['maxHeight']?' max-height:'+_['maxHeight']+' px;':'')}},'t':0,'p':{'c':'app-popup-menu-outer-container '+_['className'],'sc':1}}]
 };
-PopupMenu.prototype.getTemplateContent = function($,_) {
+PopupMenu.prototype.getTemplateContent = function(_,$) {
 	return null
 };
 function Submit() {};
 Submit.prototype.onSubmit = function() {
 	this.dispatchEvent('submit');
 };
-Submit.prototype.getTemplateMain = function($,_) {
-	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,$.onSubmit],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
+Submit.prototype.getTemplateMain = function(_,$) {
+	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,'submit'],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
 };
 function TabPanel() {};
 TabPanel.prototype.initiate = function() {
@@ -3725,7 +3710,7 @@ TabPanel.prototype.getScopeElement = function() {
 TabPanel.prototype.getTabParamsByIndex = function(tabIndex) {
 	return this.args['tabs'][tabIndex];
 };
-TabPanel.prototype.getTemplateMain = function($,_) {
+TabPanel.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'app-tab app-content-tab','_index':idx}}]},'p':_['tabs']},{'c':!!isObject(_['rest'])?[{'c':[_['rest']['title']||__[51],{'c':!!_['rest']['showCount']?[' (',{'pr':'count','p':$.g('count')},')']:'','i':true}],'t':0,'p':{'c':function(){return 'app-tab app-tab-rest'+($.g('count')?' shown':'')}},'n':{'c':'count'}}]:'','i':true}],'t':0,'p':{'c':'app-tab-panel','sc':1}}]
 };
 TabPanel.prototype.getInitials = function() {
@@ -3734,7 +3719,7 @@ TabPanel.prototype.getInitials = function() {
 	};
 };
 function Tooltip() {};
-Tooltip.prototype.getTemplateMain = function($,_) {
+Tooltip.prototype.getTemplateMain = function(_,$) {
 	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
 };
 Tooltip.prototype.getInitials = function() {
@@ -3760,7 +3745,7 @@ TooltipPopup.prototype.correctAndSetText = function(text, changedProps) {
 	}
 	return text;
 };
-TooltipPopup.prototype.getTemplateMain = function($,_) {
+TooltipPopup.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-tooltip-popup-caption'}},{'c':{'c':function(){return[[{'h':function(item){return[{'c':item,'t':0,'p':{'c':'app-tooltip-list-item'}}]},'p':$.g('text'),'f':'text'}]]},'sw':$.g('corrector'),'s':['list'],'d':[{'pr':'text','p':$.g('text')}],'p':'corrector'},'t':0,'p':{'c':'app-tooltip-popup-text'}}],'t':0,'p':{'c':function(){return 'app-tooltip-popup '+$.g('className')+($.g('shown')?' shown':'')},'st':function(){return 'left:'+$.g('left')+'px;top:'+$.g('top')+'px;'},'sc':1},'n':{'c':['className','shown'],'st':['left','top']}}]
 };
 TooltipPopup.prototype.getInitials = function() {
@@ -3793,7 +3778,7 @@ FilterSubscription.prototype.onSubscribeButtonClick = function(e, target) {
 		});
 	}
 };
-FilterSubscription.prototype.getTemplateMain = function($,_) {
+FilterSubscription.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[__[85],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[90],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[91],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[92],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[5],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[23]+' subscribed':__[25])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
 };
 FilterSubscription.prototype.getInitials = function() {
@@ -3812,7 +3797,7 @@ FilterSubscriptionOptions.prototype.onCheckboxChange = function(e) {
 	params[e['name']] = e['intChecked'];
 	Subscription.doAction('save', params);
 };
-FilterSubscriptionOptions.prototype.getTemplateMain = function($,_) {
+FilterSubscriptionOptions.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'tenderOfFavorite','checked':$.g('opt1')}},' ',__[81],' ',{'c':__[82],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFavorite','checked':$.g('opt2')}},' ',__[81],' ',{'c':__[83],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFilter','checked':$.g('opt3')}},' ',__[81],' ',{'c':__[84],'t':20}],'t':0,'p':{'c':'app-subscription-option'}}],'t':0,'p':{'c':'app-subscription-options','sc':1}}]
 };
 FilterSubscriptionOptions.prototype.getInitials = function() {
@@ -3833,7 +3818,7 @@ UserInfo.prototype.onLoaded = function(data) {
 UserInfo.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);	
 };
-UserInfo.prototype.getTemplateMain = function($,_) {
+UserInfo.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'c':[__[53],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[54],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[55],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[56],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'bold'}}],'t':5},{'c':[{'c':[__[57],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[58],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?' red':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[62],'tr':'_blank','c':'access standart-button red-button'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[60],'t':12,'p':{'h':__[59],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[61],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[65],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[66],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[3],{'c':__[67],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[68],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button green-button'}}]
 };
 UserInfo.prototype.getInitials = function() {
@@ -3841,19 +3826,13 @@ UserInfo.prototype.getInitials = function() {
 		'loader':{'controller': UserInfoLoader,'async': true }
 	};
 };
-function Favorites() {
-	Initialization.initiate.call(this);
-	this.processInitials();
-};
+function Favorites() {};
 Favorites.prototype.getInitials = function() {
 	return {
 		'actions':{'load': {'url': CONFIG.favorites.get},'add': {'url': CONFIG.favorites.add},'remove': {'url': CONFIG.favorites.remove}}
 	};
 };
-function Filters() {
-	Initialization.initiate.call(this);
-	this.processInitials();
-};
+function Filters() {};
 Filters.prototype.onLoadFilters = function(data) {};
 Filters.prototype.onLoad = function(data) {};
 Filters.prototype.onAdd = function(data) {};
@@ -3866,29 +3845,20 @@ Filters.prototype.getInitials = function() {
 		'actions':{'load': {'url' : CONFIG.filters.load,'method' : 'GET','callback': this.onLoad},'save': {'url' : CONFIG.filters.save,'method' : 'POST','callback': this.onAdd},'set': {'url' : CONFIG.filters.set,'method': 'POST'},'subscribe': {'url' : CONFIG.filters.subscribe,'method': 'POST','callback': this.onSubscribe}}
 	};
 };
-function FiltersStat() {
-	Initialization.initiate.call(this);
-	this.processInitials();
-};
+function FiltersStat() {};
 FiltersStat.prototype.getInitials = function() {
 	return {
 		'options':{'key': 'filterId','store': true,'storeAs': 'filterStat_$filterId','storePeriod': '4hour'},
 		'actions':{'load': {'url': CONFIG.filterStat.load,'method': 'GET'}}
 	};
 };
-function Subscription() {
-	Initialization.initiate.call(this);
-	this.processInitials();
-};
+function Subscription() {};
 Subscription.prototype.getInitials = function() {
 	return {
 		'actions':{'load': {'url': CONFIG.settings.subscr,'method': 'GET'},'save': {'url': CONFIG.settings.set,'method': 'GET'}}
 	};
 };
-function UserInfoLoader() {
-	Initialization.initiate.call(this);
-	this.processInitials();
-};
+function UserInfoLoader() {};
 UserInfoLoader.prototype.getInitials = function() {
 	return {
 		'actions':{'load': {'url' : CONFIG.user.get,'method' : 'GET'}}
@@ -3898,7 +3868,7 @@ function CalendarFavorites() {};
 CalendarFavorites.prototype.getArgs2 = function(data) {
 	return data;
 };
-CalendarFavorites.prototype.getTemplateContent = function($,_) {
+CalendarFavorites.prototype.getTemplateContent = function(_,$) {
 	return[{'c':{'h':function(tender){return[{'cmp':DataTableStandartRow,'p':{'aa':{'nocontrols':'1'},'a':tender}}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'simple-datatable calendar-favorites-datatable'}}]
 };
 CalendarFavorites.prototype.getInitials = function() {
@@ -3930,7 +3900,7 @@ OrderCall.prototype.onShow = function() {
 OrderCall.prototype.onHide = function() {
 	clearInterval(this.interval);
 };
-OrderCall.prototype.getTemplateContent = function($,_) {
+OrderCall.prototype.getTemplateContent = function(_,$) {
 	return[{'cmp':OrderCallForm},{'c':__[19],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'standart-button order-support'}}]
 };
 OrderCall.prototype.getInitials = function() {
@@ -3943,7 +3913,7 @@ Support.prototype.onOrderCallButtonClick = function() {
 	this.hide();
 	Dialoger.show(OrderCall);
 };
-Support.prototype.getTemplateContent = function($,_) {
+Support.prototype.getTemplateContent = function(_,$) {
 	return[{'cmp':SupportForm},{'c':__[21],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button order-support'}}]
 };
 Support.prototype.getInitials = function() {
@@ -3953,14 +3923,14 @@ Support.prototype.getInitials = function() {
 };
 function AuthForm() {};
 AuthForm.prototype.onSuccess = function() {
-	window.location.reload();
+	Router.reload();
 };
-AuthForm.prototype.getTemplateContent = function($,_) {
+AuthForm.prototype.getTemplateContent = function(_,$) {
 	return[{'c':__T[4],'t':0,'p':{'c':'app-authform-logo'}}]
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': 'user/login.php','method': 'POST','ajax': true,'container': 'app-authform-inputs','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'app-submit'}}
+		'args':{'action': 'user/login.php','ajax': true,'container': 'app-authform-inputs','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'app-submit'}}
 	};
 };
 function OrderCallForm() {};
@@ -4047,10 +4017,8 @@ SupportForm.prototype.getInitials = function() {
 	};
 };
 function KeywordsControl() {};
-KeywordsControl.prototype.onRendered = function() {
-	this.attachControl('nonmorph');
-};
-KeywordsControl.prototype.getTemplateMain = function($,_) {
+KeywordsControl.prototype.onRendered = function() {};
+KeywordsControl.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0],'className':'frameless'}}},'t':0,'p':{'c':'app-keywords-options'}}]
 };
 function Input() {};
@@ -4058,7 +4026,7 @@ Input.prototype.onChange = function() {};
 Input.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
-Input.prototype.getTemplateMain = function($,_) {
+Input.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'t':14,'e':[18,$.onChange],'p':{'tp':function(){return $.g('type')},'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'v':function(){return $.g('value')},'readonly':function(){return ($.g('enabled')?' readonly':'')},'accept':function(){return $.g('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
 function Select() {};
@@ -4123,7 +4091,7 @@ Select.prototype.onClick = function() {
 Select.prototype.hide = function() {
 	this.set('active',false);
 };
-Select.prototype.getTemplateMain = function($,_) {
+Select.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':{'0':'className','2':'active'}}}]
 };
 function Textarea() {};
@@ -4131,20 +4099,20 @@ Textarea.prototype.onChange = function() {};
 Textarea.prototype.getControlValue = function() {
 	return this.findElement('textarea').value;
 };
-Textarea.prototype.getTemplateMain = function($,_) {
+Textarea.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':{'pr':'value','p':$.g('value')},'t':49,'e':[18,$.onChange],'p':{'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'readonly':function(){return ($.g('enabled')?' readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
 };
 function TopMenu() {
 	Router.addMenu(this);
 	this.isRouteMenu = true;
 };
-TopMenu.prototype.getTemplateMain = function($,_) {
+TopMenu.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[5],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[6],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[7],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[8],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[9],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
 };
-function includeGeneralTemplateUnavailable($,_) {
+function includeGeneralTemplateUnavailable(_) {
 	return[{'t':0,'p':{'c':'app-unavailable-info '+(_['tariff']?' unavailable':' auth'),'st':(_['width']?' width:'+_['width']:'')}}]
 }
-function includeGeneralTemplateCheckbox($,_) {
+function includeGeneralTemplateCheckbox(_) {
 	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['checked']?' checked':''),'_name':_['name'],'_value':_['value']}}]
 }
 Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,TenderSearchForm,SearchFormFilters,Calendar,Dialog,Form,FormField,PopupMenu,Submit,TabPanel,Tooltip,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea,TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
@@ -4155,5 +4123,6 @@ Filters = new Filters();
 FiltersStat = new FiltersStat();
 Subscription = new Subscription();
 UserInfoLoader = new UserInfoLoader();
+Initialization.initiateControllers([Favorites,Filters,FiltersStat,Subscription,UserInfoLoader]);
 User.load(App);
 })();

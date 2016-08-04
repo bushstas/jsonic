@@ -93,6 +93,7 @@ function Level() {
 				eventType = __EVENTTYPES[props['e'][i]] || eventType;
 				callback = props['e'][i + 1];
 				var isOnce = props['e'][i + 2] === true;
+				if (isString(callback)) callback = component.dispatchEvent.bind(component, callback);
 				if (isString(eventType) && isFunction(callback)) {					
 					if (isOnce) {
 						eventHandler.listenOnce(element, eventType, callback.bind(component));
@@ -228,7 +229,7 @@ function Level() {
 	var includeTemplate = function(item) {
 		if (isString(item['tmp'])) item['tmp'] = component.getTemplateByKey(item['tmp']);
 		if (isFunction(item['tmp'])) {		
-			var items = item['tmp'].call(component, component, item['p']);
+			var items = item['tmp'].call(component, item['p'], component);
 			if (isArray(items)) {
 				for (var i = 0; i < items.length; i++) renderItem(items[i]);
 			}
@@ -252,8 +253,7 @@ function Level() {
 							waiting[i][0].set(waiting[i][1], cmp);
 						}
 					}
-				}
-				
+				}				
 			}
 			if (isArray(item['w'])) {
 				for (i = 0; i < item['w'].length; i += 2) {
@@ -271,6 +271,7 @@ function Level() {
 					i++;	
 				}
 			}
+			if (item['nm']) component.registerControl(cmp, item['nm']);
 		} else if (item && isObject(item)) {
 			if (!item.isRendered()) item.render(pe);
 			registerChild(item, true);
@@ -315,9 +316,22 @@ function Level() {
 	};
 
 	var disposeDom = function() {
-		var elementsToDispose = this.getElements();
+		var elementsToDispose = getElements();
 		for (var i = 0; i < elementsToDispose.length; i++) parentElement.removeChild(elementsToDispose[i]);
 		elementsToDispose = null;
+	};
+
+	var getElements = function() {
+		var elements = [];
+		if (firstNodeChild && lastNodeChild) {
+			var isAdding = false;
+			for (var i = 0; i < parentElement.childNodes.length; i++) {
+				if (parentElement.childNodes[i] == firstNodeChild) isAdding = true;
+				if (isAdding) elements.push(parentElement.childNodes[i]);
+				if (parentElement.childNodes[i] == lastNodeChild) break;
+			}
+		}
+		return elements;
 	};
 
 	this.render = function(items, pe, pl, nsc) {
@@ -356,7 +370,7 @@ function Level() {
 		var isDetached = !isAppended;
 		if (isDetached === this.detached) return;
 		this.detached = isDetached;
-		var elements = this.getElements();
+		var elements = getElements();
 		if (isDetached) {
 			realParentElement = parentElement;
 			parentElement = document.createElement('div'); 
@@ -367,19 +381,6 @@ function Level() {
 			realParentElement = null;
 			for (var i = 0; i < elements.length; i++) appendChild(elements[i]);
 		}
-	};
-
-	this.getElements = function() {
-		var elements = [];
-		if (firstNodeChild && lastNodeChild) {
-			var isAdding = false;
-			for (var i = 0; i < parentElement.childNodes.length; i++) {
-				if (parentElement.childNodes[i] == firstNodeChild) isAdding = true;
-				if (isAdding) elements.push(parentElement.childNodes[i]);
-				if (parentElement.childNodes[i] == lastNodeChild) break;
-			}
-		}
-		return elements;
 	};
 
 	this.dispose = function() {

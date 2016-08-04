@@ -14,7 +14,7 @@ function onRendered() {
 
 
 function openInformer() {
-	var datatable = this.getChildById('datatable');
+	var datatable = this.getChild('datatable');
 }
 
 function openFilter(filterId) {

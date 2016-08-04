@@ -1,64 +1,6 @@
-function Component() {
-	var processInitials = function() {
-		var initials = this.initials;
-		if (isObject(initials)) {
-			for (var k in initials) {
-				if (isArrayLike(initials[k])) {
-					if (k == 'correctors') {
-						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
-					} else if (k == 'globals') {
-						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
-					} else if (k == 'followers') {
-						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
-					} else if (k == 'controllers') {
-						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
-					} else if (k == 'props') {
-						Objects.merge(this.props, initials[k]);
-					} else if (k == 'options') {
-						this.initOptions(initials[k]);
-					}
-				}
-			}
-		}
-	};
-
-	var attachController = function(options) {
-		if (isObject(options['on'])) {
-			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
-		}
-	};
-
-	var addCorrector = function(name, handler) {
-		if (isFunction(handler)) {
-			this.correctors = this.correctors || {};
-			this.correctors[name] = handler;
-		}
-	};
-
-	var addFollower = function(name, handler) {
-		if (isFunction(handler)) {
-			this.followers = this.followers || {};
-			this.followers[name] = handler;
-		}
-	};
-
-	var subscribeToHelper = function(options) {
-		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
-	};
-
-	var getInitial = function(initialName) {
-		return Objects.get(this.initials, initialName);
-	};
-
-	var processPostRenderInitials = function() {
-		var helpers = getInitial.call(this, 'helpers');
-		if (isArray(helpers)) {
-			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
-		}
-	};
-
+function Component() {	
 	var load = function() {
-		var loader = getInitial.call(this, 'loader');
+		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
 			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
@@ -91,14 +33,14 @@ function Component() {
 				this.parentElement.removeChild(this.tempPlaceholder);
 				this.tempPlaceholder = null;
 			}
-			processPostRenderInitials.call(this);
+			Initialization.processPostRenderInitials.call(this);
 		}
 	};
 
 	var doRendering = function() {
 		this.level = new Level();
-		var args = getCombinedArgs.call(this);
-		var content = this.getTemplateMain(this, args);
+		this.args = getCombinedArgs.call(this);
+		var content = this.getTemplateMain(this.args, this);
 		if (isArray(content)) {
 			this.level.setComponent(this);
 			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
@@ -110,7 +52,8 @@ function Component() {
 				if (isFunction(this.callbacks[i])) this.callbacks[i]();
 			}
 		}
-		this.callbacks = this.waiting = this.args = args = null;
+		delete this.callbacks;
+		delete this.waiting;
 	};
 
 	var getCombinedArgs = function() {
@@ -193,7 +136,6 @@ function Component() {
 
 	Component.prototype.render = function(parentElement) {
 		this.parentElement = parentElement;
-		processInitials.call(this);
 		load.call(this);
 	};
 
@@ -211,7 +153,7 @@ function Component() {
 	};
 
 	Component.prototype.provideWithComponent = function(propName, componentName, waitingChild) {
-		var cmp = this.getChildById(componentName);
+		var cmp = this.getChild(componentName);
 		if (cmp) waitingChild.set(propName, cmp);
 		else {
 			this.waiting = this.waiting || {};
@@ -257,6 +199,7 @@ function Component() {
 	};
 
 	Component.prototype.set = function(propName, propValue) {
+		this.props = this.props || {};
 		var props;
 		if (!isUndefined(propValue)) {
 			props = {};
@@ -330,6 +273,46 @@ function Component() {
 		this.children = this.children || {};
 		this.children[child.getId() || this.childrenCount] = child;
 		this.childrenCount++;
+	};
+
+	Component.prototype.registerControl = function(control, name) {
+	 	this.controls = this.controls || {};
+	 	this.controls[name] = control;
+	};
+
+	Component.prototype.getControl = function(name) {
+		return Objects.get(this.controls, name);
+	};
+
+	Component.prototype.getCotrolAt = function(index) {
+		return Objects.getByIndex(this.controls, index);
+	};
+
+	Component.prototype.setControlValue = function(name, value) {
+		var control = this.getControl(name);
+		if (control) control.setValue(value);
+	};
+
+	Component.prototype.enableControl = function(name, isEnabled) {
+		var control = this.getControl(name);
+		if (control) control.setEnabled(isEnabled);
+	};
+
+	Component.prototype.forEachControl = function(callback) {
+		if (isObject(this.controls)) Objects.each(this.controls, callback, this);
+	};
+
+	Component.prototype.getControlsData = function() {
+		var objs = [{}];
+		this.forEachControl(function(control, k) {
+			objs[0][k] = control.getValue();
+		});
+		this.forEachChild(function(child) {
+			if (!isControl(child)) {
+				objs.push(child.getControlsData());
+			}
+		});
+		return Objects.merge.apply(null, objs);
 	};
 
 	Component.prototype.setParent = function(parentalComponent) {
@@ -498,6 +481,7 @@ function Component() {
 		this.initials = null;
 		this.followers = null;
 		this.correctors = null;
+		this.controls = null;
 		this.parentalComponent = null;
 	};
 	

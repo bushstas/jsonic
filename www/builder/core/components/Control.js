@@ -39,40 +39,44 @@ function Control() {
 		}
 		return this.getProperValue(value);
 	};
-	var getControlValue = function() {
-		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
-	};
 	var dispatchChange = function() {
 		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
 	};
 	var onChangeChildControl = function(e) {
 		dispatchChange.call(this);
 	};
+
+	Control.prototype.getControlValue = function() {
+		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+	};
+
 	Control.prototype.getInitials = function() {
 		return {'enabled': true};
 	};
-	Control.prototype.attachControl = function(control) {
-		if (isString(control)) control = this.getChildById(control);
-		if (isControl(control)) {
-			this.controls = this.controls || {};
-			this.controls[control.getId()] = control;
-			this.addListener(control, 'change', onChangeChildControl.call(this));
-		}
+
+	Control.prototype.registerControl = function(control, name) {
+	 	this.controls = this.controls || {};
+	 	this.controls[name] = control;
+	 	this.addListener(control, 'change', onChangeChildControl.call(this));
 	};
+
 	Control.prototype.getName = function() {
 		return this.props.name;
 	};
+
 	Control.prototype.getValue = function() {
 		var value;
 		if (this.hasControls()) {
 			value = {};
 			for (var k in this.controls) value[k] = this.controls[k].getValue();
-		} else value = getCorrectedValue.call(this, getControlValue.call(this));
+		} else value = getCorrectedValue.call(this, this.getControlValue());
 		return value;
 	};
+
 	Control.prototype.getProperValue = function(value) {
 		return value;
 	};
+
 	Control.prototype.setValue = function(value) {
 		if (this.hasControls() && isObject(value)) {
 			for (var k in value) {
@@ -83,18 +87,23 @@ function Control() {
 			this.setProperValue(value);
 		}
 	};
+
 	Control.prototype.setProperValue = function(value) {
 		this.set('value', value);
 	};
+
 	Control.prototype.hasControls = function() {
 		return !Objects.empty(this.controls);
-	}
+	};
+
 	Control.prototype.isEnabled = function() {
 		return !!this.get('enabled');
 	};
+
 	Control.prototype.setEnabled = function(isEnabled) {
 		this.set('enabled', isEnabled);
 	};
+	
 	Control.prototype.disposeInternal = function() {
 		this.controls = null;
 		this.options = null;

@@ -17,6 +17,7 @@ function Dialoger() {
 	var defineDialog = function() {
 		if (isUndefined(dialogs[currentDialogId])) {
 			dialogs[currentDialogId] = new currentDialogClass();
+			Initialization.initiate.call(dialogs[currentDialogId]);
 			dialogs[currentDialogId].render(document.body);
 		}
 		currentDialog = dialogs[currentDialogId];

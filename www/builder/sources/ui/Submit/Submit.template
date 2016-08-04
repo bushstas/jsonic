@@ -1,5 +1,5 @@
 <div class="app-submit-container">
-	<div class="{$class}" onClick="onSubmit">
+	<div class="{$class}" onClick="!submit">
 		{$value}
 	</div>
 </div>

@@ -766,6 +766,7 @@
 			foreach ($controllers as $controller) {
 				$compiledJs[] = $controller." = new ".$controller."();";
 			}
+			$compiledJs[] = 'Initialization.initiateControllers(['.implode(',', array_keys($classes['controller'])).']);';
 		}
 		$compiledJs[] = "User.load(".$config['entry'].");";
 		$compiledJs[] = "})();";
