@@ -1,8 +1,1 @@
-<div class="app-input-container {$class}" scope="1">
-	{if $caption}
-		<div class="app-input-caption">
-			{$caption}
-		</div>
-	{/if}
-	<input type="{$type}" name="{$name}" placeholder="{$placeholder}" value="{$value}" onInput="onChange" readonly="{$enabled?'readonly'}" accept="{$accept}"/>
-</div>
+<input type="{$type}" name="{$name}" placeholder="{$placeholder}" value="{$value}" onInput="onChange" readonly="{$enabled?'readonly'}" accept="{$accept}"/>

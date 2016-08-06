@@ -4,21 +4,21 @@ function onRendered() {
 	var value = $value;
 	var selected;
 	if (!isUndefined(value)) {
-		selected = this.selectByValue(value);
+		selected = this.selectByValue(value, true);
 	}
 	if (!selected) {
 		this.selectByIndex(0);
 	}
 }
 
-function selectByValue(value) {
-	if ($value == value) return;
+function selectByValue(value, forced) {
+	if (!forced && $value == value) return;
 	var options = $options;
 	if (isArray(options)) {
 		for (var i = 0; i < options.length; i++) {
 			if (options[i]['value'] == value) {
 				this.selectedIndex = i;
-				$value = value,
+				if (!forced) $value = value;
 				$title = options[i]['title'];
 				return true;
 			}
@@ -64,7 +64,7 @@ function getControlValue() {
 }
 
 function onClick() {
-	$active = true;
+	this.toggle('active');
 	Popuper.watch(this, this.findElement('.->> app-select'));
 }
 

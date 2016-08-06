@@ -1,7 +1,7 @@
 ;(function() {
 var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442','\u00A0','Delete',' \u00A0 ','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
-var __ = ['\u0420\u0435\u0433\u0438\u043e\u043d\u044b','\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438','\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u0438 \u0440\u0435\u0433\u0438\u043e\u043d\u044b','\u044c','\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u043a\u043b\u044e\u0447\u0435\u0432\u044b\u043c \u0441\u043b\u043e\u0432\u0430\u043c','\u0441 \u0443\u0447\u0435\u0442\u043e\u043c \u043c\u043e\u0440\u0444\u043e\u043b\u043e\u0433\u0438\u0438','\u043f\u043e \u0442\u043e\u0447\u043d\u043e\u043c\u0443 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u044e','\u0422\u0435\u043d\u0434\u0435\u0440\u044b \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0430\u044e\u0442\u0441\u044f','dd month yyyy','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','standart-button','standart-button green-button','standart-button red-button','standart-button white-button','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u0415\u0449\u0435','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u041e\u0431\u0449\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f','\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438','\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0417\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0417\u0430 \u0432\u0447\u0435\u0440\u0430','\u0422\u0435\u043a\u0443\u0449\u0438\u0445','\u0417\u0430 \u043d\u0435\u0434\u0435\u043b\u044e','\u0417\u0430 \u043c\u0435\u0441\u044f\u0446','\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u044f\u0442\u044c \u043c\u0435\u043d\u044f \u043e \u043f\u043e\u044f\u0432\u043b\u0435\u043d\u0438\u0438','\u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043d\u043e\u0432\u044b\u0445 \u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u043e\u0432 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u043d\u043e\u0432\u044b\u0445 \u0442\u0435\u043d\u0434\u0435\u0440\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u043a\u0430\u0436\u0434\u044b\u0435 2 \u0447\u0430\u0441\u0430','\u043a\u0430\u0436\u0434\u044b\u0439 \u0434\u0435\u043d\u044c','\u0447\u0435\u0440\u0435\u0437 \u0434\u0435\u043d\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041f\u0435\u0440\u0438\u043e\u0434\u0438\u0447\u043d\u043e\u0441\u0442\u044c \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443'];
-var __V = [[{'value':'0','title':__[14]},{'value':'1','title':__[15]}],{'type':'text','name':'name','caption':__[31],'class':'half-width'},{'type':'text','name':'phone','caption':__[32],'class':'half-width'},{'type':'text','name':'email','caption':__[33],'class':'half-width'},{'key':'calendar','className':'float-right'},[{'title':__[87],'value':84},{'title':__[88],'value':7},{'title':__[89],'value':3}],{'scope':'app-mainpage-content','tabs':[{'title':__[70],'container':'app-mainpage-tab1-content','active':true},{'title':__[71],'container':'app-mainpage-tab2-content'},{'title':__[72],'container':'app-mainpage-tab3-content'}],'rest':{'showCount':true}},{'title':__[73],'extended':true,'className':'main-page-filter-stat'}];
+var __ = ['\u0420\u0435\u0433\u0438\u043e\u043d\u044b','\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438','\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u0438 \u0440\u0435\u0433\u0438\u043e\u043d\u044b','\u044c','\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u043a\u043b\u044e\u0447\u0435\u0432\u044b\u043c \u0441\u043b\u043e\u0432\u0430\u043c','\u0441 \u0443\u0447\u0435\u0442\u043e\u043c \u043c\u043e\u0440\u0444\u043e\u043b\u043e\u0433\u0438\u0438','\u043f\u043e \u0442\u043e\u0447\u043d\u043e\u043c\u0443 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u044e','\u0422\u0435\u043d\u0434\u0435\u0440\u044b \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0430\u044e\u0442\u0441\u044f','dd month yyyy','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','upf','upf upk','upf upx','upf une','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u0415\u0449\u0435','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u041e\u0431\u0449\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f','\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438','\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0417\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0417\u0430 \u0432\u0447\u0435\u0440\u0430','\u0422\u0435\u043a\u0443\u0449\u0438\u0445','\u0417\u0430 \u043d\u0435\u0434\u0435\u043b\u044e','\u0417\u0430 \u043c\u0435\u0441\u044f\u0446','\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u044f\u0442\u044c \u043c\u0435\u043d\u044f \u043e \u043f\u043e\u044f\u0432\u043b\u0435\u043d\u0438\u0438','\u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043d\u043e\u0432\u044b\u0445 \u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u043e\u0432 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u043d\u043e\u0432\u044b\u0445 \u0442\u0435\u043d\u0434\u0435\u0440\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u043a\u0430\u0436\u0434\u044b\u0435 2 \u0447\u0430\u0441\u0430','\u043a\u0430\u0436\u0434\u044b\u0439 \u0434\u0435\u043d\u044c','\u0447\u0435\u0440\u0435\u0437 \u0434\u0435\u043d\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041f\u0435\u0440\u0438\u043e\u0434\u0438\u0447\u043d\u043e\u0441\u0442\u044c \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443'];
+var __V = [[{'value':'0','title':__[14]},{'value':'1','title':__[15]}],{'caption':__[31],'class':'upl','controlClass':Input,'controlProps':{'type':'text','name':'name'}},{'caption':__[33],'class':'upl','controlClass':Input,'controlProps':{'type':'text','name':'email'}},{'caption':__[32],'class':'upl','controlClass':Input,'controlProps':{'type':'text','name':'phone'}},{'key':'calendar','className':'unb'},[{'title':__[87],'value':84},{'title':__[88],'value':7},{'title':__[89],'value':3}],{'scope':'udc','tabs':[{'title':__[70],'container':'ud7','active':true},{'title':__[71],'container':'udw'},{'title':__[72],'container':'udk'}],'rest':{'showCount':true}},{'title':__[73],'extended':true,'className':'ugs'}];
 var __DICTURL = 'dictionary/get.php';
 var __TAGS = ['div','span','table','tbody','thead','tr','td','th','ul','ol','li','p','a','form','input','img','video','audio','aside','article','b','big','blockquote','button','canvas','caption','center','code','col','colgroup','footer','font','h1','h2','h3','h4','h5','h6','header','hr','i','iframe','label','menu','pre','s','section','select','strong','textarea','u','small'];
 var __A = {'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'};
@@ -12,7 +12,7 @@ var __ERRORROUTES = {'404':Error404,'401':Error401};
 var __HASHROUTER = true;
 var __INDEXROUTE = 'main';
 var __DEFAULTROUTE = null;
-var __VIEWCONTAINER = 'app-view-container';
+var __VIEWCONTAINER = 'up7';
 var __I = 'initiate';
 var __GI = 'getInitials';
 var __TC = TooltipPopup;
@@ -173,6 +173,7 @@ function Application() {
 }
 Application();
 function Component() {	
+	if (this !== window) return;
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
@@ -298,11 +299,18 @@ function Component() {
 	Component.prototype.initiate = function() {
 		this.propActivities = {};
 		this.propsToSet = {};
-		this.rendered = this.disposed = false;
+		this.rendered = this.disposed = this.disabled = false;
 	};
 	Component.prototype.render = function(parentElement) {
 		this.parentElement = parentElement;
 		load.call(this);
+	};
+	Component.prototype.disable = function(isDisabled) {
+		this.disabled = isDisabled;
+		this.addClass('upt', !isDisabled);
+	};
+	Component.prototype.isDisabled = function() {
+		return this.disabled;
 	};
 	Component.prototype.instanceOf = function(parent) {
 		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
@@ -327,8 +335,17 @@ function Component() {
 	Component.prototype.getWaitingChild = function(componentName) {
 		return Objects.get(this.waiting, componentName);
 	};
-	Component.prototype.get = function(propName) {
-		return this.propsToSet[propName] || this.props[propName];
+	Component.prototype.get = function(propName, keys) {
+		var prop = this.propsToSet[propName] || this.props[propName];
+		if (!keys || !isArrayLike(prop) || !isArray(keys)) return prop;
+		var end;
+		for (var i = 0; i < keys.length; i++) {
+			prop = prop[keys[i]];
+			if (isUndefined(prop)) return '';
+			end = keys.length == i + 1;
+			if (end || !isArrayLike(prop)) break;
+		}
+		return end ? prop || '' : '';
 	};
 	Component.prototype.showElement = function(element, isShown) {
 		if (isString(element)) element = this.findElement(element);
@@ -336,6 +353,9 @@ function Component() {
 	};
 	Component.prototype.setStyle = function(styles) {
 		if (this.isRendered()) this.getElement().setStyle(styles);
+	};
+	Component.prototype.setVisible = function(isVisible) {
+		if (this.isRendered() && !this.isDisposed()) this.getElement().show(isVisible);
 	};
 	Component.prototype.addClass = function(className, isAdding) {
 		if (this.isRendered()) {
@@ -412,7 +432,15 @@ function Component() {
 		if ((isString(childId) || isNumber(childId)) && isObject(this.children)) delete this.children[childId];	
 	 };
 	Component.prototype.forEachChild = function(callback) {
-		if (isObject(this.children)) Objects.each(this.children, callback, this);
+		if (isArrayLike(this.children)) {
+			var result;
+			for (var k in this.children) {
+				if (!this.children[k].isDisabled()) {
+					result = callback.call(this, this.children[k], k);
+					if (result) return result;
+				}
+			}
+		}
 	};
 	Component.prototype.registerChildComponent = function(child) {
 		this.childrenCount = this.childrenCount || 0;
@@ -422,13 +450,16 @@ function Component() {
 	};
 	Component.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
-	 	this.controls[name] = control;
+	 	if (!isUndefined(this.controls[name])) {
+	 		if (!isArray(this.controls[name])) this.controls[name] = [this.controls[name]];
+	 		this.controls[name].push(control);
+	 	} else this.controls[name] = control;
+	 	control.setName(name);
 	};
 	Component.prototype.getControl = function(name) {
-		return Objects.get(this.controls, name);
-	};
-	Component.prototype.getCotrolAt = function(index) {
-		return Objects.getByIndex(this.controls, index);
+		return Objects.get(this.controls, name) || this.forEachChild(function(child) {
+			return child.getControl(name);
+		});
 	};
 	Component.prototype.setControlValue = function(name, value) {
 		var control = this.getControl(name);
@@ -441,17 +472,16 @@ function Component() {
 	Component.prototype.forEachControl = function(callback) {
 		if (isObject(this.controls)) Objects.each(this.controls, callback, this);
 	};
-	Component.prototype.getControlsData = function() {
-		var objs = [{}];
-		this.forEachControl(function(control, k) {
-			objs[0][k] = control.getValue();
-		});
+	Component.prototype.hasControls = function() {
+		return !Objects.empty(this.controls);
+	};
+	Component.prototype.getControlsData = function(data) {
+		data = data || {};
 		this.forEachChild(function(child) {
-			if (!isControl(child)) {
-				objs.push(child.getControlsData());
-			}
+			if (!isControl(child)) child.getControlsData(data);
+			else data[child.getName()] = child.getValue();
 		});
-		return Objects.merge.apply(null, objs);
+		return data;
 	};
 	Component.prototype.setParent = function(parentalComponent) {
 		this.parentalComponent = parentalComponent;
@@ -655,6 +685,7 @@ Condition.prototype.dispose = function() {
 	this.nextSiblingChild = null;
 };
 function Control() {
+	if (this !== window) return;
 	var getCorrectedValue = function(value) {
 		var type = Objects.get(this.options, 'type');
 		switch (type) {
@@ -698,49 +729,49 @@ function Control() {
 	var onChangeChildControl = function(e) {
 		this.dispatchChange();
 	};
+	Control.prototype.onChange = function(e) {};
 	Control.prototype.dispatchChange = function() {
-		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
-	};
-	Control.prototype.getControlValue = function() {
-		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+		var event = {'value': this.getValue(), 'instance': this};
+		this.onChange(event);
+		this.dispatchEvent('change', event);
 	};
 	Control.prototype.getInitials = function() {
 		return {'enabled': true};
 	};
 	Control.prototype.registerControl = function(control, name) {
-	 	this.controls = this.controls || {};
-	 	this.controls[name] = control;
+		Component.prototype.registerControl.call(this, control, name);
 	 	this.addListener(control, 'change', onChangeChildControl.bind(this));
 	};
+	Control.prototype.setName = function(name) {
+		this.name = name;
+	};
 	Control.prototype.getName = function() {
-		return this.props.name;
+		return this.name;
 	};
 	Control.prototype.getValue = function() {
 		var value;
 		if (this.hasControls()) {
 			value = {};
-			for (var k in this.controls) value[k] = this.controls[k].getValue();
+			for (var k in this.controls) {
+				if (isArray(this.controls[k])) {
+					value[k] = [];
+					for (var i = 0; i < this.controls[k].length; i++) value[k].push(this.controls[k][i].getValue());
+				} else value[k] = this.controls[k].getValue();
+			}
 		} else value = getCorrectedValue.call(this, this.getControlValue());
 		return value;
+	};
+	Control.prototype.getControlValue = function() {
+		return this.get('value');
 	};
 	Control.prototype.getProperValue = function(value) {
 		return value;
 	};
 	Control.prototype.setValue = function(value) {
-		if (this.hasControls() && isObject(value)) {
-			for (var k in value) {
-				if (isControl(this.controls[k])) this.controls[k].setValue(this.controls[k].hasControls() ? value : value[k]);
-			}
-		} else {
-			this.value = value;
-			this.setProperValue(value);
-		}
+		this.setProperValue(value);
 	};
 	Control.prototype.setProperValue = function(value) {
 		this.set('value', value);
-	};
-	Control.prototype.hasControls = function() {
-		return !Objects.empty(this.controls);
 	};
 	Control.prototype.isEnabled = function() {
 		return !!this.get('enabled');
@@ -751,11 +782,11 @@ function Control() {
 	Control.prototype.disposeInternal = function() {
 		this.controls = null;
 		this.options = null;
-		this.value = null;
 	};
 }
 Control();
 function Controller() {	
+	if (this !== window) return;
 	var makeUrl = function(url, options) {
 		var regExp;
 		for (var k in options) {
@@ -766,29 +797,42 @@ function Controller() {
 		}
 		return url;
 	};
-	var gotFromStore = function(options) {
+	var gotFromStore = function(actionName, options) {
 		if (shouldStore.call(this)) {
 			var storeAs = getStoreAs.call(this, options);
 			if (isString(storeAs)) {
 				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 				if (isArrayLike(storedData)) {
-					onActionComplete.call(this, storedData, true);
+					onActionComplete.call(this, actionName, storedData, true);
 					return true;
 				}
 			}
 		}
 		return false;
 	};
-	var onActionComplete = function(data, isFromStorage) {
-		var actionName = this.action['name'];
+	var onActionComplete = function(actionName, data, isFromStorage) {
 		this.data = this.data || {};
 		this.data[actionName] = data;
-		if (isFunction(this.action['callback'])) {
-			this.action['callback'].call(this, data);
+		var action = getAction.call(this, actionName);
+		if (isObject(action) && isFunction(action['callback'])) {
+			action['callback'].call(this, data);
 		}
+		if (action['autoset']) autoset.call(this, action['autoset'], data);
 		this.dispatchEvent(actionName, data);
 		if (!isFromStorage && actionName == 'load' && shouldStore.call(this)) {
 			store.call(this, true, data);
+		}
+		this.activeRequests.removeItem(actionName);
+	};
+	var autoset = function(opts, data) {
+		var props = {};
+		if (isString(opts)) {
+			props[opts] = data; 
+		} else if (isObject(opts)) {
+			for (var k in opts) props[opts[k]] = data[k];
+		}
+		for (var i = 0; i < this.subscribers.length; i++) {
+			this.subscribers[i][2].set(props);
 		}
 	};
 	var shouldStore = function() {
@@ -861,18 +905,20 @@ function Controller() {
 		return null;
 	};
 	Controller.prototype.initiate = function() {
-		this.listeners = [];
+		this.subscribers = [];
+		this.requests = {};
+		this.activeRequests = [];
 	};
 	Controller.prototype.subscribe = function(eventType, callback, subscriber) {
-		this.listeners.push([eventType, callback, subscriber]);
+		this.subscribers.push([eventType, callback, subscriber]);
 	};
 	Controller.prototype.unsubscribe = function(subscriber, eventType) {
 		var done = false;
 		while (!done) {
 			done = true;
-			for (var i = 0; i < this.listeners.length; i++) {
-				if (this.listeners[i][2] == subscriber && (!eventType || this.listeners[i][0] == eventType)) {
-					this.listeners.splice(i, 1);
+			for (var i = 0; i < this.subscribers.length; i++) {
+				if (this.subscribers[i][2] == subscriber && (!eventType || this.subscribers[i][0] == eventType)) {
+					this.subscribers.splice(i, 1);
 					done = false;
 					break;
 				}
@@ -882,10 +928,10 @@ function Controller() {
 	Controller.prototype.dispatchEvent = function(eventType, data) {
 		var dataToDispatch = data;
 		if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
-		if (isArray(this.listeners)) {
-			for (var i = 0; i < this.listeners.length; i++) {
-				if (this.listeners[i][0] == eventType && isFunction(this.listeners[i][1])) {
-					this.listeners[i][1].call(this.listeners[i][2] || null, dataToDispatch, this);
+		if (isArray(this.subscribers)) {
+			for (var i = 0; i < this.subscribers.length; i++) {
+				if (this.subscribers[i][0] == eventType && isFunction(this.subscribers[i][1])) {
+					this.subscribers[i][1].call(this.subscribers[i][2] || null, dataToDispatch, this);
 				}
 			}
 		}
@@ -911,9 +957,9 @@ function Controller() {
 		this.doAction('load', options);
 	};
 	Controller.prototype.doAction = function(actionName, options, url) {
+		if (this.activeRequests.indexOf(actionName) > -1) return;
 		var action = getAction.call(this, actionName);
-		this.action = action;	
-		if (actionName == 'load' && gotFromStore.call(this, options)) return;
+		if (actionName == 'load' && gotFromStore.call(this, actionName, options)) return;
 		if (!isObject(options)) options = {};
 		if (action && isObject(action) && action['options'] && isObject(action['options'])) {
 			Objects.merge(options, action['options']);
@@ -922,9 +968,12 @@ function Controller() {
 		url = url || makeUrl(action['url'], options);
 		if (!url || !isString(url)) {
 			log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
+		}		
+		if (!this.requests[actionName]) {
+			this.requests[actionName] = new AjaxRequest(url, onActionComplete.bind(this, actionName));
 		}
-		this.request = this.request || new AjaxRequest(url, onActionComplete.bind(this));
-		this.request.send(method, options, url);
+		this.requests[actionName].send(method, options, url);
+		this.activeRequests.push(actionName);		
 	};
 	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
 		if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
@@ -934,15 +983,14 @@ function Controller() {
 		}
 	};
 	Controller.prototype.dispose = function() {
-		this.listeners = null;
-		if (this.request) {
-			this.request.dispose();
-		}
+		this.subscribers = null;
+		for (var k in this.requests) this.requests[k].dispose();
 		this.options = null;
 		this.request = null;
 		this.data = null;
-		this.action = null;
 		this.initials = null;
+		this.activeRequests = null;
+		this.requests = null;
 	};
 }
 Controller();
@@ -1332,6 +1380,7 @@ function Level() {
 			var events = item['e'];
 			if (isArray(events)) {
 				for (i = 0; i < events.length; i++) {
+					if (isString(events[i + 1])) events[i + 1] = component.dispatchEvent.bind(component, events[i + 1]);
 					cmp.subscribe(events[i], events[i + 1], component);
 					i++;	
 				}
@@ -1503,7 +1552,7 @@ Menu.prototype.getButton = function(viewName) {
 	return this.findElement('a[role="' + viewName + '"]');
 };
 Menu.prototype.setButtonActive = function(button, isActive) {
-	var activeClassName = this.activeButtonClass || 'active';
+	var activeClassName = this.activeButtonClass || 'ua6';
 	button.toggleClass(activeClassName, isActive);
 	if (isActive) {
 		this.activeButton = button;
@@ -1583,8 +1632,8 @@ View.prototype.getControllersToLoad = function() {
 function CheckboxHandler() {
 	var subscribers = [];
 	var options = [];
-	var defaultCheckboxClass = 'app-ui-checkbox';
-	var defaultCheckboxCheckedClass = 'checked';
+	var defaultCheckboxClass = 'uai';
+	var defaultCheckboxCheckedClass = 'up6';
 	var currentOptions, currentObject, currentScope, checkbox, labelClass,
 		checkboxClass, targetClasses, currentCheckedClass, currentTarget;
 	this.subscribe = function(subscriber, opts) {
@@ -1723,98 +1772,6 @@ function ClickHandler() {
 	};
 }
 ClickHandler = new ClickHandler();
-function Dates() {
-	var date;
-	var months = ["\u042f\u043d\u0432\u0430\u0440\u044c","\u0424\u0435\u0432\u0440\u0430\u043b\u044c","\u041c\u0430\u0440\u0442","\u0410\u043f\u0440\u0435\u043b\u044c","\u041c\u0430\u0439","\u0418\u044e\u043d\u044c","\u0418\u044e\u043b\u044c","\u0410\u0432\u0433\u0443\u0441\u0442","\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c","\u041e\u043a\u0442\u044f\u0431\u0440\u044c","\u041d\u043e\u044f\u0431\u0440\u044c","\u0414\u0435\u043a\u0430\u0431\u0440\u044c"];
-	var months2 = ["\u044f\u043d\u0432\u0430\u0440\u044f","\u0444\u0435\u0432\u0440\u0430\u043b\u044f","\u043c\u0430\u0440\u0442\u0430","\u0430\u043f\u0440\u0435\u043b\u044f","\u043c\u0430\u044f","\u0438\u044e\u043d\u044f","\u0438\u044e\u043b\u044f","\u0430\u0432\u0433\u0443\u0441\u0442\u0430","\u0441\u0435\u043d\u0442\u044f\u0431\u0440\u044f","\u043e\u043a\u0442\u044f\u0431\u0440\u044f","\u043d\u043e\u044f\u0431\u0440\u044f","\u0434\u0435\u043a\u0430\u0431\u0440\u044f"];
-	this.getYear = function() {
-		return get().getFullYear();
-	};
-	this.getDay = function() {
-		return get().getDate();
-	};
-	this.getDate = function() {
-		var date = get();
-		return {day: date.getDate(), month: date.getMonth(), year: date.getFullYear()};
-	};
-	this.getMonth = function() {
-		return get().getMonth();
-	};
-	this.getMonthName = function() {
-		if (isNumber(arguments[0])) {
-			return months[arguments[0]];
-		}
-		return months[this.getMonth()];
-	};
-	this.getTimeStamp = function() {
-		return new Date().getTime();
-	};
-	this.getDays = function(month, year) {
-		return 33 - new Date(year, month, 33).getDate();
-	};
-	this.getWeekDay = function(day, month, year) {
-		return new Date(year, month, day).getDay();
-	};
-	this.getFormattedDate = function(stringDate, format) {
-		format = format.toLowerCase();
-		stringDate = stringDate.split(/[ \.-]+/);
-		var y, y2, ys, m2, d, d2;
-		var s0 = ~~stringDate[0], m = ~~stringDate[1], s2 = ~~stringDate[2];
-		if (s2) {
-			m2 = m < 10 ? '0' + m : m;
-			if (s2 > 100) {
-				y = s2;
-				d = s0;
-			} else {
-				d = s2;
-				y = s0;
-			}
-			d2 = d < 10 ? '0' + d : d;
-			ys = y + '';
-			y2 = ys.charAt(2) + ys.charAt(3);
-		} else {
-			return stringDate;
-		}
-		format = format.replace(/y{4}/, y);
-		format = format.replace(/y{2}/, y2);
-		format = format.replace(/month/, months2[m - 1]);
-		format = format.replace(/m{2}/, m2);
-		format = format.replace(/m{1}/, m);
-		format = format.replace(/d{2}/, d2);
-		format = format.replace(/d{1}/, d);
-		return format;
-	};
-	var get = function() {
-		return new Date();
-	};
-}
-Dates = new Dates();
-function Decliner() {
-	var words = __DW;
-	this.getCount = function(key, num) {
-		if (isArray(num)) num = num.length;
-		return num + ' ' + this.get(key, num);
-	};
-	this.get = function(key, num) {
-		if (isArray(num)) num = num.length;
-		if (!isNumber(num)) return '';
-		return Objects.get(Objects.get(words, key, '').split(','), getVariant(num), '');
-	};
-	var getVariant = function(num) {
-		var n, m;
-		num = num.toString();
-		m = num.charAt(num.length - 1); 		
-		if (num.length > 1) n = num.charAt(num.length - 2); 
-		else n = 0;
-		if (n == 1) return 2;
-		else { 
-			if (m == 1) return 0;
-			else if (m > 1 && m < 5) return 1;
-			else return 2;
-		}
-	};
-}
-Decliner = new Decliner();
 function Dialoger() {
 	var dialogs = {};
 	var currentDialogId, currentDialogClass, currentDialog,
@@ -1883,21 +1840,18 @@ Dictionary = new Dictionary();
 var __D = Dictionary;
 function Globals() {
 	var listeners = {};
+	var subscribers = {};
 	var components = {};
 	var views = {};
 	var globalVars = {};
 	this.addView = function(view, key) {
-		if (isUndefined(views[key])) {
-			views[key] = view;
-		}
+		if (isUndefined(views[key])) views[key] = view;
 	};
 	this.getView = function(key) {
 		return views[key];
 	};
 	this.addComponent = function(component, key) {
-		if (isUndefined(components[key])) {
-			components[key] = component;
-		}
+		if (isUndefined(components[key])) components[key] = component;
 	};
 	this.getComponent = function(key) {
 		return components[key];
@@ -1906,19 +1860,17 @@ function Globals() {
 		delete components[key];
 	};
 	this.subscribe = function(globalVarName, callback, subscriber) {
-		if (!isArray(listeners[globalVarName])) {
-			listeners[globalVarName] = [];
-		}
-		listeners[globalVarName].push([callback, subscriber]);
+		if (!isArray(subscribers[globalVarName])) subscribers[globalVarName] = [];
+		subscribers[globalVarName].push([callback, subscriber]);
 	};
 	this.unsubscribe = function(subscriber, globalVarName) {
-		if (isArray(listeners[globalVarName])) {
+		if (isArray(subscribers[globalVarName])) {
 			var done = false;
 			while (!done) {
 				done = true;
-				for (var i = 0; i < listeners[globalVarName].length; i++) {
-					if (listeners[globalVarName][i][1] == subscriber) {
-						listeners[globalVarName].splice(i, 1);
+				for (var i = 0; i < subscribers[globalVarName].length; i++) {
+					if (subscribers[globalVarName][i][1] == subscriber) {
+						subscribers[globalVarName].splice(i, 1);
 						done = false;
 						break;
 					}
@@ -1931,16 +1883,38 @@ function Globals() {
 	};
 	this.set = function(globalVarName, globalVarValue) {
 		globalVars[globalVarName] = globalVarValue;
-		if (isArray(listeners[globalVarName])) {
-			for (var i = 0; i < listeners[globalVarName].length; i++) {
-				if (isFunction(listeners[globalVarName][i][0])) {
-					listeners[globalVarName][i][0].call(listeners[globalVarName][i][1] || null, globalVarValue, globalVarName);
+		if (isArray(subscribers[globalVarName])) {
+			for (var i = 0; i < subscribers[globalVarName].length; i++) {
+				if (isFunction(subscribers[globalVarName][i][0])) {
+					subscribers[globalVarName][i][0].call(subscribers[globalVarName][i][1] || null, globalVarValue, globalVarName);
 				}
 			}
 		}
 	};
 	this.has = function(globalVarName, globalVarValue) {
 		return Objects.has(globalVars, globalVarName, globalVarValue);
+	};
+	this.listen = function(globalEventName, callback, listener) {
+		if (!isArray(listeners[globalEventName])) listeners[globalEventName] = [];
+		listeners[globalEventName].push([callback, listener]);
+	};
+	this.unlisten = function(globalEventName, listener) {
+		if (isArray(listeners[globalEventName])) {
+			var indexes = [];
+			for (var i = 0; i < listeners[globalEventName].length; i++) {
+				if (listeners[globalEventName][i][1] == listener) indexes.push(i);
+			}
+			listeners[globalEventName].removeIndexes(indexes);
+		}
+	};
+	this.dispatchEvent = function(globalEventName, params) {
+		if (isArray(listeners[globalEventName])) {
+			for (var i = 0; i < listeners[globalEventName].length; i++) {
+				if (isFunction(listeners[globalEventName][i][0])) {
+					listeners[globalEventName][i][0].call(listeners[globalEventName][i][1] || null, params);
+				}
+			}
+		}
 	};
 }
 Globals = new Globals();
@@ -2057,7 +2031,7 @@ function Tooltiper() {
 	var target, eventHandler, event;
 	var request, tooltipElement, timer;
 	var tooltip = __TC, tooltipApi = __TA;
-	var tooltipClass = 'tooltiped';
+	var tooltipClass = 'udx';
 	var addClass, text, position, key,
 		caption, delay, corrector;
 	var onBodyMouseOver = function(e) {
@@ -2095,6 +2069,7 @@ function Tooltiper() {
 	};
 	var createPopup = function() {
 		tooltip = new tooltip();
+		Initialization.initiate.call(tooltip);
 		tooltip.render(document.body);
 		tooltipElement = tooltip.getElement();
 	};
@@ -2217,6 +2192,23 @@ Array.prototype.getIntersections = function(arr) {
 };
 Array.prototype.hasIntersections = function(arr) {
 	return !isUndefined(this.getIntersections(arr)[0]);
+};
+Array.prototype.removeIndexes = function(indexes) {
+	var deleted = 0;
+	for (var i = 0; i < indexes.length; i++) {
+		this.splice(indexes[i] - deleted, 1);
+		deleted++;
+	}
+};
+Array.prototype.isEmpty = function() {
+	return this.length > 0;
+};
+Array.prototype.removeItems = function(items) {
+	for (var i = 0; i < items.length; i++) this.removeItem(items[i]);
+};
+Array.prototype.removeItem = function(item) {
+	var index = this.indexOf(item);
+	if (index > -1) this.splice(index, 1);
 };
 var StyleNameCache = {};
 Element.prototype.setClass = function(className) {
@@ -2959,6 +2951,98 @@ function User() {
 		};
 	};
 }
+function Dates() {
+	var date;
+	var months = ["\u042f\u043d\u0432\u0430\u0440\u044c","\u0424\u0435\u0432\u0440\u0430\u043b\u044c","\u041c\u0430\u0440\u0442","\u0410\u043f\u0440\u0435\u043b\u044c","\u041c\u0430\u0439","\u0418\u044e\u043d\u044c","\u0418\u044e\u043b\u044c","\u0410\u0432\u0433\u0443\u0441\u0442","\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c","\u041e\u043a\u0442\u044f\u0431\u0440\u044c","\u041d\u043e\u044f\u0431\u0440\u044c","\u0414\u0435\u043a\u0430\u0431\u0440\u044c"];
+	var months2 = ["\u044f\u043d\u0432\u0430\u0440\u044f","\u0444\u0435\u0432\u0440\u0430\u043b\u044f","\u043c\u0430\u0440\u0442\u0430","\u0430\u043f\u0440\u0435\u043b\u044f","\u043c\u0430\u044f","\u0438\u044e\u043d\u044f","\u0438\u044e\u043b\u044f","\u0430\u0432\u0433\u0443\u0441\u0442\u0430","\u0441\u0435\u043d\u0442\u044f\u0431\u0440\u044f","\u043e\u043a\u0442\u044f\u0431\u0440\u044f","\u043d\u043e\u044f\u0431\u0440\u044f","\u0434\u0435\u043a\u0430\u0431\u0440\u044f"];
+	this.getYear = function() {
+		return get().getFullYear();
+	};
+	this.getDay = function() {
+		return get().getDate();
+	};
+	this.getDate = function() {
+		var date = get();
+		return {day: date.getDate(), month: date.getMonth(), year: date.getFullYear()};
+	};
+	this.getMonth = function() {
+		return get().getMonth();
+	};
+	this.getMonthName = function() {
+		if (isNumber(arguments[0])) {
+			return months[arguments[0]];
+		}
+		return months[this.getMonth()];
+	};
+	this.getTimeStamp = function() {
+		return new Date().getTime();
+	};
+	this.getDays = function(month, year) {
+		return 33 - new Date(year, month, 33).getDate();
+	};
+	this.getWeekDay = function(day, month, year) {
+		return new Date(year, month, day).getDay();
+	};
+	this.getFormattedDate = function(stringDate, format) {
+		format = format.toLowerCase();
+		stringDate = stringDate.split(/[ \.-]+/);
+		var y, y2, ys, m2, d, d2;
+		var s0 = ~~stringDate[0], m = ~~stringDate[1], s2 = ~~stringDate[2];
+		if (s2) {
+			m2 = m < 10 ? '0' + m : m;
+			if (s2 > 100) {
+				y = s2;
+				d = s0;
+			} else {
+				d = s2;
+				y = s0;
+			}
+			d2 = d < 10 ? '0' + d : d;
+			ys = y + '';
+			y2 = ys.charAt(2) + ys.charAt(3);
+		} else {
+			return stringDate;
+		}
+		format = format.replace(/y{4}/, y);
+		format = format.replace(/y{2}/, y2);
+		format = format.replace(/month/, months2[m - 1]);
+		format = format.replace(/m{2}/, m2);
+		format = format.replace(/m{1}/, m);
+		format = format.replace(/d{2}/, d2);
+		format = format.replace(/d{1}/, d);
+		return format;
+	};
+	var get = function() {
+		return new Date();
+	};
+}
+Dates = new Dates();
+function Decliner() {
+	var words = __DW;
+	this.getCount = function(key, num) {
+		if (isArray(num)) num = num.length;
+		return num + ' ' + this.get(key, num);
+	};
+	this.get = function(key, num) {
+		if (isArray(num)) num = num.length;
+		if (!isNumber(num)) return '';
+		return Objects.get(Objects.get(words, key, '').split(','), getVariant(num), '');
+	};
+	var getVariant = function(num) {
+		var n, m;
+		num = num.toString();
+		m = num.charAt(num.length - 1); 		
+		if (num.length > 1) n = num.charAt(num.length - 2); 
+		else n = 0;
+		if (n == 1) return 2;
+		else { 
+			if (m == 1) return 0;
+			else if (m > 1 && m < 5) return 1;
+			else return 2;
+		}
+	};
+}
+Decliner = new Decliner();
 function Objects() {
 	this.each = function(obj, callback, thisObj) {
 		if (isArrayLike(obj)) {
@@ -3014,7 +3098,7 @@ function Objects() {
 		if (isArray(obj)) return obj[idx];
 		var count = 0;
 		for (var k in obj) {
-			if (count == idx) return idx[k];
+			if (count == idx) return obj[k];
 			count++;
 		}
 	};
@@ -3034,6 +3118,26 @@ function Objects() {
 	};
 	this.getKey = function(obj, value) {
 		for (var k in obj) if (obj[k] == value) return k;
+	};
+	this.flatten = function(obj, flattened, transformed) {
+		var top = isUndefined(transformed);
+		flattened = flattened || {};
+		transformed = transformed || [];
+		if (!isObject(obj)) return obj;
+		for (var k in obj) {
+			if (isObject(obj[k])) Objects.flatten(obj[k], flattened, transformed);
+			else {
+				if (!isUndefined(flattened[k])) {
+					if (transformed.indexOf(k) == -1 || !isArray(flattened[k])) {
+						flattened[k] = [flattened[k]];
+						transformed.push(k);
+					}					
+					flattened[k].push(obj[k])
+				} else flattened[k] = obj[k];
+			}
+		}
+		if (top) transformed = null;
+		return flattened;
 	};
 }
 Objects = new Objects();
@@ -3121,33 +3225,33 @@ App.prototype.onError = function(errorCode) {
 	this.getChild('menu').setAppended(false);
 };
 App.prototype.getTemplateMain = function(_,$) {
-	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]
+	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'p':{'c':'up7'}}]
 };
 function Analytics() {};
 Analytics.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'p':{'c':'view-content'}}]
+	return[{'t':0,'p':{'c':'uae'}}]
 };
 function Error401() {};
 Error401.prototype.onRendered = function() {};
 Error401.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'app-auth-form-container'}}]
+	return[{'c':{'cmp':AuthForm},'t':0,'p':{'c':'udp'}}]
 };
 function Error404() {};
 Error404.prototype.onRendered = function() {};
 Error404.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':'404','t':0,'p':{'c':'app-404-title'}},{'c':__T[0],'t':0,'p':{'c':'app-404-text'}}],'t':0,'p':{'c':'app-404-container'}}]
+	return[{'c':[{'c':'404','t':0,'p':{'c':'udo'}},{'c':__T[0],'t':0,'p':{'c':'udz'}}],'t':0,'p':{'c':'udn'}}]
 };
 function Favorite() {};
 Favorite.prototype.onRendered = function() {};
 Favorite.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'p':{'c':'view-content'}}]
+	return[{'t':0,'p':{'c':'uae'}}]
 };
 function Main() {};
 Main.prototype.onRendered = function() {
 	this.onResize();
 };
 Main.prototype.onResize = function() {
-	var element = this.findElement('.app-mainpage-content');
+	var element = this.findElement('.udc');
 	element.setHeight('');
 	var height = element.getHeight();
 	var bodyHeight = document.body.getHeight();
@@ -3157,7 +3261,7 @@ Main.prototype.onResize = function() {
 	}
 };
 Main.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[52],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[69],{'cmp':Tooltip,'p':{'a':__V[4]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'a':__V[6]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'a':__V[7]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
+	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[52],'t':0,'p':{'c':'udl'}},{'cmp':UserInfo},{'c':[__[69],{'cmp':Tooltip,'p':{'a':__V[4]}}],'t':0,'p':{'c':'uds upw'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'udy'}},'t':6,'p':{'c':'udd'}},{'c':[{'cmp':TabPanel,'p':{'a':__V[6]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'a':__V[7]}},'t':0,'p':{'c':'ud7'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'udw'}},{'t':0,'p':{'c':'udk'}}],'t':0,'p':{'c':'udc'}}],'t':6,'p':{'c':'ud9'}}],'t':5},'t':2,'p':{'c':'udh','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'uae ud3','sc':1}}]
 };
 Main.prototype.getInitials = function() {
 	return {
@@ -3179,7 +3283,7 @@ Search.prototype.onFormExpand = function() {
 	this.toggle('expanded');
 };
 Search.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'i':'form'}},{'cmp':TendersDataTable,'p':{'i':'datatable'}}],'t':0,'p':{'c':function(){return 'view-content'+($.g('expanded')?' form-expanded':'')},'sc':1},'n':{'c':'expanded'}}]
+	return[{'c':[{'cmp':SearchForm,'e':['expand',$.onFormExpand],'p':{'i':'form'}},{'cmp':TendersDataTable,'p':{'i':'datatable'}}],'t':0,'p':{'c':function(){return 'uae'+($.g('expanded')?' ua4':'')},'sc':1},'n':{'c':'expanded'}}]
 };
 Search.prototype.getInitials = function() {
 	return {
@@ -3191,20 +3295,20 @@ Search.prototype.getControllersToLoad = function() {
 };
 function DataTable() {};
 DataTable.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'app-datatable-outer-container'}}]
+	return[{'c':{'cmp':DataTableTabPanel},'t':0,'p':{'c':'ua5'}}]
 };
 function DataTableTabPanel() {};
 function DataTableFragmets() {};
 function DataTableRow() {};
 DataTableRow.prototype.getTemplateControls = function(_,$) {
-	return[{'t':0,'p':{'c':'app-datatable-color-mark datatable-control'}},{'c':{'tmp':includeGeneralTemplateCheckbox},'t':0,'p':{'c':'app-datatable-checkbox-container datatable-control'}},{'t':0,'p':{'c':'app-datatable-star datatable-control'}}]
+	return[{'t':0,'p':{'c':'uan uap'}},{'c':{'tmp':includeGeneralTemplateCheckbox},'t':0,'p':{'c':'uaz uap'}},{'t':0,'p':{'c':'uao uap'}}]
 };
 DataTableRow.prototype.getTemplateCount = function(_,$) {
-	return[{'c':_['count'],'t':1,'p':{'c':'app-datatable-standart-row-count'}}]
+	return[{'c':_['count'],'t':1,'p':{'c':'uar'}}]
 };
 function DataTableStandartRow() {};
 DataTableStandartRow.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[!_['nocontrols']?{'tmp':$.getTemplateControls}:'',{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'app-datatable-standart-row-top-item'}},{'c':!!_['multiregion']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}}]:_['regionName'],'i':true},{'c':!!_['multicategory']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'app-datatable-standart-row-top-item tooltiped','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}}]:_['subcategory'],'i':true},{'c':_['razm']==' N/A'?{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}}:_['razm'],'t':0,'p':{'c':'app-datatable-standart-row-top-item'}}],'t':0,'p':{'c':'app-datatable-standart-row-top'}},{'c':_['price'],'t':0,'p':{'c':'app-datatable-standart-row-price'}},{'c':[{'c':!!_['hot']?[{'tmp':$.getTemplateHotMark}]:'','i':true},_['name']],'t':0,'p':{'c':'app-datatable-standart-row-name'}},{'t':0,'p':{'c':'app-datatable-standart-row-bottom'}},{'c':!!_['fragments']?[{'cmp':DataTableFragmets,'p':{'p':{'data':_['fragments']}}}]:'','i':true}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'app-datatable-row','sc':1,'_id':_['Id']}}]
+	return[{'c':[!_['nocontrols']?{'tmp':$.getTemplateControls}:'',{'c':[{'c':getFzName(_['type']),'t':0,'p':{'c':'ua3'}},{'c':!!_['multiregion']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multiregion']}},_['regionName']],'t':0,'p':{'c':'ua3 udx','txt':_['regionnames'],'cap':__[0],'del':'1','cor':'list','pos':'left-top'}}]:{'c':_['regionName'],'t':0,'p':{'c':'ua3'}},'i':true},{'c':!!_['multicategory']?[{'c':[{'tmp':$.getTemplateCount,'p':{'count':_['multicategory']}},_['subcategory']],'t':0,'p':{'c':'ua3 udx','txt':_['subcategories'],'cap':__[1],'del':'1','cor':'list','pos':'left-top'}}]:{'c':_['subcategory'],'t':0,'p':{'c':'ua3'}},'i':true},{'c':_['razm']==' N/A'?{'tmp':includeGeneralTemplateUnavailable,'p':{'tariff':_['isUnavailable'],'width':'66px'}}:_['razm'],'t':0,'p':{'c':'ua3'}}],'t':0,'p':{'c':'uaq'}},{'c':_['price'],'t':0,'p':{'c':'uaj'}},{'c':[{'c':!!_['hot']?[{'tmp':$.getTemplateHotMark}]:'','i':true},_['name']],'t':0,'p':{'c':'uau'}},{'t':0,'p':{'c':'uah'}},{'c':!!_['fragments']?[{'cmp':DataTableFragmets,'p':{'p':{'data':_['fragments']}}}]:'','i':true}],'t':12,'p':{'h':'#tender/'+_['Id'],'tr':'_blank','c':'uab','sc':1,'_id':_['Id']}}]
 };
 function TendersDataTable() {};
 function FilterStatistics() {};
@@ -3221,7 +3325,7 @@ FilterStatistics.prototype.onFilterClick = function() {
 	alert('filter')
 };
 FilterStatistics.prototype.refresh = function() {
-	this.showElement('.app-filter-stat-refresh', false);
+	this.showElement('.uay', false);
 	this.currentFilterIndex = 0;
 	this.getCountForFilterWithIndex(0);	
 };
@@ -3229,7 +3333,7 @@ FilterStatistics.prototype.onLoaded = function(filters) {
 	this.set('filters', filters);
 };
 FilterStatistics.prototype.updateFilterCount = function(data) {
-	this.fill(this.findElement('.row' + data['filterId']), data['numbers']);
+	this.fill(this.findElement('.uge' + data['filterId']), data['numbers']);
 	this.currentFilterIndex++;
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 };
@@ -3238,17 +3342,17 @@ FilterStatistics.prototype.getCountForFilterWithIndex = function(index) {
 	if (isObject(filter)) {
 		FiltersStat.load({'filterId': filter['filterId']});
 	} else {
-		this.showElement('.app-filter-stat-refresh', true);
+		this.showElement('.uay', true);
 	}
 };
 FilterStatistics.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[_['title']?_['title']:'',{'c':__[74],'t':0,'p':{'c':'app-filter-stat-refresh'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[75],'t':7},{'c':__[76],'t':7},{'c':__[77],'t':7},{'c':__[78],'t':7},{'c':!!_['extended']?[{'c':__[79],'t':7},{'c':__[80],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
+	return[{'c':[{'c':[_['title']?_['title']:'',{'c':__[74],'t':0,'p':{'c':'uay'}}],'t':0,'p':{'c':'uad'}},{'c':{'c':[{'c':__[75],'t':7},{'c':__[76],'t':7},{'c':__[77],'t':7},{'c':__[78],'t':7},{'c':!!_['extended']?[{'c':__[79],'t':7},{'c':__[80],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'ual','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'ug5'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'uas uge'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'ua9'}}],'t':0,'p':{'c':'ug4 '+_['className'],'sc':1}}]
 };
 FilterStatistics.prototype.getInitials = function() {
 	return {
 		'loader':{'controller': Filters,'async': false},
 		'controllers':[{'controller': FiltersStat,'on': {'load': this.updateFilterCount}}],
-		'helpers':[{helper: ClickHandler,options: {'app-filter-stat-refresh': this.onRefreshButtonClick,'app-filter-stat-row-name': this.onFilterClick}}]
+		'helpers':[{helper: ClickHandler,options: {'uay': this.onRefreshButtonClick,'ug5': this.onFilterClick}}]
 	};
 };
 function SearchForm() {};
@@ -3256,7 +3360,7 @@ SearchForm.prototype.toggleExpand = function() {
 	this.dispatchEvent('expand');
 };
 SearchForm.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
+	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'uag'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'ua0'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'ua8'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'uac','sc':1}}]
 };
 SearchForm.prototype.getInitials = function() {
 	return {
@@ -3265,21 +3369,21 @@ SearchForm.prototype.getInitials = function() {
 };
 function SearchFormButton() {};
 SearchFormButton.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-search-form-button '+_['className']}}]
+	return[{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'uaw '+_['className']}}]
 };
 SearchFormButton.prototype.getTemplateContent = function(_,$) {
 	return null
 };
 function SearchFormPanel() {};
 SearchFormPanel.prototype.show = function() {
-	this.addClass('shown');
+	this.addClass('up5');
 	Popuper.watch(this);
 };
 SearchFormPanel.prototype.hide = function() {
-	this.addClass('shown', false);
+	this.addClass('up5', false);
 };
 SearchFormPanel.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'t':0,'e':[0,$.hide],'p':{'c':'app-search-form-panel-close'}},{'c':_['title'],'t':0,'p':{'c':'app-search-form-panel-title'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'app-search-form-panel '+_['className'],'sc':1}}]
+	return[{'c':[{'t':0,'e':[0,$.hide],'p':{'c':'up4'}},{'c':_['title'],'t':0,'p':{'c':'upe'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'uax '+_['className'],'sc':1}}]
 };
 SearchFormPanel.prototype.getTemplateContent = function(_,$) {
 	return null
@@ -3289,7 +3393,7 @@ SearchFormPanelButton.prototype.onClick = function() {
 	this.get('panel').show();
 };
 SearchFormPanelButton.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'tmp':$.getTemplateContent},'t':0,'e':[0,$.onClick],'p':{'c':'app-search-form-button '+_['className']}}]
+	return[{'c':{'tmp':$.getTemplateContent},'t':0,'e':[0,$.onClick],'p':{'c':'uaw '+_['className']}}]
 };
 function KeywordsButton() {};
 KeywordsButton.prototype.getTemplateContent = function(_,$) {
@@ -3297,29 +3401,43 @@ KeywordsButton.prototype.getTemplateContent = function(_,$) {
 };
 KeywordsButton.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'search-keywords'}
+		'args':{'className': 'uak'}
 	};
 };
 function KeywordsPanel() {};
+KeywordsPanel.prototype.aaa = function(e) {
+	console.log(e)
+};
 KeywordsPanel.prototype.getTemplateContent = function(_,$) {
-	return[{'cmp':KeywordsControl}]
+	return[{'cmp':KeywordsControl,'nm':'keywords'}]
 };
 KeywordsPanel.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'keywords-panel','title': __[13]}
+		'args':{'className': 'upb','title': __[13]}
 	};
 };
+function FiltersForm() {};
+FiltersForm.prototype.getProperData = function(data) {
+	return Objects.flatten(data);
+};
 function TenderSearchForm() {};
+TenderSearchForm.prototype.initiate = function() {
+	Globals.listen('TenderSearchFormChanged', this.onChange, this);
+};
 TenderSearchForm.prototype.onResetButtonClick = function(e) {
-	var button = e.target.getAncestor('.app-search-form-reset');
-	button.addClass('active');
+	var button = e.target.getAncestor('.uat');
+	button.addClass('ua6');
 	this.delay(function() {
-		button.removeClass('active');
+		button.removeClass('ua6');
 	}, 2500);
 };
 TenderSearchForm.prototype.onResetConfirmed = function() {};
+TenderSearchForm.prototype.onChange = function() {
+	var data = this.getProperData(this.getControlsData());
+	console.log(data)
+};
 TenderSearchForm.prototype.getTemplateMain = function(_,$) {
-	return[{'cmp':KeywordsPanel,'p':{'i':'keywordsPanel'}},{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'hover-label'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'confirm-reset-filter'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'confirm-label'}}],'t':0,'p':{'c':'app-search-form-reset'}},{'c':[{'cmp':SearchFormFilters},{'c':{'cmp':KeywordsButton,'w':['panel','keywordsPanel']},'t':0,'p':{'c':'app-tender-search-form-content'}}],'t':0,'p':{'c':'app-tender-search-form','sc':1}}]
+	return[{'cmp':KeywordsPanel,'p':{'i':'keywordsPanel'}},{'c':[{'c':__[10],'t':0,'e':[0,$.onResetButtonClick],'p':{'c':'uav'}},{'c':[__[11],' ',{'c':__[12],'t':40,'p':{'c':'uam'}}],'t':0,'e':[0,$.onResetConfirmed],'p':{'c':'uaf'}}],'t':0,'p':{'c':'uat'}},{'c':[{'cmp':SearchFormFilters},{'c':{'cmp':KeywordsButton,'w':['panel','keywordsPanel']},'t':0,'p':{'c':'ua7'}}],'t':0,'p':{'c':'ugb','sc':1}}]
 };
 function SearchFormCreateFilterMenu() {};
 SearchFormCreateFilterMenu.prototype.onCreateButtonClick = function() {
@@ -3330,7 +3448,7 @@ SearchFormCreateFilterMenu.prototype.onWizardButtonClick = function() {
 };
 SearchFormCreateFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'create-filters-menu'},
+		'args':{'className': 'upp'},
 		'props':{'buttons': [{'name': __[5],'handler': this.onCreateButtonClick},{'name': __[6],'handler': this.onWizardButtonClick}]}
 	};
 };
@@ -3352,11 +3470,11 @@ SearchFormFilterMenu.prototype.handleClick = function(value, button) {
 	Globals.getView('search').openFilter(value);
 };
 SearchFormFilterMenu.prototype.getTemplateContent = function(_,$) {
-	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['item']['isAutoOpen']?' checked':''),'_value':_['item']['value']}}]
+	return[{'t':0,'p':{'c':'uai'+(_['item']['isAutoOpen']?' up6':''),'_value':_['item']['value']}}]
 };
 SearchFormFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'filters-menu','maxHeight': 400},
+		'args':{'className': 'upo','maxHeight': 400},
 		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
 		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true}}]
 	};
@@ -3369,7 +3487,7 @@ SearchFormFilters.prototype.onSaveFilterClick = function() {
 	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
 };
 SearchFormFilters.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'c':__[7],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'app-search-form-filters-create-button'}},{'c':[{'c':__[8],'t':0,'p':{'c':'app-search-form-filters-button-inner'}},{'c':[{'c':{'pr':'quantity','p':$.g('quantity')},'t':42,'p':{'c':'app-search-form-filters-button-quantity'}},{'t':0,'p':{'c':'app-search-form-filters-button-plus'}}],'t':0,'p':{'c':'app-search-form-filters-button-side'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'app-search-form-filters-button'+(!$.g('quantity')?' with-plus':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':$.g('filterName')},'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-name'}},{'c':__[9],'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-save-button'}}],'t':0,'p':{'c':'app-search-form-filters','sc':1}}]
+	return[{'c':[{'c':[{'c':__[7],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'upr'}},{'c':[{'c':__[8],'t':0,'p':{'c':'upu'}},{'c':[{'c':{'pr':'quantity','p':$.g('quantity')},'t':42,'p':{'c':'up1'}},{'t':0,'p':{'c':'upj'}}],'t':0,'p':{'c':'up2'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'upq'+(!$.g('quantity')?' up3':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':$.g('filterName')},'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'upd'}},{'c':__[9],'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'uph'}}],'t':0,'p':{'c':'upi','sc':1}}]
 };
 SearchFormFilters.prototype.getInitials = function() {
 	return {
@@ -3439,7 +3557,7 @@ Calendar.prototype.changeMonth = function(value) {
 	this.redraw();
 };
 Calendar.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1},{'c':__[46],'t':1},{'c':__[47],'t':1},{'c':__[48],'t':1},{'c':__[49],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?' another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
+	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'un2'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'un3'}}],'t':0,'p':{'c':'unj'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'un1'}}],'t':0,'p':{'c':'unu'}},{'c':[{'c':[{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1},{'c':__[46],'t':1},{'c':__[47],'t':1},{'c':__[48],'t':1},{'c':__[49],'t':1}],'t':0,'p':{'c':'und'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?' unl':'')+' '+(day.current?' un9':'')+' '+(day.marked?' uns':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'uny'}}],'t':0,'p':{'c':'unh'}}],'t':0,'p':{'c':'unq'}}]
 };
 function FavoritesCalendar() {};
 FavoritesCalendar.prototype.onRendered = function() {
@@ -3473,7 +3591,7 @@ FavoritesCalendar.prototype.onMarkedDayClick = function(e) {
 FavoritesCalendar.prototype.getInitials = function() {
 	return {
 		'controllers':[{'controller': Favorites,'on': {'load': this.onLoadFavorites}}],
-		'helpers':[{'helper': ClickHandler,'options': {'marked': this.onMarkedDayClick}}]
+		'helpers':[{'helper': ClickHandler,'options': {'uns': this.onMarkedDayClick}}]
 	};
 };
 function Dialog() {};
@@ -3497,7 +3615,7 @@ Dialog.prototype.expand = function() {
 Dialog.prototype.onShow = function() {};
 Dialog.prototype.onHide = function() {};
 Dialog.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['marginLeft','marginTop','width']}}]
+	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'unc'+($.g('shown')?' up5':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'unv'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'unf'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'un8'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'unt','st':function(){return ($.g('height')?' max-height:'+$.g('height')+' px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'ung'+($.g('expanded')?' un0':'')+($.g('shown')?' up5':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['marginLeft','marginTop','width']}}]
 };
 Dialog.prototype.getTemplateContent = function(_,$) {
 	return null
@@ -3505,7 +3623,7 @@ Dialog.prototype.getTemplateContent = function(_,$) {
 Dialog.prototype.getInitials = function() {
 	return {
 		'args':{'closable': true},
-		'followers':{'width': this.reposition,height: this.reposition},
+		'followers':{'width': this.reposition,'height': this.reposition},
 		'props':{'width': 600}
 	};
 };
@@ -3572,17 +3690,10 @@ Form.prototype.disposeInternal = function() {
 	this.request = null;
 };
 Form.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'e':[23,$.onSubmit],'p':{'p':_['submit']}}]:'','i':true}],'t':13,'p':{'c':'app-form-controls','m':_['method'],'a':_['action'],'_ajax':(_['ajax']?1:''),'_iframe':(_['iframe']?1:'')}}]
+	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'e':[23,$.onSubmit],'p':{'p':_['submit']}}]:'','i':true}],'t':13,'p':{'c':'uga'+(_['className']?' '+_['className']:''),'m':_['method'],'a':_['action'],'_ajax':(_['ajax']?1:''),'_iframe':(_['iframe']?1:'')}}]
 };
 Form.prototype.getTemplateContent = function(_,$) {
 	return null
-};
-function FormField() {};
-FormField.prototype.getValue = function() {
-	return this.getCotrolAt(0).getValue();
-};
-FormField.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'p':_['controlProps']}}],'t':0,'p':{'c':'app-input-container '+_['class'],'sc':1}}]
 };
 function PopupMenu() {};
 PopupMenu.prototype.onRendered = function() {
@@ -3591,7 +3702,7 @@ PopupMenu.prototype.onRendered = function() {
 	this.addListener(this.button, 'click', this.onShowButtonClick);
 };
 PopupMenu.prototype.onClick = function(e) {
-	var target = e.getTarget('.app-popup-menu-button');
+	var target = e.getTarget('.upz');
 	if (!isNull(target)) {
 		var idx = target.getData('index');
 		var value = target.getData('value');
@@ -3610,7 +3721,7 @@ PopupMenu.prototype.onShowButtonClick = function() {
 PopupMenu.prototype.handleClick = function(value, button) {};
 PopupMenu.prototype.onBeforeShow = function() {};
 PopupMenu.prototype.show = function() {
-	var innerElement = this.findElement('.app-popup-menu-inner-container');
+	var innerElement = this.findElement('.upn');
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
 	this.setStyle({'max-height': height + 'px', 'height': height + 'px'});
@@ -3635,17 +3746,10 @@ PopupMenu.prototype.getButtonData = function(item) {
 	};
 };
 PopupMenu.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'c':{'h':function(button,idx){return[{'c':[button['name'],{'tmp':$.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'app-popup-menu-button','_value':button['value'],'_index':idx}}]},'p':$.g('buttons'),'f':'buttons'},'t':0,'e':[0,$.onClick],'p':{'c':'app-popup-menu-inner-container','st':(_['maxHeight']?' max-height:'+_['maxHeight']+' px;':'')}},'t':0,'p':{'c':'app-popup-menu-outer-container '+_['className'],'sc':1}}]
+	return[{'c':{'c':{'h':function(button,idx){return[{'c':[button['name'],{'tmp':$.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'upz','_value':button['value'],'_index':idx}}]},'p':$.g('buttons'),'f':'buttons'},'t':0,'e':[0,$.onClick],'p':{'c':'upn','st':(_['maxHeight']?' max-height:'+_['maxHeight']+' px;':'')}},'t':0,'p':{'c':'upa '+_['className'],'sc':1}}]
 };
 PopupMenu.prototype.getTemplateContent = function(_,$) {
 	return null
-};
-function Submit() {};
-Submit.prototype.onSubmit = function() {
-	this.dispatchEvent('submit');
-};
-Submit.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,'submit'],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
 };
 function TabPanel() {};
 TabPanel.prototype.initiate = function() {
@@ -3666,10 +3770,10 @@ TabPanel.prototype.redraw = function() {
 	this.hiddenTabs = [];
 	var tabPanelWidth = this.getElement().getWidth();
 	var controlWidth = this.getControlsWidth();
-	var tabs = this.findElements('.app-tab');
+	var tabs = this.findElements('.unw');
 	var totalWidth = 0, buttonWidth;
 	for (var i = 0; i < tabs.length; i++) {
-		tabs[i].toggleClass('first', i == 0);
+		tabs[i].toggleClass('unk', i == 0);
 		buttonWidth = tabs[i].getWidth();
 		if (totalWidth + controlWidth + buttonWidth + this.margin > tabPanelWidth) {
 			tabs[i].show(false);
@@ -3683,9 +3787,9 @@ TabPanel.prototype.redraw = function() {
 };
 TabPanel.prototype.getControlsWidth = function() {
 	var width = 0;
-	var restButton = this.findElement('.app-tab-rest');
+	var restButton = this.findElement('.unx');
 	if (restButton) width += restButton.getWidth() + this.margin;
-	var plusButton = this.findElement('.app-tab-plus');
+	var plusButton = this.findElement('.ug9');
 	if (plusButton) width += plusButton.getWidth() + this.margin;
 	return width;
 };
@@ -3698,10 +3802,10 @@ TabPanel.prototype.activateTab = function(tabIndex, isShown) {
 	var container = this.findElement('.' + Objects.get(this.getTabParamsByIndex(tabIndex), 'container'), this.getScopeElement());
 	if (container) container.show(isShown);
 	if (isShown) this.activeTab = tabIndex;
-	this.getTab(tabIndex).toggleClass('active', isShown);
+	this.getTab(tabIndex).toggleClass('ua6', isShown);
 };
 TabPanel.prototype.getTab = function(tabIndex) {
-	return this.findElements('.app-content-tab')[tabIndex];
+	return this.findElements('.ugp')[tabIndex];
 };
 TabPanel.prototype.getScopeElement = function() {
 	if (!this.scopeElement && isString(this.args['scope'])) this.scopeElement = this.findElementWithinParent('.' + this.args['scope']) || document.body;
@@ -3711,16 +3815,16 @@ TabPanel.prototype.getTabParamsByIndex = function(tabIndex) {
 	return this.args['tabs'][tabIndex];
 };
 TabPanel.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'app-tab app-content-tab','_index':idx}}]},'p':_['tabs']},{'c':!!isObject(_['rest'])?[{'c':[_['rest']['title']||__[51],{'c':!!_['rest']['showCount']?[' (',{'pr':'count','p':$.g('count')},')']:'','i':true}],'t':0,'p':{'c':function(){return 'app-tab app-tab-rest'+($.g('count')?' shown':'')}},'n':{'c':'count'}}]:'','i':true}],'t':0,'p':{'c':'app-tab-panel','sc':1}}]
+	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'unw ugp','_index':idx}}]},'p':_['tabs']},{'c':!!isObject(_['rest'])?[{'c':[_['rest']['title']||__[51],{'c':!!_['rest']['showCount']?[' (',{'pr':'count','p':$.g('count')},')']:'','i':true}],'t':0,'p':{'c':function(){return 'unw unx'+($.g('count')?' up5':'')}},'n':{'c':'count'}}]:'','i':true}],'t':0,'p':{'c':'un7','sc':1}}]
 };
 TabPanel.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ClickHandler,'options': {'app-tab-rest': this.onRestTabClick,'app-tab': this.onTabClick}}]
+		'helpers':[{'helper': ClickHandler,'options': {'unx': this.onRestTabClick,'unw': this.onTabClick}}]
 	};
 };
 function Tooltip() {};
 Tooltip.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
+	return[{'t':0,'p':{'c':'udx ud5 '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
 };
 Tooltip.prototype.getInitials = function() {
 	return {
@@ -3746,7 +3850,7 @@ TooltipPopup.prototype.correctAndSetText = function(text, changedProps) {
 	return text;
 };
 TooltipPopup.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-tooltip-popup-caption'}},{'c':{'c':function(){return[[{'h':function(item){return[{'c':item,'t':0,'p':{'c':'app-tooltip-list-item'}}]},'p':$.g('text'),'f':'text'}]]},'sw':$.g('corrector'),'s':['list'],'d':[{'pr':'text','p':$.g('text')}],'p':'corrector'},'t':0,'p':{'c':'app-tooltip-popup-text'}}],'t':0,'p':{'c':function(){return 'app-tooltip-popup '+$.g('className')+($.g('shown')?' shown':'')},'st':function(){return 'left:'+$.g('left')+'px;top:'+$.g('top')+'px;'},'sc':1},'n':{'c':['className','shown'],'st':['left','top']}}]
+	return[{'c':[{'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'ud4'}},{'c':{'c':function(){return[[{'h':function(item){return[{'c':item,'t':0,'p':{'c':'uda'}}]},'p':$.g('text'),'f':'text'}]]},'sw':$.g('corrector'),'s':['list'],'d':[{'pr':'text','p':$.g('text')}],'p':'corrector'},'t':0,'p':{'c':'udb'}}],'t':0,'p':{'c':function(){return 'ude '+$.g('className')+($.g('shown')?' up5':'')},'st':function(){return 'left:'+$.g('left')+'px;top:'+$.g('top')+'px;'},'sc':1},'n':{'c':['className','shown'],'st':['left','top']}}]
 };
 TooltipPopup.prototype.getInitials = function() {
 	return {
@@ -3770,40 +3874,36 @@ FilterSubscription.prototype.getSubscribedCount = function() {
 };
 FilterSubscription.prototype.onFreqChange = function(e) {};
 FilterSubscription.prototype.onSubscribeButtonClick = function(e, target) {
-	var filterId = e.getTargetData('.app-subscription-filter-row', 'filterId');
+	var filterId = e.getTargetData('.ugq', 'filterId');
 	if (filterId) {
 		Filters.doAction('subscribe', {
 			'filterId': filterId,
-			'value': target.hasClass('subscribed') ? '0' : '1'
+			'value': target.hasClass('ugr') ? '0' : '1'
 		});
 	}
 };
 FilterSubscription.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[__[85],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[90],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[91],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[92],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[5],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[23]+' subscribed':__[25])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
+	return[{'c':[{'c':[__[85],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'udi'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'udq'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'udu'}}],'t':0,'p':{'c':'udr'}},{'c':[{'c':{'c':[{'c':__[90],'t':7,'p':{'c':'ugn'}},{'c':__[91],'t':7,'p':{'c':'ugo'}},{'c':__[92],'t':7,'p':{'c':'ugz'}},{'c':__T[1],'t':7,'p':{'c':'ug6'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'ugi'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[5],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'ud1 '+(filter['isSubs']==1?__[23]+' ugr':__[25])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'ugq'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'ud2','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'ud6','sc':1}}]
 };
 FilterSubscription.prototype.getInitials = function() {
 	return {
 		'loader':{'controller': Filters},
-		'helpers':[{'helper': ClickHandler,'options': {'subscr-button': this.onSubscribeButtonClick}}]
+		'helpers':[{'helper': ClickHandler,'options': {'ud1': this.onSubscribeButtonClick}}]
 	};
 };
 function FilterSubscriptionOptions() {};
-FilterSubscriptionOptions.prototype.onLoaded = function(data) {
-	var options = data['options'];
-	this.set({'opt1':options['tenderOfFavorite'],'opt2':options['protocolOfFavorite'],'opt3':options['protocolOfFilter']});
-};
 FilterSubscriptionOptions.prototype.onCheckboxChange = function(e) {
 	var params = {};
 	params[e['name']] = e['intChecked'];
 	Subscription.doAction('save', params);
 };
 FilterSubscriptionOptions.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'tenderOfFavorite','checked':$.g('opt1')}},' ',__[81],' ',{'c':__[82],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFavorite','checked':$.g('opt2')}},' ',__[81],' ',{'c':__[83],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFilter','checked':$.g('opt3')}},' ',__[81],' ',{'c':__[84],'t':20}],'t':0,'p':{'c':'app-subscription-option'}}],'t':0,'p':{'c':'app-subscription-options','sc':1}}]
+	return[{'c':[{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'tenderOfFavorite','checked':$.g('opts',['tenderOfFavorite'])}},' ',__[81],' ',{'c':__[82],'t':20}],'t':0,'p':{'c':'udj'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFavorite','checked':$.g('opts',['protocolOfFavorite'])}},' ',__[81],' ',{'c':__[83],'t':20}],'t':0,'p':{'c':'udj'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFilter','checked':$.g('opts',['protocolOfFilter'])}},' ',__[81],' ',{'c':__[84],'t':20}],'t':0,'p':{'c':'udj'}}],'t':0,'p':{'c':'ugu','sc':1}}]
 };
 FilterSubscriptionOptions.prototype.getInitials = function() {
 	return {
 		'loader':{'controller': Subscription},
-		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'labelClass': 'app-subscription-option'}}]
+		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'labelClass': 'udj'}}]
 	};
 };
 function UserInfo() {};
@@ -3819,12 +3919,20 @@ UserInfo.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);	
 };
 UserInfo.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'c':[__[53],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[54],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[55],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[56],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'bold'}}],'t':5},{'c':[{'c':[__[57],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[58],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?' red':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[62],'tr':'_blank','c':'access standart-button red-button'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[60],'t':12,'p':{'h':__[59],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[61],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[65],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[66],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[3],{'c':__[67],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[68],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button green-button'}}]
+	return[{'c':[{'c':[{'c':[__[53],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[54],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[55],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[56],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'upw'}}],'t':5},{'c':[{'c':[__[57],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[58],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?' ug2':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'udg','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[62],'tr':'_blank','c':'ud0 upf upx'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[60],'t':12,'p':{'h':__[59],'tr':'_blank','c':'ug1 upf une'}},{'c':__[61],'t':0,'p':{'c':'uds upw'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'ud8'}},{'c':[{'c':[' ',{'c':__[65],'t':0,'p':{'c':'ugj'}},{'c':__[66],'t':0,'p':{'c':'udf'}}],'t':0,'p':{'c':'udv'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[3],{'c':__[67],'t':51}],'t':0,'p':{'c':'udt'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'udm'}}],'t':0,'p':{'c':'ug3'}},{'c':__[68],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'upf upk'}}]
 };
 UserInfo.prototype.getInitials = function() {
 	return {
 		'loader':{'controller': UserInfoLoader,'async': true }
 	};
+};
+function FormField() {};
+FormField.prototype.getTemplateMain = function(_,$) {
+	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'ups'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'p':_['controlProps']}}],'t':0,'p':{'c':'upy'+(_['class']?' '+_['class']:''),'sc':1}}]
+};
+function Submit() {};
+Submit.prototype.getTemplateMain = function(_,$) {
+	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,'submit'],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'unm'}}]
 };
 function Favorites() {};
 Favorites.prototype.getInitials = function() {
@@ -3855,7 +3963,7 @@ FiltersStat.prototype.getInitials = function() {
 function Subscription() {};
 Subscription.prototype.getInitials = function() {
 	return {
-		'actions':{'load': {'url': CONFIG.settings.subscr,'method': 'GET'},'save': {'url': CONFIG.settings.set,'method': 'GET'}}
+		'actions':{'load': {'url': CONFIG.settings.subscr,'method': 'GET','autoset': {'options': 'opts'}},'save': {'url': CONFIG.settings.set,'method': 'GET'}}
 	};
 };
 function UserInfoLoader() {};
@@ -3869,7 +3977,7 @@ CalendarFavorites.prototype.getArgs2 = function(data) {
 	return data;
 };
 CalendarFavorites.prototype.getTemplateContent = function(_,$) {
-	return[{'c':{'h':function(tender){return[{'cmp':DataTableStandartRow,'p':{'aa':{'nocontrols':'1'},'a':tender}}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'simple-datatable calendar-favorites-datatable'}}]
+	return[{'c':{'h':function(tender){return[{'cmp':DataTableStandartRow,'p':{'aa':{'nocontrols':'1'},'a':tender}}]},'p':$.g('tenders'),'f':'tenders'},'t':0,'p':{'c':'uaa upv'}}]
 };
 CalendarFavorites.prototype.getInitials = function() {
 	return {
@@ -3901,7 +4009,7 @@ OrderCall.prototype.onHide = function() {
 	clearInterval(this.interval);
 };
 OrderCall.prototype.getTemplateContent = function(_,$) {
-	return[{'cmp':OrderCallForm},{'c':__[19],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':OrderCallForm},{'c':__[19],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'upf upm'}}]
 };
 OrderCall.prototype.getInitials = function() {
 	return {
@@ -3914,7 +4022,7 @@ Support.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);
 };
 Support.prototype.getTemplateContent = function(_,$) {
-	return[{'cmp':SupportForm},{'c':__[21],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':SupportForm},{'c':__[21],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'upf upm'}}]
 };
 Support.prototype.getInitials = function() {
 	return {
@@ -3926,11 +4034,11 @@ AuthForm.prototype.onSuccess = function() {
 	Router.reload();
 };
 AuthForm.prototype.getTemplateContent = function(_,$) {
-	return[{'c':__T[4],'t':0,'p':{'c':'app-authform-logo'}}]
+	return[{'c':__T[4],'t':0,'p':{'c':'una'}}]
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': 'user/login.php','ajax': true,'container': 'app-authform-inputs','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'app-submit'}}
+		'args':{'action': 'user/login.php','ajax': true,'className': 'unp','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'ugc'}}
 	};
 };
 function OrderCallForm() {};
@@ -4007,47 +4115,49 @@ OrderCallForm.prototype.validateTime = function() {
 };
 OrderCallForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': CONFIG.orderCall.send,'method': 'POST','container': 'app-order-call','controls': [__V[1],__V[2],__V[3],{'type': 'select','name': 'topic','options': Dictionary.get('orderCallTopics'),'caption': __[34],'class': 'half-width'},{'type': 'select','name': 'date','options': this.getDateOptions(),'caption': __[35],'class': 'half-width'},{'type': 'select','name': 'time','options': Dictionary.get('timeOptions'),'caption': __[36],'class': 'half-width'},{'type': 'textarea','name': 'comment','caption': __[37]}],'submit': {'value': __[68],'class': __[23] + ' send-button'}}
+		'args':{'action': CONFIG.orderCall.send,'method': 'POST','className': 'unn','controls': [__V[1],__V[2],__V[3],{'caption': __[34],'class': 'upl','controlClass': Select,'controlProps': {'name': 'topic','options': Dictionary.get('orderCallTopics')}},{'caption': __[35],'class': 'upl','controlClass': Select,'controlProps': {'name': 'date','options': this.getDateOptions()}},{'caption': __[36],'class': 'upl','controlClass': Select,'controlProps': {'name': 'time','options': Dictionary.get('timeOptions')}},{'caption': __[37],'controlClass': Textarea,'controlProps': {'name': 'comment'}}],'submit': {'value': __[68],'class': __[23] + ' uno'}}
 	};
 };
 function SupportForm() {};
 SupportForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': CONFIG.support.send,'controls': [__V[1],__V[2],__V[3],{'type': 'textarea','name': 'comment','caption': __[40]},{'type': 'file','name': 'screenshot','accept': 'image/*','caption': __[41]}],'submit': {'value': __[42],'class': __[23] + ' send-button'}}
+		'args':{'action': CONFIG.support.send,'className': 'unn','controls': [__V[1],__V[2],__V[3],{'caption': __[40],'controlClass': Textarea,'controlProps': {'name': 'comment'}},{'caption': __[41],'controlClass': Input,'controlProps': {'name': 'screenshot','type': 'file','accept': 'image/*'}}],'submit': {'value': __[42],'class': __[23] + ' uno'}}
 	};
 };
 function KeywordsControl() {};
-KeywordsControl.prototype.onRendered = function() {};
+KeywordsControl.prototype.onChange = function() {
+	Globals.dispatchEvent('TenderSearchFormChanged');
+};
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0],'className':'frameless'}}},'t':0,'p':{'c':'app-keywords-options'}}]
+	return[{'c':{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0],'className':'frameless'}}},'t':0,'p':{'c':'ugh'}}]
 };
 function Input() {};
-Input.prototype.onChange = function() {};
 Input.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
 Input.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'t':14,'e':[18,$.onChange],'p':{'tp':function(){return $.g('type')},'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'v':function(){return $.g('value')},'readonly':function(){return ($.g('enabled')?' readonly':'')},'accept':function(){return $.g('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
+	return[{'t':14,'e':[18,$.onChange],'p':{'tp':function(){return $.g('type')},'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'v':function(){return $.g('value')},'readonly':function(){return ($.g('enabled')?' readonly':'')},'accept':function(){return $.g('accept')}},'n':{'tp':'type','n':'name','p':'placeholder','v':'value','readonly':'enabled','accept':'accept'}}]
 };
 function Select() {};
 Select.prototype.onRendered = function() {
 	var value = this.get('value');
 	var selected;
 	if (!isUndefined(value)) {
-		selected = this.selectByValue(value);
+		selected = this.selectByValue(value, true);
 	}
 	if (!selected) {
 		this.selectByIndex(0);
 	}
 };
-Select.prototype.selectByValue = function(value) {
-	if (this.get('value') == value) return;
+Select.prototype.selectByValue = function(value, forced) {
+	if (!forced && this.get('value') == value) return;
 	var options = this.get('options');
 	if (isArray(options)) {
 		for (var i = 0; i < options.length; i++) {
 			if (options[i]['value'] == value) {
 				this.selectedIndex = i;
-				this.set({'value':value,'title':options[i]['title']});
+				if (!forced) this.set('value',value);
+				this.set('title',options[i]['title']);
 				return true;
 			}
 		}
@@ -4063,16 +4173,16 @@ Select.prototype.selectByIndex = function(index) {
 	}
 };
 Select.prototype.enableOption = function(index, isEnabled) {
-	var optionsContainer = this.findElement('.app-select-options');
+	var optionsContainer = this.findElement('.up0');
 	var optionElement = optionsContainer.getChildAt(index);
-	optionElement.toggleClass('disabled', !isEnabled);
+	optionElement.toggleClass('upt', !isEnabled);
 	if (index == this.selectedIndex) {
 		this.selectByIndex(index == 0 ? index + 1 : 0);
     }
 };
 Select.prototype.onOptionsClick = function(e) {
-	var target = e.getTarget('.app-select-option');
-	if (target && !target.hasClass('disabled')) {
+	var target = e.getTarget('.up8');
+	if (target && !target.hasClass('upt')) {
 		var value = target.getData('value');
 		if (this.selectByValue(value)) this.dispatchChange();
 		this.hide();
@@ -4085,37 +4195,36 @@ Select.prototype.getControlValue = function() {
 	return this.findElement('input').value;
 };
 Select.prototype.onClick = function() {
-	this.set('active',true);
-	Popuper.watch(this, this.findElement('.app-select'));
+	this.toggle('active');
+	Popuper.watch(this, this.findElement('.up9'));
 };
 Select.prototype.hide = function() {
 	this.set('active',false);
 };
 Select.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':['active','className']}}]
+	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'upg'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'up8','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'up0'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'up9'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' ua6':'')},'sc':1},'n':{'c':['active','className']}}]
 };
 function Textarea() {};
-Textarea.prototype.onChange = function() {};
 Textarea.prototype.getControlValue = function() {
 	return this.findElement('textarea').value;
 };
 Textarea.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':function(){return {'c':{'pr':'caption','p':$.g('caption')},'t':0,'p':{'c':'app-input-caption'}}},'p':['caption'],'i':function(){return($.g('caption'))}},{'c':{'pr':'value','p':$.g('value')},'t':49,'e':[18,$.onChange],'p':{'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'readonly':function(){return ($.g('enabled')?' readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}],'t':0,'p':{'c':function(){return 'app-input-container '+$.g('class')},'sc':1},'n':{'c':'class'}}]
+	return[{'c':{'pr':'value','p':$.g('value')},'t':49,'e':[18,$.onChange],'p':{'n':function(){return $.g('name')},'p':function(){return $.g('placeholder')},'readonly':function(){return ($.g('enabled')?' readonly':'')}},'n':{'n':'name','p':'placeholder','readonly':'enabled'}}]
 };
 function TopMenu() {
 	Router.addMenu(this);
 	this.isRouteMenu = true;
 };
 TopMenu.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'app-top-menu-logo'}},{'c':__T[5],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[6],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[7],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[8],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[9],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'app-top-menu-inner'}},'t':0,'p':{'c':'app-top-menu','sc':1}}]
+	return[{'c':{'c':[{'t':12,'p':{'h':'#main','c':'unr'}},{'c':__T[5],'t':12,'p':{'h':'#main','r':'main'}},{'c':__T[6],'t':12,'p':{'h':'#search','r':'search'}},{'c':__T[7],'t':12,'p':{'h':'#favorite','r':'favorite'}},{'c':__T[8],'t':12,'p':{'h':'#planzakupok','r':'planzakupok'}},{'c':__T[9],'t':12,'p':{'h':'#analytics','r':'analytics'}}],'t':0,'p':{'c':'un6'}},'t':0,'p':{'c':'unz','sc':1}}]
 };
 function includeGeneralTemplateUnavailable(_) {
-	return[{'t':0,'p':{'c':'app-unavailable-info '+(_['tariff']?' unavailable':' auth'),'st':(_['width']?' width:'+_['width']:'')}}]
+	return[{'t':0,'p':{'c':'ugd '+(_['tariff']?' ugy':' ugl'),'st':(_['width']?' width:'+_['width']:'')}}]
 }
 function includeGeneralTemplateCheckbox(_) {
-	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['checked']?' checked':''),'_name':_['name'],'_value':_['value']}}]
+	return[{'t':0,'p':{'c':'uai'+(_['checked']?' up6':''),'_name':_['name'],'_value':_['value']}}]
 }
-Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,TenderSearchForm,SearchFormFilters,Calendar,Dialog,Form,FormField,PopupMenu,Submit,TabPanel,Tooltip,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea,TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,FiltersForm,SearchFormFilters,Calendar,Dialog,Form,PopupMenu,TabPanel,Tooltip,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo,FormField,Submit],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],FiltersForm,[TenderSearchForm],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
 Router = new Router();
 User = new User();
 Favorites = new Favorites();

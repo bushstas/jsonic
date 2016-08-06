@@ -1,3 +1,3 @@
 {template .content}
-	<component class="KeywordsControl">
+	<control class="KeywordsControl" name="keywords">
 {/template}

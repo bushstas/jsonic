@@ -280,6 +280,7 @@
 		$css = array();
 		$decls = array();
 		$cssData = array();
+		$jsFileNames = array();
 		$apiConfig = '';
 		$isConfigJsFile = false;
 		foreach ($files as $file) {
@@ -296,6 +297,7 @@
 					$isConfigJsFile = true;
 				} else {
 					parseJsClass($content, $classes, $file);
+					$jsFileNames[] = $file['name'];
 				}
 			} elseif ($file['ext'] == 'template') {
 				$templates[$file['name']] = preg_replace("/<\!--.*?-->/", "", $content);
@@ -313,6 +315,13 @@
 				$includes[] = $file;
 			} elseif ($file['ext'] == 'decl') {
 				$decls[] = $content;
+			}
+		}
+		$templateClasses = array_keys($templates);
+		$classesFromTemplates = array();
+		foreach ($templateClasses as $templateClass) {
+			if (!in_array($templateClass, $jsFileNames)) {
+				$classesFromTemplates[] = $templateClass;
 			}
 		}
 		$declensions = array();
@@ -486,14 +495,28 @@
 		// Checking components
 		$usedComponents = array();
 		$calledComponents = array();
+		$calledComponentsTypes = array();
+		$calledComponentsTypes2 = array();
+		$typesInFiles = array();
 		$filesOfUsedComponents = array();
 		foreach ($templates as $filename => $file) {
-			preg_match_all("/<(component|control|form|menu)([^>]+)>/i", $file, $matches);
+			preg_match_all("/<(component|control|form|menu)\s([^>]+)>/i", $file, $matches);
+			$typeMatches = $matches[1];
 			$tagContents = $matches[2];
-			foreach ($tagContents as $cnt) {
+
+			foreach ($tagContents as $j => $cnt) {
 				preg_match_all("/class=[\"'](\w+)[\"']/i", $cnt, $matches);
-				foreach ($matches[1] as $match) {
+				foreach ($matches[1] as $i => $match) {
 					$usedComponents[] = $match;
+					if (!empty($calledComponentsTypes2[$match]) && $calledComponentsTypes2[$match] != $typeMatches[$j]) {
+						$but = $filename == $typesInFiles[$match] ? 'и здесь же' : 'а';
+						error("Используются различные типы при вызове компонента <b>".$match."</b><br><br>
+							В шаблоне класса <b>".$filename."</b> указан тип <b>".$typeMatches[$j]."</b>,<br><br>
+							".$but." в шаблоне класса <b>".$typesInFiles[$match]."</b> указан другой тип <b>".$calledComponentsTypes2[$match]."</b>");
+					}
+					$typesInFiles[$match] = $filename;
+					$calledComponentsTypes[$match] = array('type' => $typeMatches[$j], 'file' => $filename);
+					$calledComponentsTypes2[$match] = $typeMatches[$j];
 					$calledComponents[$match] = 1;
 					if (!is_array($filesOfUsedComponents[$match])) {
 						$filesOfUsedComponents[$match] = array();
@@ -502,6 +525,20 @@
 				}
 			}
 		}
+	
+		foreach ($classesFromTemplates as $classFromTemplate) {
+			if (isset($calledComponentsTypes2[$classFromTemplate])) {
+				$classes[$calledComponentsTypes2[$classFromTemplate]][$classFromTemplate] = array(
+					'name' => $classFromTemplate,
+					'content' => '',
+					'type' => $calledComponentsTypes2[$classFromTemplate],
+					'extends' => array(ucfirst($calledComponentsTypes2[$classFromTemplate])),
+					'isSuper' => true
+				);
+				$classNames[$classFromTemplate] = true;
+			}
+		}		
+
 		foreach ($classes['component'] as $class) {
 			if (is_array($class['extends'])) {
 				foreach ($class['extends'] as $superClass) {
@@ -606,6 +643,9 @@
 		}
 		foreach ($classesList as &$class) {
 			$class['extends'] = array_unique(getAllExtendClasses($class['extends']));
+			if (isset($calledComponentsTypes[$class['name']]) && $class['type'] != $calledComponentsTypes[$class['name']]['type']) {				
+				error("Неверный тип вызываемого компонента <b>".$class['name']."</b> в шаблоне класса <b>".$calledComponentsTypes[$class['name']]['file']."</b><br><br>Найдено: <b>".$calledComponentsTypes[$class['name']]['type']."</b>, требуется: <b>".$class['type']."</b>");
+			}
 		}
 		foreach ($routeControllersToLoad as $routeControllersToLoad) {
 			if (!is_array($classes['controller'][$routeControllersToLoad])) {

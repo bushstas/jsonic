@@ -1,4 +1,5 @@
 function Controller() {	
+	if (this !== window) return;
 	var makeUrl = function(url, options) {
 		var regExp;
 		for (var k in options) {
@@ -9,29 +10,42 @@ function Controller() {
 		}
 		return url;
 	};
-	var gotFromStore = function(options) {
+	var gotFromStore = function(actionName, options) {
 		if (shouldStore.call(this)) {
 			var storeAs = getStoreAs.call(this, options);
 			if (isString(storeAs)) {
 				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 				if (isArrayLike(storedData)) {
-					onActionComplete.call(this, storedData, true);
+					onActionComplete.call(this, actionName, storedData, true);
 					return true;
 				}
 			}
 		}
 		return false;
 	};
-	var onActionComplete = function(data, isFromStorage) {
-		var actionName = this.action['name'];
+	var onActionComplete = function(actionName, data, isFromStorage) {
 		this.data = this.data || {};
 		this.data[actionName] = data;
-		if (isFunction(this.action['callback'])) {
-			this.action['callback'].call(this, data);
+		var action = getAction.call(this, actionName);
+		if (isObject(action) && isFunction(action['callback'])) {
+			action['callback'].call(this, data);
 		}
+		if (action['autoset']) autoset.call(this, action['autoset'], data);
 		this.dispatchEvent(actionName, data);
 		if (!isFromStorage && actionName == 'load' && shouldStore.call(this)) {
 			store.call(this, true, data);
+		}
+		this.activeRequests.removeItem(actionName);
+	};
+	var autoset = function(opts, data) {
+		var props = {};
+		if (isString(opts)) {
+			props[opts] = data; 
+		} else if (isObject(opts)) {
+			for (var k in opts) props[opts[k]] = data[k];
+		}
+		for (var i = 0; i < this.subscribers.length; i++) {
+			this.subscribers[i][2].set(props);
 		}
 	};
 	var shouldStore = function() {
@@ -105,20 +119,22 @@ function Controller() {
 	};
 
 	Controller.prototype.initiate = function() {
-		this.listeners = [];
+		this.subscribers = [];
+		this.requests = {};
+		this.activeRequests = [];
 	};
 
 	Controller.prototype.subscribe = function(eventType, callback, subscriber) {
-		this.listeners.push([eventType, callback, subscriber]);
+		this.subscribers.push([eventType, callback, subscriber]);
 	};
 
 	Controller.prototype.unsubscribe = function(subscriber, eventType) {
 		var done = false;
 		while (!done) {
 			done = true;
-			for (var i = 0; i < this.listeners.length; i++) {
-				if (this.listeners[i][2] == subscriber && (!eventType || this.listeners[i][0] == eventType)) {
-					this.listeners.splice(i, 1);
+			for (var i = 0; i < this.subscribers.length; i++) {
+				if (this.subscribers[i][2] == subscriber && (!eventType || this.subscribers[i][0] == eventType)) {
+					this.subscribers.splice(i, 1);
 					done = false;
 					break;
 				}
@@ -129,10 +145,10 @@ function Controller() {
 	Controller.prototype.dispatchEvent = function(eventType, data) {
 		var dataToDispatch = data;
 		if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
-		if (isArray(this.listeners)) {
-			for (var i = 0; i < this.listeners.length; i++) {
-				if (this.listeners[i][0] == eventType && isFunction(this.listeners[i][1])) {
-					this.listeners[i][1].call(this.listeners[i][2] || null, dataToDispatch, this);
+		if (isArray(this.subscribers)) {
+			for (var i = 0; i < this.subscribers.length; i++) {
+				if (this.subscribers[i][0] == eventType && isFunction(this.subscribers[i][1])) {
+					this.subscribers[i][1].call(this.subscribers[i][2] || null, dataToDispatch, this);
 				}
 			}
 		}
@@ -163,9 +179,9 @@ function Controller() {
 	};
 
 	Controller.prototype.doAction = function(actionName, options, url) {
+		if (this.activeRequests.indexOf(actionName) > -1) return;
 		var action = getAction.call(this, actionName);
-		this.action = action;	
-		if (actionName == 'load' && gotFromStore.call(this, options)) return;
+		if (actionName == 'load' && gotFromStore.call(this, actionName, options)) return;
 		if (!isObject(options)) options = {};
 		if (action && isObject(action) && action['options'] && isObject(action['options'])) {
 			Objects.merge(options, action['options']);
@@ -174,9 +190,12 @@ function Controller() {
 		url = url || makeUrl(action['url'], options);
 		if (!url || !isString(url)) {
 			log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
+		}		
+		if (!this.requests[actionName]) {
+			this.requests[actionName] = new AjaxRequest(url, onActionComplete.bind(this, actionName));
 		}
-		this.request = this.request || new AjaxRequest(url, onActionComplete.bind(this));
-		this.request.send(method, options, url);
+		this.requests[actionName].send(method, options, url);
+		this.activeRequests.push(actionName);		
 	};
 
 	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
@@ -188,15 +207,14 @@ function Controller() {
 	};
 
 	Controller.prototype.dispose = function() {
-		this.listeners = null;
-		if (this.request) {
-			this.request.dispose();
-		}
+		this.subscribers = null;
+		for (var k in this.requests) this.requests[k].dispose();
 		this.options = null;
 		this.request = null;
 		this.data = null;
-		this.action = null;
 		this.initials = null;
+		this.activeRequests = null;
+		this.requests = null;
 	};
 }
 Controller();

@@ -18,3 +18,20 @@ Array.prototype.getIntersections = function(arr) {
 Array.prototype.hasIntersections = function(arr) {
 	return !isUndefined(this.getIntersections(arr)[0]);
 };
+Array.prototype.removeIndexes = function(indexes) {
+	var deleted = 0;
+	for (var i = 0; i < indexes.length; i++) {
+		this.splice(indexes[i] - deleted, 1);
+		deleted++;
+	}
+};
+Array.prototype.isEmpty = function() {
+	return this.length > 0;
+};
+Array.prototype.removeItems = function(items) {
+	for (var i = 0; i < items.length; i++) this.removeItem(items[i]);
+};
+Array.prototype.removeItem = function(item) {
+	var index = this.indexOf(item);
+	if (index > -1) this.splice(index, 1);
+};

@@ -636,7 +636,8 @@
 		}
 	}
 
-	function transformIntoValidJson($value) {
+	function transformIntoValidJson($value, $addNQs = false) {
+		global $classesList;
 		$regexp = '/\s*([\{\}\[\],:])\s*/';
 		preg_match_all($regexp, $value, $signs);
 		$signs = $signs[1];
@@ -644,7 +645,11 @@
 		$parts = preg_split($regexp, $value);
 		foreach ($parts as $i => &$part) {
 			if (!empty($part) && $parts != 'null' && $part != 'false' && $part != 'true' && !is_numeric($part)) {
+				$isNotQuoted = !preg_match('/^["\']/', $part);
 				$part = trim(trim($part, '"'), "'");
+				if ($addNQs && $isNotQuoted && isset($classesList[$part])) {
+					$part = '<nq>'.$part.'<nq>';
+				}
 				$part = '"'.str_replace('"', "'", $part).'"';
 			}
 		}
@@ -743,7 +748,7 @@
 						$i++;
 						
 						if ($properParts[$i + 2] == '{' || empty($functionName)) {
-							error("Ошибка в валидации кода класса <b>".$className.'</b>');
+							error("Ошибка в валидации кода класса <b>".$component['name'].'</b>');
 						}
 					}
 					$opening = 0;
@@ -1232,7 +1237,7 @@
 							}
 							if (!empty($child['e'])) {
 								if ($child['e'][0]['t'] == 'else') {
-									$child['e'] = array($child['e'][0]['c']);
+									$child['e'] = array($child['e'][0]);
 								}
 								if (!empty($child['p']) && !empty($child['e'])) {
 									array_unshift($child['e'], '<nq><function_returns_array>');
@@ -1539,8 +1544,8 @@
 	}
 
 	function checkIfConditionForContainigProps($ifCondition, &$child, &$component, $addingIntoChild = false) {
-		if (is_array($component) && preg_match('/\$\w+[\.\[]/', $ifCondition)) {
-			error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$ifCondition.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+		if (is_array($component) && preg_match('/\$\w+[\[]/', $ifCondition)) {
+			error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$ifCondition.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 		}
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string($component) && $hasCode) {
@@ -1929,8 +1934,8 @@
 		if (!empty($else)) {
 			$else = ltrim($else, '{');
 			$else = rtrim($else, '}');
-			if (preg_match('/\$\w+[\.\[]/', $else)) {
-				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$else.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+			if (preg_match('/\$\w+[\[]/', $else)) {
+				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$else.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 			}
 			$child['e'] = parseCode($else, $component, 'else');
 		}
@@ -2001,8 +2006,8 @@
 				if (is_string($component)) {
 					error('Шаблон, содержащийся в файле <b>'.$component.'</b> содержит код с реактивными переменными <b>'.$propValue.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
 				}
-				if (preg_match('/\$\w+[\.\[]/', $propValue)) {
-					error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$propValue.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+				if (preg_match('/\$\w+[\[]/', $propValue)) {
+					error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$propValue.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 				}				
 				preg_match_all($regexp, $propValue, $matches);
 				$codes = $matches[1];
@@ -2066,11 +2071,11 @@
 		if (empty($codes)) {
 			return array($text);
 		}
-		if (preg_match('/\$\w+[\.\[]/', $text)) {
+		if (preg_match('/\$\w+[\[]/', $text)) {
 			if (is_array($component)) {
-				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+				error('Шаблон класса <b>'.$component['name'].'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 			} else {
-				error('Один из шаблонов файле <b>'.$component.'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b>. Использование <b>$var.name</b> или <b>$var["name"]</b> недопустимо');
+				error('Один из шаблонов файле <b>'.$component.'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 			}
 		}
 		$parts = preg_split($regexp, $text);
@@ -2111,9 +2116,37 @@
 			if (preg_match('/\#\w/', $code)) {
 				error('Обнаружено использование контстанты данных <b>'.$code.'</b> внутри текстового нода в шаблоне класса <b>'.$component['name'].'</b><br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>');
 			}
-			$code = preg_replace('/^\s*\$(\w+)\s*$/', "{'pr':'$1','p':\<this>g('$1')}", $code);
+			preg_match_all('/^\s*\$([a-z][\w+\.\-]*)\s*$/i', $code, $matches);
+			$match = $matches[1][0];
+			if (!empty($match)) {
+				$parts = explode('.', $match);
+				if (count($parts) == 1) {
+					$code = "{'pr':'".$match."','p':\<this>g('".$match."')}";
+				} else {
+					$name = $parts[0];
+					array_shift($parts);
+					$code = "{'pr':'".$name."','p':\<this>g('".$name."',['".implode("','",$parts)."'])}";
+				}
+			}
 		} else {
-			$code = preg_replace('/\$(\w+)/i', "<this>g('$1')", $code);	
+			$regexp = '/\$([a-z][\w+\.\-]*)/i';
+			preg_match_all($regexp, $code, $matches);
+			$parts = preg_split($regexp, $code);
+			$matches = $matches[1];
+			$code = '';
+			foreach ($parts as $i => $part) {
+				$code .= $part;
+				if (isset($matches[$i])) {
+					$p = explode('.', $matches[$i]);
+					if (count($p) == 1) {
+						$code .= "<this>g('".$matches[$i]."')";
+					} else {
+						$name = $p[0];
+						array_shift($p);
+						$code .= "<this>g('".$name."',['".implode("','",$p)."'])";
+					}
+				}
+			}
 		}
 		$code = preg_replace('/^&([a-z])/i', "$1", $code);
 		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
@@ -2268,7 +2301,7 @@
 			}
 			$dataIndex[$v] = $i;
 		}
-		$var = transformIntoValidJson('{'.trim(preg_replace('/;*\s*'.$regexp.'/', ",'$1':", $data), ',').'}');
+		$var = transformIntoValidJson('{'.trim(preg_replace('/;*\s*'.$regexp.'/', ",'$1':", $data), ',').'}', true);
 		
 		$var = preg_replace('/@(\w+)/', "<nq>__.$1<nq>", $var);
 		$data = json_decode($var, true);

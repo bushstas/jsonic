@@ -3,7 +3,10 @@ controller Subscription
 initial actions = {
 	'load': {
 		'url': CONFIG.settings.subscr,
-		'method': 'GET'
+		'method': 'GET',
+		'autoset': {
+			'options': 'opts'
+		}
 	},
 	'save': {
 		'url': CONFIG.settings.set,

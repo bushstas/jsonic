@@ -1,8 +1,1 @@
-<div class="app-input-container {$class}" scope="1">
-	{if $caption}
-		<div class="app-input-caption">
-			{$caption}
-		</div>
-	{/if}
-	<textarea name="{$name}" placeholder="{$placeholder}" onInput="onChange" readonly="{$enabled?'readonly'}">{$value}</textarea>
-</div>
+<textarea name="{$name}" placeholder="{$placeholder}" onInput="onChange" readonly="{$enabled?'readonly'}">{$value}</textarea>

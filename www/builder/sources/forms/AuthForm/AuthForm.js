@@ -3,7 +3,7 @@ form AuthForm
 initial args = {
 	'action': 'user/login.php',
 	'ajax': true,
-	'container': '->> app-authform-inputs',
+	'className': '->> app-authform-inputs',
 	'controls': [
 		{
 			'caption': @login,

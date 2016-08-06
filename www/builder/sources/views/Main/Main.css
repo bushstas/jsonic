@@ -26,6 +26,9 @@ $imgsrc = ../images/mainpage
 .mainpage-leftcolumn-title {
     $(mt27 fs16 c#4c546b pb7)
 }
+.mainpage-leftcolumn-title .app-tooltip {
+    $fright
+}
 .app-mainpage-table .app-mainpage-content-column {
     $(pt12 rel)
 }

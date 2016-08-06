@@ -1,14 +1,14 @@
 #subscrFreqOptions = [
 	{
-		title: @per2hours,
-		value: 84
+		'title': @per2hours,
+		'value': 84
 	},
 	{
-		title: @per1day,
-		value: 7
+		'title': @per1day,
+		'value': 7
 	},
 	{
-		title: @per2days,
-		value: 3
+		'title': @per2days,
+		'value': 3
 	}
 ]

@@ -1,20 +1,29 @@
 #nameInput = {
-	'type': 'text',
-	'name': 'name',
 	'caption': @contactName,
-	'class': '->> half-width'
+	'class': '->> half-width',
+	'controlClass': Input,
+	'controlProps': {
+		'type': 'text',
+		'name': 'name'
+	}
 }
 
 #emailInput = {
-	'type': 'text',
-	'name': 'phone',
-	'caption': @contactPhone,
-	'class': '->> half-width'
+	'caption': @contactEmail,
+	'class': '->> half-width',
+	'controlClass': Input,
+	'controlProps': {
+		'type': 'text',
+		'name': 'email'
+	}
 }
 
 #phoneInput = {
-	'type': 'text',
-	'name': 'email',
-	'caption': @contactEmail,
-	'class': '->> half-width'
+	'caption': @contactPhone,
+	'class': '->> half-width',
+	'controlClass': Input,
+	'controlProps': {
+		'type': 'text',
+		'name': 'phone'
+	}
 }

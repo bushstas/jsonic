@@ -267,6 +267,7 @@ function Level() {
 			var events = item['e'];
 			if (isArray(events)) {
 				for (i = 0; i < events.length; i++) {
+					if (isString(events[i + 1])) events[i + 1] = component.dispatchEvent.bind(component, events[i + 1]);
 					cmp.subscribe(events[i], events[i + 1], component);
 					i++;	
 				}

@@ -53,7 +53,7 @@ function Objects() {
 		if (isArray(obj)) return obj[idx];
 		var count = 0;
 		for (var k in obj) {
-			if (count == idx) return idx[k];
+			if (count == idx) return obj[k];
 			count++;
 		}
 	};
@@ -73,6 +73,26 @@ function Objects() {
 	};
 	this.getKey = function(obj, value) {
 		for (var k in obj) if (obj[k] == value) return k;
+	};
+	this.flatten = function(obj, flattened, transformed) {
+		var top = isUndefined(transformed);
+		flattened = flattened || {};
+		transformed = transformed || [];
+		if (!isObject(obj)) return obj;
+		for (var k in obj) {
+			if (isObject(obj[k])) Objects.flatten(obj[k], flattened, transformed);
+			else {
+				if (!isUndefined(flattened[k])) {
+					if (transformed.indexOf(k) == -1 || !isArray(flattened[k])) {
+						flattened[k] = [flattened[k]];
+						transformed.push(k);
+					}					
+					flattened[k].push(obj[k])
+				} else flattened[k] = obj[k];
+			}
+		}
+		if (top) transformed = null;
+		return flattened;
 	};
 }
 Objects = new Objects();

@@ -1,11 +1,11 @@
 <div class="app-subscription-options" scope="1">
 	<div class="app-subscription-option">
-		<include Checkbox name="tenderOfFavorite" checked="{$opt1}"> {@notifyMe} <b>{@favTenderChange}</b>
+		<include Checkbox name="tenderOfFavorite" checked="{$opts.tenderOfFavorite}"> {@notifyMe} <b>{@favTenderChange}</b>
 	</div>
 	<div class="app-subscription-option">
-		<include Checkbox name="protocolOfFavorite" checked="{$opt2}"> {@notifyMe} <b>{@protocolChange}</b>
+		<include Checkbox name="protocolOfFavorite" checked="{$opts.protocolOfFavorite}"> {@notifyMe} <b>{@protocolChange}</b>
 	</div>
 	<div class="app-subscription-option">
-		<include Checkbox name="protocolOfFilter" checked="{$opt3}"> {@notifyMe} <b>{@newProtocols}</b>
+		<include Checkbox name="protocolOfFilter" checked="{$opts.protocolOfFilter}"> {@notifyMe} <b>{@newProtocols}</b>
 	</div>
 </div>

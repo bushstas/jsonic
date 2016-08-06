@@ -1,20 +1,17 @@
 function Globals() {
 	var listeners = {};
+	var subscribers = {};
 	var components = {};
 	var views = {};
 	var globalVars = {};
 	this.addView = function(view, key) {
-		if (isUndefined(views[key])) {
-			views[key] = view;
-		}
+		if (isUndefined(views[key])) views[key] = view;
 	};
 	this.getView = function(key) {
 		return views[key];
 	};
 	this.addComponent = function(component, key) {
-		if (isUndefined(components[key])) {
-			components[key] = component;
-		}
+		if (isUndefined(components[key])) components[key] = component;
 	};
 	this.getComponent = function(key) {
 		return components[key];
@@ -23,19 +20,17 @@ function Globals() {
 		delete components[key];
 	};
 	this.subscribe = function(globalVarName, callback, subscriber) {
-		if (!isArray(listeners[globalVarName])) {
-			listeners[globalVarName] = [];
-		}
-		listeners[globalVarName].push([callback, subscriber]);
+		if (!isArray(subscribers[globalVarName])) subscribers[globalVarName] = [];
+		subscribers[globalVarName].push([callback, subscriber]);
 	};
 	this.unsubscribe = function(subscriber, globalVarName) {
-		if (isArray(listeners[globalVarName])) {
+		if (isArray(subscribers[globalVarName])) {
 			var done = false;
 			while (!done) {
 				done = true;
-				for (var i = 0; i < listeners[globalVarName].length; i++) {
-					if (listeners[globalVarName][i][1] == subscriber) {
-						listeners[globalVarName].splice(i, 1);
+				for (var i = 0; i < subscribers[globalVarName].length; i++) {
+					if (subscribers[globalVarName][i][1] == subscriber) {
+						subscribers[globalVarName].splice(i, 1);
 						done = false;
 						break;
 					}
@@ -48,16 +43,38 @@ function Globals() {
 	};
 	this.set = function(globalVarName, globalVarValue) {
 		globalVars[globalVarName] = globalVarValue;
-		if (isArray(listeners[globalVarName])) {
-			for (var i = 0; i < listeners[globalVarName].length; i++) {
-				if (isFunction(listeners[globalVarName][i][0])) {
-					listeners[globalVarName][i][0].call(listeners[globalVarName][i][1] || null, globalVarValue, globalVarName);
+		if (isArray(subscribers[globalVarName])) {
+			for (var i = 0; i < subscribers[globalVarName].length; i++) {
+				if (isFunction(subscribers[globalVarName][i][0])) {
+					subscribers[globalVarName][i][0].call(subscribers[globalVarName][i][1] || null, globalVarValue, globalVarName);
 				}
 			}
 		}
 	};
 	this.has = function(globalVarName, globalVarValue) {
 		return Objects.has(globalVars, globalVarName, globalVarValue);
+	};
+	this.listen = function(globalEventName, callback, listener) {
+		if (!isArray(listeners[globalEventName])) listeners[globalEventName] = [];
+		listeners[globalEventName].push([callback, listener]);
+	};
+	this.unlisten = function(globalEventName, listener) {
+		if (isArray(listeners[globalEventName])) {
+			var indexes = [];
+			for (var i = 0; i < listeners[globalEventName].length; i++) {
+				if (listeners[globalEventName][i][1] == listener) indexes.push(i);
+			}
+			listeners[globalEventName].removeIndexes(indexes);
+		}
+	};
+	this.dispatchEvent = function(globalEventName, params) {
+		if (isArray(listeners[globalEventName])) {
+			for (var i = 0; i < listeners[globalEventName].length; i++) {
+				if (isFunction(listeners[globalEventName][i][0])) {
+					listeners[globalEventName][i][0].call(listeners[globalEventName][i][1] || null, params);
+				}
+			}
+		}
 	};
 }
 Globals = new Globals();

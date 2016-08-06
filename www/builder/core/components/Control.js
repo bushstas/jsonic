@@ -1,4 +1,5 @@
 function Control() {
+	if (this !== window) return;
 	var getCorrectedValue = function(value) {
 		var type = Objects.get(this.options, 'type');
 		switch (type) {
@@ -43,12 +44,12 @@ function Control() {
 		this.dispatchChange();
 	};
 
-	Control.prototype.dispatchChange = function() {
-		this.dispatchEvent('change', {'value': this.get('value'), 'instance': this});
-	};
+	Control.prototype.onChange = function(e) {};
 
-	Control.prototype.getControlValue = function() {
-		return (!isUndefined(this.value) ? this.value : this.props.value) || '';
+	Control.prototype.dispatchChange = function() {
+		var event = {'value': this.getValue(), 'instance': this};
+		this.onChange(event);
+		this.dispatchEvent('change', event);
 	};
 
 	Control.prototype.getInitials = function() {
@@ -56,22 +57,34 @@ function Control() {
 	};
 
 	Control.prototype.registerControl = function(control, name) {
-	 	this.controls = this.controls || {};
-	 	this.controls[name] = control;
+		Component.prototype.registerControl.call(this, control, name);
 	 	this.addListener(control, 'change', onChangeChildControl.bind(this));
 	};
 
+	Control.prototype.setName = function(name) {
+		this.name = name;
+	};
+
 	Control.prototype.getName = function() {
-		return this.props.name;
+		return this.name;
 	};
 
 	Control.prototype.getValue = function() {
 		var value;
 		if (this.hasControls()) {
 			value = {};
-			for (var k in this.controls) value[k] = this.controls[k].getValue();
+			for (var k in this.controls) {
+				if (isArray(this.controls[k])) {
+					value[k] = [];
+					for (var i = 0; i < this.controls[k].length; i++) value[k].push(this.controls[k][i].getValue());
+				} else value[k] = this.controls[k].getValue();
+			}
 		} else value = getCorrectedValue.call(this, this.getControlValue());
 		return value;
+	};
+
+	Control.prototype.getControlValue = function() {
+		return this.get('value');
 	};
 
 	Control.prototype.getProperValue = function(value) {
@@ -79,22 +92,11 @@ function Control() {
 	};
 
 	Control.prototype.setValue = function(value) {
-		if (this.hasControls() && isObject(value)) {
-			for (var k in value) {
-				if (isControl(this.controls[k])) this.controls[k].setValue(this.controls[k].hasControls() ? value : value[k]);
-			}
-		} else {
-			this.value = value;
-			this.setProperValue(value);
-		}
+		this.setProperValue(value);
 	};
 
 	Control.prototype.setProperValue = function(value) {
 		this.set('value', value);
-	};
-
-	Control.prototype.hasControls = function() {
-		return !Objects.empty(this.controls);
 	};
 
 	Control.prototype.isEnabled = function() {
@@ -108,7 +110,6 @@ function Control() {
 	Control.prototype.disposeInternal = function() {
 		this.controls = null;
 		this.options = null;
-		this.value = null;
 	};
 }
 Control();

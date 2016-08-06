@@ -2,20 +2,26 @@ form SupportForm extends OrderCallForm
 
 initial args = {
 	'action': CONFIG.support.send,
+	'className': '->> app-order-call',
 	'controls': [
 		#nameInput,
 		#emailInput,
 		#phoneInput,
 		{
-			'type': 'textarea',
-			'name': 'comment',
-			'caption': @descrProblem
+			'caption': @descrProblem,
+			'controlClass': Textarea,
+			'controlProps': {
+				'name': 'comment'
+			}
 		},
 		{
-			'type': 'file',
-			'name': 'screenshot',
-			'accept': 'image/*',
-			'caption': @attachScreenshot
+			'caption': @attachScreenshot,
+			'controlClass': Input,
+			'controlProps': {
+				'name': 'screenshot',
+				'type': 'file',				
+				'accept': 'image/*'
+			}			
 		}
 	],
 	'submit': {

@@ -1,5 +1,5 @@
 control KeywordsControl
 
-function onRendered() {
-	
+function onChange() {
+	Globals.dispatchEvent('TenderSearchFormChanged');
 }

@@ -3,36 +3,44 @@ form OrderCallForm
 initial args = {
 	'action': CONFIG.orderCall.send,
 	'method': 'POST',
-	'container': '->> app-order-call',
+	'className': '->> app-order-call',
 	'controls': [
 		#nameInput,
 		#emailInput,
 		#phoneInput,
 		{
-			'type': 'select',
-			'name': 'topic',
-			'options': Dictionary.get('orderCallTopics'),
 			'caption': @callTopic,
-			'class': '->> half-width'
+			'class': '->> half-width',
+			'controlClass': Select,
+			'controlProps': {
+				'name': 'topic',
+				'options': Dictionary.get('orderCallTopics')
+			}			
 		},
 		{
-			'type': 'select',
-			'name': 'date',
-			'options': this.getDateOptions(),
 			'caption': @callDate,
-			'class': '->> half-width'
+			'class': '->> half-width',
+			'controlClass': Select,
+			'controlProps': {
+				'name': 'date',
+				'options': this.getDateOptions()
+			}			
 		},
 		{
-			'type': 'select',
-			'name': 'time',
-			'options': Dictionary.get('timeOptions'),
 			'caption': @callTime,
-			'class': '->> half-width'
+			'class': '->> half-width',
+			'controlClass': Select,
+			'controlProps': {
+				'name': 'time',
+				'options': Dictionary.get('timeOptions')
+			}
 		},
 		{
-			'type': 'textarea',
-			'name': 'comment',
-			'caption': @descr
+			'caption': @descr,
+			'controlClass': Textarea,
+			'controlProps': {
+				'name': 'comment'
+			}
 		}
 	],
 	'submit': {

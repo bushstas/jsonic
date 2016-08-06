@@ -1,4 +1,5 @@
 function Component() {	
+	if (this !== window) return;
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
@@ -131,12 +132,21 @@ function Component() {
 	Component.prototype.initiate = function() {
 		this.propActivities = {};
 		this.propsToSet = {};
-		this.rendered = this.disposed = false;
+		this.rendered = this.disposed = this.disabled = false;
 	};
 
 	Component.prototype.render = function(parentElement) {
 		this.parentElement = parentElement;
 		load.call(this);
+	};
+
+	Component.prototype.disable = function(isDisabled) {
+		this.disabled = isDisabled;
+		this.addClass('->> disabled', !isDisabled);
+	};
+	
+	Component.prototype.isDisabled = function() {
+		return this.disabled;
 	};
 
 	Component.prototype.instanceOf = function(parent) {
@@ -166,8 +176,17 @@ function Component() {
 		return Objects.get(this.waiting, componentName);
 	};
 
-	Component.prototype.get = function(propName) {
-		return this.propsToSet[propName] || this.props[propName];
+	Component.prototype.get = function(propName, keys) {
+		var prop = this.propsToSet[propName] || this.props[propName];
+		if (!keys || !isArrayLike(prop) || !isArray(keys)) return prop;
+		var end;
+		for (var i = 0; i < keys.length; i++) {
+			prop = prop[keys[i]];
+			if (isUndefined(prop)) return '';
+			end = keys.length == i + 1;
+			if (end || !isArrayLike(prop)) break;
+		}
+		return end ? prop || '' : '';
 	};
 
 	Component.prototype.showElement = function(element, isShown) {
@@ -177,6 +196,10 @@ function Component() {
 
 	Component.prototype.setStyle = function(styles) {
 		if (this.isRendered()) this.getElement().setStyle(styles);
+	};
+
+	Component.prototype.setVisible = function(isVisible) {
+		if (this.isRendered() && !this.isDisposed()) this.getElement().show(isVisible);
 	};
 
 	Component.prototype.addClass = function(className, isAdding) {
@@ -265,7 +288,15 @@ function Component() {
 	 };
 
 	Component.prototype.forEachChild = function(callback) {
-		if (isObject(this.children)) Objects.each(this.children, callback, this);
+		if (isArrayLike(this.children)) {
+			var result;
+			for (var k in this.children) {
+				if (!this.children[k].isDisabled()) {
+					result = callback.call(this, this.children[k], k);
+					if (result) return result;
+				}
+			}
+		}
 	};
 
 	Component.prototype.registerChildComponent = function(child) {
@@ -277,15 +308,17 @@ function Component() {
 
 	Component.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
-	 	this.controls[name] = control;
+	 	if (!isUndefined(this.controls[name])) {
+	 		if (!isArray(this.controls[name])) this.controls[name] = [this.controls[name]];
+	 		this.controls[name].push(control);
+	 	} else this.controls[name] = control;
+	 	control.setName(name);
 	};
 
 	Component.prototype.getControl = function(name) {
-		return Objects.get(this.controls, name);
-	};
-
-	Component.prototype.getCotrolAt = function(index) {
-		return Objects.getByIndex(this.controls, index);
+		return Objects.get(this.controls, name) || this.forEachChild(function(child) {
+			return child.getControl(name);
+		});
 	};
 
 	Component.prototype.setControlValue = function(name, value) {
@@ -302,17 +335,17 @@ function Component() {
 		if (isObject(this.controls)) Objects.each(this.controls, callback, this);
 	};
 
-	Component.prototype.getControlsData = function() {
-		var objs = [{}];
-		this.forEachControl(function(control, k) {
-			objs[0][k] = control.getValue();
-		});
+	Component.prototype.hasControls = function() {
+		return !Objects.empty(this.controls);
+	};
+
+	Component.prototype.getControlsData = function(data) {
+		data = data || {};
 		this.forEachChild(function(child) {
-			if (!isControl(child)) {
-				objs.push(child.getControlsData());
-			}
+			if (!isControl(child)) child.getControlsData(data);
+			else data[child.getName()] = child.getValue();
 		});
-		return Objects.merge.apply(null, objs);
+		return data;
 	};
 
 	Component.prototype.setParent = function(parentalComponent) {
