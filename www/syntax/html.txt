@@ -149,7 +149,7 @@ contexts:
         2: entity.name.tag.block.any.html
       push:
         - meta_scope: meta.tag.block.any.html
-        - match: (>)
+        - match: "((?: ?/)?>)"
           captures:
             1: entity.name.sign.style.html
           pop: true

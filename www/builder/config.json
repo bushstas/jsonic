@@ -10,6 +10,7 @@
 	"entry"      : "App",
 	"scope"      : "./sources",
 	"sources"    : "./core",
+	"tests"      : "./tests",
 	"blanks"     : "./blanks",
 	"scripts"    : "./scripts",
 	"container"  : "app-view-container",

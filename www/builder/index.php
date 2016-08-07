@@ -16,7 +16,7 @@
 	}
 	select {
 		font-family: Segoe UI, Georgia, Arial;
-		padding: 4px 10px;
+		padding: 4px 6px;
 	}
 	input[type="checkbox"] {
 		float: left;
@@ -42,6 +42,10 @@
 	.topic-select {
 		width: 200px;
 	}
+	.testform {
+		position: absolute;
+		left: 145px;
+	}
 </style>
 </head>
 <body>
@@ -50,11 +54,15 @@
 		<select class="topic-select" name="topic">
 			<option value="tmp">шаблонам</option>
 			<option value="tmpcode">коду в шаблонах</option>
+			<option value="attr">зарезерв. атрибуты тегов</option>
 		</select>
+	</form>
+	<form class="testform" metod="GET" target="iframe" action="test.php">
+		<input name="submit" type="submit" value="Запустить тест" style="padding: 5px 10px;">
 	</form>
 	<form metod="GET" target="iframe" action="build.php">
 		<div class="top">
-			<input type="submit" value="Скомпилировать" style="padding: 5px 10px;">
+			<input name="submit" type="submit" value="Скомпилировать" style="padding: 5px 10px;">
 		</div>
 		<div style="clear: both;"></div>
 		<iframe name="iframe" id="iframe" width="70%" height="1000"></iframe>
