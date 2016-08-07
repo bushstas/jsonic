@@ -1,3 +1,2 @@
 {template .content}
-	<div>{@searchByKeywords}</div>
-{/template}
+<div>{@searchByKeywords}</div>

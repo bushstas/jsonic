@@ -1005,7 +1005,7 @@
 		
 		$templates = array();
 		for ($i = 0; $i < count($templateNames); $i++) {
-			$templates[] = getParsedTemplate($templateContents[$i], $templateNames[$i], $regexp, $component); 
+			$templates[] = getParsedTemplate($templateContents[$i], $templateNames[$i], $regexp, $component, $tmpids); 
 		}
 
 		$isSingle = count($templates) == 1;
@@ -1057,7 +1057,7 @@
 		return $templateFunctions;
 	}
 
-	function getParsedTemplate($content, $name, $regexp, &$component) {
+	function getParsedTemplate($content, $name, $regexp, &$component, $tmpids) {
 		$html = preg_replace($regexp, '', $content);
 		$html = preg_replace('/<(\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
 		$html = preg_replace('/<\/(img|br|hr|input|component|control|form|menu)>/', '', $html);
@@ -1085,7 +1085,7 @@
 		}
 		$isLet = 0;
 		checkTagsPairing($list, $component);
-		$children = getHtmlChildren($list, $component, $isLet);
+		$children = getHtmlChildren($list, $component, $isLet, false, $name, $tmpids);
 		return array('name' => $name, 'children' => $children);
 	}
 
@@ -1123,7 +1123,7 @@
 		return preg_match("/^[<\{]\//", $tagContent) ? 1 : 0;
 	}
 
-	function getHtmlChildren($list, &$component, &$let, $isSwitch = false) {
+	function getHtmlChildren($list, &$component, &$let, $isSwitch = false, $templateName, $tmpids) {
 		global $isSwitchContext;
 		if (empty($list)) {
 			return array();
@@ -1161,12 +1161,19 @@
 				}
 				elseif ($tagName == 'template')
 				{
-					preg_match("/<template +[\"']*(\w+)[\"']*/i",  $content, $match);
-					$child = array('tmp' => '<nq><this>getTemplate'.ucfirst($match[1]).'<nq>');
+					preg_match("/<template +[\"']*(\w+)[\"']*[^=]/i",  $content, $match);
+					$tmpName = $match[1];
+					if (!empty($tmpName) && $tmpName == $templateName) {
+						error('Шаблон <b>'.$templateName.'</b> класса <b>'.$component['name'].'</b> вызывает сам себя');
+					}
+					$child = array('tmp' => '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>');
 					getTemplateProperties($item['content'], $child, $component);
-					if (is_array($child['p']) && !empty($child['p']['tmpkey'])) {
-						$child['tmp'] = '<nq>'.strip_tags($child['p']['tmpkey']).'<nq>';
-						unset($child['p']['tmpkey']);
+					if (is_array($child['p']) && !empty($child['p']['tmpid'])) {
+						if (!empty($tmpids[$child['p']['tmpid']]) && $tmpids[$child['p']['tmpid']] == $templateName) {
+							error('Шаблон <b>'.$templateName.'</b> класса <b>'.$component['name'].'</b> вызывает сам себя');
+						}
+						$child['tmp'] = strip_tags($child['p']['tmpid']);
+						unset($child['p']['tmpid']);
 						if (count(array_keys($child['p'])) == 0) {
 							unset($child['p']);
 						}
@@ -1212,7 +1219,7 @@
 					if ($isSwitch) $isSwitchContext = true;
 					$child = array();
 					$isLet = 0;
-					$data = getHtmlChildren($childrenList, $component, $isLet, $isSwitchContext);
+					$data = getHtmlChildren($childrenList, $component, $isLet, $isSwitchContext, $templateName, $tmpids);
 					if ($isLet > 0) {
 						for ($ii = 0; $ii < $isLet; $ii++) {
 							$data[] = '</let>';

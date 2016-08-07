@@ -1,17 +1,16 @@
 {template .controls}
-	<div class="app-datatable-color-mark datatable-control"></div>	
-	<div class="app-datatable-checkbox-container datatable-control">
-		<include checkbox>
-	</div>
-	<div class="app-datatable-star datatable-control"></div>
-{/template}
+<div class="app-datatable-color-mark datatable-control"></div>	
+<div class="app-datatable-checkbox-container datatable-control">
+	<include checkbox>
+</div>
+<div class="app-datatable-star datatable-control"></div>
+
 
 {template .hotMark as .name}
-	<div data-title="fuck" class="tooltiped datatable-tooltiped datatable-hot-tender" data-timeout="true"></div>
-{/template}
+<div data-title="fuck" class="tooltiped datatable-tooltiped datatable-hot-tender" data-timeout="true"></div>
+
 
 {template .count}
-	<span class="app-datatable-standart-row-count">
-		{~count}
-	</span>
-{/template}
+<span class="app-datatable-standart-row-count">
+	{~count}
+</span>

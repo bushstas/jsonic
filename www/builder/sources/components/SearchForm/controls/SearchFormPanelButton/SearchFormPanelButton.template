@@ -1,5 +1,3 @@
-{template .main}
-	<div class="app-search-form-button {~className}" onClick="onClick">
-		<template content>
-	</div>
-{/template}
+<div class="app-search-form-button {~className}" onClick="onClick">
+	<template content>
+</div>

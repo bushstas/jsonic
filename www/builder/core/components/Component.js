@@ -496,7 +496,6 @@ function Component() {
 	};
 
 	Component.prototype.getTemplateById = function(tmpid) {
-		document.body.innerHTML = 'bushstas';
 		if (isObject(this.templatesById)) return this.templatesById[tmpid];
 		var parents = this.inheritedSuperClasses;
 		if (isArrayLike(parents)) {
