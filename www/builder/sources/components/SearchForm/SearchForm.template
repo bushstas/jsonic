@@ -1,6 +1,8 @@
-<div class="app-search-form" scope="1">
-	<div class="app-search-form-title">{~title}</div>
-	<div class="app-search-form-close-side" onClick="toggleExpand"></div>
-	<div class="app-search-form-close" onClick="toggleExpand"></div>
+<div class="app-search-form" scope>
+	<div class="app-search-form-title">
+		{~title}
+	</div>
+	<div class="app-search-form-close-side" onClick="toggleExpand"/>
+	<div class="app-search-form-close" onClick="toggleExpand"/>
 	<component class="TenderSearchForm">
 </div>

@@ -1,5 +1,5 @@
 {template .main}
-	<a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope="1" data-id="{~Id}">		
+	<a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope data-id="{~Id}">		
 		<template controls if="{!~nocontrols}">		
 		<div class="app-datatable-standart-row-top">
 			<div class="app-datatable-standart-row-top-item">

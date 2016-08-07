@@ -16,8 +16,8 @@ initial controllers = [
 
 initial helpers = [
 	{
-		helper: ClickHandler,
-		options: {
+		'helper': ClickHandler,
+		'options': {
 			'->> app-filter-stat-refresh': this.onRefreshButtonClick,
 			'->> app-filter-stat-row-name': this.onFilterClick
 		}

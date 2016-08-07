@@ -227,7 +227,7 @@ function Level() {
 	};
 
 	var includeTemplate = function(item) {
-		if (isString(item['tmp'])) item['tmp'] = component.getTemplateByKey(item['tmp']);
+		if (isString(item['tmp'])) item['tmp'] = component.getTemplateById(item['tmp']);
 		if (isFunction(item['tmp'])) {		
 			var items = item['tmp'].call(component, item['p'], component);
 			if (isArray(items)) {

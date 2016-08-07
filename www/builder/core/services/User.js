@@ -41,9 +41,7 @@ function User() {
 	var onLoadItem = function() {
 		if (loadedItems == 2) {
 			loaded = true;
-			if (app instanceof Function) {
-				app = new app();
-				Initialization.initiate.call(app);
+			if (isComponentLike(app)) {
 				app.run();
 			}
 		}

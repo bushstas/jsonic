@@ -978,12 +978,17 @@
 		return false;
 	}
  
-	function getTemplateFunctions($template, &$component, $class = null) {
+	function getTemplateFunctions($template, &$component, $class = null, &$tmpids = null) {
 		global $calledComponents;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
 		$template = preg_replace('/&nbsp;/', '\u00A0', $template);
 
+		preg_match_all("/\{template +\.(\w+) +as +\.(\w+) *\}/", $template, $matches);		
+		foreach ($matches[1] as $i => $match) {
+			$tmpids[$matches[2][$i]] = $match;
+			$template = preg_replace('/\{template +\.'.$match.' +as +\.'.$matches[2][$i].' *\}/', '{template .'.$match.'}', $template);
+		}
 		$regexp = "/\{template +\.(\w+) *\}/";
 		preg_match_all($regexp, $template, $matches);
 		$templateNames = $matches[1];
@@ -1054,6 +1059,8 @@
 
 	function getParsedTemplate($content, $name, $regexp, &$component) {
 		$html = preg_replace($regexp, '', $content);
+		$html = preg_replace('/<(\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
+		$html = preg_replace('/<\/(img|br|hr|input|component|control|form|menu)>/', '', $html);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
 
@@ -1626,7 +1633,6 @@
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
 		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
-
 		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
 		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);
@@ -1637,6 +1643,7 @@
 			$hasCode = hasCode($propValue);
 			$fullPropName = $propName;
 			$isObfClName = $obfuscate === true && $fullPropName == 'class';
+			$isTag = !$isComponentTag && !isset($child['tmp']);
 
 			if (is_numeric($child['t']) || $isComponentTag) {
 				if ($propName == 'scope') {
@@ -1652,7 +1659,7 @@
 					continue;
 				}
 				
-				if (!$isComponentTag && !isset($child['tmp']) && isset($propsShortcuts[$propName])) {
+				if ($isTag && isset($propsShortcuts[$propName])) {
 					$propName = $propsShortcuts[$propName];
 				} else {
 					$propName = preg_replace('/^data-/', '_', $propName);
@@ -1752,7 +1759,8 @@
 				if ($hasClassVar) {
 					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
 				}				
-				$props[$propName] = correctTagAttributeText($propName, $attrContent);
+				$attrContent = correctTagAttributeText($propName, $attrContent);
+				$props[$propName] = $attrContent;
 				$names[$propName] = array_unique($names[$propName]);
 				sort($names[$propName]);
 				if (count($names[$propName]) == 1) {
@@ -2216,10 +2224,16 @@
 		$js[] = '};';
 	}
 
+
 	function addTemplateFunction(&$js, $class, $templateHtml, &$component) {
-		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class);
+		$tmpids = array();
+		$templateFunctions = getTemplateFunctions($templateHtml, $component, $class, $tmpids);
 		foreach ($templateFunctions as $templateFunction) {
 			addPrototypeFunction($js, $class, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', "\n\treturn".$templateFunction['content']);
+		}
+		if (!empty($tmpids)) {
+			foreach ($tmpids as $k => &$v) $v = '<nq>'.$class.'.prototype.getTemplate'.ucfirst($v).'<nq>';
+			$js[] = $class.'.prototype.templatesById = '.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
 		}
 	}
 

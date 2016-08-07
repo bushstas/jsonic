@@ -1,4 +1,5 @@
 function Application() {
+	if (this !== window) return;
 	var getViewParams = function(route, allParams) {
 		var params;
 		if (isObject(route['dinamicParams'])) {

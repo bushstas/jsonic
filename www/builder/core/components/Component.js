@@ -416,8 +416,8 @@ function Component() {
 				for (var i = 0; i < el.childNodes.length; i++) {
 					if (isElement(el.childNodes[i])) {
 						callback(el.childNodes[i]);
-					} else if (isText(el.childNodes[i]) && el.childNodes[i].hasOwnProperty('placeholderName') && !isUndefined(data[el.childNodes[i]['placeholderName']])) {
-						el.childNodes[i].textContent = data[el.childNodes[i]['placeholderName']];
+					} else if (isText(el.childNodes[i]) && !isUndefined(data[el.childNodes[i].placeholderName])) {
+						el.childNodes[i].textContent = data[el.childNodes[i].placeholderName];
 					}
 				}
 			};
@@ -495,6 +495,19 @@ function Component() {
 		}
 	};
 
+	Component.prototype.getTemplateById = function(tmpid) {
+		document.body.innerHTML = 'bushstas';
+		if (isObject(this.templatesById)) return this.templatesById[tmpid];
+		var parents = this.inheritedSuperClasses;
+		if (isArrayLike(parents)) {
+			for (var i = 0; i < parents.length; i++) {
+				if (isObject(parents[i].prototype.templatesById) && isFunction(parents[i].prototype.templatesById[tmpid])) {
+					return parents[i].prototype.templatesById[tmpid];
+				}
+			}
+		}
+	};
+
 	Component.prototype.unrender = function() {
 		this.disposeLinks();
 		this.disposeInternal();
@@ -530,7 +543,6 @@ function Component() {
 	Component.prototype.onRendered = f;
 	Component.prototype.onLoaded = f;
 	Component.prototype.getTemplateMain = f;
-	Component.prototype.getTemplateByKey = f;
 	Component.prototype.disposeInternal = f;
 	Component.prototype.getArgs = f;	
 	Component.prototype.g = Component.prototype.get;

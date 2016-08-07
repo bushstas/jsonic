@@ -1,6 +1,6 @@
-<div class="app-filter-stat {~className}" scope="1">
+<div class="app-filter-stat {~className}" scope>
 	<div class="app-filter-stat-title">
-		{~title?~title}
+		{~title}
 		<div class="app-filter-stat-refresh">
 			{@refresh}
 		</div>

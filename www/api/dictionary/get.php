@@ -1,6 +1,12 @@
 <?php
 	
 	$dictionary = array(
+		'fztypes' => array(
+			'44' => '44 ФЗ',
+			'94' => '94 ФЗ',
+			'223' => '223 ФЗ',
+			'com' => 'КОММ'
+		),
 		'orderCallTopics' => array(
 			array('value' => 'tariff',  'title' => 'Вопрос по тарифам'),
 			array('value' => 'doc',     'title' => 'Документооборот'),

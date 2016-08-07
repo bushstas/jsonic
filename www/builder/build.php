@@ -808,7 +808,9 @@
 			}
 			$compiledJs[] = 'Initialization.initiateControllers(['.implode(',', array_keys($classes['controller'])).']);';
 		}
-		$compiledJs[] = "User.load(".$config['entry'].");";
+		$compiledJs[] = $config['entry']." = new ".$config['entry']."();";
+		$compiledJs[] = "Initialization.initiate.call(".$config['entry'].");";
+		$compiledJs[] = "User.load(".$config['entry'].");";		
 		$compiledJs[] = "})();";
 
 
