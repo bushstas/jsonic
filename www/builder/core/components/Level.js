@@ -369,7 +369,7 @@ function Level() {
 
 	this.setAppended = function(isAppended) {
 		var isDetached = !isAppended;
-		if (isDetached === this.detached) return;
+		if (isDetached === !!this.detached) return;
 		this.detached = isDetached;
 		var elements = getElements();
 		if (isDetached) {

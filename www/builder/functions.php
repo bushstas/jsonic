@@ -1622,8 +1622,11 @@
 		$names = array();
 		$ifCondition = false;
 		$else = null;
+
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
+		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
+
 		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
 		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
 		$propNames = array_merge($matches1[1], $matches2[1]);

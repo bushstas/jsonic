@@ -571,6 +571,10 @@ function Component() {
 	Component.prototype.setAppended = function(isAppended) {
 		if (this.level) this.level.setAppended(isAppended);
 	};
+	Component.prototype.appendChild = function(child, isAppended) {
+		if (isString(child)) child = this.getChild(child);
+		if (isComponentLike(child)) child.setAppended(isAppended);
+	};
 	Component.prototype.setScope = function(scope) {
 		this.scope = scope;
 	};
@@ -1471,7 +1475,7 @@ function Level() {
 	};
 	this.setAppended = function(isAppended) {
 		var isDetached = !isAppended;
-		if (isDetached === this.detached) return;
+		if (isDetached === !!this.detached) return;
 		this.detached = isDetached;
 		var elements = getElements();
 		if (isDetached) {
@@ -3221,8 +3225,11 @@ function stringToNumber(str) {
 	return Number(str);
 }
 function App() {};
+App.prototype.onNoErrors = function() {
+	this.appendChild('menu', true);
+};
 App.prototype.onError = function(errorCode) {
-	this.getChild('menu').setAppended(false);
+	this.appendChild('menu', false);
 };
 App.prototype.getTemplateMain = function(_,$) {
 	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]
@@ -3617,9 +3624,6 @@ Dialog.prototype.onHide = function() {};
 Dialog.prototype.getTemplateMain = function(_,$) {
 	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?'max-height:'+$.g('height')+'px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['marginLeft','marginTop','width']}}]
 };
-Dialog.prototype.getTemplateContent = function(_,$) {
-	return null
-};
 Dialog.prototype.getInitials = function() {
 	return {
 		'args':{'closable': true},
@@ -3690,10 +3694,7 @@ Form.prototype.disposeInternal = function() {
 	this.request = null;
 };
 Form.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'e':[23,$.onSubmit],'p':{'p':_['submit']}}]:'','i':true}],'t':13,'p':{'c':'app-form-controls'+(_['className']?' '+_['className']:''),'m':_['method'],'a':_['action'],'_ajax':(_['ajax']?1:''),'_iframe':(_['iframe']?1:'')}}]
-};
-Form.prototype.getTemplateContent = function(_,$) {
-	return null
+	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'e':[23,$.onSubmit],'p':{'p':_['submit']}}]:'','i':true}],'t':13,'p':{'c':'app-form-controls'+(_['className']?' '+_['className']:''),'m':_['method'],'a':_['action'],'_ajax':(_['ajax']?1:''),'_iframe':(_['iframe']?1:''),'sc':1}}]
 };
 function PopupMenu() {};
 PopupMenu.prototype.onRendered = function() {
@@ -3747,9 +3748,6 @@ PopupMenu.prototype.getButtonData = function(item) {
 };
 PopupMenu.prototype.getTemplateMain = function(_,$) {
 	return[{'c':{'c':{'h':function(button,idx){return[{'c':[button['name'],{'tmp':$.getTemplateContent,'p':{'item':button}}],'t':0,'p':{'c':'app-popup-menu-button','_value':button['value'],'_index':idx}}]},'p':$.g('buttons'),'f':'buttons'},'t':0,'e':[0,$.onClick],'p':{'c':'app-popup-menu-inner-container','st':(_['maxHeight']?'max-height:'+_['maxHeight']+'px;':'')}},'t':0,'p':{'c':'app-popup-menu-outer-container '+_['className'],'sc':1}}]
-};
-PopupMenu.prototype.getTemplateContent = function(_,$) {
-	return null
 };
 function TabPanel() {};
 TabPanel.prototype.initiate = function() {

@@ -1,4 +1,4 @@
-<div class="app-subscription-options" scope="1">
+<div class="app-subscription-options" scope>
 	<div class="app-subscription-option">
 		<include Checkbox name="tenderOfFavorite" checked="{$opts.tenderOfFavorite}"> {@notifyMe} <b>{@favTenderChange}</b>
 	</div>

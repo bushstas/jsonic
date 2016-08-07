@@ -1,5 +1,9 @@
 application App
 
+function onNoErrors() {
+	this.appendChild('menu', true);
+}
+
 function onError(errorCode) {
-	this.getChild('menu').setAppended(false);
+	this.appendChild('menu', false);
 }

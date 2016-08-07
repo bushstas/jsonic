@@ -458,6 +458,11 @@ function Component() {
 		if (this.level) this.level.setAppended(isAppended);
 	};
 
+	Component.prototype.appendChild = function(child, isAppended) {
+		if (isString(child)) child = this.getChild(child);
+		if (isComponentLike(child)) child.setAppended(isAppended);
+	};
+
 	Component.prototype.setScope = function(scope) {
 		this.scope = scope;
 	};

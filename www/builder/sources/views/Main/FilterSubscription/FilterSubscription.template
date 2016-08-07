@@ -1,4 +1,4 @@
-<div class="app-subscription" scope="1">
+<div class="app-subscription" scope>
 	<div class="app-subscription-title">
 		{@subscrSetting} <b>{@ofNewTenders}</b>
 	</div>

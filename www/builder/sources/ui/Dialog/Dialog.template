@@ -1,20 +1,15 @@
-{template .main}
-	<div class="app-dialog-mask{$shown?' shown'}" onClick="hide"></div>
-	<div class="app-dialog{$expanded?' expanded'}{$shown?' shown'}" scope="1" style="width:{$width}px;margin-left:{$marginLeft};margin-top:{$marginTop};">
-		{if ~closable}
-			<div class="app-dialog-close" onClick="hide"></div>
-		{/if}
-		{if ~expandable}
-			<div class="app-dialog-expand" onClick="expand"></div>
-		{/if}
-		<div class="app-dialog-title">
-			{$title}
-		</div>
-		<div class="app-dialog-content" style="{$height?'max-height:'+$height+'px;'}">
-			<template content>
-		</div>
+<div class="app-dialog-mask{$shown?' shown'}" onClick="hide"></div>
+<div class="app-dialog{$expanded?' expanded'}{$shown?' shown'}" scope style="width:{$width}px;margin-left:{$marginLeft};margin-top:{$marginTop};">
+	{if ~closable}
+		<div class="app-dialog-close" onClick="hide"></div>
+	{/if}
+	{if ~expandable}
+		<div class="app-dialog-expand" onClick="expand"></div>
+	{/if}
+	<div class="app-dialog-title">
+		{$title}
 	</div>
-{/template}
-
-{template .content}
-{/template}
+	<div class="app-dialog-content" style="{$height?'max-height:'+$height+'px;'}">
+		<template content>
+	</div>
+</div>

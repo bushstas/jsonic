@@ -1,15 +1,10 @@
-{template .main}
-	<div class="app-popup-menu-outer-container {~className}" scope="1">
-		<div class="app-popup-menu-inner-container" onClick="onClick" style="{~maxHeight?'max-height:'+~maxHeight+'px;'}">
-			{foreach $buttons as &idx => &button}
-				<div class="app-popup-menu-button" data-value="{&button['value']}" data-index="{&idx}">
-					{&button['name']}
-					<template content item="{&button}">
-				</div>
-			{/foreach}
-		</div>
+<div class="app-popup-menu-outer-container {~className}" scope>
+	<div class="app-popup-menu-inner-container" onClick="onClick" style="{~maxHeight?'max-height:'+~maxHeight+'px;'}">
+		{foreach $buttons as &idx => &button}
+			<div class="app-popup-menu-button" data-value="{&button['value']}" data-index="{&idx}">
+				{&button['name']}
+				<template content item="{&button}">
+			</div>
+		{/foreach}
 	</div>
-{/template}
-
-{template .content}
-{/template}
+</div>

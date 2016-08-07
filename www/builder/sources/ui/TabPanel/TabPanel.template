@@ -1,4 +1,4 @@
-<div class="app-tab-panel" scope="1">
+<div class="app-tab-panel" scope>
 	{foreach ~tabs as &idx => &tab}
 		<div class="app-tab app-content-tab" data-index="{&idx}">
 			{&tab['title']}
