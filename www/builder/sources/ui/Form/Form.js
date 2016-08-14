@@ -2,20 +2,21 @@ component Form
 
 function onSubmit() {
 	if (this.isValid()) {
-		this.form = this.form || this.findElement('form');
-		var ajax = this.form.getData('ajax');
+		var form = this.getElement();
+		var ajax = form.getData('ajax');
 		if (ajax) {
 			this.sendAjaxRequest();
 		} else {
 			this.setFormKey();
-			this.form.submit();
+			form.submit();
 		}
 	}
 };
 
 function sendAjaxRequest() {
-	var action = this.form.attr('action');
-	var method = this.form.attr('method');
+	var form = this.getElement();
+	var action = form.attr('action');
+	var method = form.attr('method');
 	if (action) {
 		this.request = this.request || new AjaxRequest(action, this.handleResponse, null, this);
 		this.request.send(method, this.getControlsData());
@@ -67,6 +68,5 @@ function onFailure(data) {
 };
 
 function disposeInternal() {
-	this.form = null;
 	this.request = null;
 };

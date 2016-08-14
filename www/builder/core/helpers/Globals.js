@@ -2,14 +2,7 @@ function Globals() {
 	var listeners = {};
 	var subscribers = {};
 	var components = {};
-	var views = {};
 	var globalVars = {};
-	this.addView = function(view, key) {
-		if (isUndefined(views[key])) views[key] = view;
-	};
-	this.getView = function(key) {
-		return views[key];
-	};
 	this.addComponent = function(component, key) {
 		if (isUndefined(components[key])) components[key] = component;
 	};

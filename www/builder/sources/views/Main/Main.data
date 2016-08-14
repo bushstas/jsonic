@@ -25,3 +25,8 @@
 	'extended': true,
 	'className': '->> main-page-filter-stat'
 }
+
+#calendarTooltip = {
+	'key': 'calendar',
+	'className': '->> float-right'
+}

@@ -1585,6 +1585,9 @@
 				array_unshift($child['c'], '<nq><function_returns_array>');
 				array_push($child['c'], '</function_returns_array><nq>');
 			}
+			if (count($child['c']) == 2) {
+				$child['c'] = array('<nq><function>','','</function><nq>');
+			}
 		} else {
 			if (!preg_match('/'.$signs.'/', $ifCondition)) {
 				$child['i'] = '<nq>!!'.$ifCondition.'<nq>';
@@ -2354,21 +2357,33 @@
 		return $declensions;
 	}
 
-	function getTextConstants($texts, &$textsIndex) {
+	function getTextConstants($textData, &$textsIndex) {
 		$constants = array();
 		$regexp = '/@(\w+)\s*:\s*/';
-		foreach ($texts as $text) {
+		$nameFiles = array();
+		foreach ($textData as $textDataItem) {
+			$text = $textDataItem['text'];
+			$file = $textDataItem['file'];
 			preg_match_all($regexp, $text, $matches);
 			$varNames = $matches[1];
 			if (!empty($varNames)) {
 				$parts = preg_split($regexp, $text);
 				array_shift($parts);
 				foreach ($parts as $i => $part) {
+					if (!empty($constants[$varNames[$i]])) {
+						if ($nameFiles[$varNames[$i]] == $file) {
+							error('Дублирование текстовой контстанты <b>'.$varNames[$i].'</b> в файлe <b>'.$nameFiles[$varNames[$i]].'</b>.texts');
+						} else {
+							error('Дублирование текстовой контстанты <b>'.$varNames[$i].'</b> в файлах <b>'.$nameFiles[$varNames[$i]].'</b>.texts и <b>'.$file.'</b>.texts');
+						}
+					}
+					$nameFiles[$varNames[$i]] = $file;
 					$constants[$varNames[$i]] = trim($part);
 				}
 			}
 		}
 		$textsIndex = array_keys($constants);
+
 		return array_values($constants);
 	}
 
@@ -2465,7 +2480,7 @@
 		$parents = $component['extends'];
 		if (is_array($parents)) {
 			foreach ($parents as $parent) {
-				if (in_array($method, $classesList[$parent]['functionList'])) {
+				if (is_array($classesList[$parent]['functionList']) && in_array($method, $classesList[$parent]['functionList'])) {
 					return true;
 				}
 			}

@@ -1,0 +1,2 @@
+{template .tooltip}
+<div class="tooltiped app-tooltip {~className}" data-text="{~text}" data-key="{~key}" data-class="{~class}" data-caption="{~caption}"></div>

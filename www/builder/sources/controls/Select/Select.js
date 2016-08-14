@@ -20,6 +20,7 @@ function selectByValue(value, forced) {
 				this.selectedIndex = i;
 				if (!forced) $value = value;
 				$title = options[i]['title'];
+				this.syncTooltip(i);
 				return true;
 			}
 		}
@@ -34,13 +35,18 @@ function selectByIndex(index) {
 		if ($value == options[index]['value']) return;
 		$value = options[index]['value'],
 		$title = options[index]['title'];
+		this.syncTooltip(index);
 	}
 }
 
+function syncTooltip(index) {
+	var optionElement = this.getOptionElementAt(index);
+	var tooltipElement = this.findElement('.->> app-tooltip', optionElement);
+	
+}
+
 function enableOption(index, isEnabled) {
-	var optionsContainer = this.findElement('.->> app-select-options');
-	var optionElement = optionsContainer.getChildAt(index);
-	optionElement.toggleClass('->> disabled', !isEnabled);
+	this.getOptionElementAt(index).toggleClass('->> disabled', !isEnabled);
 	if (index == this.selectedIndex) {
 		this.selectByIndex(index == 0 ? index + 1 : 0);
     }
@@ -55,6 +61,10 @@ function onOptionsClick(e) {
 	}
 }
 
+function getOptionElementAt(index) {
+	return this.findElement('.->> app-select-options').getChildAt(index);
+}
+
 function setProperValue(value) {
 	this.selectByValue(value);
 }
@@ -65,7 +75,7 @@ function getControlValue() {
 
 function onClick() {
 	this.toggle('active');
-	Popuper.watch(this, this.findElement('.->> app-select'));
+	Popuper.watch(this);
 }
 
 function hide() {

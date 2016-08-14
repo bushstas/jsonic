@@ -90,6 +90,9 @@ Element.prototype.getAncestor = function(selector) {
 Element.prototype.getData = function(name) {
 	return this.getAttribute('_' + name) || '';
 };
+Element.prototype.setData = function(name, value) {
+	this.setAttribute('_' + name, value);
+};
 Element.prototype.getRect = function() {
 	return this.getBoundingClientRect();
 };

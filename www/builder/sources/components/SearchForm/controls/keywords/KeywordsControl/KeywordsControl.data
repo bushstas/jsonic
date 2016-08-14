@@ -1,10 +1,12 @@
 #keywordsNonMorphOptions = [
 	{
 		'value': '0',
-		'title': @isMorph
+		'title': @isMorph,
+		'tooltip': 'morph'
 	},
 	{
 		'value': '1',
-		'title': @isNonMorph
+		'title': @isNonMorph,
+		'tooltip': 'nonmorph'
 	}
 ]

@@ -36,7 +36,8 @@
 			print("Файл конфигурации не найден. Использованы настройки по умолчанию.<br>");
 			$config = $defaultConfig;
 		} else {
-			$config = json_decode(file_get_contents(CONFIG_FILENAME), true);
+			$configJson = file_get_contents(CONFIG_FILENAME);
+			$config = json_decode($configJson, true);
 			if (!is_array($config)) {
 				print("Файл конфигурации не корректен. Использованы настройки по умолчанию.<br>");
 				$config = $defaultConfig;
@@ -268,7 +269,12 @@
 		$componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
 		$jsSourcesFiles = gatherFiles($config['sources'], array(), true);
 		$sourcesList = array();
+		$helpers = array();
 		foreach ($jsSourcesFiles as $jsSourcesFile) {
+			if (preg_match('/\bhelpers\//', $jsSourcesFile['path'])) {
+				$helpers[] = $jsSourcesFile['name'];
+				$jsSourcesFile['isHelper'] = true;
+			}
 			$sourcesList[$jsSourcesFile['name']] = $jsSourcesFile;
 		}
 
@@ -283,6 +289,7 @@
 		$jsFileNames = array();
 		$apiConfig = '';
 		$isConfigJsFile = false;
+		$js = '';
 		foreach ($files as $file) {
 			$content = file_get_contents($file['path']);
 			$content = preg_replace('/^\s+|\s+$/', '', $content);
@@ -296,6 +303,7 @@
 					$apiConfig = preg_replace('/^\s*var +CONFIG *= *|[;\r\n\t]/', '', $content);
 					$isConfigJsFile = true;
 				} else {
+					$js .= $content;
 					parseJsClass($content, $classes, $file);
 					$jsFileNames[] = $file['name'];
 				}
@@ -305,7 +313,7 @@
 				$cssData[] = $file;
 				$css[] =  '/* '.$file['name'].' */'.preg_replace("/\/\*[^\*]*\*\//", "", $content);
 			} elseif ($file['ext'] == 'texts') {
-				$texts[] = $content;
+				$texts[] = array('text' => $content, 'file' => $file['name']);
 			} elseif ($file['ext'] == 'data') {
 				$data[] = $content;
 			} elseif ($file['ext'] == 'cssconst') {
@@ -327,6 +335,26 @@
 		$declensions = array();
 		if (!empty($decls)) {
 			$declensions = getDeclensions($decls);
+		}
+		$missingHelpers = array();
+		foreach ($helpers as $helper) {
+			$isMissing = false;
+			if (!preg_match('/\b'.$helper.'\b/', $js)) {
+				$isMissing = true;
+				if ($helper == 'Tooltiper') {
+					$isMissing = empty($tooltipClass);
+				} elseif ($helper == 'Globals') {
+					$isMissing = !preg_match('/\binitial globals\b/', ' '.$js);
+				} elseif ($helper == 'StoreKeeper') {
+					$isMissing = !preg_match('/\bstoreAs\b/', ' '.$js);
+				}
+			}
+			if ($isMissing) $missingHelpers[] = $helper;
+		}
+		foreach ($missingHelpers as $missingHelper) {
+			if (isset($sourcesList[$missingHelper]) && $sourcesList[$missingHelper]['isHelper']) {
+				unset($sourcesList[$missingHelper]);
+			}
 		}
 
 		if (!$isConfigJsFile) {
@@ -525,6 +553,31 @@
 				}
 			}
 		}
+		$notUsedClasses = array();
+		$parentalClasses = array();
+		foreach ($classesList as $key => $value) {			
+			if (is_array($value['extends'])) {
+				$parentalClasses = array_merge($parentalClasses, $value['extends']);
+			}
+			if (in_array($value['type'], array('component', 'control', 'form', 'menu', 'dialog')) && !in_array($key, $usedComponents)) {
+				$notUsedClasses[] = $key;
+			}
+		}
+		$parentalClasses = array_unique($parentalClasses);
+		$properNotUsedComponents = array();
+		foreach ($notUsedClasses as $className) {
+			$regexp = '/\b'.$className.'\b/';
+			$modifiedJs = preg_replace('/(component|control|menu|form|dialog)\s+'.$className.'\b/', '', $js);
+			if (!in_array($className, $parentalClasses) && !preg_match($regexp, $modifiedJs) && !preg_match($regexp, $configJson)) {
+				$properNotUsedComponents[] = $className;
+			}
+		}
+		foreach ($properNotUsedComponents as $className) {
+			unset($classesList[$className]);
+			foreach ($classes as $classType => &$classesByType) {
+				unset($classesByType[$className]);
+			}
+		}
 	
 		foreach ($classesFromTemplates as $classFromTemplate) {
 			if (isset($calledComponentsTypes2[$classFromTemplate])) {
@@ -643,7 +696,10 @@
 		}
 		foreach ($classesList as &$class) {
 			$class['extends'] = array_unique(getAllExtendClasses($class['extends']));
-			if (isset($calledComponentsTypes[$class['name']]) && $class['type'] != $calledComponentsTypes[$class['name']]['type']) {				
+			if (isset($calledComponentsTypes[$class['name']]) && $class['type'] != $calledComponentsTypes[$class['name']]['type']) {
+				if ($class['type'] == 'dialog') {
+					error('Недопустимая попытка вызвать компонент с типом <b>dialog</b> из шаблона в классе <b>'.$calledComponentsTypes[$class['name']]['file'].'</b><br><br>Для диалога синглтона  используйте код вида<xmp>Dialoger.show(CommentsDialog, options)</xmp>в противном случае используйте третий аргумент в качестве id параметра<xmp>Dialoger.show(ItemDialog, options, itemId)</xmp>');
+				}
 				error("Неверный тип вызываемого компонента <b>".$class['name']."</b> в шаблоне класса <b>".$calledComponentsTypes[$class['name']]['file']."</b><br><br>Найдено: <b>".$calledComponentsTypes[$class['name']]['type']."</b>, требуется: <b>".$class['type']."</b>");
 			}
 		}
@@ -704,7 +760,9 @@
 		$compiledJs = array();
 		$compiledJs[] = implode("\n", $globals);
 		foreach ($jsSourcesFiles as $jsSourcesFile) {
-			$compiledJs[] = $jsSourcesFile['content'];
+			if (isset($sourcesList[$jsSourcesFile['name']])) {
+				$compiledJs[] = $jsSourcesFile['content'];
+			}
 		}
 
 	
@@ -889,8 +947,11 @@
 		}
 		$compiledJs = preg_replace('/\{\s+\}/', '{}', $compiledJs);
 		if ($advancedMode) {
-			createFile('base.js', $compiledJs);
-			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js');
+			createFile('base.js', $compiledJs);			
+			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js 2>&1', $output);	
+			if (!empty($output[0]) && preg_match('/ERROR/', $output[0])) {
+				error('Ошибка обфусцирующего компилятора:<br><br>'.$output[0].'<br><br>'.$output[1]);
+			}
 			unlink('base.js');
 			rename('base2.js', DEFAULT_PATH.$pathToCompiledJs);
 		} else {

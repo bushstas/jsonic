@@ -28,15 +28,15 @@ function Tooltiper() {
 			createPopup();
 		}
 		key = '';
-		text = target.attr('txt');
-		addClass = target.attr('cls');
-		position = target.attr('pos');
-		caption = target.attr('cap');
-		delay = target.attr('del');
-		corrector = target.attr('cor');
+		text = target.getData('text');
+		addClass = target.getData('class');
+		position = target.getData('position');
+		caption = target.getData('caption');
+		delay = target.getData('delay');
+		corrector = target.getData('corrector');
 
 		if (!text) {
-			key = target.attr('key');
+			key = target.getData('key');
 		}
 		eventHandler.listenOnce(target, 'mouseleave', onLeave);
 	};
@@ -137,10 +137,10 @@ function Tooltiper() {
 		var cap = Objects.get(data, 'caption');
 		if (cap && isString(cap)) {
 			caption = cap;
-			target.attr('cap', cap);
+			target.setData('caption', cap);
 		}
 		if (text && isString(text)) {
-			target.attr('txt', text);
+			target.setData('text', text);
 			show();
 		}
 	};

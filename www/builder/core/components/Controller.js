@@ -13,7 +13,7 @@ function Controller() {
 	var gotFromStore = function(actionName, options) {
 		if (shouldStore.call(this)) {
 			var storeAs = getStoreAs.call(this, options);
-			if (isString(storeAs)) {
+			if (isString(storeAs) && typeof StoreKeeper != 'undefined') {
 				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 				if (isArrayLike(storedData)) {
 					onActionComplete.call(this, actionName, storedData, true);
@@ -54,6 +54,7 @@ function Controller() {
 		return Objects.has(this.options, 'storeAs');
 	};
 	var store = function(isAdding, data) {
+		if (typeof StoreKeeper == 'undefined') return;
 		var storeAs = getStoreAs.call(this, data);
 		if (isAdding) {		
 			StoreKeeper.set(storeAs, data);

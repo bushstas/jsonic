@@ -58,7 +58,7 @@ function Component() {
 	};
 
 	var getCombinedArgs = function() {
-		return Objects.merge(this.args, Objects.get(this.initials, 'args'), this.getArgs()); 
+		return Objects.merge(Objects.get(this.initials, 'args'), this.getArgs(), this.args); 
 	};
 
 	var propagatePropertyChange = function(changedProps) {

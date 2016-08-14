@@ -35,7 +35,6 @@ function Application() {
 				var viewContentElement = createViewContentElement.call(this);
 				view.render(viewContentElement);
 				view.initControllers();
-				Globals.addView(view, route['name']);
 			} else {
 				activateView.call(this, view, true, isSameView);
 			}
@@ -139,6 +138,9 @@ function Application() {
 			titleElement = headElement.appendChild(document.createElement('title'));
 		}
 		titleElement.innerHTML = title;
+	};
+	Application.prototype.getView = function(viewName) {
+		return this.views[viewName];
 	};
 	Application.prototype.disposeView = function(viewName) {
 		if (isObject(this.views[viewName])) {

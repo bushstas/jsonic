@@ -15,7 +15,10 @@ $imgsrc = ../images/ui
     $nosh
 }
 .app-select:after {
-    $(cnt abs r8 t15 png=select-arrow w10 h5 opac8)
+    $(cnt abs r8 t50% mt-2 png=select-arrow w10 h5 opac8)
+}
+.app-select.frameless:after {
+    $(rel ra ta inb vmid mt3 ml7)
 }
 .app-select:hover:after {
     $opac10
@@ -27,8 +30,10 @@ $imgsrc = ../images/ui
     $z15
 }
 .app-select-value {
-    $ (p10 nowrap ovh ell)
-    
+    $ (p10 nowrap ovh ell)    
+}
+.app-select.frameless .app-select-value {
+    $(inb vmid p5_0)
 }
 .app-select-options {
     $ (abs none t100% l-1 r-1 mt2 mah300 bgwhite bo#bec8da br4 p6 regular)

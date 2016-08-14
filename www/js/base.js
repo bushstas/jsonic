@@ -1,7 +1,7 @@
 ;(function() {
 var __T = ['\u0417\u0430\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0435\u043c\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u043d\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442','\u00A0','Delete',' \u00A0 ','LOGO','\u0413\u043b\u0430\u0432\u043d\u0430\u044f','\u041f\u043e\u0438\u0441\u043a','\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435','\u041f\u043b\u0430\u043d\u044b \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u0410\u043d\u0430\u043b\u0438\u0442\u0438\u043a\u0430'];
-var __ = ['\u0420\u0435\u0433\u0438\u043e\u043d\u044b','\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438','\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u0438 \u0440\u0435\u0433\u0438\u043e\u043d\u044b','\u044c','\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u043a\u043b\u044e\u0447\u0435\u0432\u044b\u043c \u0441\u043b\u043e\u0432\u0430\u043c','\u0441 \u0443\u0447\u0435\u0442\u043e\u043c \u043c\u043e\u0440\u0444\u043e\u043b\u043e\u0433\u0438\u0438','\u043f\u043e \u0442\u043e\u0447\u043d\u043e\u043c\u0443 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u044e','\u0422\u0435\u043d\u0434\u0435\u0440\u044b \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0430\u044e\u0442\u0441\u044f','dd month yyyy','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','standart-button','standart-button green-button','standart-button red-button','standart-button white-button','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u0415\u0449\u0435','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u041e\u0431\u0449\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f','\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438','\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0417\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0417\u0430 \u0432\u0447\u0435\u0440\u0430','\u0422\u0435\u043a\u0443\u0449\u0438\u0445','\u0417\u0430 \u043d\u0435\u0434\u0435\u043b\u044e','\u0417\u0430 \u043c\u0435\u0441\u044f\u0446','\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u044f\u0442\u044c \u043c\u0435\u043d\u044f \u043e \u043f\u043e\u044f\u0432\u043b\u0435\u043d\u0438\u0438','\u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043d\u043e\u0432\u044b\u0445 \u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u043e\u0432 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u043d\u043e\u0432\u044b\u0445 \u0442\u0435\u043d\u0434\u0435\u0440\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u043a\u0430\u0436\u0434\u044b\u0435 2 \u0447\u0430\u0441\u0430','\u043a\u0430\u0436\u0434\u044b\u0439 \u0434\u0435\u043d\u044c','\u0447\u0435\u0440\u0435\u0437 \u0434\u0435\u043d\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041f\u0435\u0440\u0438\u043e\u0434\u0438\u0447\u043d\u043e\u0441\u0442\u044c \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443'];
-var __V = [[{'value':'0','title':__[14]},{'value':'1','title':__[15]}],{'caption':__[31],'class':'half-width','controlClass':Input,'controlProps':{'type':'text','name':'name'}},{'caption':__[33],'class':'half-width','controlClass':Input,'controlProps':{'type':'text','name':'email'}},{'caption':__[32],'class':'half-width','controlClass':Input,'controlProps':{'type':'text','name':'phone'}},{'key':'calendar','className':'float-right'},[{'title':__[87],'value':84},{'title':__[88],'value':7},{'title':__[89],'value':3}],{'scope':'app-mainpage-content','tabs':[{'title':__[70],'container':'app-mainpage-tab1-content','active':true},{'title':__[71],'container':'app-mainpage-tab2-content'},{'title':__[72],'container':'app-mainpage-tab3-content'}],'rest':{'showCount':true}},{'title':__[73],'extended':true,'className':'main-page-filter-stat'}];
+var __ = ['\u0420\u0435\u0433\u0438\u043e\u043d\u044b','\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438','\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u044b \u0438 \u0440\u0435\u0433\u0438\u043e\u043d\u044b','\u044c','\u0420\u0410\u0421\u0428\u0418\u0420\u0415\u041d\u041d\u042b\u0419 \u041f\u041e\u0418\u0421\u041a','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u043e\u0432\u044b\u0439','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043c\u0430\u0441\u0442\u0435\u0440\u043e\u043c','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u041c\u043e\u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u044b','\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c','\u041e\u0447\u0438\u0441\u0442\u0438\u0442\u044c \u0432\u0435\u0441\u044c \u0444\u0438\u043b\u044c\u0442\u0440','\u0423\u0432\u0435\u0440\u0435\u043d\u044b?','\u0414\u0430','\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u043a\u043b\u044e\u0447\u0435\u0432\u044b\u043c \u0441\u043b\u043e\u0432\u0430\u043c','\u0441 \u0443\u0447\u0435\u0442\u043e\u043c \u043c\u043e\u0440\u0444\u043e\u043b\u043e\u0433\u0438\u0438','\u043f\u043e \u0442\u043e\u0447\u043d\u043e\u043c\u0443 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u044e','\u0418\u0441\u043a\u0430\u0442\u044c','\u0432','\u0422\u0435\u043d\u0434\u0435\u0440\u044b \u0432 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c, \u043a\u043e\u0442\u043e\u0440\u044b\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0430\u044e\u0442\u0441\u044f','dd month yyyy','\u0417\u0430\u043a\u0430\u0437 \u0437\u0432\u043e\u043d\u043a\u0430 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u044f\u0432\u043a\u0430 \u0432 \u0442\u0435\u0445\u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430','standart-button','standart-button green-button','standart-button red-button','standart-button white-button','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d','\u041b\u043e\u0433\u0438\u043d','\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c','\u041f\u0430\u0440\u043e\u043b\u044c','\u0412\u043e\u0439\u0442\u0438','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0435 \u0438\u043c\u044f','\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u0439 \u0442\u0435\u043b\u0435\u0444\u043e\u043d','Email','\u0422\u0435\u043c\u0430 \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u044b\u0439 \u0434\u0435\u043d\u044c \u0437\u0432\u043e\u043d\u043a\u0430','\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u0437\u0432\u043e\u043d\u043a\u0430','\u041a\u0440\u0430\u0442\u043a\u043e\u0435 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435','\u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0437\u0430\u0432\u0442\u0440\u0430','\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b','\u041f\u0440\u0438\u043a\u0440\u0435\u043f\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442','\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c','\u041f\u043d','\u0412\u0442','\u0421\u0440','\u0427\u0442','\u041f\u0442','\u0421\u0431','\u0412\u0441','\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u0415\u0449\u0435','\u041b\u0418\u0427\u041d\u042b\u0419 \u041a\u0410\u0411\u0418\u041d\u0415\u0422','\u041a\u043b\u0438\u0435\u043d\u0442','\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f','Email','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0439 \u043f\u043b\u0430\u043d','\u041d\u0430\u0447\u0430\u043b\u043e \u0434\u043e\u0441\u0442\u0443\u043f\u0430','\u041e\u043a\u043e\u043d\u0447\u0430\u043d\u0438\u0435 \u0434\u043e\u0441\u0442\u0443\u043f\u0430','http:\/\/initpro.ru\/tariffs\/','\u0422\u0430\u0440\u0438\u0444\u043d\u044b\u0435 \u043f\u043b\u0430\u043d\u044b','\u0412\u0430\u0448 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440','http:\/\/initpro.ru\/order\/#1','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0442\u0430\u0440\u0438\u0444','\u041f\u0440\u043e\u0434\u043b\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f','8-800-700-12-50','\u0417\u0432\u043e\u043d\u043e\u043a \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0439','\u0438\u043b\u0438','\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0437\u0432\u043e\u043d\u043e\u043a','\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043c\u043e\u0438\u0445 \u0437\u0430\u043a\u0443\u043f\u043e\u043a','\u041e\u0431\u0449\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f','\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438','\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435','\u0417\u0430 \u0441\u0435\u0433\u043e\u0434\u043d\u044f','\u0417\u0430 \u0432\u0447\u0435\u0440\u0430','\u0422\u0435\u043a\u0443\u0449\u0438\u0445','\u0417\u0430 \u043d\u0435\u0434\u0435\u043b\u044e','\u0417\u0430 \u043c\u0435\u0441\u044f\u0446','\u0423\u0432\u0435\u0434\u043e\u043c\u043b\u044f\u0442\u044c \u043c\u0435\u043d\u044f \u043e \u043f\u043e\u044f\u0432\u043b\u0435\u043d\u0438\u0438','\u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u0442\u0435\u043d\u0434\u0435\u0440\u0430\u043c \u0432 \u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u043c','\u043d\u043e\u0432\u044b\u0445 \u043f\u0440\u043e\u0442\u043e\u043a\u043e\u043b\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u043e\u0432 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u043d\u043e\u0432\u044b\u0445 \u0442\u0435\u043d\u0434\u0435\u0440\u043e\u0432 \u043f\u043e \u043c\u043e\u0438\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u0430\u043c','\u043a\u0430\u0436\u0434\u044b\u0435 2 \u0447\u0430\u0441\u0430','\u043a\u0430\u0436\u0434\u044b\u0439 \u0434\u0435\u043d\u044c','\u0447\u0435\u0440\u0435\u0437 \u0434\u0435\u043d\u044c','\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u0430','\u041f\u0435\u0440\u0438\u043e\u0434\u0438\u0447\u043d\u043e\u0441\u0442\u044c \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0438','\u041f\u043e\u0434\u043f\u0438\u0441\u043a\u0430 \u043d\u0430 \u0440\u0430\u0441\u0441\u044b\u043b\u043a\u0443'];
+var __V = [[{'value':'0','title':__[14],'tooltip':'morph'},{'value':'1','title':__[15],'tooltip':'nonmorph'}],{'caption':__[33],'class':'half-width','controlClass':Input,'controlProps':{'type':'text','name':'name'}},{'caption':__[35],'class':'half-width','controlClass':Input,'controlProps':{'type':'text','name':'email'}},{'caption':__[34],'class':'half-width','controlClass':Input,'controlProps':{'type':'text','name':'phone'}},[{'title':__[89],'value':84},{'title':__[90],'value':7},{'title':__[91],'value':3}],{'scope':'app-mainpage-content','tabs':[{'title':__[72],'container':'app-mainpage-tab1-content','active':true},{'title':__[73],'container':'app-mainpage-tab2-content'},{'title':__[74],'container':'app-mainpage-tab3-content'}],'rest':{'showCount':true}},{'title':__[75],'extended':true,'className':'main-page-filter-stat'},{'key':'calendar','className':'float-right'}];
 var __DICTURL = 'dictionary/get.php';
 var __TAGS = ['div','span','table','tbody','thead','tr','td','th','ul','ol','li','p','a','form','input','img','video','audio','aside','article','b','big','blockquote','button','canvas','caption','center','code','col','colgroup','footer','font','h1','h2','h3','h4','h5','h6','header','hr','i','iframe','label','menu','pre','s','section','select','strong','textarea','u','small'];
 var __A = {'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'};
@@ -58,7 +58,6 @@ function Application() {
 				var viewContentElement = createViewContentElement.call(this);
 				view.render(viewContentElement);
 				view.initControllers();
-				Globals.addView(view, route['name']);
 			} else {
 				activateView.call(this, view, true, isSameView);
 			}
@@ -163,6 +162,9 @@ function Application() {
 		}
 		titleElement.innerHTML = title;
 	};
+	Application.prototype.getView = function(viewName) {
+		return this.views[viewName];
+	};
 	Application.prototype.disposeView = function(viewName) {
 		if (isObject(this.views[viewName])) {
 			this.views[viewName].dispose();
@@ -228,7 +230,7 @@ function Component() {
 		delete this.waiting;
 	};
 	var getCombinedArgs = function() {
-		return Objects.merge(this.args, Objects.get(this.initials, 'args'), this.getArgs()); 
+		return Objects.merge(Objects.get(this.initials, 'args'), this.getArgs(), this.args); 
 	};
 	var propagatePropertyChange = function(changedProps) {
 		var pn, pv, i, activities, cnds = [], ifsw = [];
@@ -815,7 +817,7 @@ function Controller() {
 	var gotFromStore = function(actionName, options) {
 		if (shouldStore.call(this)) {
 			var storeAs = getStoreAs.call(this, options);
-			if (isString(storeAs)) {
+			if (isString(storeAs) && typeof StoreKeeper != 'undefined') {
 				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 				if (isArrayLike(storedData)) {
 					onActionComplete.call(this, actionName, storedData, true);
@@ -856,6 +858,7 @@ function Controller() {
 		return Objects.has(this.options, 'storeAs');
 	};
 	var store = function(isAdding, data) {
+		if (typeof StoreKeeper == 'undefined') return;
 		var storeAs = getStoreAs.call(this, data);
 		if (isAdding) {		
 			StoreKeeper.set(storeAs, data);
@@ -1356,9 +1359,16 @@ function Level() {
 		if (isComponent) component.registerChildComponent(child);
 	};
 	var includeTemplate = function(item) {
+		var args = item['p'];
+		if (isObject(args) && isObject(args['args'])) {
+			tempArgs = args['args'];
+			delete args['args'];
+			for (var k in args) tempArgs[k] = args[k];
+			args = tempArgs;
+		}
 		if (isString(item['tmp'])) item['tmp'] = component.getTemplateById(item['tmp']);
 		if (isFunction(item['tmp'])) {		
-			var items = item['tmp'].call(component, item['p'], component);
+			var items = item['tmp'].call(component, args, component);
 			if (isArray(items)) {
 				for (var i = 0; i < items.length; i++) renderItem(items[i]);
 			}
@@ -1857,14 +1867,7 @@ function Globals() {
 	var listeners = {};
 	var subscribers = {};
 	var components = {};
-	var views = {};
 	var globalVars = {};
-	this.addView = function(view, key) {
-		if (isUndefined(views[key])) views[key] = view;
-	};
-	this.getView = function(key) {
-		return views[key];
-	};
 	this.addComponent = function(component, key) {
 		if (isUndefined(components[key])) components[key] = component;
 	};
@@ -1943,12 +1946,15 @@ function Popuper() {
 	this.watch = function(component, element) {
 		if (components.indexOf(component) == -1) {
 			components.push(component);
+			if (isString(element)) element = component.findElement(element);
 			elements.push(element || component.getElement() || null);
 		}
 	};
 	var onBodyMouseDown = function(e) {
+		var element;
 		for (var i = 0; i < components.length; i++) {
-			if (!isElement(elements[i]) || !e.targetHasAncestor(elements[i])) {
+			element = elements[i];
+			if (!isElement(element) || !e.targetHasAncestor(element)) {
 				components[i].hide();
 				reset();
 			}
@@ -2071,14 +2077,14 @@ function Tooltiper() {
 			createPopup();
 		}
 		key = '';
-		text = target.attr('txt');
-		addClass = target.attr('cls');
-		position = target.attr('pos');
-		caption = target.attr('cap');
-		delay = target.attr('del');
-		corrector = target.attr('cor');
+		text = target.getData('text');
+		addClass = target.getData('class');
+		position = target.getData('position');
+		caption = target.getData('caption');
+		delay = target.getData('delay');
+		corrector = target.getData('corrector');
 		if (!text) {
-			key = target.attr('key');
+			key = target.getData('key');
 		}
 		eventHandler.listenOnce(target, 'mouseleave', onLeave);
 	};
@@ -2175,10 +2181,10 @@ function Tooltiper() {
 		var cap = Objects.get(data, 'caption');
 		if (cap && isString(cap)) {
 			caption = cap;
-			target.attr('cap', cap);
+			target.setData('caption', cap);
 		}
 		if (text && isString(text)) {
-			target.attr('txt', text);
+			target.setData('text', text);
 			show();
 		}
 	};
@@ -2316,6 +2322,9 @@ Element.prototype.getAncestor = function(selector) {
 };
 Element.prototype.getData = function(name) {
 	return this.getAttribute('_' + name) || '';
+};
+Element.prototype.setData = function(name, value) {
+	this.setAttribute('_' + name, value);
 };
 Element.prototype.getRect = function() {
 	return this.getBoundingClientRect();
@@ -2896,7 +2905,9 @@ function User() {
 	this.load = function(application) {
 		if (!loaded) {
 			initOptions();
-			loadDictionary();
+			if (typeof Dictionary != 'undefined') {
+				loadDictionary();
+			}
 			app = application;
 			if (loadRequest) {
 				loadRequest.execute();
@@ -3278,7 +3289,7 @@ Main.prototype.onResize = function() {
 	}
 };
 Main.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[52],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[69],{'cmp':Tooltip,'p':{'a':__V[4]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'a':__V[6]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'a':__V[7]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
+	return[{'c':{'c':{'c':[{'c':{'c':[{'c':__[54],'t':0,'p':{'c':'app-mainpage-left-column-title'}},{'cmp':UserInfo},{'c':[__[71],{'tmp':includeGeneralTemplateTooltip,'p':{'args':__V[7]}}],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'cmp':FavoritesCalendar}],'t':0,'p':{'c':'app-mainpage-left-column-area'}},'t':6,'p':{'c':'app-mainpage-left-column'}},{'c':[{'cmp':TabPanel,'p':{'a':__V[5]}},{'c':[{'c':{'cmp':FilterStatistics,'p':{'a':__V[6]}},'t':0,'p':{'c':'app-mainpage-tab1-content'}},{'c':[{'cmp':FilterSubscriptionOptions},{'cmp':FilterSubscription}],'t':0,'p':{'c':'app-mainpage-tab2-content'}},{'t':0,'p':{'c':'app-mainpage-tab3-content'}}],'t':0,'p':{'c':'app-mainpage-content'}}],'t':6,'p':{'c':'app-mainpage-content-column'}}],'t':5},'t':2,'p':{'c':'app-mainpage-table','cp':'0px','cs':'0px'}},'t':0,'p':{'c':'view-content main-view-content','sc':1}}]
 };
 Main.prototype.getInitials = function() {
 	return {
@@ -3367,7 +3378,7 @@ FilterStatistics.prototype.getCountForFilterWithIndex = function(index) {
 	}
 };
 FilterStatistics.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[_['title'],{'c':__[74],'t':0,'p':{'c':'app-filter-stat-refresh'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[75],'t':7},{'c':__[76],'t':7},{'c':__[77],'t':7},{'c':__[78],'t':7},{'c':!!_['extended']?[{'c':__[79],'t':7},{'c':__[80],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
+	return[{'c':[{'c':[_['title'],{'c':__[76],'t':0,'p':{'c':'app-filter-stat-refresh'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[77],'t':7},{'c':__[78],'t':7},{'c':__[79],'t':7},{'c':__[80],'t':7},{'c':!!_['extended']?[{'c':__[81],'t':7},{'c':__[82],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
 };
 FilterStatistics.prototype.getInitials = function() {
 	return {
@@ -3572,7 +3583,7 @@ Calendar.prototype.changeMonth = function(value) {
 	this.redraw();
 };
 Calendar.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[43],'t':1},{'c':__[44],'t':1},{'c':__[45],'t':1},{'c':__[46],'t':1},{'c':__[47],'t':1},{'c':__[48],'t':1},{'c':__[49],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?'another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
+	return[{'c':[{'c':[{'t':0,'e':[0,$.onPrevClick],'p':{'c':'app-calendar-prev'}},{'c':[{'pr':'month','p':$.g('month')},{'c':{'pr':'year','p':$.g('year')},'t':1,'p':{'c':'app-calendar-year'}}],'t':0,'p':{'c':'app-calendar-month'}},{'t':0,'e':[0,$.onNextClick],'p':{'c':'app-calendar-next'}}],'t':0,'p':{'c':'app-calendar-header'}},{'c':[{'c':[{'c':__[45],'t':1},{'c':__[46],'t':1},{'c':__[47],'t':1},{'c':__[48],'t':1},{'c':__[49],'t':1},{'c':__[50],'t':1},{'c':__[51],'t':1}],'t':0,'p':{'c':'app-calendar-day-names'}},{'c':{'h':function(day){return[{'c':day.num,'t':1,'p':{'c':(day.another?'another':'')+' '+(day.current?' current':'')+' '+(day.marked?' marked':'')}}]},'p':$.g('days'),'f':'days'},'t':0,'p':{'c':'app-calendar-days'}}],'t':0,'p':{'c':'app-calendar-content'}}],'t':0,'p':{'c':'app-calendar'}}]
 };
 function FavoritesCalendar() {};
 FavoritesCalendar.prototype.onRendered = function() {
@@ -3598,7 +3609,7 @@ FavoritesCalendar.prototype.onMarkedDayClick = function(e) {
 	var timestamp = e.target.innerHTML + '.' + (this.month + 1) + '.' + this.year;
 	if (isArray(this.tenderByDates[timestamp])) {
 		Dialoger.show(CalendarFavorites, {
-			'title': __[16] + ' ' + Dates.getFormattedDate(timestamp, __[17]),
+			'title': __[18] + ' ' + Dates.getFormattedDate(timestamp, __[19]),
 			'tenders': this.tenderByDates[timestamp]
 		});
 	}
@@ -3642,19 +3653,20 @@ Dialog.prototype.getInitials = function() {
 function Form() {};
 Form.prototype.onSubmit = function() {
 	if (this.isValid()) {
-		this.form = this.form || this.findElement('form');
-		var ajax = this.form.getData('ajax');
+		var form = this.getElement();
+		var ajax = form.getData('ajax');
 		if (ajax) {
 			this.sendAjaxRequest();
 		} else {
 			this.setFormKey();
-			this.form.submit();
+			form.submit();
 		}
 	}
 };
 Form.prototype.sendAjaxRequest = function() {
-	var action = this.form.attr('action');
-	var method = this.form.attr('method');
+	var form = this.getElement();
+	var action = form.attr('action');
+	var method = form.attr('method');
 	if (action) {
 		this.request = this.request || new AjaxRequest(action, this.handleResponse, null, this);
 		this.request.send(method, this.getControlsData());
@@ -3698,7 +3710,6 @@ Form.prototype.onFailure = function(data) {
 	this.log(error, 'onFailure', data);
 };
 Form.prototype.disposeInternal = function() {
-	this.form = null;
 	this.request = null;
 };
 Form.prototype.getTemplateMain = function(_,$) {
@@ -3821,20 +3832,11 @@ TabPanel.prototype.getTabParamsByIndex = function(tabIndex) {
 	return this.args['tabs'][tabIndex];
 };
 TabPanel.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'app-tab app-content-tab','_index':idx}}]},'p':_['tabs']},{'c':!!isObject(_['rest'])?[{'c':[_['rest']['title']||__[51],{'c':!!_['rest']['showCount']?[' (',{'pr':'count','p':$.g('count')},')']:'','i':true}],'t':0,'p':{'c':function(){return 'app-tab app-tab-rest'+($.g('count')?' shown':'')}},'n':{'c':'count'}}]:'','i':true}],'t':0,'p':{'c':'app-tab-panel','sc':1}}]
+	return[{'c':[{'h':function(tab,idx){return[{'c':tab['title'],'t':0,'p':{'c':'app-tab app-content-tab','_index':idx}}]},'p':_['tabs']},{'c':!!isObject(_['rest'])?[{'c':[_['rest']['title']||__[53],{'c':!!_['rest']['showCount']?[' (',{'pr':'count','p':$.g('count')},')']:'','i':true}],'t':0,'p':{'c':function(){return 'app-tab app-tab-rest'+($.g('count')?' shown':'')}},'n':{'c':'count'}}]:'','i':true}],'t':0,'p':{'c':'app-tab-panel','sc':1}}]
 };
 TabPanel.prototype.getInitials = function() {
 	return {
 		'helpers':[{'helper': ClickHandler,'options': {'app-tab-rest': this.onRestTabClick,'app-tab': this.onTabClick}}]
-	};
-};
-function Tooltip() {};
-Tooltip.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'txt':_['txt'],'key':_['key'],'cls':_['cls'],'cap':_['caption']}}]
-};
-Tooltip.prototype.getInitials = function() {
-	return {
-		'args':{'className': ''}
 	};
 };
 function TooltipPopup() {};
@@ -3889,7 +3891,7 @@ FilterSubscription.prototype.onSubscribeButtonClick = function(e, target) {
 	}
 };
 FilterSubscription.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[__[85],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[90],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[91],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[92],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[5],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[23]+' subscribed':__[25])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
+	return[{'c':[{'c':[__[87],' ',{'c':__[88],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[92],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[93],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[94],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[4],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[25]+' subscribed':__[27])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
 };
 FilterSubscription.prototype.getInitials = function() {
 	return {
@@ -3904,7 +3906,7 @@ FilterSubscriptionOptions.prototype.onCheckboxChange = function(e) {
 	Subscription.doAction('save', params);
 };
 FilterSubscriptionOptions.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'tenderOfFavorite','checked':$.g('opts',['tenderOfFavorite'])}},' ',__[81],' ',{'c':__[82],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFavorite','checked':$.g('opts',['protocolOfFavorite'])}},' ',__[81],' ',{'c':__[83],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFilter','checked':$.g('opts',['protocolOfFilter'])}},' ',__[81],' ',{'c':__[84],'t':20}],'t':0,'p':{'c':'app-subscription-option'}}],'t':0,'p':{'c':'app-subscription-options','sc':1}}]
+	return[{'c':[{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'tenderOfFavorite','checked':$.g('opts',['tenderOfFavorite'])}},' ',__[83],' ',{'c':__[84],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFavorite','checked':$.g('opts',['protocolOfFavorite'])}},' ',__[83],' ',{'c':__[85],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFilter','checked':$.g('opts',['protocolOfFilter'])}},' ',__[83],' ',{'c':__[86],'t':20}],'t':0,'p':{'c':'app-subscription-option'}}],'t':0,'p':{'c':'app-subscription-options','sc':1}}]
 };
 FilterSubscriptionOptions.prototype.getInitials = function() {
 	return {
@@ -3915,9 +3917,9 @@ FilterSubscriptionOptions.prototype.getInitials = function() {
 function UserInfo() {};
 UserInfo.prototype.onLoaded = function(data) {
 	if (!User.hasFullAccess()) {
-		data['prolongButtonText'] = __[63];
+		data['prolongButtonText'] = __[65];
 	} else if (data['needToProlong']) {
-		data['prolongButtonText'] = __[64];
+		data['prolongButtonText'] = __[66];
 	}
 	this.set(data);
 };
@@ -3925,7 +3927,7 @@ UserInfo.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);	
 };
 UserInfo.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'c':[__[53],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[54],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[55],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[56],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'bold'}}],'t':5},{'c':[{'c':[__[57],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[58],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?'red':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[62],'tr':'_blank','c':'access standart-button red-button'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[60],'t':12,'p':{'h':__[59],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[61],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[65],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[66],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[3],{'c':__[67],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[68],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button green-button'}}]
+	return[{'c':[{'c':[{'c':[__[55],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[56],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[57],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[58],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'bold'}}],'t':5},{'c':[{'c':[__[59],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[60],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?'red':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[64],'tr':'_blank','c':'access standart-button red-button'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[62],'t':12,'p':{'h':__[61],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[63],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[67],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[68],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[3],{'c':__[69],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[70],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button green-button'}}]
 };
 UserInfo.prototype.getInitials = function() {
 	return {
@@ -3997,7 +3999,7 @@ FilterEdit.prototype.initiate = function() {
 };
 FilterEdit.prototype.getInitials = function() {
 	return {
-		'props':{'title': __[50]}
+		'props':{'title': __[52]}
 	};
 };
 function OrderCall() {};
@@ -4015,11 +4017,11 @@ OrderCall.prototype.onHide = function() {
 	clearInterval(this.interval);
 };
 OrderCall.prototype.getTemplateContent = function(_,$) {
-	return[{'cmp':OrderCallForm},{'c':__[19],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':OrderCallForm},{'c':__[21],'t':0,'e':[0,$.onSupportButtonClick],'p':{'c':'standart-button order-support'}}]
 };
 OrderCall.prototype.getInitials = function() {
 	return {
-		'props':{'title': __[18]}
+		'props':{'title': __[20]}
 	};
 };
 function Support() {};
@@ -4028,11 +4030,11 @@ Support.prototype.onOrderCallButtonClick = function() {
 	Dialoger.show(OrderCall);
 };
 Support.prototype.getTemplateContent = function(_,$) {
-	return[{'cmp':SupportForm},{'c':__[21],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button order-support'}}]
+	return[{'cmp':SupportForm},{'c':__[23],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button order-support'}}]
 };
 Support.prototype.getInitials = function() {
 	return {
-		'props':{'title': __[20]}
+		'props':{'title': __[22]}
 	};
 };
 function AuthForm() {};
@@ -4044,7 +4046,7 @@ AuthForm.prototype.getTemplateContent = function(_,$) {
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': 'user/login.php','ajax': true,'className': 'app-authform-inputs','controls': [{'caption': __[27],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[26]}},{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[28]}}],'submit': {'value': __[30],'class': 'app-submit'}}
+		'args':{'action': 'user/login.php','ajax': true,'className': 'app-authform-inputs','controls': [{'caption': __[29],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[28]}},{'caption': __[31],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[30]}}],'submit': {'value': __[32],'class': 'app-submit'}}
 	};
 };
 function OrderCallForm() {};
@@ -4082,7 +4084,7 @@ OrderCallForm.prototype.getDateOptions = function() {
 			continue;
 		}	
 		dayInWeek = Dictionary.get('dayNames')[dayInWeek];
-		txt = count > 1 || (!!prev &&prev != d - 1) ? d + ' ' + monthNames[m] + ', ' + dayInWeek : (count == 0 ? __[38] : __[39]) + ', ' + d + ' ' + monthNames[m];
+		txt = count > 1 || (!!prev &&prev != d - 1) ? d + ' ' + monthNames[m] + ', ' + dayInWeek : (count == 0 ? __[40] : __[41]) + ', ' + d + ' ' + monthNames[m];
 		dates.push({'value': txt, 'title': txt});
 		count++;
 		index++;
@@ -4095,7 +4097,7 @@ OrderCallForm.prototype.validateTime = function() {
 	var dateSelect = this.getControl('date');
 	var timeSelect = this.getControl('time');
 	var dateValue = dateSelect.getValue();
-    var isToday = (new RegExp(__[38])).test(dateValue);
+    var isToday = (new RegExp(__[40])).test(dateValue);
     if (isToday) {
 	    var d = new Date();
 	    var times = [11, 13, 16];
@@ -4121,13 +4123,13 @@ OrderCallForm.prototype.validateTime = function() {
 };
 OrderCallForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': CONFIG.orderCall.send,'method': 'POST','className': 'app-order-call','controls': [__V[1],__V[2],__V[3],{'caption': __[34],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'topic','options': Dictionary.get('orderCallTopics')}},{'caption': __[35],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'date','options': this.getDateOptions()}},{'caption': __[36],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'time','options': Dictionary.get('timeOptions')}},{'caption': __[37],'controlClass': Textarea,'controlProps': {'name': 'comment'}}],'submit': {'value': __[68],'class': __[23] + ' send-button'}}
+		'args':{'action': CONFIG.orderCall.send,'method': 'POST','className': 'app-order-call','controls': [__V[1],__V[2],__V[3],{'caption': __[36],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'topic','options': Dictionary.get('orderCallTopics')}},{'caption': __[37],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'date','options': this.getDateOptions()}},{'caption': __[38],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'time','options': Dictionary.get('timeOptions')}},{'caption': __[39],'controlClass': Textarea,'controlProps': {'name': 'comment'}}],'submit': {'value': __[70],'class': __[25] + ' send-button'}}
 	};
 };
 function SupportForm() {};
 SupportForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': CONFIG.support.send,'className': 'app-order-call','controls': [__V[1],__V[2],__V[3],{'caption': __[40],'controlClass': Textarea,'controlProps': {'name': 'comment'}},{'caption': __[41],'controlClass': Input,'controlProps': {'name': 'screenshot','type': 'file','accept': 'image/*'}}],'submit': {'value': __[42],'class': __[23] + ' send-button'}}
+		'args':{'action': CONFIG.support.send,'className': 'app-order-call','controls': [__V[1],__V[2],__V[3],{'caption': __[42],'controlClass': Textarea,'controlProps': {'name': 'comment'}},{'caption': __[43],'controlClass': Input,'controlProps': {'name': 'screenshot','type': 'file','accept': 'image/*'}}],'submit': {'value': __[44],'class': __[25] + ' send-button'}}
 	};
 };
 function KeywordsControl() {};
@@ -4135,7 +4137,7 @@ KeywordsControl.prototype.onChange = function() {
 	Globals.dispatchEvent('TenderSearchFormChanged');
 };
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0],'className':'frameless'}}},'t':0,'p':{'c':'app-keywords-options'}}]
+	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0],'className':'frameless'}}},{'c':__[17],'t':1,'p':{'c':'bold'}}],'t':0,'p':{'c':'app-keywords-options'}}]
 };
 function Input() {};
 Input.prototype.getControlValue = function() {
@@ -4164,6 +4166,7 @@ Select.prototype.selectByValue = function(value, forced) {
 				this.selectedIndex = i;
 				if (!forced) this.set('value',value);
 				this.set('title',options[i]['title']);
+				this.syncTooltip(i);
 				return true;
 			}
 		}
@@ -4176,12 +4179,15 @@ Select.prototype.selectByIndex = function(index) {
 	if (isObject(options[index])) {
 		if (this.get('value') == options[index]['value']) return;
 		this.set({'value':options[index]['value'],'title':options[index]['title']});
+		this.syncTooltip(index);
 	}
 };
+Select.prototype.syncTooltip = function(index) {
+	var optionElement = this.getOptionElementAt(index);
+	var tooltipElement = this.findElement('.app-tooltip', optionElement);
+};
 Select.prototype.enableOption = function(index, isEnabled) {
-	var optionsContainer = this.findElement('.app-select-options');
-	var optionElement = optionsContainer.getChildAt(index);
-	optionElement.toggleClass('disabled', !isEnabled);
+	this.getOptionElementAt(index).toggleClass('disabled', !isEnabled);
 	if (index == this.selectedIndex) {
 		this.selectByIndex(index == 0 ? index + 1 : 0);
     }
@@ -4194,6 +4200,9 @@ Select.prototype.onOptionsClick = function(e) {
 		this.hide();
 	}
 };
+Select.prototype.getOptionElementAt = function(index) {
+	return this.findElement('.app-select-options').getChildAt(index);
+};
 Select.prototype.setProperValue = function(value) {
 	this.selectByValue(value);
 };
@@ -4202,13 +4211,13 @@ Select.prototype.getControlValue = function() {
 };
 Select.prototype.onClick = function() {
 	this.toggle('active');
-	Popuper.watch(this, this.findElement('.app-select'));
+	Popuper.watch(this);
 };
 Select.prototype.hide = function() {
 	this.set('active',false);
 };
 Select.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':option.title,'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':['active','className']}}]
+	return[{'c':[{'c':{'pr':'title','p':$.g('title')},'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':[option.title,{'c':!!option.tooltip?[{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':option.tooltip}}]:'','i':true}],'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+($.g('className')?' '+$.g('className'):'')+($.g('active')?' active':'')},'sc':1},'n':{'c':['active','className']}}]
 };
 function Textarea() {};
 Textarea.prototype.getControlValue = function() {
@@ -4230,7 +4239,10 @@ function includeGeneralTemplateUnavailable(_) {
 function includeGeneralTemplateCheckbox(_) {
 	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['checked']?' checked':''),'_name':_['name'],'_value':_['value']}}]
 }
-Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,FiltersForm,SearchFormFilters,Calendar,Dialog,Form,PopupMenu,TabPanel,Tooltip,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo,FormField,Submit],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],FiltersForm,[TenderSearchForm],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
+function includeGeneralTemplateTooltip(_) {
+	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'_text':_['text'],'_key':_['key'],'_class':_['class'],'_caption':_['caption']}}]
+}
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,FiltersForm,SearchFormFilters,Calendar,Dialog,Form,PopupMenu,TabPanel,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo,FormField,Submit],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],FiltersForm,[TenderSearchForm],Calendar,[FavoritesCalendar],Controller,[Favorites,Filters,FiltersStat,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[KeywordsControl,Input,Select,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu]]);
 Router = new Router();
 User = new User();
 Favorites = new Favorites();

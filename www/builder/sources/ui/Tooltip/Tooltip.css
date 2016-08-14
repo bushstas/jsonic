@@ -1,9 +1,18 @@
 .app-tooltip {
-	$wh18 $bc#C1C6D6 $lh17 $inb $round $pointer $bold $center $box $white
+	$(wh18 bc#C1C6D6 lh17 inb round pointer bold center box white)
 }
 .app-tooltip:before {
 	content: '!';
 }
 .app-tooltip:hover {
 	background-color: $red;
+}
+.app-tooltip.question-tooltip {
+	$(wh12 bc#68758E vtop fs8 lh12 ml2)
+}
+.app-tooltip.question-tooltip:before {
+	content: '?';
+}
+.app-tooltip.question-tooltip:hover {
+	$bc#515763
 }

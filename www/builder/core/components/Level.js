@@ -227,9 +227,16 @@ function Level() {
 	};
 
 	var includeTemplate = function(item) {
+		var args = item['p'];
+		if (isObject(args) && isObject(args['args'])) {
+			tempArgs = args['args'];
+			delete args['args'];
+			for (var k in args) tempArgs[k] = args[k];
+			args = tempArgs;
+		}
 		if (isString(item['tmp'])) item['tmp'] = component.getTemplateById(item['tmp']);
 		if (isFunction(item['tmp'])) {		
-			var items = item['tmp'].call(component, item['p'], component);
+			var items = item['tmp'].call(component, args, component);
 			if (isArray(items)) {
 				for (var i = 0; i < items.length; i++) renderItem(items[i]);
 			}

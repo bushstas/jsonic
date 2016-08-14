@@ -1,13 +1,11 @@
-﻿доделать template .name as .name
+﻿не включать код неиспользуемых хелперов в сборку
+
+запилить тестовую сборку
 
 проверить FOREACH
-
-#tooltip className ->> float-right ошибка при обфускации css
 
 файлы include ошибка если нет {template .tmpname}
 
 неверный вывод ошибок в шаблонах include (не определен класс)
 
 {from &i = 10 to 20 step 1}
-
-реализовать args="{~a}" arg:value="1" -> value extends args (CalendarFavorites)

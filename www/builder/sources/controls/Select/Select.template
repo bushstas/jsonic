@@ -4,7 +4,12 @@
 	</div>
 	<div class="app-select-options" onClick="onOptionsClick">
 		{foreach $options as &option}
-			<div class="app-select-option" data-value="{&option.value}">{&option.title}</div>
+			<div class="app-select-option" data-value="{&option.value}">
+				{&option.title}
+				{if &option.tooltip}
+					<include tooltip className="question-tooltip" key="{&option.tooltip}">
+				{/if}
+			</div>
 		{/foreach}
 	</div>
 	<input type="hidden" name="{$name}" value="{$value}"/>

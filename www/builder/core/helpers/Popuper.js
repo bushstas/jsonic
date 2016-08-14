@@ -8,12 +8,15 @@ function Popuper() {
 	this.watch = function(component, element) {
 		if (components.indexOf(component) == -1) {
 			components.push(component);
+			if (isString(element)) element = component.findElement(element);
 			elements.push(element || component.getElement() || null);
 		}
 	};
 	var onBodyMouseDown = function(e) {
+		var element;
 		for (var i = 0; i < components.length; i++) {
-			if (!isElement(elements[i]) || !e.targetHasAncestor(elements[i])) {
+			element = elements[i];
+			if (!isElement(element) || !e.targetHasAncestor(element)) {
 				components[i].hide();
 				reset();
 			}

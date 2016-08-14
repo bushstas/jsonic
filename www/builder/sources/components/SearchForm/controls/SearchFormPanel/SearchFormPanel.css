@@ -1,7 +1,7 @@
 $imgsrc = ../images/form
 
 .app-search-form-panel {
-	$(abs l-60 t10 b10 z200 w330 bc#fbfbfc br3 hid opac0)
+	$(abs l-60 t10 b10 z200 w330 bc#fbfbfc br3 hid opac0 p54_10_10_10)
 	box-shadow: 0px 0px 7px #b1b1b1;
     -moz-box-shadow: 0px 0px 7px #b1b1b1;
     -webkit-box-shadow: 0px 0px 7px #b1b1b1;
@@ -11,7 +11,7 @@ $imgsrc = ../images/form
 	$(vis opac10 l10)
 }
 .app-search-form-panel-title {
-    $(fs18 p0_20 mb8 lh46 h46 c#505b6e bob#d9ddea bold gr_bottom_#fbfbfc_#edf1f6)
+    $(abs t l r fs18 p0_15 mb8 lh46 h46 c#505b6e bob#d9ddea bold gr_bottom_#fbfbfc_#edf1f6)
 }
 .app-search-form-panel-close {
 	$(abs r12 t14 wh20 pointer png=close-panel bg z10)

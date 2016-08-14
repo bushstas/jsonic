@@ -20,7 +20,9 @@ function User() {
 	this.load = function(application) {
 		if (!loaded) {
 			initOptions();
-			loadDictionary();
+			if (typeof Dictionary != 'undefined') {
+				loadDictionary();
+			}
 			app = application;
 			if (loadRequest) {
 				loadRequest.execute();

@@ -1,3 +1,5 @@
 <div class="app-keywords-options">
+	<span class="bold">{@tofind}</span>
 	<control class="Select" name="nonmorph" options="{#keywordsNonMorphOptions}" className="frameless">
+	<span class="bold">{@in}</span>
 </div>
