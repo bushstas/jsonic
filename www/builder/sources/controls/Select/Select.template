@@ -1,6 +1,9 @@
-<div class="app-select{$className?' '+$className}{$active?' active'}" scope>
+<div class="app-select{~className?' '+~className}{$active?' active'}" scope>
 	<div class="app-select-value" onClick="onClick">
 		{$title}
+		{if ~tooltip}
+			<include tooltip className="question-tooltip" key="{$tooltip}">
+		{/if}
 	</div>
 	<div class="app-select-options" onClick="onOptionsClick">
 		{foreach $options as &option}

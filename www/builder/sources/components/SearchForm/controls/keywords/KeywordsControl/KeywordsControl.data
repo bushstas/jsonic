@@ -10,3 +10,15 @@
 		'tooltip': 'nonmorph'
 	}
 ]
+
+#docCheckboxOptions = {
+	'text': @inDoc
+}
+
+#contCheckboxOptions = {
+	'text': @inCont
+}
+
+#prodCheckboxOptions = {
+	'text': @inProd
+}

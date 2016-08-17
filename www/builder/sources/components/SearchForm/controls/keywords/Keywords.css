@@ -1,12 +1,29 @@
+$imgsrc = ../images/searchform
+
 .app-keywords-options {
-	$(nowrap pl5 bob#e0e4eb h34)
+	$(nowrap pl5 bob#e0e4eb h34 rel)
 }
 .app-keywords-options .bold {
 	$(inb vmid)
 }
 .app-keywords-options .app-select {
-	$(w200 inb vmid regular)
+	$(w200 inb vmid regular ml12)
 }
-.app-keywords-options .app-select .app-select-value {
-	$(ml12)
+.app-keywords-options .app-checkbox-label {
+	$(vmid ml10 pr10)
+}
+.app-keywords-options .app-ui-checkbox {
+	$(mt2)
+}
+.app-keywords-add-request {
+	$(abs r35 t7)
+}
+.app-keywords-add-request span {
+	$(inb pl14 png=plusreq bp0_50% norep pointer c#5e79a3)
+}
+.app-keywords-add-request span:hover {
+	$c#49658f
+}
+.app-keywords-options .keywords-hint {
+	$(abs r2 t8)
 }

@@ -1752,11 +1752,7 @@
 							if ($hasClassVar) {
 								$attrParts[] = '<nq>'.$code.'<nq>';
 							} else {
-								if (hasCondition($code)) {
-									$attrContent .= '<plus>('.$code.')</plus>';
-								} else {
-									$attrContent .= '<plus>'.$code.'</plus>';
-								}
+								$attrContent .= '<plus>'.$code.'</plus>';
 							}
 						}
 					}
@@ -2073,9 +2069,6 @@
 				$names[] = $match;
 			}
 		}
-		if (preg_match('/.\?[^:]+:./', $code)) {
-			$code = '('.$code.')';
-		}
 		return preg_replace($regexp, "\<this>g('$1')", $code);
 	}
 
@@ -2212,7 +2205,7 @@
 					}
 
 				}
-				$originalCode = $code;
+				$originalCode = '('.$code.')';
 			}
 		}
 		return $originalCode;

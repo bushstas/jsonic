@@ -69,10 +69,15 @@
 .app-search-form-panel-close:hover{opacity:0.6;}
 .app-search-form-panel.keywords-panel{width:1000px;}
 /* Keywords */
-.app-keywords-options{white-space:nowrap;padding-left:5px;border-bottom:1px solid #e0e4eb;height:34px;}
+.app-keywords-options{white-space:nowrap;padding-left:5px;border-bottom:1px solid #e0e4eb;height:34px;position:relative;}
 .app-keywords-options .bold{display:inline-block;vertical-align:middle;}
-.app-keywords-options .app-select{width:200px;display:inline-block;vertical-align:middle;font-family:ptsans;}
-.app-keywords-options .app-select .app-select-value{margin-left:12px;}
+.app-keywords-options .app-select{width:200px;display:inline-block;vertical-align:middle;font-family:ptsans;margin-left:12px;}
+.app-keywords-options .app-checkbox-label{vertical-align:middle;margin-left:10px;padding-right:10px;}
+.app-keywords-options .app-ui-checkbox{margin-top:2px;}
+.app-keywords-add-request{position:absolute;right:35px;top:7px;}
+.app-keywords-add-request span{display:inline-block;padding-left:14px;background-image:url(../images/searchform/plusreq.png);background-position:0 50%;background-repeat:no-repeat;cursor:pointer;color:#5e79a3;}
+.app-keywords-add-request span:hover{color:#49658f;}
+.app-keywords-options .keywords-hint{position:absolute;right:2px;top:8px;}
 /* SearchFormCreateFilterMenu */
 .app-popup-menu-outer-container.create-filters-menu .app-popup-menu-inner-container{border:none;}
 .app-popup-menu-outer-container.create-filters-menu{margin-top:3px;-webkit-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);-moz-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);border:none;width:278px;}
@@ -97,6 +102,9 @@
 .app-search-form-filter-save-button:hover{background-color:#499059;}
 .app-search-form-filter-name{max-width:170px;position:absolute;top:52px;left:0;line-height:18px;color:#eff1f5;cursor:default;white-space:nowrap;overflow:hidden;cursor:pointer;text-overflow:ellipsis;padding-right:20px;}
 .app-search-form-filter-name:before{content:'';border-bottom:1px dashed #a9adb3;position:absolute;bottom:0;left:0;right:20px;}
+/* Checkbox */
+.app-checkbox-label{display:inline-block;cursor:pointer;color:#5e79a3;}
+.app-checkbox-label:hover{color:#49658f;}
 /* Input */
 .app-input-container{margin:5px 0;}
 .app-input-container.half-width{display:inline-block;width:49%;vertical-align:top;}
