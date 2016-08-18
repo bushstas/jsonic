@@ -1,0 +1,2 @@
+control KeywordTags extends Tags
+

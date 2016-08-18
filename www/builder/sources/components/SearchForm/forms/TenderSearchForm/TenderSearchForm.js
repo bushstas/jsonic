@@ -1,7 +1,16 @@
 component TenderSearchForm extends FiltersForm
 
 function initiate() {
-	Globals.listen('TenderSearchFormChanged', this.onChange, this);
+	Globals.addListeners({
+		'TenderSearchFormChanged': this.onChange,
+		'TenderSearchFormGotParams': this.onGetParams
+	}, this);
+}
+
+function onRendered() {
+	this.onGetParams({
+		'registryContracts': 1
+	});
 }
 
 function onResetButtonClick(e) {
@@ -17,6 +26,20 @@ function onResetConfirmed() {
 }
 
 function onChange() {
-	var data = this.getProperData(this.getControlsData());
-	console.log(data)
+	var data = this.getProperData();
+	console.log(this.getControlsData())
+}
+
+function onGetParams(params) {
+	var data = {
+		'keywords': {
+			'nonmorph': params['nonmorph'],
+			'registryContracts': params['registryContracts'],
+			'registryProducts': params['registryProducts'],
+			'searchInDocumentation': params['searchInDocumentation'],
+			'containKeyword': params['containKeyword'],
+			'notcontainKeyword': params['notcontainKeyword']
+		}
+	};
+	this.setControlsData(data);
 }

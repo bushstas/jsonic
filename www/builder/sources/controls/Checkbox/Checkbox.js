@@ -8,3 +8,7 @@ function onClick() {
 function getControlValue() {
 	return $checked ? 1 : 0;
 }
+
+function setControlValue(value) {
+	$checked = !!value;
+}

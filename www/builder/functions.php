@@ -643,6 +643,7 @@
 		$signs = $signs[1];
 		
 		$parts = preg_split($regexp, $value);
+		printArr($parts);
 		foreach ($parts as $i => &$part) {
 			if (!empty($part) && $parts != 'null' && $part != 'false' && $part != 'true' && !is_numeric($part)) {
 				$isNotQuoted = !preg_match('/^["\']/', $part);
@@ -802,8 +803,9 @@
 					}
 				}
 			}
-			$codeParts = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n,;]+)/', "this.set('$1',$2)", $codeParts);
-			$codeParts = preg_replace('/\$(\w+)/', "this.get('$1')", $codeParts);			
+			$codeParts = preg_replace('/,(?=\s*\$\w)/', "```", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n;\`]+)/', "this.set('$1',$2)", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)/', "this.get('$1')", $codeParts);
 			
 			$regexp = '/[;\n]/';
 			preg_match_all($regexp, $codeParts, $matches);
@@ -815,14 +817,14 @@
 			foreach ($parts as $i => $part) {
 				$p = preg_replace('/\s/', '', $part);
 				if (!empty($p)) {
-					if (preg_match_all('/^(\s*)this\.set\(\'(\w+)\',(.+?)\)\s*,*\s*$/', $part, $matches)) {
+					if (preg_match_all('/^(\s*)this\.set\(\'(\w+)\',(.+?)\)\s*(```)*\s*$/', $part, $matches)) {
 						if (!$isSet) {
 							$set = array();
 							$isSet = true;
 						}
 						$set[] = array($matches[1][0], $matches[2][0], trim($matches[3][0]));
 						$match = trim($matches[0][0]);
-						if (preg_match('/,$/', $match)) {
+						if (preg_match('/```$/', $match)) {
 							$prevPart = $part;
 							continue;
 						}
@@ -862,7 +864,7 @@
 					$code .= $texts[$i];
 				}
 			}
-
+			$code = str_replace("```", ",", $code);
 			$code = str_replace('<sldq>', '\"', $code);
 			$code = str_replace("<slq>", "\'", $code);
 		}

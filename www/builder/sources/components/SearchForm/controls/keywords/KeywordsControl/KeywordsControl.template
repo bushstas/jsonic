@@ -11,3 +11,21 @@
 	</div>
 	<div class="app-tooltip keywords-hint"></div>
 </div>
+<div class="app-keywords-area">
+	{foreach $keywords as &item}
+		<div class="app-keywords-block">
+			<div class="app-keywords-left">
+				<div class="app-keywords-tags-title">
+					{@contains}
+				</div>
+				<control class="ContainKeywordTags" name="containKeyword" args="{&item[0]}">
+			</div>
+			<div class="app-keywords-right">
+				<div class="app-keywords-tags-title">
+					{@excludes}
+				</div>
+				<control class="ExcludeKeywordTags" name="notcontainKeyword" args="{&item[1]}">
+			</div>
+		</div>
+	{/foreach}
+</div>

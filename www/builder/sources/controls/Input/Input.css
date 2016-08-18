@@ -12,7 +12,7 @@
 }
 .app-input-container textarea,
 .app-input-container input {
-	$p10 $box $w100% $tran $c#6f7b9a $bold $fs14 $bo#bec8da $br3
+	$(p10 box w100% c#6f7b9a bold fs14 bo#bec8da br3)
     box-shadow: inset 2px 1px 3px #d7deec;
 }
 .app-input-container textarea:focus,
@@ -20,4 +20,12 @@
     $boc#38986a 
     box-shadow: 1px 1px 6px #93C7AE;
     outline: none;
+}
+.app-input-container input::-webkit-input-placeholder,
+.app-input-container textarea::-webkit-input-placeholder {
+	$(regular c#72798c)
+}
+.app-input-container input:focus::-webkit-input-placeholder,
+.app-input-container textarea:focus::-webkit-input-placeholder {
+	$(c#a5abbe)
 }

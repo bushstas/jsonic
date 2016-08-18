@@ -1,0 +1,11 @@
+{template .main}
+<div class="app-tags" scope>
+	<div class="app-tags-container">
+		<template topContent>
+		<template input>
+	</div>
+	<component class="Recommendations">
+</div>
+
+{template .input}
+<component class="AutoComplete">

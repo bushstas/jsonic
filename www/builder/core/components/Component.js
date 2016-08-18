@@ -348,6 +348,14 @@ function Component() {
 		return data;
 	};
 
+	Component.prototype.setControlsData = function(data) {
+		this.forEachChild(function(child) {
+			if (!isControl(child)) child.setControlsData(data);
+			else child.setValue(data[child.getName()]);
+		});
+		return data;
+	};
+
 	Component.prototype.setParent = function(parentalComponent) {
 		this.parentalComponent = parentalComponent;
 	};

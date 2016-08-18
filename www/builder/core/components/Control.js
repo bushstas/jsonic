@@ -92,10 +92,13 @@ function Control() {
 	};
 
 	Control.prototype.setValue = function(value) {
-		this.setProperValue(value);
+		if (this.hasControls()) {
+			this.setControlsData(value);
+		} 
+		this.setControlValue(value);
 	};
 
-	Control.prototype.setProperValue = function(value) {
+	Control.prototype.setControlValue = function(value) {
 		this.set('value', value);
 	};
 

@@ -1,0 +1,5 @@
+{template .topContent}
+
+
+{template .input}
+<component class="AutoComplete" arg-placeholder="{@enterKeywords}">

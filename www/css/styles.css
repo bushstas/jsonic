@@ -78,6 +78,13 @@
 .app-keywords-add-request span{display:inline-block;padding-left:14px;background-image:url(../images/searchform/plusreq.png);background-position:0 50%;background-repeat:no-repeat;cursor:pointer;color:#5e79a3;}
 .app-keywords-add-request span:hover{color:#49658f;}
 .app-keywords-options .keywords-hint{position:absolute;right:2px;top:8px;}
+.app-keywords-area{position:absolute;top:100px;left:0;right:0;bottom:4px;overflow:auto;padding:0 15px;z-index:1;}
+.app-keywords-block{position:relative;z-index:1;margin-top:20px;height:97%;min-height:500px;}
+.app-keywords-block:first-child{margin-top:0;}
+.app-keywords-left{position:absolute;top:0;left:0;bottom:0;right:33%;z-index:2;}
+.app-keywords-right{position:absolute;top:0;left:68.5%;bottom:0;right:0;z-index:1;}
+.app-keywords-tags-title{font-family:ptsansbold;color:#3B4452;font-size:16px;line-height:16px;}
+.app-keywords-area .app-tags-container{position:absolute;min-height:0;max-height:none;height:auto;top:22px;left:0;right:0;bottom:50%;}
 /* SearchFormCreateFilterMenu */
 .app-popup-menu-outer-container.create-filters-menu .app-popup-menu-inner-container{border:none;}
 .app-popup-menu-outer-container.create-filters-menu{margin-top:3px;-webkit-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);-moz-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);border:none;width:278px;}
@@ -110,8 +117,10 @@
 .app-input-container.half-width{display:inline-block;width:49%;vertical-align:top;}
 .app-input-container.half-width:nth-child(2n){margin-left:2%;}
 .app-input-caption{color:#6f7b9a;font-size:14px;line-height:14px;margin-bottom:6px;}
-.app-input-container textarea,.app-input-container input{padding:10px;box-sizing:border-box;width:100%;background-color:transparent;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;border-radius:3px;box-shadow:inset 2px 1px 3px #d7deec;}
+.app-input-container textarea,.app-input-container input{padding:10px;box-sizing:border-box;width:100%;color:#6f7b9a;font-family:ptsansbold;font-size:14px;border:1px solid #bec8da;border-radius:3px;box-shadow:inset 2px 1px 3px #d7deec;}
 .app-input-container textarea:focus,.app-input-container input:focus{border-color:#38986a;box-shadow:1px 1px 6px #93C7AE;outline:none;}
+.app-input-container input::-webkit-input-placeholder,.app-input-container textarea::-webkit-input-placeholder{font-family:ptsans;color:#72798c;}
+.app-input-container input:focus::-webkit-input-placeholder,.app-input-container textarea:focus::-webkit-input-placeholder{color:#a5abbe;}
 /* Select */
 .app-select{position:relative;box-sizing:border-box;font-family:ptsansbold;color:#6f7b9a;font-size:14px;border:1px solid #bec8da;border-radius:3px;cursor:pointer;box-shadow:inset 2px 1px 3px #d7deec;}
 .app-select.frameless{border:0;box-shadow:none;}
@@ -130,6 +139,8 @@
 .app-select-option:hover{color:#5f6b7f;background-color:#e7ecf4;}
 .app-select-option.disabled{color:#a5aec0;cursor:default;}
 .app-select-option.disabled:hover{background-color:#fff;}
+/* Tags */
+.app-tags-container{position:relative;margin-bottom:6px;background-color:#f3f5f7;padding:5px;color:#666;font-size:13px;border:1px solid #dde5f3;border-radius:2px;min-height:182px;max-height:182px;height:182px;box-shadow:1px 1px 6px #f0f4f7;}
 /* CalendarFavorites */
 .calendar-favorites-datatable{padding-bottom:20px;min-height:300px;}
 /* Support */
@@ -183,6 +194,7 @@ body.main-page .app-top-menu-inner{width:1350px;margin:auto;}
 .app-top-menu a:nth-child(5){background-image:url(../images/topmenu/planzakupok.png);}
 .app-top-menu a:nth-child(6){background-image:url(../images/topmenu/analytics.png);}
 .app-top-menu a.active{color:#4C546B;font-family:ptsansbold;border-bottom:4px solid #4C546B !important;}
+/* AutoComplete */
 /* Calendar */
 .app-calendar{border-radius:3px;margin-top:4px;border:1px solid #e4eaf3;font-size:14px;box-shadow:0 0 6px #dde4ef;}
 .app-calendar-header{position:relative;background-color:#f5f8fc;height:42px;border-radius:3px;border-bottom:1px solid #d6e1f0;}

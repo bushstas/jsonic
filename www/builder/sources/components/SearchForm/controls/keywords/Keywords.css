@@ -27,3 +27,24 @@ $imgsrc = ../images/searchform
 .app-keywords-options .keywords-hint {
 	$(abs r2 t8)
 }
+.app-keywords-area {
+	$(abs t100 l r b4 ova p0_15 z1)
+}
+.app-keywords-block {
+	$(rel z1 mt20 h97% mih500)
+}
+.app-keywords-block:first-child {
+	$mt0
+}
+.app-keywords-left {
+	$(abs t l b r33% z2)
+}
+.app-keywords-right {
+	$(abs t l68.5% b r z1)	
+}
+.app-keywords-tags-title {
+	$(bold c#3B4452 fs16 lh16)
+}
+.app-keywords-area .app-tags-container {
+	$(abs mih0 nomaxh ha t22 l r b50%)
+}

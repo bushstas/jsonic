@@ -47,6 +47,9 @@ function Globals() {
 	this.has = function(globalVarName, globalVarValue) {
 		return Objects.has(globalVars, globalVarName, globalVarValue);
 	};
+	this.addListeners = function(listeners, listener) {
+		for (var k in listeners) this.listen(k, listeners[k], listener);
+	};
 	this.listen = function(globalEventName, callback, listener) {
 		if (!isArray(listeners[globalEventName])) listeners[globalEventName] = [];
 		listeners[globalEventName].push([callback, listener]);

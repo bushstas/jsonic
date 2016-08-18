@@ -6,3 +6,6 @@
 @inCont: реестре контрактов
 @inProd: продуктах
 @addRequest: Добавить запрос
+@contains: Содержит
+@excludes: Исключает
+@enterKeywords: Введите ключевые слова через запятую

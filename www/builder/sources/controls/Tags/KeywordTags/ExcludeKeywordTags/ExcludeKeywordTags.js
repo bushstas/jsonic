@@ -1,0 +1,1 @@
+control ExcludeKeywordTags extends KeywordTags
