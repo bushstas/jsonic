@@ -192,6 +192,10 @@ function Component() {
 		}
 	};
 
+	Component.prototype.addOneTo = function(propName, item, index) {
+		this.addTo(propName, [item], index);
+	};
+
 	Component.prototype.addTo = function(propName, items, index) {
 		var prop = this.get(propName);
 		if (!isArray(items)) items = [items];

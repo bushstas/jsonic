@@ -850,6 +850,7 @@
 			$codeParts = preg_replace('/\$(\w+)\.removeAt\(/', "this.removeByIndexFrom('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.remove\(/', "this.removeValueFrom('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)\.addOne\(/', "this.addOneTo('$1', ", $codeParts);
 			$codeParts = preg_replace('/,(?=\s*\$\w)/', "```", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n;\`]+)/', "this.set('$1',$2)", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)/', "this.get('$1')", $codeParts);

@@ -352,6 +352,9 @@ function Component() {
 			}
 		}
 	};
+	Component.prototype.addOneTo = function(propName, item, index) {
+		this.addTo(propName, [item], index);
+	};
 	Component.prototype.addTo = function(propName, items, index) {
 		var prop = this.get(propName);
 		if (!isArray(items)) items = [items];
@@ -1819,7 +1822,7 @@ function ClickHandler() {
 		var opts = options[index];
 		var target;
 		for (var k in opts) {
-			target = e.getTargetWithClass(k);
+			target = e.getTargetWithClass(k, true);
 			if (target) {
 				if (isFunction(opts[k])) {
 					opts[k].call(subscriber, e, target);
@@ -2514,9 +2517,11 @@ MouseEvent.prototype.targetHasAncestor = function(element) {
 MouseEvent.prototype.targetHasClass = function(className) {
 	return this.target.hasClass(className) || (!!this.target.parentNode && this.target.parentNode.hasClass(className));
 };
-MouseEvent.prototype.getTargetWithClass = function(className) {
+MouseEvent.prototype.getTargetWithClass = function(className, strict) {
 	if (this.target.hasClass(className)) return this.target;
-	if (!!this.target.parentNode && this.target.parentNode.hasClass(className)) return this.target.parentNode;
+	if (!strict || !this.target.className) {
+		if (!!this.target.parentNode && this.target.parentNode.hasClass(className)) return this.target.parentNode;
+	}
 	return null;
 };
 String.prototype.isEmpty = function() {
@@ -4360,8 +4365,16 @@ KeywordsControl.prototype.setControlValue = function(value) {
 KeywordsControl.prototype.onFocus = function(isSwitched) {
 	this.set('switched',isSwitched);
 };
+KeywordsControl.prototype.addRequest = function() {
+	this.addOneTo('keywords', []);
+};
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'c':{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':'app-keywords-area'}}]
+};
+KeywordsControl.prototype.getInitials = function() {
+	return {
+		'helpers':[{'helper': ClickHandler,'options': {'app-keywords-add-request': this.addRequest}}]
+	};
 };
 function Checkbox() {};
 Checkbox.prototype.onClick = function() {

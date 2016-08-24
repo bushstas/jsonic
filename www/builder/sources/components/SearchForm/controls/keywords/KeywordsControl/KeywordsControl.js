@@ -1,5 +1,14 @@
 control KeywordsControl
 
+initial helpers = [
+	{
+		'helper': ClickHandler,
+		'options': {
+			'->> app-keywords-add-request': this.addRequest
+		}
+	}
+]
+
 function onChange() {
 	Globals.dispatchEvent('TenderSearchFormChanged');
 }
@@ -28,3 +37,7 @@ function setControlValue(value) {
 function onFocus(isSwitched) {
 	$switched = isSwitched;
 }
+
+function addRequest() {
+	$keywords.addOne([]);
+};

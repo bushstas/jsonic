@@ -25,7 +25,7 @@ function ClickHandler() {
 		var opts = options[index];
 		var target;
 		for (var k in opts) {
-			target = e.getTargetWithClass(k);
+			target = e.getTargetWithClass(k, true);
 			if (target) {
 				if (isFunction(opts[k])) {
 					opts[k].call(subscriber, e, target);
