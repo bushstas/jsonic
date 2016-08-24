@@ -1,0 +1,17 @@
+$imgsrc = ../images/ui
+
+.app-autocomplete {
+	$(rel)
+}
+.app-autocomplete .add {
+	$(abs t50% mt-16 r5 w86 lh33 z10)
+}
+.app-autocomplete .add:after {
+	$(cnt abs l-22 t50% wh22 mt-11 png=enter bg bgwhite)
+}
+.app-autocomplete-variants {
+	$(abs)
+}
+.app-autocomplete-variants:empty {
+	$none
+}

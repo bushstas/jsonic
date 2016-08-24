@@ -14,17 +14,17 @@
 <div class="app-keywords-area">
 	{foreach $keywords as &item}
 		<div class="app-keywords-block">
-			<div class="app-keywords-left">
+			<div class="app-keywords-left{$switched?' switched'}">
 				<div class="app-keywords-tags-title">
 					{@contains}
 				</div>
-				<control class="ContainKeywordTags" name="containKeyword" args="{&item[0]}">
+				<control class="ContainKeywordTags" name="containKeyword" args="{&item[0]}" onFocus="onFocus(false)">
 			</div>
-			<div class="app-keywords-right">
+			<div class="app-keywords-right{$switched?' switched'}">
 				<div class="app-keywords-tags-title">
 					{@excludes}
 				</div>
-				<control class="ExcludeKeywordTags" name="notcontainKeyword" args="{&item[1]}">
+				<control class="ExcludeKeywordTags" name="notcontainKeyword" args="{&item[1]}" onFocus="onFocus(true)">
 			</div>
 		</div>
 	{/foreach}

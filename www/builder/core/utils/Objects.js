@@ -74,6 +74,11 @@ function Objects() {
 	this.getKey = function(obj, value) {
 		for (var k in obj) if (obj[k] == value) return k;
 	};
+	this.getKeys = function(obj) {
+		var keys = [];
+		for (var k in obj) keys.push(k);
+		return keys;
+	};
 	this.flatten = function(obj, flattened, transformed) {
 		var top = isUndefined(transformed);
 		flattened = flattened || {};

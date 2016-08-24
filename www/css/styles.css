@@ -82,9 +82,12 @@
 .app-keywords-block{position:relative;z-index:1;margin-top:20px;height:97%;min-height:500px;}
 .app-keywords-block:first-child{margin-top:0;}
 .app-keywords-left{position:absolute;top:0;left:0;bottom:0;right:33%;z-index:2;}
+.app-keywords-left.switched{right:68.5%;}
 .app-keywords-right{position:absolute;top:0;left:68.5%;bottom:0;right:0;z-index:1;}
+.app-keywords-right.switched{left:33%;}
 .app-keywords-tags-title{font-family:ptsansbold;color:#3B4452;font-size:16px;line-height:16px;}
 .app-keywords-area .app-tags-container{position:absolute;min-height:0;max-height:none;height:auto;top:22px;left:0;right:0;bottom:50%;}
+.app-keywords-area .app-tags-content{top:75px;}
 /* SearchFormCreateFilterMenu */
 .app-popup-menu-outer-container.create-filters-menu .app-popup-menu-inner-container{border:none;}
 .app-popup-menu-outer-container.create-filters-menu{margin-top:3px;-webkit-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);-moz-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);border:none;width:278px;}
@@ -141,6 +144,8 @@
 .app-select-option.disabled:hover{background-color:#fff;}
 /* Tags */
 .app-tags-container{position:relative;margin-bottom:6px;background-color:#f3f5f7;padding:5px;color:#666;font-size:13px;border:1px solid #dde5f3;border-radius:2px;min-height:182px;max-height:182px;height:182px;box-shadow:1px 1px 6px #f0f4f7;}
+.app-tags-content{position:absolute;top:56px;left:0;right:0;bottom:0;padding:0 4px;overflow:hidden;border-radius:0 0 2px 2px;}
+.app-tags-item{max-width:260px;color:#38986a;background-color:#E8F3E7;border:1px solid #38986a;cursor:pointer;border-radius:3px;padding-left:10px;padding-right:30px;margin:2px;display:block;float:left;position:relative;box-sizing:border-box;height:28px;line-height:26px;font-family:segoesemibold;}
 /* CalendarFavorites */
 .calendar-favorites-datatable{padding-bottom:20px;min-height:300px;}
 /* Support */
@@ -165,7 +170,7 @@ textarea{resize:none;}
 b{font-family:ptsansbold;font-weight:normal;}
 .app-view-container{position:absolute;padding:0;z-index:1;top:43px;left:0;right:0;bottom:0;}
 .bold{font-family:ptsansbold;}
-.standart-button{position:relative;display:block;line-height:38px;max-height:38px;min-height:38px;font-size:14px;background-color:#5c729e;color:#fff;font-family:ptsansbold;border-radius:3px;text-align:center;cursor:pointer;box-sizing:border-box;background-image:url(../images/buttons/blue.png);background-position:0 0;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;}
+.standart-button{position:relative;display:block;line-height:38px;font-size:14px;background-color:#5c729e;color:#fff;font-family:ptsansbold;border-radius:3px;text-align:center;cursor:pointer;box-sizing:border-box;background-image:url(../images/buttons/blue.png);background-position:0 0;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;}
 .standart-button:hover{background-position:0 100% !important;}
 .standart-button.green-button{background-color:#38986a;background-image:url(../images/buttons/green.png);}
 .standart-button.red-button{background-color:#b65f5f;background-image:url(../images/buttons/red.png);}
@@ -195,6 +200,11 @@ body.main-page .app-top-menu-inner{width:1350px;margin:auto;}
 .app-top-menu a:nth-child(6){background-image:url(../images/topmenu/analytics.png);}
 .app-top-menu a.active{color:#4C546B;font-family:ptsansbold;border-bottom:4px solid #4C546B !important;}
 /* AutoComplete */
+.app-autocomplete{position:relative;}
+.app-autocomplete .add{position:absolute;top:50%;margin-top:-16px;right:5px;width:86px;line-height:33px;z-index:10;}
+.app-autocomplete .add:after{content:'';position:absolute;left:-22px;top:50%;width:22px;height:22px;margin-top:-11px;background-image:url(../images/ui/enter.png);background-position:center center;background-repeat:no-repeat;background-color:#fff;}
+.app-autocomplete-variants{position:absolute;}
+.app-autocomplete-variants:empty{display:none;}
 /* Calendar */
 .app-calendar{border-radius:3px;margin-top:4px;border:1px solid #e4eaf3;font-size:14px;box-shadow:0 0 6px #dde4ef;}
 .app-calendar-header{position:relative;background-color:#f5f8fc;height:42px;border-radius:3px;border-bottom:1px solid #d6e1f0;}

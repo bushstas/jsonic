@@ -1,7 +1,24 @@
 Array.prototype.contains = function(v) {
 	var iv = ~~v;
 	if (iv == v) return this.indexOf(iv) > -1 || this.indexOf(v + '') > -1;
+	return this.has(v);
+};
+
+Array.prototype.has = function(v) {
 	return this.indexOf(v) > -1;
+};
+
+Array.prototype.hasAny = function() {
+	for (var i = 0; i < arguments.length; i++) {
+		if (this.indexOf(arguments[i]) > -1) return true;
+	}
+};
+
+Array.prototype.hasExcept = function() {
+	var args = Array.prototype.slice.call(arguments);
+	for (var i = 0; i < this.length; i++) {
+		if (args.indexOf(this[i]) == -1) return true;
+	}
 };
 
 Array.prototype.removeDuplicates = function() {

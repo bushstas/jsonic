@@ -25,5 +25,8 @@ var CONFIG = {
 	'settings': {
 		'subscr': 'settings/get.php',
 		'set': 'settings/set.php'
+	},
+	'keywords': {
+		'get': 'keywords/get.php'
 	}
 };

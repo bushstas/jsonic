@@ -1,0 +1,2 @@
+{template .content}
+<div class="standart-button green-button add" onClick="onAddButtonClick">{@add}</div>

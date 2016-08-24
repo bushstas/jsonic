@@ -2,3 +2,9 @@
 	$(rel mb6 bc#f3f5f7 p5 c#666 fs13 bo#dde5f3 br2 mih182 mah182 h182)
     box-shadow: 1px 1px 6px #f0f4f7;
 }
+.app-tags-content {
+	$(abs t56 l r b p0_4 ovh br0_0_2_2)
+}
+.app-tags-item {
+	$(maw260 c#38986a bc#E8F3E7 bo#38986a pointer br3 pl10 pr30 m2 block fleft rel box h28 lh26 semibold)
+}

@@ -2,4 +2,4 @@
 
 
 {template .input}
-<component class="AutoComplete" arg-placeholder="{@enterKeywords}">
+<component class="KeywordsAutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter">

@@ -3,6 +3,15 @@
 	<div class="app-tags-container">
 		<template topContent>
 		<template input>
+		<div class="app-tags-content">
+			<div class="app-tags-placeholder">
+				{foreach $items as &item}
+					<div class="app-tags-item">
+						{&item}
+					</div>
+				{/foreach}
+			</div>
+		</div>
 	</div>
 	<component class="Recommendations">
 </div>

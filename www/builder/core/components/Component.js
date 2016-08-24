@@ -176,6 +176,21 @@ function Component() {
 		return Objects.get(this.waiting, componentName);
 	};
 
+	Component.prototype.addTo = function(propName, item, index) {
+		var prop = this.get(propName);
+		if (isArray(prop)) {
+			if (!isNumber(index)) prop.push(item);
+			else if (index == 0) prop.unshift(item);
+			else {
+			
+			}			
+			var activities = this.propActivities['for'];
+			if (activities && isArray(activities[propName])) {
+				for (i = 0; i < activities[propName].length; i++) activities[propName][i].add(item, index);
+			}
+		}
+	};
+
 	Component.prototype.get = function(propName, keys) {
 		var prop = this.propsToSet[propName] || this.props[propName];
 		if (!keys || !isArrayLike(prop) || !isArray(keys)) return prop;

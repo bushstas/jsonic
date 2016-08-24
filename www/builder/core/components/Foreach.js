@@ -22,7 +22,7 @@ Foreach.prototype.createLevels = function(isUpdating) {
 	}
 };
 
-Foreach.prototype.createLevel = function(items, isUpdating) {
+Foreach.prototype.createLevel = function(items, isUpdating, index) {
 	var level = new Level();
 	level.setComponent(this.parentLevel.getComponent());
 	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
@@ -34,6 +34,10 @@ Foreach.prototype.update = function(items) {
 	this.items = items;
 	this.disposeLevels();
 	this.createLevels(true);
+};
+
+Foreach.prototype.add = function(item, index) {console.log(item)
+	this.createLevel(this.handler(item, ~~index), false, index);	
 };
 
 Foreach.prototype.getFirstNodeChild = function() {

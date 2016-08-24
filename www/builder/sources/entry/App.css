@@ -56,7 +56,7 @@ b {
   $bold
 }
 .standart-button {
-  $(rel block lh38 mah38 mih38 fs14 bc#5c729e white bold br3 center pointer box)
+  $(rel block lh38 fs14 bc#5c729e white bold br3 center pointer box)
   background-image: url(../images/buttons/blue.png);
   background-position: 0 0;
   -moz-user-select: none;

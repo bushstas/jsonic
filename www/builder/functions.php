@@ -636,6 +636,48 @@
 		}
 	}
 
+	function replaceArrayLikeSymbols($text) {
+		$text = str_replace('[', '<arr>', $text);
+		$text = str_replace(']', '</arr>', $text);
+		$text = str_replace('{', '<obj>', $text);
+		$text = str_replace('}', '</obj>', $text);
+		return $text;
+	}
+
+	function transformQuotedText($text) {
+		$regexp = '/[\'"]/';
+		preg_match_all($regexp, $text, $matches);
+		$matches = $matches[0];
+		$parts = preg_split($regexp, $text);
+		$codeParts = '';
+		$isText = false;
+		$currentText = '';
+		foreach ($parts as $i => $part) {
+			if (!$isText) {
+				$codeParts .= $part;
+				if (isset($matches[$i])) {
+					$isText = true;
+					$currentQuote = $matches[$i];
+					$currentText = $currentQuote;
+				}
+			} else {
+				$currentText .= $part;
+				if (isset($matches[$i])) {
+					if ($matches[$i] == $currentQuote) {
+						$isText = false;
+						$currentText .= $currentQuote;
+						$codeParts .= replaceArrayLikeSymbols($currentText);
+						$currentQuote = '';
+						$currentText = '';						
+					} else {
+						$currentText .= $matches[$i];
+					}
+				}
+			}
+		}
+		return $codeParts;
+	}
+
 	function transformIntoValidJson($value, $addNQs = false) {
 		global $classesList;
 		$regexp = '/\s*([\{\}\[\],:])\s*/';
@@ -643,7 +685,6 @@
 		$signs = $signs[1];
 		
 		$parts = preg_split($regexp, $value);
-		printArr($parts);
 		foreach ($parts as $i => &$part) {
 			if (!empty($part) && $parts != 'null' && $part != 'false' && $part != 'true' && !is_numeric($part)) {
 				$isNotQuoted = !preg_match('/^["\']/', $part);
@@ -674,7 +715,10 @@
 		$regexp = '/\.bind\(([^\)]+)\)/';		
 		preg_match_all($regexp, $initialValue, $binds);
 		$binds = $binds[1];
-		$text = transformIntoValidJson(preg_replace($regexp, '__BIND__', $initialValue));
+		
+		$text = preg_replace($regexp, '__BIND__', $initialValue);
+		$text = transformQuotedText($text);
+		$text = transformIntoValidJson($text);		
 		
 		$initialsObject = json_decode($text, true);
 		if ($initialsObject === null) {
@@ -803,6 +847,7 @@
 					}
 				}
 			}
+			$codeParts = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $codeParts);
 			$codeParts = preg_replace('/,(?=\s*\$\w)/', "```", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n;\`]+)/', "this.set('$1',$2)", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)/', "this.get('$1')", $codeParts);
@@ -1700,6 +1745,12 @@
 						$once = true;
 					}
 					$isDispatching = preg_match('/^\!/', $propValue);
+					preg_match_all('/\(([^\)]*)\)/', $propValue, $matches);
+					$args = '';
+					if (!empty($matches[1])) {
+						$propValue = str_replace($matches[0][0], '', $propValue);
+						$args = $matches[1][0];
+					}
 					$callback = preg_replace("/[^\w]/", "", $propValue);
 					if (!$isDispatching && is_array($component) && !hasComponentMethod($callback, $component)) {
 						error('Функция обработчик события <b>'.$callback.'</b> не найдена среди методов класса <b>'.$component['name'].'</b>');
@@ -1710,7 +1761,11 @@
 					}
 					$child['e'][] = $eventType;
 					if (!$isDispatching) {
-						$child['e'][] = '<nq><this>'.$callback.'<nq>';
+						if (empty($args)) {
+							$child['e'][] = '<nq><this>'.$callback.'<nq>';
+						} else {
+							$child['e'][] = '<nq><this>'.$callback.'.bind($,'.$args.')<nq>';
+						}
 					} else {
 						$child['e'][] = $callback;
 					}
@@ -2470,12 +2525,12 @@
 	}
 
 	function hasComponentMethod($method, $component) {
-		if (in_array($method, $component['functionList'])) return true;
+		if (is_array($component['functionList']) && in_array($method, $component['functionList'])) return true;
 		global $classesList;
 		$parents = $component['extends'];
 		if (is_array($parents)) {
 			foreach ($parents as $parent) {
-				if (is_array($classesList[$parent]['functionList']) && in_array($method, $classesList[$parent]['functionList'])) {
+				if (hasComponentMethod($method, $classesList[$parent])) {
 					return true;
 				}
 			}

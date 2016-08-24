@@ -7,3 +7,7 @@ function onChange() {
 function setControlValue(value) {
 	$keywords = [[value['containKeyword'], value['notcontainKeyword']]];
 }
+
+function onFocus(isSwitched) {
+	$switched = isSwitched;
+}
