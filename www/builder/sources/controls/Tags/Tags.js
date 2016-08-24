@@ -34,3 +34,7 @@ function onRemoveButtonClick(e, target) {
 function getControlValue() {
 	return $items.join(',');
 }
+
+function clearControl() {
+	$items = [];
+};

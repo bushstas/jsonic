@@ -43,6 +43,18 @@ function Objects() {
 		}
 		return objs[0];
 	};
+	this.concat = function() {
+		var arrs = arguments;
+		if (!isArray(arrs[0])) arrs[0] = [];
+		for (var i = 1; i < arrs.length; i++) {
+			if (isArray(arrs[i])) {
+				for (var j = 0; j < arrs[i].length; j++) {
+					arrs[0].push(arrs[i][j]);
+				}
+			}
+		}
+		return arrs[0];
+	};
 	this.clone = function(obj) {
 		if (!isArrayLike(obj)) return obj;
 		return JSON.parse(JSON.stringify(obj));

@@ -10,3 +10,5 @@
 @excludes: Исключает
 @enterKeywords: Введите ключевые слова через запятую
 @add: Добавить
+@wordsAdded: Добавлено слов:
+@removeAll: Удалить все

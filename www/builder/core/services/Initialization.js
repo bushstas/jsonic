@@ -10,7 +10,8 @@ function Initialization() {
 				if (isUndefined(initials1[k])) {
 					initials1[k] = initials2[k];
 				} else {
-					Objects.merge(initials1[k], initials2[k]);
+					if (isObject(initials1[k]) || isObject(initials2[k])) Objects.merge(initials1[k], initials2[k]);
+					else if (isArray(initials1[k]) || isArray(initials2[k])) Objects.concat(initials1[k], initials2[k]);
 				}
 			}
 		}
@@ -97,13 +98,17 @@ function Initialization() {
 	};
 	this.initiate = function(props, args) {
 		var initials = null;
+		if (isFunction(this.constructor.prototype.getInitials)) {
+			initials = this.constructor.prototype.getInitials();
+		}
 		var initiateParental = function(superClasses, object) {
+			var parentInitials;
 			for (var i = 0; i < superClasses.length; i++) {
 				if (isFunction(superClasses[i].prototype.initiate)) {
 					superClasses[i].prototype.initiate.call(object);
 				}
 				if (isFunction(superClasses[i].prototype.getInitials)) {
-					var parentInitials = superClasses[i].prototype.getInitials();
+					parentInitials = superClasses[i].prototype.getInitials();
 					if (isObject(parentInitials)) {
 						initials = extendInitials(initials, parentInitials);
 					}
@@ -120,14 +125,6 @@ function Initialization() {
 		else this.props = props || {};
 		if (isFunction(this.constructor.prototype.initiate)) {
 			this.constructor.prototype.initiate.call(this);
-		}
-		if (isFunction(this.constructor.prototype.getInitials)) {
-			var ownInitials = this.constructor.prototype.getInitials();
-			if (isNull(initials)) {
-				initials = ownInitials;
-			} else if (isObject(ownInitials)) {
-				initials = extendInitials(initials, ownInitials);
-			}
 		}
 		this.initials = initials;
 		this.args = args;

@@ -51,11 +51,12 @@ function Control() {
 		return value;
 	};
 
-	Control.prototype.setValue = function(value) {
+	Control.prototype.setValue = function(value, fireChange) {
 		if (this.hasControls()) {
 			this.setControlsData(value);
 		} 
 		this.setControlValue(value);
+		if (fireChange) this.dispatchChange();
 	};
 
 	Control.prototype.setControlValue = function(value) {
@@ -68,6 +69,15 @@ function Control() {
 
 	Control.prototype.setEnabled = function(isEnabled) {
 		this.set('enabled', isEnabled);
+	};
+
+	Control.prototype.clear = function(fireChange) {
+		this.clearControl();
+		if (fireChange) this.dispatchChange();
+	};
+
+	Control.prototype.clearControl = function() {
+		this.setControlValue('');
 	};
 	
 	Control.prototype.disposeInternal = function() {

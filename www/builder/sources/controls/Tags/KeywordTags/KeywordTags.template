@@ -1,0 +1,11 @@
+{template .topButtons}
+<div class="app-tags-top-buttons">
+	<div class="app-tags-top-buttons-item">
+		{@wordsAdded} {$count}
+	</div>
+	<div class="app-tags-top-buttons-item">
+		<span class="app-tags-remove-all">
+			{@removeAll}
+		</span>
+	</div>
+</div>

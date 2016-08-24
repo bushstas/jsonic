@@ -548,6 +548,10 @@ function Component() {
 		}
 	};
 
+	Component.prototype.getUniqueId = function() {
+		return this.uniqueId = this.uniqueId || generateRandomKey();
+	};
+
 	Component.prototype.unrender = function() {
 		this.disposeLinks();
 		this.disposeInternal();

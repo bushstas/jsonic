@@ -57,3 +57,24 @@ $imgsrc = ../images/searchform
 .app-keywords-area .app-tags-content {
 	$t75
 }
+.app-tags-top {
+	$(h16 nowrap p2_0_2_0)
+}
+.app-tags-top-buttons {
+	$(fright fs12)
+}
+.app-tags-top-buttons-item {
+	$(inb h18 lh18)
+}
+.app-tags-top-buttons-item:first-child {
+	$(c#5f6b7f pr12)
+}
+.app-tags-top-buttons-item:nth-child(2) {
+	$(pl14 bol#cfd5e1 pr3)
+}
+.app-tags-top-buttons-item:nth-child(2) span {
+	$(pointer c#a66666)
+}
+.app-tags-top-buttons-item:nth-child(2) span:hover {
+	$c#6c3a3a
+}

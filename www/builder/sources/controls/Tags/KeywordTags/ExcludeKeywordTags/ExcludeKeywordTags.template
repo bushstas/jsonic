@@ -1,4 +1,7 @@
 {template .topContent}
+<div class="app-tags-top">
+	<template topButtons>
+</div>
 
 {template .input}
 <component class="AutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter">

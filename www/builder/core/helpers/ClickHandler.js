@@ -1,11 +1,17 @@
 function ClickHandler() {
 	var subscribers = [];
+	var options = [];
 	var eventHandler = new EventHandler();
-	this.subscribe = function(subscriber, options) {
-		if (subscribers.indexOf(subscriber) == -1) {
-			eventHandler.listen(subscriber.getElement(), 'click', onClick.bind(null, options, subscriber));
+	var extendOptions = function(index, opts) {
+		Objects.merge(options[index], opts);
+	};
+	this.subscribe = function(subscriber, opts) {
+		var index = subscribers.indexOf(subscriber);
+		if (index == -1) {
+			options.push(opts);
+			eventHandler.listen(subscriber.getElement(), 'click', onClick.bind(null, subscriber));
 			subscribers.push(subscriber);
-		}
+		} else extendOptions(index, opts);
 	};
 	this.unsubscribe = function(subscriber) {
 		var idx = subscribers.indexOf(subscriber);
@@ -14,13 +20,15 @@ function ClickHandler() {
 			subscribers.splice(idx, 1);
 		}
 	};
-	var onClick = function(options, subscriber, e) {
+	var onClick = function(subscriber, e) {
+		var index = subscribers.indexOf(subscriber);
+		var opts = options[index];
 		var target;
-		for (var k in options) {
+		for (var k in opts) {
 			target = e.getTargetWithClass(k);
 			if (target) {
-				if (isFunction(options[k])) {
-					options[k].call(subscriber, e, target);
+				if (isFunction(opts[k])) {
+					opts[k].call(subscriber, e, target);
 					e.stopPropagation();
 					break;
 				}
