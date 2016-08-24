@@ -16,6 +16,13 @@ function Initialization() {
 		}
 		return initials1;
 	};
+	var addProps = function(initialProps) {
+		for (var k in initialProps)	{
+			if (isUndefined(this.props[k])) {
+				this.props[k] = initialProps[k];
+			}
+		}
+	};
 	this.processInitials = function() {
 		var initials = this.initials;
 		if (isObject(initials)) {
@@ -30,7 +37,7 @@ function Initialization() {
 					} else if (k == 'controllers') {
 						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
 					} else if (k == 'props') {
-						Objects.merge(this.props, initials[k]);
+						addProps.call(this, initials[k]);
 					} else if (k == 'options') {
 						this.options = initials[k];
 					}

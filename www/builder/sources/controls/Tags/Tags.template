@@ -6,15 +6,16 @@
 		<div class="app-tags-content">
 			<div class="app-tags-placeholder">
 				{foreach $items as &item}
-					<div class="app-tags-item">
+					<div class="app-tags-item" data-text="{&item}">
 						{&item}
+						<span class="app-tags-remove"/>
 					</div>
 				{/foreach}
 			</div>
 		</div>
 	</div>
-	<component class="Recommendations">
+	<template bottomContent>
 </div>
 
 {template .input}
-<component class="AutoComplete">
+<component class="AutoComplete" onFocus="!focus" onEnter="onEnter">

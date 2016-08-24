@@ -1,5 +1,0 @@
-{template .topContent}
-
-
-{template .input}
-<component class="KeywordsAutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter">

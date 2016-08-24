@@ -338,15 +338,33 @@ function Component() {
 	Component.prototype.getWaitingChild = function(componentName) {
 		return Objects.get(this.waiting, componentName);
 	};
-	Component.prototype.addTo = function(propName, item, index) {
+	Component.prototype.removeValueFrom = function(propName, value) {
 		var prop = this.get(propName);
-		if (isArray(prop)) {
-			if (!isNumber(index)) prop.push(item);
-			else if (index == 0) prop.unshift(item);
-			else {}			
+		if (isArray(prop)) this.removeByIndexFrom(propName, prop.indexOf(value));
+	};
+	Component.prototype.removeByIndexFrom = function(propName, index) {
+		var prop = this.get(propName);
+		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
+			prop.splice(index, 1);
 			var activities = this.propActivities['for'];
 			if (activities && isArray(activities[propName])) {
-				for (i = 0; i < activities[propName].length; i++) activities[propName][i].add(item, index);
+				for (i = 0; i < activities[propName].length; i++) activities[propName][i].remove(index);
+			}
+		}
+	};
+	Component.prototype.addTo = function(propName, items, index) {
+		var prop = this.get(propName);
+		if (!isArray(items)) items = [items];
+		if (isArray(prop)) {
+			for (var j = 0; j < items.length; j++) {
+				if (!isNumber(index)) prop.push(items[j]);
+				else if (index == 0) prop.unshift(items[j]);
+				else prop.insertAt(items[j], index);
+				var activities = this.propActivities['for'];
+				if (activities && isArray(activities[propName])) {
+					for (i = 0; i < activities[propName].length; i++) activities[propName][i].add(items[j], index);
+				}
+				if (isNumber(index)) index++;
 			}
 		}
 	};
@@ -722,46 +740,6 @@ Condition.prototype.dispose = function() {
 };
 function Control() {
 	if (this !== window) return;
-	var getCorrectedValue = function(value) {
-		var type = Objects.get(this.options, 'type');
-		switch (type) {
-			case 'array':
-				if (isString(value)) {
-					value = value.split(',');
-				} else if (!isArray(value)) {
-					value = [value];
-				}
-			break;
-			case 'string':
-				if (isArray(value)) {
-					value = value.join(',');
-				} else if (isObject(value)) {
-					value = JSON.stringify(value);
-				} else if (isNumber(value)) {
-					value = value + '';
-				} else if (!!value) {
-					value = '1';
-				} else {
-					value = '';
-				}
-			break;
-			case 'number':
-				if (isString(value)) {
-					value = stringToNumber(value);
-				} else if (isBool(value)) {
-					value = !!value ? 1 : 0;
-				} else if (isArray(value)) {
-					value = ~~value[0];
-				} else {
-					value = 0;
-				}
-			break;
-			case 'boolean':
-				value = !!value && value === '0';
-			break;
-		}
-		return this.getProperValue(value);
-	};
 	var onChangeChildControl = function(e) {
 		this.dispatchChange();
 	};
@@ -794,7 +772,7 @@ function Control() {
 					for (var i = 0; i < this.controls[k].length; i++) value[k].push(this.controls[k][i].getValue());
 				} else value[k] = this.controls[k].getValue();
 			}
-		} else value = getCorrectedValue.call(this, this.getControlValue());
+		} else value = this.getControlValue();
 		return value;
 	};
 	Control.prototype.getControlValue = function() {
@@ -1094,17 +1072,28 @@ Foreach.prototype.createLevels = function(isUpdating) {
 Foreach.prototype.createLevel = function(items, isUpdating, index) {
 	var level = new Level();
 	level.setComponent(this.parentLevel.getComponent());
-	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+	var nextSiblingChild;
+	if (isNumber(index) && this.levels[index]) {
+		nextSiblingChild = this.levels[index].getFirstNodeChild();
+	} else {
+		nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+	}
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
-	this.levels.push(level);
+	this.levels.insertAt(level, index);
 };
 Foreach.prototype.update = function(items) {
 	this.items = items;
 	this.disposeLevels();
 	this.createLevels(true);
 };
-Foreach.prototype.add = function(item, index) {console.log(item)
+Foreach.prototype.add = function(item, index) {
 	this.createLevel(this.handler(item, ~~index), false, index);	
+};
+Foreach.prototype.remove = function(index) {
+	if (this.levels[index]) {
+		this.levels[index].dispose();
+		this.levels.splice(index, 1);
+	}
 };
 Foreach.prototype.getFirstNodeChild = function() {
 	if (this.levels[0]) {
@@ -1815,6 +1804,7 @@ function ClickHandler() {
 			if (target) {
 				if (isFunction(options[k])) {
 					options[k].call(subscriber, e, target);
+					e.stopPropagation();
 					break;
 				}
 			}
@@ -2304,7 +2294,7 @@ Array.prototype.removeIndexes = function(indexes) {
 	}
 };
 Array.prototype.isEmpty = function() {
-	return this.length > 0;
+	return this.length == 0;
 };
 Array.prototype.removeItems = function(items) {
 	for (var i = 0; i < items.length; i++) this.removeItem(items[i]);
@@ -2312,6 +2302,10 @@ Array.prototype.removeItems = function(items) {
 Array.prototype.removeItem = function(item) {
 	var index = this.indexOf(item);
 	if (index > -1) this.splice(index, 1);
+};
+Array.prototype.insertAt = function(item, index) {
+	if (!isNumber(index) || index >= this.length) this.push(item);
+	else this.splice(index, 0, item);
 };
 var StyleNameCache = {};
 Element.prototype.setClass = function(className) {
@@ -2476,6 +2470,9 @@ Element.prototype.show = function(isShown) {
 Element.prototype.find = function(selector) {
 	return this.querySelector(selector);
 };
+Element.prototype.getParent = function() {
+	return this.parentNode;
+};
 MouseEvent.prototype.getTarget = function(selector) {
 	return this.target.getAncestor(selector);
 };
@@ -2502,6 +2499,18 @@ MouseEvent.prototype.getTargetWithClass = function(className) {
 	if (this.target.hasClass(className)) return this.target;
 	if (!!this.target.parentNode && this.target.parentNode.hasClass(className)) return this.target.parentNode;
 	return null;
+};
+String.prototype.isEmpty = function() {
+	return !(/[^\s]/).test(this);
+};
+String.prototype.toArray = function(delimiter) {
+	delimiter = delimiter || ',';
+	var ar = [];
+	var parts= this.split(delimiter);
+	for (var i = 0; i < parts.length; i++) {
+		if (parts[i]) ar.push(parts[i].trim());
+	}
+	return ar;
 };
 function AjaxRequest(url, callback, params, thisObj) {
 	var self = this, tempUrl, active = false, 
@@ -2651,6 +2660,13 @@ function Initialization() {
 		}
 		return initials1;
 	};
+	var addProps = function(initialProps) {
+		for (var k in initialProps)	{
+			if (isUndefined(this.props[k])) {
+				this.props[k] = initialProps[k];
+			}
+		}
+	};
 	this.processInitials = function() {
 		var initials = this.initials;
 		if (isObject(initials)) {
@@ -2665,7 +2681,7 @@ function Initialization() {
 					} else if (k == 'controllers') {
 						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
 					} else if (k == 'props') {
-						Objects.merge(this.props, initials[k]);
+						addProps.call(this, initials[k]);
 					} else if (k == 'options') {
 						this.options = initials[k];
 					}
@@ -3187,7 +3203,9 @@ function Objects() {
 		if (!isArrayLike(objs[0])) objs[0] = {};
 		for (var i = 1; i < objs.length; i++) {
 			if (isArrayLike(objs[i])) {
-				for (var k in objs[i]) objs[0][k] = objs[i][k];
+				for (var k in objs[i]) {
+					if (!isUndefined(objs[i][k])) objs[0][k] = objs[i][k];
+				}
 			}
 		}
 		return objs[0];
@@ -3534,11 +3552,11 @@ function TenderSearchForm() {};
 TenderSearchForm.prototype.initiate = function() {
 	Globals.addListeners({
 		'TenderSearchFormChanged': this.onChange,
-		'TenderSearchFormGotParams': this.onGetParams
+		'TenderSearchFormGotParams': this.setParams
 	}, this);
 };
 TenderSearchForm.prototype.onRendered = function() {
-	this.onGetParams({
+	this.setParams({
 		'registryContracts': 1
 	});
 };
@@ -3554,7 +3572,7 @@ TenderSearchForm.prototype.onChange = function() {
 	var data = this.getProperData();
 	console.log(this.getControlsData())
 };
-TenderSearchForm.prototype.onGetParams = function(params) {
+TenderSearchForm.prototype.setParams = function(params) {
 	var data = {
 		'keywords': {
 			'nonmorph': params['nonmorph'],
@@ -3644,9 +3662,13 @@ AutoComplete.prototype.onInput = function(value) {
 };
 AutoComplete.prototype.onEnter = function(value) {
 	this.dispatchEvent('enter', value);
+	this.clear();
 };
 AutoComplete.prototype.onEscape = function() {
 	this.dispatchEvent('escape');
+};
+AutoComplete.prototype.clear = function() {
+	this.input.value = '';
 };
 AutoComplete.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'t':14,'p':{'tp':'text','p':_['placeholder']}},{'t':0,'p':{'c':'app-autocomplete-variants'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'app-autocomplete app-input-container','sc':1}}]
@@ -4288,13 +4310,30 @@ KeywordsControl.prototype.onChange = function() {
 	Globals.dispatchEvent('TenderSearchFormChanged');
 };
 KeywordsControl.prototype.setControlValue = function(value) {
-	this.set('keywords',[[value['containKeyword'], value['notcontainKeyword']]]);
+	var maxlen = 0;
+	if (isArray(value['containKeyword'])) {
+		maxlen = Math.max(maxlen, value['containKeyword'].length);
+	}
+	if (isArray(value['notcontainKeyword'])) {
+		maxlen = Math.max(maxlen, value['notcontainKeyword'].length);
+	}
+	if (maxlen > 0) {
+		var kw = [], ck, nck;
+		for (var i = 0; i < maxlen; i++) {
+			ck = Objects.get(value['containKeyword'], i, '').toArray();
+			nck = Objects.get(value['notcontainKeyword'], i, '').toArray();
+			kw.push([ck, nck]);
+		}
+		this.set('keywords',kw);
+	} else {
+		this.set('keywords',[[]]);
+	}
 };
 KeywordsControl.prototype.onFocus = function(isSwitched) {
 	this.set('switched',isSwitched);
 };
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'c':{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'a':item[0]}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'a':item[1]}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':'app-keywords-area'}}]
+	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'c':{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':'app-keywords-area'}}]
 };
 function Checkbox() {};
 Checkbox.prototype.onClick = function() {
@@ -4391,39 +4430,54 @@ Select.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'pr':'title','p':$.g('title')},{'c':!!_['tooltip']?[{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':$.g('tooltip')}}]:'','i':true}],'t':0,'e':[0,$.onClick],'p':{'c':'app-select-value'}},{'c':{'h':function(option){return[{'c':[option.title,{'c':!!option.tooltip?[{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':option.tooltip}}]:'','i':true}],'t':0,'p':{'c':'app-select-option','_value':option.value}}]},'p':$.g('options'),'f':'options'},'t':0,'e':[0,$.onOptionsClick],'p':{'c':'app-select-options'}},{'t':14,'p':{'tp':'hidden','n':function(){return $.g('name')},'v':function(){return $.g('value')}},'n':{'n':'name','v':'value'}}],'t':0,'p':{'c':function(){return 'app-select'+(_['className']?' '+_['className']:'')+($.g('active')?' active':'')},'sc':1},'n':{'c':'active'}}]
 };
 function ContainKeywordTags() {};
-ContainKeywordTags.prototype.getTemplateTopOptions = function(_,$) {
+ContainKeywordTags.prototype.onPickRecommendation = function() {};
+ContainKeywordTags.prototype.getTemplateTopContent = function(_,$) {
 	return null
 };
+ContainKeywordTags.prototype.getTemplateInput = function(_,$) {
+	return[{'cmp':KeywordsAutoComplete,'e':[15,'focus','enter',$.onEnter],'p':{'a':{'placeholder':__[24]}}}]
+};
+ContainKeywordTags.prototype.getTemplateBottomContent = function(_,$) {
+	return[{'cmp':Recommendations,'e':['pick',$.onPickRecommendation]}]
+};
 function ExcludeKeywordTags() {};
-ExcludeKeywordTags.prototype.getTemplateTopOptions = function(_,$) {
+ExcludeKeywordTags.prototype.getTemplateTopContent = function(_,$) {
 	return null
 };
 ExcludeKeywordTags.prototype.getTemplateInput = function(_,$) {
 	return[{'cmp':AutoComplete,'e':[15,'focus','enter',$.onEnter],'p':{'a':{'placeholder':__[24]}}}]
 };
 function KeywordTags() {};
-KeywordTags.prototype.getTemplateTopContent = function(_,$) {
-	return null
-};
-KeywordTags.prototype.getTemplateInput = function(_,$) {
-	return[{'cmp':KeywordsAutoComplete,'e':[15,'focus','enter',$.onEnter],'p':{'a':{'placeholder':__[24]}}}]
-};
 function Tags() {};
 Tags.prototype.onEnter = function(value) {
-	var v = value.split(',');
+	var v = value.split(','), a = [], tv;
 	for (var i = 0; i < v.length; i++) {
-		if (!this.get('items').has(v[i])) this.addTo('items', v[i], 0);
+		tv = v[i].trim();
+		if (!tv.isEmpty() && !this.get('items').has(tv)) a.push(tv);
+	}
+	if (!a.isEmpty()) {
+		this.addTo('items', a, 0);
+		this.dispatchChange();
 	}
 };
+Tags.prototype.onRemoveButtonClick = function(e, target) {
+	var t = target.getParent().getData('text');
+	this.removeValueFrom('items', t);
+	this.dispatchChange();
+};
+Tags.prototype.getControlValue = function() {
+	return this.get('items').join(',');
+};
 Tags.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[{'tmp':$.getTemplateTopContent},{'tmp':$.getTemplateInput},{'c':{'c':{'h':function(item){return[{'c':item,'t':0,'p':{'c':'app-tags-item'}}]},'p':$.g('items'),'f':'items'},'t':0,'p':{'c':'app-tags-placeholder'}},'t':0,'p':{'c':'app-tags-content'}}],'t':0,'p':{'c':'app-tags-container'}},{'cmp':Recommendations}],'t':0,'p':{'c':'app-tags','sc':1}}]
+	return[{'c':[{'c':[{'tmp':$.getTemplateTopContent},{'tmp':$.getTemplateInput},{'c':{'c':{'h':function(item){return[{'c':[item,{'t':1,'p':{'c':'app-tags-remove'}}],'t':0,'p':{'c':'app-tags-item','_text':item}}]},'p':$.g('items'),'f':'items'},'t':0,'p':{'c':'app-tags-placeholder'}},'t':0,'p':{'c':'app-tags-content'}}],'t':0,'p':{'c':'app-tags-container'}},{'tmp':$.getTemplateBottomContent}],'t':0,'p':{'c':'app-tags','sc':1}}]
 };
 Tags.prototype.getTemplateInput = function(_,$) {
-	return[{'cmp':AutoComplete}]
+	return[{'cmp':AutoComplete,'e':[15,'focus','enter',$.onEnter]}]
 };
 Tags.prototype.getInitials = function() {
 	return {
-		'props':{'items': []}
+		'props':{'items': []},
+		'helpers':[{'helper': ClickHandler,'options': {'app-tags-remove': this.onRemoveButtonClick}}]
 	};
 };
 function Textarea() {};

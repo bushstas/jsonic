@@ -847,6 +847,8 @@
 					}
 				}
 			}
+			$codeParts = preg_replace('/\$(\w+)\.removeAt\(/', "this.removeByIndexFrom('$1', ", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)\.remove\(/', "this.removeValueFrom('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $codeParts);
 			$codeParts = preg_replace('/,(?=\s*\$\w)/', "```", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n;\`]+)/', "this.set('$1',$2)", $codeParts);
@@ -1158,9 +1160,12 @@
 			}
 		}
 		foreach ($opened as $tn => $count) {
-			if ($count != $closed[$tn]) {
+			if ($count > $closed[$tn]) {
 				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'операторов' : 'тегов';
 				error('Ошибка валидации шаблонов класса <b>'.$component['name'].'</b>. Один из '.$object.' <b>'.$tn.'</b> не имеет закрывающего тега');
+			} elseif ($count < $closed[$tn]) {
+				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'оператор' : 'тег';
+				error('Ошибка валидации шаблонов класса <b>'.$component['name'].'</b>. Лишний закрывающийся '.$object.' <b>'.$tn.'</b>');
 			}
 		}
 	}

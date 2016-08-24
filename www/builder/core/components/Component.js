@@ -176,17 +176,35 @@ function Component() {
 		return Objects.get(this.waiting, componentName);
 	};
 
-	Component.prototype.addTo = function(propName, item, index) {
+	Component.prototype.removeValueFrom = function(propName, value) {
 		var prop = this.get(propName);
-		if (isArray(prop)) {
-			if (!isNumber(index)) prop.push(item);
-			else if (index == 0) prop.unshift(item);
-			else {
-			
-			}			
+		if (isArray(prop)) this.removeByIndexFrom(propName, prop.indexOf(value));
+	};
+
+	Component.prototype.removeByIndexFrom = function(propName, index) {
+		var prop = this.get(propName);
+		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
+			prop.splice(index, 1);
 			var activities = this.propActivities['for'];
 			if (activities && isArray(activities[propName])) {
-				for (i = 0; i < activities[propName].length; i++) activities[propName][i].add(item, index);
+				for (i = 0; i < activities[propName].length; i++) activities[propName][i].remove(index);
+			}
+		}
+	};
+
+	Component.prototype.addTo = function(propName, items, index) {
+		var prop = this.get(propName);
+		if (!isArray(items)) items = [items];
+		if (isArray(prop)) {
+			for (var j = 0; j < items.length; j++) {
+				if (!isNumber(index)) prop.push(items[j]);
+				else if (index == 0) prop.unshift(items[j]);
+				else prop.insertAt(items[j], index);
+				var activities = this.propActivities['for'];
+				if (activities && isArray(activities[propName])) {
+					for (i = 0; i < activities[propName].length; i++) activities[propName][i].add(items[j], index);
+				}
+				if (isNumber(index)) index++;
 			}
 		}
 	};

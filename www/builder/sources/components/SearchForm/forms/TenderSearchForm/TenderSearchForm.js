@@ -3,12 +3,12 @@ component TenderSearchForm extends FiltersForm
 function initiate() {
 	Globals.addListeners({
 		'TenderSearchFormChanged': this.onChange,
-		'TenderSearchFormGotParams': this.onGetParams
+		'TenderSearchFormGotParams': this.setParams
 	}, this);
 }
 
 function onRendered() {
-	this.onGetParams({
+	this.setParams({
 		'registryContracts': 1
 	});
 }
@@ -30,7 +30,7 @@ function onChange() {
 	console.log(this.getControlsData())
 }
 
-function onGetParams(params) {
+function setParams(params) {
 	var data = {
 		'keywords': {
 			'nonmorph': params['nonmorph'],

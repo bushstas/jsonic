@@ -146,6 +146,8 @@
 .app-tags-container{position:relative;margin-bottom:6px;background-color:#f3f5f7;padding:5px;color:#666;font-size:13px;border:1px solid #dde5f3;border-radius:2px;min-height:182px;max-height:182px;height:182px;box-shadow:1px 1px 6px #f0f4f7;}
 .app-tags-content{position:absolute;top:56px;left:0;right:0;bottom:0;padding:0 4px;overflow:hidden;border-radius:0 0 2px 2px;}
 .app-tags-item{max-width:260px;color:#38986a;background-color:#E8F3E7;border:1px solid #38986a;cursor:pointer;border-radius:3px;padding-left:10px;padding-right:30px;margin:2px;display:block;float:left;position:relative;box-sizing:border-box;height:28px;line-height:26px;font-family:segoesemibold;}
+.app-tags-remove{background-image:url(../images/ui/tagsclearg.png);cursor:pointer;position:absolute;right:7px;top:6px;display:block;background-position:center center;background-repeat:no-repeat;width:15px;height:15px;opacity:0.7;}
+.app-tags-remove:hover{opacity:1;}
 /* CalendarFavorites */
 .calendar-favorites-datatable{padding-bottom:20px;min-height:300px;}
 /* Support */

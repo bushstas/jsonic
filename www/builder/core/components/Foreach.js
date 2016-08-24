@@ -25,9 +25,14 @@ Foreach.prototype.createLevels = function(isUpdating) {
 Foreach.prototype.createLevel = function(items, isUpdating, index) {
 	var level = new Level();
 	level.setComponent(this.parentLevel.getComponent());
-	var nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+	var nextSiblingChild;
+	if (isNumber(index) && this.levels[index]) {
+		nextSiblingChild = this.levels[index].getFirstNodeChild();
+	} else {
+		nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+	}
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
-	this.levels.push(level);
+	this.levels.insertAt(level, index);
 };
 
 Foreach.prototype.update = function(items) {
@@ -36,8 +41,15 @@ Foreach.prototype.update = function(items) {
 	this.createLevels(true);
 };
 
-Foreach.prototype.add = function(item, index) {console.log(item)
+Foreach.prototype.add = function(item, index) {
 	this.createLevel(this.handler(item, ~~index), false, index);	
+};
+
+Foreach.prototype.remove = function(index) {
+	if (this.levels[index]) {
+		this.levels[index].dispose();
+		this.levels.splice(index, 1);
+	}
 };
 
 Foreach.prototype.getFirstNodeChild = function() {

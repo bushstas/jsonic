@@ -7,20 +7,17 @@ Array.prototype.contains = function(v) {
 Array.prototype.has = function(v) {
 	return this.indexOf(v) > -1;
 };
-
 Array.prototype.hasAny = function() {
 	for (var i = 0; i < arguments.length; i++) {
 		if (this.indexOf(arguments[i]) > -1) return true;
 	}
 };
-
 Array.prototype.hasExcept = function() {
 	var args = Array.prototype.slice.call(arguments);
 	for (var i = 0; i < this.length; i++) {
 		if (args.indexOf(this[i]) == -1) return true;
 	}
 };
-
 Array.prototype.removeDuplicates = function() {
 	this.filter(function(item, pos, self) {
 	    return self.indexOf(item) == pos;
@@ -43,7 +40,7 @@ Array.prototype.removeIndexes = function(indexes) {
 	}
 };
 Array.prototype.isEmpty = function() {
-	return this.length > 0;
+	return this.length == 0;
 };
 Array.prototype.removeItems = function(items) {
 	for (var i = 0; i < items.length; i++) this.removeItem(items[i]);
@@ -51,4 +48,8 @@ Array.prototype.removeItems = function(items) {
 Array.prototype.removeItem = function(item) {
 	var index = this.indexOf(item);
 	if (index > -1) this.splice(index, 1);
+};
+Array.prototype.insertAt = function(item, index) {
+	if (!isNumber(index) || index >= this.length) this.push(item);
+	else this.splice(index, 0, item);
 };

@@ -1,1 +1,8 @@
-{template .topOptions}
+{template .topContent}
+
+
+{template .input}
+<component class="KeywordsAutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter">
+
+{template .bottomContent}
+<component class="Recommendations" onPick="onPickRecommendation">

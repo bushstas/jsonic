@@ -36,7 +36,9 @@ function Objects() {
 		if (!isArrayLike(objs[0])) objs[0] = {};
 		for (var i = 1; i < objs.length; i++) {
 			if (isArrayLike(objs[i])) {
-				for (var k in objs[i]) objs[0][k] = objs[i][k];
+				for (var k in objs[i]) {
+					if (!isUndefined(objs[i][k])) objs[0][k] = objs[i][k];
+				}
 			}
 		}
 		return objs[0];

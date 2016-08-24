@@ -161,3 +161,6 @@ Element.prototype.show = function(isShown) {
 Element.prototype.find = function(selector) {
 	return this.querySelector(selector);
 };
+Element.prototype.getParent = function() {
+	return this.parentNode;
+};

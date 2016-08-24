@@ -21,6 +21,7 @@ function ClickHandler() {
 			if (target) {
 				if (isFunction(options[k])) {
 					options[k].call(subscriber, e, target);
+					e.stopPropagation();
 					break;
 				}
 			}

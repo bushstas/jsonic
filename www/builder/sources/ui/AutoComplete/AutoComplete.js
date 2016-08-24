@@ -40,8 +40,13 @@ function onInput(value) {
 
 function onEnter(value) {
 	this.dispatchEvent('enter', value);
+	this.clear();
 }
 
 function onEscape() {
 	this.dispatchEvent('escape');
+}
+
+function clear() {
+	this.input.value = '';
 }
