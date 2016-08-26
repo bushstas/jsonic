@@ -120,13 +120,24 @@ function Component() {
 					component = activities[pn][i][0];
 					value = activities[pn][i][1]();
 					if (component) {
-						if (activities[pn][i][2] && isObject(value)) component.refresh(value);
-						else component.set(pn, value);
+						if (activities[pn][i][3] && isObject(value)) component.refresh(value);
+						else component.set(activities[pn][i][2], value);
 					}
 				}
 			}
 		}
 		cnds = ifsw = null;
+		callFollowers.call(this, changedProps);
+	};
+
+	var callFollowers = function(changedProps) {
+		for (var k in changedProps) {
+			callFollower.call(this, k, changedProps[k]);
+		}
+	};
+
+	var callFollower = function(propName, propValue) {
+		if (Objects.has(this.followers, propName)) this.followers[propName].call(this, propValue);
 	};
 
 	Component.prototype.initiate = function() {
@@ -224,6 +235,7 @@ function Component() {
 				}
 				if (isNumber(index)) index++;
 			}
+			callFollower.call(this, propName, prop);
 		}
 	};
 
@@ -293,9 +305,6 @@ function Component() {
 		}	
 		if (this.isRendered()) {
 			if (isChanged) propagatePropertyChange.call(this, changedProps);
-			for (var k in changedProps) {
-				if (Objects.has(this.followers, k)) this.followers[k].call(this);
-			}
 		}
 		changedProps = null;
 	};

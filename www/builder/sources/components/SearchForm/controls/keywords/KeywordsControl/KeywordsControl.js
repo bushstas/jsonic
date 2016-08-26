@@ -10,7 +10,7 @@ initial helpers = [
 ]
 
 initial followers = {
-	'keywordsCount': this.onRequestsCountChange
+	'keywords': this.onKeywordsChange
 }
 
 function onChange() {
@@ -33,10 +33,8 @@ function setControlValue(value) {
 			kw.push([ck, nck]);
 		}
 		$keywords = kw;
-		$keywordsCount = kw.length;
 	} else {
 		$keywords = [[]];
-		$keywordsCount = 1;
 	}
 }
 
@@ -46,9 +44,11 @@ function onFocus(isSwitched) {
 
 function addRequest() {
 	$keywords.addOne([]);
-	$keywordsCount++;
 };
 
-function onRequestsCountChange() {
-	
+function onKeywordsChange(kw) {console.log(kw)
+	$keywordsCount = kw.length;
+	var tabs = [];
+	for (var i = 1; i <= kw.length; i++) tabs.push(@request + ' ' + i);
+	$tabs = tabs;
 }

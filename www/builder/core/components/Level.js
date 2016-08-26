@@ -295,7 +295,7 @@ function Level() {
 					isReactive = Objects.has(n, k) && isFunction(pr[k]);
 					props[k] = isReactive ? pr[k]() : pr[k];
 					if (isReactive) {
-						registerPropComp(n[k], [cmp, pr[k], isArgs]);
+						registerPropComp(n[k], [cmp, pr[k], k, isArgs]);
 					}
 				}
 			}

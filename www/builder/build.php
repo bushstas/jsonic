@@ -881,6 +881,7 @@
 		$compiledJs = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $compiledJs);
 		
 		if (is_array($textsIndex)) {
+			$cjs = $compiledJs;
 			$regexp = '/\b__\.\w+\b/';
 			preg_match_all($regexp, $compiledJs, $matches);
 			$codes = $matches[0];
@@ -892,7 +893,16 @@
 					$parts2 = explode('.', $codes[$i]);
 					$index = array_search($parts2[1], $textsIndex);
 					if (is_bool($index)) {
-						error('“екстова€ константа <b>'.$parts2[1].'</b> не найдена');
+						$p = preg_split('/\b__\.'.$parts2[1].'\b/', $cjs);
+						preg_match_all('/(\w+)\.prototype\.(\w+)\s*=\s*function/', $p[0], $mtchs);
+						$cnt = count($mtchs[0]);
+						$cln = $mtchs[1][$cnt - 1];
+						$fnn = $mtchs[2][$cnt - 1];
+						preg_match('/^getTemplate([A-Z]\w*)$/', $fnn, $mtch);
+						if (isset($mtch[1])) {
+							error('“екстова€ константа <b>'.$parts2[1].'</b> используема€ в шаблоне <b>'.strtolower($mtch[1]).'</b> класса <b>'.$cln.'</b> не найдена');	
+						}
+						error('“екстова€ константа <b>'.$parts2[1].'</b> используема€ в методе <b>'.$fnn.'</b> класса <b>'.$cln.'</b> не найдена');
 					}
 					$compiledJs .= '__['.$index.']';
 				}
