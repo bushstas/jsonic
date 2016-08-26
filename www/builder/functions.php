@@ -847,6 +847,9 @@
 					}
 				}
 			}
+			$codeParts = preg_replace('/\$(\w+)\s*([\+\-\*\/\%])=\s*(\w+)/', "this.plusTo('$1',$3,'$2')", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)\s*\+\+/', "this.plusTo('$1',1)", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)\s*--/', "this.plusTo('$1',-1)", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.removeAt\(/', "this.removeByIndexFrom('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.remove\(/', "this.removeValueFrom('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $codeParts);
@@ -1114,9 +1117,24 @@
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
 
+		$regexp = "/\{[^\}]+\}/";
+		preg_match_all($regexp, $html, $matches);
+		$matches = $matches[0];
+		foreach ($matches as &$match) {
+			$match = str_replace('>', '__MORE__', $match);
+		}
+		$parts = preg_split($regexp, $html);
+		$html = '';
+		foreach ($parts as $i => $part) {
+			$html .= $part;
+			if (isset($matches[$i])) {
+				$html .= $matches[$i];
+			}
+		}
 		$regexp = "/(<\/*[a-z]+[^>]*>|\{\s*\/*foreach[^\}]*\}|\{\s*\/*if[^\}]*\}|\{\s*else\}|\{\s*\/*switch[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
-		$tags = $matches[1];			
+		$tags = implode('__TMPDELIMITER__', $matches[1]);
+		$tags = explode('__TMPDELIMITER__', str_replace('__MORE__', '>', $tags));
 		$parts = preg_split($regexp, $html);
 		
 		$list = array();

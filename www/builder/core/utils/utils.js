@@ -70,3 +70,6 @@ function isNone(a) {
 function stringToNumber(str) {
 	return Number(str);
 }
+function getCount(a) {
+	return isArray(a) ? a.length : 0;
+}

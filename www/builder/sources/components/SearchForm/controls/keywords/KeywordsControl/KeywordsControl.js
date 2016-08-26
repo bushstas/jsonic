@@ -29,8 +29,10 @@ function setControlValue(value) {
 			kw.push([ck, nck]);
 		}
 		$keywords = kw;
+		$keywordsCount = kw.length;
 	} else {
 		$keywords = [[]];
+		$keywordsCount = 1;
 	}
 }
 
@@ -40,4 +42,5 @@ function onFocus(isSwitched) {
 
 function addRequest() {
 	$keywords.addOne([]);
+	$keywordsCount++;
 };

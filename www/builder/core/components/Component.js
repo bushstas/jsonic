@@ -192,6 +192,20 @@ function Component() {
 		}
 	};
 
+	Component.prototype.plusTo = function(propName, add, sign) {
+		var prop = this.get(propName);
+		if (!sign || sign == '+') {
+			if (isNumber(prop) || isString(prop)) this.set(propName, prop + add);
+		} else 	if (isNumber(prop) && isNumber(add)) {
+			var v;
+			if (sign == '-') v = prop - add;
+			else if (sign == '*') v =  prop * add;
+			else if (sign == '/') v = prop / add;
+			else if (sign == '%') v = prop % add;
+			this.set(propName, v);
+		}
+	};
+
 	Component.prototype.addOneTo = function(propName, item, index) {
 		this.addTo(propName, [item], index);
 	};

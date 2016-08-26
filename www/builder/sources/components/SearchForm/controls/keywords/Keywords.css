@@ -30,6 +30,9 @@ $imgsrc = ../images/searchform
 .app-keywords-area {
 	$(abs t100 l r b4 ova p0_15 z1)
 }
+.app-keywords-area.multi {
+	$t132
+}
 .app-keywords-block {
 	$(rel z1 mt20 h97% mih500)
 }
@@ -77,4 +80,7 @@ $imgsrc = ../images/searchform
 }
 .app-tags-top-buttons-item:nth-child(2) span:hover {
 	$c#6c3a3a
+}
+.app-keywords-area .app-tabs {
+	$mt4
 }

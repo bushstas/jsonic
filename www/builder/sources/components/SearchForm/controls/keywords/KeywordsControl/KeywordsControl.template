@@ -11,7 +11,8 @@
 	</div>
 	<div class="app-tooltip keywords-hint"></div>
 </div>
-<div class="app-keywords-area">
+<div class="app-keywords-area{$keywordsCount>1?' multi'}">
+	<component class="Tabs">
 	{foreach $keywords as &item}
 		<div class="app-keywords-block">
 			<div class="app-keywords-left{$switched?' switched'}">
