@@ -9,6 +9,10 @@ initial helpers = [
 	}
 ]
 
+initial followers = {
+	'keywordsCount': this.onRequestsCountChange
+}
+
 function onChange() {
 	Globals.dispatchEvent('TenderSearchFormChanged');
 }
@@ -44,3 +48,7 @@ function addRequest() {
 	$keywords.addOne([]);
 	$keywordsCount++;
 };
+
+function onRequestsCountChange() {
+	
+}

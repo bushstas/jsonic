@@ -1,3 +1,8 @@
 <div class="app-tabs" scope>
-
+	{foreach $items as &item}
+		<div class="app-tabs-item">
+			{&item}
+			<div class="app-tabs-remove"/>
+		</div>
+	{/foreach}
 </div>

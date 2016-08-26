@@ -287,6 +287,7 @@ function Level() {
 	};
 
 	var initComponentProps = function(p, ap, n, cmp, isArgs) {
+		propComps = propComps || {};
 		var props = {}, k, isReactive;
 		var f = function(pr) {
 			if (isObject(pr)) {
@@ -301,21 +302,6 @@ function Level() {
 		};
 		f(p); f(ap); 
 		return props;
-	};
-
-	var registerPropComps = function(cmp, propNames, argNames, props) {
-		propComps = propComps || {};
-		var data;
-		for (var k in props) {
-			data = [cmp, props[k], k == 'args'];
-			if (isObject(names) && (isArray(names[k]) || isString(names[k]))) {
-				if (isString(names[k])) {
-					registerPropComp(names[k], data);
-				} else {
-					for (i = 0; i < names[k].length; i++) registerPropComp(names[k][i], data);
-				}
-			}
-		}
 	};
 
 	var registerPropComp = function(pn, data) {

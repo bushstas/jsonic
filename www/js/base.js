@@ -1458,6 +1458,7 @@ function Level() {
 		}
 	};
 	var initComponentProps = function(p, ap, n, cmp, isArgs) {
+		propComps = propComps || {};
 		var props = {}, k, isReactive;
 		var f = function(pr) {
 			if (isObject(pr)) {
@@ -1472,20 +1473,6 @@ function Level() {
 		};
 		f(p); f(ap); 
 		return props;
-	};
-	var registerPropComps = function(cmp, propNames, argNames, props) {
-		propComps = propComps || {};
-		var data;
-		for (var k in props) {
-			data = [cmp, props[k], k == 'args'];
-			if (isObject(names) && (isArray(names[k]) || isString(names[k]))) {
-				if (isString(names[k])) {
-					registerPropComp(names[k], data);
-				} else {
-					for (i = 0; i < names[k].length; i++) registerPropComp(names[k][i], data);
-				}
-			}
-		}
 	};
 	var registerPropComp = function(pn, data) {
 		propComps[pn] = propComps[pn] || [];
@@ -4063,7 +4050,7 @@ TabPanel.prototype.getInitials = function() {
 };
 function Tabs() {};
 Tabs.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'p':{'c':'app-tabs','sc':1}}]
+	return[{'c':{'h':function(item){return[{'c':[item,{'t':0,'p':{'c':'app-tabs-remove'}}],'t':0,'p':{'c':'app-tabs-item'}}]},'p':$.g('items'),'f':'items'},'t':0,'p':{'c':'app-tabs','sc':1}}]
 };
 function TooltipPopup() {};
 TooltipPopup.prototype.correctAndSetText = function(text, changedProps) {
@@ -4391,12 +4378,16 @@ KeywordsControl.prototype.addRequest = function() {
 	this.addOneTo('keywords', []);
 	this.plusTo('keywordsCount',1);
 };
+KeywordsControl.prototype.onRequestsCountChange = function() {
+	alert(111)
+};
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'c':[{'cmp':Tabs},{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'}],'t':0,'p':{'c':function(){return 'app-keywords-area'+($.g('keywordsCount')>1?' multi':'')}},'n':{'c':'keywordsCount'}}]
+	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'c':[{'cmp':Tabs,'p':{'p':{'items':function(){return $.g('tabs')}}},'n':{'items':'tabs'}},{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'}],'t':0,'p':{'c':function(){return 'app-keywords-area'+($.g('keywordsCount')>1?' multi':'')}},'n':{'c':'keywordsCount'}}]
 };
 KeywordsControl.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ClickHandler,'options': {'app-keywords-add-request': this.addRequest}}]
+		'helpers':[{'helper': ClickHandler,'options': {'app-keywords-add-request': this.addRequest}}],
+		'followers':{'keywordsCount': this.onRequestsCountChange}
 	};
 };
 function Checkbox() {};
