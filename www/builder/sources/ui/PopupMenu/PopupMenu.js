@@ -1,8 +1,7 @@
 component PopupMenu
 
 function onRendered() {
-	var element = this.getElement();
-	this.button = element.parentNode;
+	this.button = <>.parentNode;
 	this.addListener(this.button, 'click', this.onShowButtonClick);
 }
 
@@ -31,7 +30,7 @@ function onBeforeShow() {}
 function show() {
 	var innerElement = this.findElement('.->> app-popup-menu-inner-container');
 	var rect = innerElement.getRect();
-	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
+	var height = Math.min(rect.height, this.options{ 'maxHeight', 400 });
 	this.setStyle({'max-height': height + 'px', 'height': height + 'px'});
     this.button.addClass('active');
     Popuper.watch(this);

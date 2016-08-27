@@ -15,5 +15,5 @@ function onLoaded(data) {
 }
 
 function onOrderCallButtonClick() {
-	Dialoger.show(OrderCall);	
+	++> OrderCall
 }

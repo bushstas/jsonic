@@ -41,8 +41,7 @@ function selectByIndex(index) {
 
 function syncTooltip(index) {
 	var optionElement = this.getOptionElementAt(index);
-	var tooltipElement = this.findElement('.->> app-tooltip', optionElement);
-	
+	var tooltipElement = optionElement<.app-tooltip>;	
 }
 
 function enableOption(index, isEnabled) {
@@ -62,7 +61,7 @@ function onOptionsClick(e) {
 }
 
 function getOptionElementAt(index) {
-	return this.findElement('.->> app-select-options').getChildAt(index);
+	return <.app-select-options>.getChildAt(index);
 }
 
 function setProperValue(value) {
@@ -70,7 +69,7 @@ function setProperValue(value) {
 }
 
 function getControlValue() {
-	return this.findElement('input').value;
+	return <input>.value;
 }
 
 function onClick() {

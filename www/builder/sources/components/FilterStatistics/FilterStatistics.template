@@ -1,7 +1,7 @@
 <div class="app-filter-stat {~className}" scope>
 	<div class="app-filter-stat-title">
 		{~title}
-		<div class="app-filter-stat-refresh">
+		<div class="app-filter-stat-refresh" eid="rb">
 			{@refresh}
 		</div>
 	</div>	

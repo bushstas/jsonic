@@ -358,6 +358,11 @@ function Component() {
 			}
 		}
 	};
+	
+	Component.prototype.registerElement = function(element, id) {
+		this.elements = this.elements || {};
+		this.elements[id] = element;
+	};
 
 	Component.prototype.registerChildComponent = function(child) {
 		this.childrenCount = this.childrenCount || 0;
@@ -457,8 +462,9 @@ function Component() {
 		return this.componentId;
 	};
 
-	Component.prototype.getElement = function() {
-		return this.scope || this.parentElement;
+	Component.prototype.getElement = function(id) {
+		if (isString(id)) return Objects.get(this.elements, id);
+		else return this.scope || this.parentElement;
 	};
 
 	Component.prototype.findElement = function(selector, scopeElement) {
@@ -580,6 +586,7 @@ function Component() {
 	};
 
 	Component.prototype.unrender = function() {
+		this.elements = null;
 		this.disposeLinks();
 		this.disposeInternal();
 		this.level.dispose();

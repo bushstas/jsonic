@@ -14,7 +14,7 @@ function onRendered() {
 
 
 function openInformer() {
-	var datatable = this.getChild('datatable');
+	var datatable = <::datatable>;
 }
 
 function openFilter(filterId) {
@@ -22,5 +22,5 @@ function openFilter(filterId) {
 }
 
 function onFormExpand() {
-	this.toggle('expanded');
+	$expanded!
 }

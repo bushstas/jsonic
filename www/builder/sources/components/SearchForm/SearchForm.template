@@ -2,7 +2,7 @@
 	<div class="app-search-form-title">
 		{~title}
 	</div>
-	<div class="app-search-form-close-side" onClick="toggleExpand"/>
-	<div class="app-search-form-close" onClick="toggleExpand"/>
+	<div class="app-search-form-close-side" onClick="!expand"/>
+	<div class="app-search-form-close" onClick="!expand"/>
 	<component class="TenderSearchForm">
 </div>

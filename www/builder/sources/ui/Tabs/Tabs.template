@@ -1,6 +1,6 @@
 <div class="app-tabs" scope>
-	{foreach $items as &item}
-		<div class="app-tabs-item">
+	{foreach $items as &i => &item}
+		<div class="app-tabs-item{$activeTab==&i?' active'}" data-index="{&i}">
 			{&item}
 			<div class="app-tabs-remove"/>
 		</div>

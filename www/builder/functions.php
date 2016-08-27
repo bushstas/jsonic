@@ -287,8 +287,78 @@
 		return false;
 	}
 
+	function parseSpecialJSCode($content) {
+		$texts = array();
+		$content = transformQuotedText($content, $texts);
+		$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
+		$content = preg_replace('/'.$regexp.' {1,}/', "$1", $content);
+		$content = preg_replace('/ {1,}'.$regexp.'/', "$1", $content);
+
+		$content = preg_replace('/(\$*[\w\]\[\.]+) *\{ *([\w\]\[\.,]+) *\}/', "Objects.get($1,$2)", $content);
+		$content = str_replace('<>', 'this.getElement()', $content);
+		$content = preg_replace('/\+\+> *(\w+) *(\(([^\)]*)\))* *;*/', "Dialoger.show($1,$3)", $content);
+		$content = preg_replace('/<\+\+ *(\w+) *(\(([^\)]*)\))* *;*/', "Dialoger.hide($1,$3)", $content);
+		$content = preg_replace('/\+> *(\w+) *(\(([^\)]*)\))*/', "Dialoger.get($1,$3)", $content);
+		$content = preg_replace('/--> *(\w+) *(\(([^\)]*)\))* *;*/', "this.dispatchEvent('$1',$3);", $content);
+		$content = preg_replace('/==> *(\w+) *(\(([^\)]*)\))* *;*/', "Globals.dispatchEvent('$1',$3);", $content);
+		$content = str_replace(",)", ")", $content);
+		
+		$regexp = '/[\w\]\[\.]*<[\.\#:]*[a-z][\w\-\]\[]*>/i';
+		$parts = preg_split($regexp, $content);
+		preg_match_all($regexp, $content, $matches);
+		$matches = $matches[0];
+		$content = '';
+		foreach ($parts as $i => $part) {
+			$content .= $part;
+			if (isset($matches[$i])) {
+				$p = preg_split('/[<>]/', $matches[$i]);
+				$tag = $p[1];
+				$scope = '';
+				$index = null;
+				if ($p[0] == 'return') {
+					$content .= 'return ';
+				} elseif (!empty($p[0])) {
+					$scope = ','.$p[0];
+				}
+				$p = explode('[', $tag);
+				if (isset($p[1])) {
+					$tag = $p[0];
+					$p = explode(']', $p[1]);
+					if (isset($p[1])) {
+						$index = $p[0];
+					}
+				}
+				$tag = preg_replace('/[^\.\#:\-\w]/', '', $tag);
+				preg_match_all('/([\.\#:]*)([\w\-]+)/', $tag, $ms);
+				if ($ms[1][0] == ':') {
+					$content .= "this.getElement('".$ms[2][0]."')";
+				} elseif ($ms[1][0] == '::') {
+					$content .= "this.getChild('".$ms[2][0]."')";
+				} else {
+					$selector = !empty($ms[1][0]) ? $ms[1][0].'->>' : '';
+					if ($index === null) {
+						$content .= "this.findElement('".$selector.$ms[2][0].$scope."')";
+					} elseif(empty($index)) {
+						$content .= "this.findElements('".$selector.$ms[2][0].$scope."')";
+					} else {
+						$content .= "this.findElements('".$selector.$ms[2][0].$scope."')[".$index."]";
+					}
+				}				
+			}
+		}
+		$parts = explode('__TEXT__', $content);
+		$content = '';
+		foreach ($parts as $i => $part) {
+			$content .= $part;
+			if (isset($texts[$i])) {
+				$content .= $texts[$i];
+			}
+		}
+		return $content;
+	}
+
 	function parseJsClass($content, &$classes, $file) {
-		$content = trim($content);
+		$content = parseSpecialJSCode(trim($content));
 		$parts = preg_split('/\n/', $content);
 		$originalFirstLine = trim($parts[0]);
 		$firstLine = trim(preg_replace('/\s*,\s*/', ',', $originalFirstLine), ';');
@@ -644,7 +714,7 @@
 		return $text;
 	}
 
-	function transformQuotedText($text) {
+	function transformQuotedText($text, &$texts = null) {
 		$regexp = '/[\'"]/';
 		preg_match_all($regexp, $text, $matches);
 		$matches = $matches[0];
@@ -666,7 +736,12 @@
 					if ($matches[$i] == $currentQuote) {
 						$isText = false;
 						$currentText .= $currentQuote;
-						$codeParts .= replaceArrayLikeSymbols($currentText);
+						if (is_array($texts)) {
+							$texts[] = $currentText;
+							$codeParts .= '__TEXT__';
+						} else {
+							$codeParts .= replaceArrayLikeSymbols($currentText);
+						}
 						$currentQuote = '';
 						$currentText = '';						
 					} else {
@@ -847,11 +922,13 @@
 					}
 				}
 			}
+			$codeParts = preg_replace('/\$(\w+)\!\s*;*/', "this.toggle('$1');", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\s*([\+\-\*\/\%])=\s*(\w+)/', "this.plusTo('$1',$3,'$2')", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\s*\+\+/', "this.plusTo('$1',1)", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\s*--/', "this.plusTo('$1',-1)", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.removeAt\(/', "this.removeByIndexFrom('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.remove\(/', "this.removeValueFrom('$1', ", $codeParts);
+			$codeParts = preg_replace('/\$(\w+)\.each\(/', "this.each('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $codeParts);
 			$codeParts = preg_replace('/\$(\w+)\.addOne\(/', "this.addOneTo('$1', ", $codeParts);
 			$codeParts = preg_replace('/,(?=\s*\$\w)/', "```", $codeParts);

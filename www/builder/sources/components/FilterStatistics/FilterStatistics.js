@@ -29,7 +29,7 @@ function onRendered() {
 }
 
 function onRefreshButtonClick() {
-	this.each('filters', function(filter) {
+	$filters.each(function(filter) {
 		StoreKeeper.remove('filterStat_' + filter['filterId']);
 	});
 	this.refresh();
@@ -40,26 +40,26 @@ function onFilterClick() {
 }
 
 function refresh() {
-	this.showElement('.->> app-filter-stat-refresh', false);
+	<:rb>.hide();
 	this.currentFilterIndex = 0;
 	this.getCountForFilterWithIndex(0);	
 }
 
 function onLoaded(filters) {
-	this.set('filters', filters);
+	$filters = filters;
 }
 
 function updateFilterCount(data) {
-	this.fill(this.findElement('.->>row' + data['filterId']), data['numbers']);
+	this.fill(this.findElement('.->> row' + data['filterId']), data['numbers']);
 	this.currentFilterIndex++;
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 }
 
 function getCountForFilterWithIndex(index) {	
-	var filter = Objects.get(this.get('filters'), index);
+	var filter = $filters{ index };
 	if (isObject(filter)) {
 		FiltersStat.load({'filterId': filter['filterId']});
 	} else {
-		this.showElement('.->> app-filter-stat-refresh', true);
+		<:rb>.show();
 	}
 }

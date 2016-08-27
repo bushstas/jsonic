@@ -11,42 +11,26 @@ initial helpers = [
 				'blur': this.onBlur,
 				'input': this.onInput
 			},
-			'inputSelector': 'input[type="text"]'
+			'inputSelector': 'input'
 		}
 	}
 ];
 
 function onRendered() {
-	this.input = this.findElement('input[type="text"]');
-	this.container = this.findElement('.->> app-autocomplete-variants');
-	var url = Objects.get(this.options, 'url');
+	var url = this.options{ 'url' };
 	if (isString(url)) {
 
 	}
 }
 
-function onFocus() {
-	this.dispatchEvent('focus');
-}
-
-function onBlur() { 
-	this.dispatchEvent('blur');
-}
-
 function onInput(value) {
-	var minLength = Objects.get(this.options, 'minLength', 3);
-
+	var minLength = this.options{ 'minLength', 3};
 }
 
 function onEnter(value) {
-	this.dispatchEvent('enter', value);
 	this.clear();
 }
 
-function onEscape() {
-	this.dispatchEvent('escape');
-}
-
 function clear() {
-	this.input.value = '';
+	<:input>.clear();
 }

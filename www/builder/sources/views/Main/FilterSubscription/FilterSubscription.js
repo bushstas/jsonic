@@ -26,7 +26,7 @@ function getTotalCount() {
 
 function getSubscribedCount() {
 	var subscribedCount = 0;
-	this.each('filters', function(filter) {
+	$filters.each(function(filter) {
 		if (filter['isSubs'] == 1) subscribedCount++;
 	});
 	return Decliner.getCount('subscr', subscribedCount);

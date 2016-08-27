@@ -498,6 +498,10 @@ function Component() {
 			}
 		}
 	};
+	Component.prototype.registerElement = function(element, id) {
+		this.elements = this.elements || {};
+		this.elements[id] = element;
+	};
 	Component.prototype.registerChildComponent = function(child) {
 		this.childrenCount = this.childrenCount || 0;
 		this.children = this.children || {};
@@ -578,8 +582,9 @@ function Component() {
 	Component.prototype.getId = function() {
 		return this.componentId;
 	};
-	Component.prototype.getElement = function() {
-		return this.scope || this.parentElement;
+	Component.prototype.getElement = function(id) {
+		if (isString(id)) return Objects.get(this.elements, id);
+		else return this.scope || this.parentElement;
 	};
 	Component.prototype.findElement = function(selector, scopeElement) {
 		return (scopeElement || this.getElement()).querySelector(selector);
@@ -681,6 +686,7 @@ function Component() {
 		return this.uniqueId = this.uniqueId || generateRandomKey();
 	};
 	Component.prototype.unrender = function() {
+		this.elements = null;
 		this.disposeLinks();
 		this.disposeInternal();
 		this.level.dispose();
@@ -1247,6 +1253,7 @@ function Level() {
 				if (isString(props['p'][k]) || isNumber(props['p'][k])) {
 					attrName = __A[k] || k;
 					if (attrName == 'scope') component.setScope(element);
+					else if (attrName == 'eid') component.registerElement(element, props['p'][k]);
 					else element.attr(attrName, props['p'][k]);
 				} else if (isFunction(props['p'][k])) {
 					pn = props['n'][k];
@@ -1847,14 +1854,22 @@ function Dialoger() {
 		currentDialogOptions;
 	this.show = function(dialogClass, options, dialogId) {
 		if (isFunction(dialogClass)) {
-			currentDialogClass = dialogClass;
 			currentDialogOptions = options;
-			defineDialogId(dialogId);
+			defineDialogId(dialogClass, dialogId);
 			defineDialog();
 			showDialog();
 		}
 	};
-	var defineDialogId = function(dialogId) {
+	this.hide = function(dialogClass, dialogId) {
+		defineDialogId(dialogClass, dialogId);
+		if (dialogs[currentDialogId]) dialogs[currentDialogId].close();
+	};
+	this.get = function(dialogClass, dialogId) {
+		defineDialogId(dialogClass, dialogId);
+		return dialogs[currentDialogId];
+	};
+	var defineDialogId = function(dialogClass, dialogId) {
+		currentDialogClass = dialogClass;
 		currentDialogId = currentDialogClass.name + (isString(dialogId) ? '_' + dialogId : '');
 	};
 	var defineDialog = function() {
@@ -1987,7 +2002,7 @@ function InputHandler() {
 	var subscribers = [];
 	var options = [];	
 	this.subscribe = function(subscriber, opts) {
-		if (isObject(opts['callbacks']) && isString(opts['inputSelector']) && subscribers.indexOf(subscriber) == -1) {
+		if (isObject(opts['callbacks']) && isString(opts['inputSelector']) && subscribers.indexOf(subscriber) == -1) {			
 			var input = subscriber.findElement(opts['inputSelector']);
 			var actions = Objects.getKeys(opts['callbacks']);
 			if (input) {
@@ -1996,8 +2011,8 @@ function InputHandler() {
 				options.push(opts);
 				var index = subscribers.length - 1;
 				if (actions.hasExcept('focus', 'blur')) input.addEventListener('keyup', onInput.bind(null, index), false);
-				if (actions.has('focus')) input.addEventListener('focus', onFocus.bind(null, index), false);
-				if (actions.has('blur')) input.addEventListener('blur', onBlur.bind(null, index), false);				
+				if (actions.has('focus')) input.addEventListener('focus', onEvent.bind(null, index, 'focus'), false);
+				if (actions.has('blur')) input.addEventListener('blur', onEvent.bind(null, index, 'blur'), false);				
 			}
 		}
 	};
@@ -2008,19 +2023,22 @@ function InputHandler() {
 		var subscriber = subscribers[index];
 		var cb = opts['callbacks'];
 		var value = e.target.value;
-		if (keyName && isFunction(cb[keyName])) cb[keyName].call(subscriber, value, e);
-		else if (isFunction(cb[keyCode])) cb[keyCode].call(subscriber, value, e);
-		if (isFunction(cb['input'])) cb['input'].call(subscriber, value, e);
+		callSubscriber(index, 'input', value);		
+		if (keyName && isFunction(cb[keyName])) callSubscriber(index, keyName, value);
+		else if (isFunction(cb[keyCode])) callSubscriber(index, keyCode, value);
 	};
 	var getKeyName = function(keyCode) {
 		return ({'13': 'enter', '27': 'esc'})[keyCode];
 	};
-	var onFocus = function(index, e) {
-		options[index]['callbacks']['focus'].call(subscribers[index]);
+	var onEvent = function(index, eventName, e) {
+		callSubscriber(index, eventName, e.target.value);
 	};
-	var onBlur = function(index, e) {
-		options[index]['callbacks']['blur'].call(subscribers[index]);
-	};
+	var callSubscriber = function(index, eventName, value) {
+		var s = subscribers[index];
+		var cb = Objects.get(options[index]['callbacks'], eventName);
+		if (isFunction(cb)) cb.call(s, value);
+		if (isString(eventName)) s.dispatchEvent(eventName, value);
+	}; 
 }
 InputHandler = new InputHandler();
 function Popuper() {
@@ -2493,14 +2511,32 @@ Element.prototype.attr = function(attrName) {
 	}
 };
 Element.prototype.show = function(isShown) {
-	var display = isString(isShown) ? isShown : (isShown ? 'block' : 'none');
+	var display = isString(isShown) ? isShown : (isUndefined(isShown) || isShown ? 'block' : 'none');
 	this.style.display = display;
+};
+Element.prototype.hide = function() {
+	this.show(false);
 };
 Element.prototype.find = function(selector) {
 	return this.querySelector(selector);
 };
 Element.prototype.getParent = function() {
 	return this.parentNode;
+};
+Element.prototype.scrollTo = function(pxy, speed) {
+	alert(pxy)
+};
+Element.prototype.scrollToElement = function(element, speed) {
+	this.scrollTo(element.getRelativePosition(this).y, speed);
+};
+Element.prototype.getRelativePosition = function(element) {
+	var a = this.getRect();
+	var b = element.getRect();
+	return {x: a.x - b.x, y: a.y - b.y};
+};
+Element.prototype.clear = function() {
+	if (isString(this.value)) this.value = '';
+	else this.innerHTML = '';
 };
 MouseEvent.prototype.getTarget = function(selector) {
 	return this.target.getAncestor(selector);
@@ -3395,10 +3431,10 @@ function getCount(a) {
 }
 function App() {};
 App.prototype.onNoErrors = function() {
-	this.appendChild('menu', true);
+	this.appendChild('menu',true);
 };
 App.prototype.onError = function(errorCode) {
-	this.appendChild('menu', false);
+	this.appendChild('menu',false);
 };
 App.prototype.getTemplateMain = function(_,$) {
 	return[{'cmp':TopMenu,'p':{'i':'menu'}},{'t':0,'p':{'c':'app-view-container'}}]
@@ -3427,13 +3463,13 @@ Main.prototype.onRendered = function() {
 	this.onResize();
 };
 Main.prototype.onResize = function() {
-	var element = this.findElement('.app-mainpage-content');
+	var element=this.findElement('.app-mainpage-content');
 	element.setHeight('');
-	var height = element.getHeight();
-	var bodyHeight = document.body.getHeight();
-	var diff = bodyHeight - 100 - height;
-	if (diff > 0) {
-		element.setHeight(bodyHeight - 100);
+	var height=element.getHeight();
+	var bodyHeight=document.body.getHeight();
+	var diff=bodyHeight-100-height;
+	if(diff>0){
+		element.setHeight(bodyHeight-100);
 	}
 };
 Main.prototype.getTemplateMain = function(_,$) {
@@ -3441,7 +3477,7 @@ Main.prototype.getTemplateMain = function(_,$) {
 };
 Main.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ResizeHandler,'options': {'callback': this.onResize}}]
+		'helpers':[{'helper':ResizeHandler,'options':{'callback':this.onResize}}]
 	};
 };
 Main.prototype.getControllersToLoad = function() {
@@ -3452,7 +3488,7 @@ Search.prototype.onRendered = function() {
 	this.openInformer();
 };
 Search.prototype.openInformer = function() {
-	var datatable = this.getChild('datatable');
+	var datatable=this.getChild('datatable');
 };
 Search.prototype.openFilter = function(filterId) {};
 Search.prototype.onFormExpand = function() {
@@ -3463,7 +3499,7 @@ Search.prototype.getTemplateMain = function(_,$) {
 };
 Search.prototype.getInitials = function() {
 	return {
-		'props':{'expanded': true}
+		'props':{'expanded':true}
 	};
 };
 Search.prototype.getControllersToLoad = function() {
@@ -3496,8 +3532,8 @@ FilterStatistics.prototype.onRendered = function() {
 	this.refresh();
 };
 FilterStatistics.prototype.onRefreshButtonClick = function() {
-	this.each('filters', function(filter) {
-		StoreKeeper.remove('filterStat_' + filter['filterId']);
+	this.each('filters', function(filter){
+		StoreKeeper.remove('filterStat_'+filter['filterId']);
 	});
 	this.refresh();
 };
@@ -3505,46 +3541,43 @@ FilterStatistics.prototype.onFilterClick = function() {
 	alert('filter')
 };
 FilterStatistics.prototype.refresh = function() {
-	this.showElement('.app-filter-stat-refresh', false);
-	this.currentFilterIndex = 0;
+	this.getElement('rb').hide();
+	this.currentFilterIndex=0;
 	this.getCountForFilterWithIndex(0);	
 };
 FilterStatistics.prototype.onLoaded = function(filters) {
-	this.set('filters', filters);
+	this.set('filters',filters);
 };
 FilterStatistics.prototype.updateFilterCount = function(data) {
-	this.fill(this.findElement('.row' + data['filterId']), data['numbers']);
+	this.fill(this.findElement('.row'+data['filterId']),data['numbers']);
 	this.currentFilterIndex++;
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 };
 FilterStatistics.prototype.getCountForFilterWithIndex = function(index) {
-	var filter = Objects.get(this.get('filters'), index);
-	if (isObject(filter)) {
-		FiltersStat.load({'filterId': filter['filterId']});
-	} else {
-		this.showElement('.app-filter-stat-refresh', true);
+	var filter=Objects.get(this.get('filters'),index);
+	if(isObject(filter)){
+		FiltersStat.load({'filterId':filter['filterId']});
+	}else{
+		this.getElement('rb').show();
 	}
 };
 FilterStatistics.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[_['title'],{'c':__[87],'t':0,'p':{'c':'app-filter-stat-refresh'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[88],'t':7},{'c':__[89],'t':7},{'c':__[90],'t':7},{'c':__[91],'t':7},{'c':!!_['extended']?[{'c':__[92],'t':7},{'c':__[93],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
+	return[{'c':[{'c':[_['title'],{'c':__[87],'t':0,'p':{'c':'app-filter-stat-refresh','eid':'rb'}}],'t':0,'p':{'c':'app-filter-stat-title'}},{'c':{'c':[{'c':__[88],'t':7},{'c':__[89],'t':7},{'c':__[90],'t':7},{'c':__[91],'t':7},{'c':!!_['extended']?[{'c':__[92],'t':7},{'c':__[93],'t':7}]:'','i':true}],'t':5},'t':2,'p':{'c':'app-filter-stat-head','cp':'0','cs':'0'}},{'c':{'h':function(filter){return[{'c':[{'c':filter['header'],'t':1,'p':{'c':'app-filter-stat-row-name'}},{'c':['+',{'pl':'today','d':'0'}],'t':1},{'c':['+',{'pl':'yesterday','d':'0'}],'t':1},{'c':{'pl':'current','d':'0'},'t':1},{'c':!!_['extended']?[{'c':{'pl':'week','d':'0'},'t':1},{'c':{'pl':'month','d':'0'},'t':1}]:'','i':true}],'t':0,'p':{'c':'app-filter-stat-row row'+filter['filterId']}}]},'p':$.g('filters'),'f':'filters'},'t':0,'p':{'c':'app-filter-stat-content'}}],'t':0,'p':{'c':'app-filter-stat '+_['className'],'sc':1}}]
 };
 FilterStatistics.prototype.getInitials = function() {
 	return {
-		'loader':{'controller': Filters,'async': false},
-		'controllers':[{'controller': FiltersStat,'on': {'load': this.updateFilterCount}}],
-		'helpers':[{'helper': ClickHandler,'options': {'app-filter-stat-refresh': this.onRefreshButtonClick,'app-filter-stat-row-name': this.onFilterClick}}]
+		'loader':{'controller':Filters,'async':false},
+		'controllers':[{'controller':FiltersStat,'on':{'load':this.updateFilterCount}}],
+		'helpers':[{'helper':ClickHandler,'options':{'app-filter-stat-refresh':this.onRefreshButtonClick,'app-filter-stat-row-name':this.onFilterClick}}]
 	};
 };
 function SearchForm() {};
-SearchForm.prototype.toggleExpand = function() {
-	this.dispatchEvent('expand');
-};
 SearchForm.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,$.toggleExpand],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
+	return[{'c':[{'c':_['title'],'t':0,'p':{'c':'app-search-form-title'}},{'t':0,'e':[0,'expand'],'p':{'c':'app-search-form-close-side'}},{'t':0,'e':[0,'expand'],'p':{'c':'app-search-form-close'}},{'cmp':TenderSearchForm}],'t':0,'p':{'c':'app-search-form','sc':1}}]
 };
 SearchForm.prototype.getInitials = function() {
 	return {
-		'args':{'title': __[4]}
+		'args':{'title':__[4]}
 	};
 };
 function SearchFormButton() {};
@@ -3557,7 +3590,7 @@ SearchFormPanel.prototype.show = function() {
 	Popuper.watch(this);
 };
 SearchFormPanel.prototype.hide = function() {
-	this.addClass('shown', false);
+	this.addClass('shown',false);
 };
 SearchFormPanel.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'t':0,'e':[0,$.hide],'p':{'c':'app-search-form-panel-close'}},{'c':_['title'],'t':0,'p':{'c':'app-search-form-panel-title'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'app-search-form-panel '+_['className'],'sc':1}}]
@@ -3575,7 +3608,7 @@ KeywordsButton.prototype.getTemplateContent = function(_,$) {
 };
 KeywordsButton.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'search-keywords'}
+		'args':{'className':'search-keywords'}
 	};
 };
 function KeywordsPanel() {};
@@ -3584,7 +3617,7 @@ KeywordsPanel.prototype.getTemplateContent = function(_,$) {
 };
 KeywordsPanel.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'keywords-panel','title': __[13]}
+		'args':{'className':'keywords-panel','title':__[13]}
 	};
 };
 function FiltersForm() {};
@@ -3594,36 +3627,36 @@ FiltersForm.prototype.getProperData = function(data) {
 function TenderSearchForm() {};
 TenderSearchForm.prototype.initiate = function() {
 	Globals.addListeners({
-		'TenderSearchFormChanged': this.onChange,
-		'TenderSearchFormGotParams': this.setParams
-	}, this);
+		'TenderSearchFormChanged':this.onChange,
+		'TenderSearchFormGotParams':this.setParams
+	},this);
 };
 TenderSearchForm.prototype.onRendered = function() {
 	this.setParams({
-		'registryContracts': 1
+		'registryContracts':1
 	});
 };
 TenderSearchForm.prototype.onResetButtonClick = function(e) {
-	var button = e.target.getAncestor('.app-search-form-reset');
+	var button=e.target.getAncestor('.app-search-form-reset');
 	button.addClass('active');
-	this.delay(function() {
+	this.delay(function(){
 		button.removeClass('active');
-	}, 2500);
+	},2500);
 };
 TenderSearchForm.prototype.onResetConfirmed = function() {};
 TenderSearchForm.prototype.onChange = function() {
-	var data = this.getProperData();
+	var data=this.getProperData();
 	console.log(this.getControlsData())
 };
 TenderSearchForm.prototype.setParams = function(params) {
-	var data = {
-		'keywords': {
-			'nonmorph': params['nonmorph'],
-			'registryContracts': params['registryContracts'],
-			'registryProducts': params['registryProducts'],
-			'searchInDocumentation': params['searchInDocumentation'],
-			'containKeyword': params['containKeyword'],
-			'notcontainKeyword': params['notcontainKeyword']
+	var data={
+		'keywords':{
+			'nonmorph':params['nonmorph'],
+			'registryContracts':params['registryContracts'],
+			'registryProducts':params['registryProducts'],
+			'searchInDocumentation':params['searchInDocumentation'],
+			'containKeyword':params['containKeyword'],
+			'notcontainKeyword':params['notcontainKeyword']
 		}
 	};
 	this.setControlsData(data);
@@ -3640,8 +3673,8 @@ SearchFormCreateFilterMenu.prototype.onWizardButtonClick = function() {
 };
 SearchFormCreateFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'create-filters-menu'},
-		'props':{'buttons': [{'name': __[5],'handler': this.onCreateButtonClick},{'name': __[6],'handler': this.onWizardButtonClick}]}
+		'args':{'className':'create-filters-menu'},
+		'props':{'buttons':[{'name':__[5],'handler':this.onCreateButtonClick},{'name':__[6],'handler':this.onWizardButtonClick}]}
 	};
 };
 function SearchFormFilterMenu() {};
@@ -3649,16 +3682,16 @@ SearchFormFilterMenu.prototype.onLoadFilters = function(filters) {
 	this.renderButtons(filters);
 };
 SearchFormFilterMenu.prototype.onCheckboxChange = function(e) {
-	Filters.doAction('set', {'filterId': e.value, 'param': 'isAutoOpen', 'value': e.checked});
+	Filters.doAction('set',{'filterId':e.value,'param':'isAutoOpen','value':e.checked});
 };
 SearchFormFilterMenu.prototype.getButtonData = function(item) {
-	return {
-		'value': item['filterId'],
-		'name': item['header'],
-		'isAutoOpen': item['isAutoOpen']
+	return{
+		'value':item['filterId'],
+		'name':item['header'],
+		'isAutoOpen':item['isAutoOpen']
 	};
 };
-SearchFormFilterMenu.prototype.handleClick = function(value, button) {
+SearchFormFilterMenu.prototype.handleClick = function(value,button) {
 	Globals.getView('search').openFilter(value);
 };
 SearchFormFilterMenu.prototype.getTemplateContent = function(_,$) {
@@ -3666,59 +3699,47 @@ SearchFormFilterMenu.prototype.getTemplateContent = function(_,$) {
 };
 SearchFormFilterMenu.prototype.getInitials = function() {
 	return {
-		'args':{'className': 'filters-menu','maxHeight': 400},
-		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
-		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'intValue': true}}]
+		'args':{'className':'filters-menu','maxHeight':400},
+		'controllers':[{'controller':Filters,'on':{'load':this.onLoadFilters}}],
+		'helpers':[{'helper':CheckboxHandler,'options':{'callback':this.onCheckboxChange,'intValue':true}}]
 	};
 };
 function SearchFormFilters() {};
 SearchFormFilters.prototype.onLoadFilters = function(filters) {
-	this.set('quantity', filters.length);
+	this.set('quantity',filters.length);
 };
 SearchFormFilters.prototype.onSaveFilterClick = function() {
-	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
+	Dialoger.show(FilterEdit,{'filterId':Globals.get('filterId')});
 };
 SearchFormFilters.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'c':__[7],'t':1},{'cmp':SearchFormCreateFilterMenu}],'t':0,'p':{'c':'app-search-form-filters-create-button'}},{'c':[{'c':__[8],'t':0,'p':{'c':'app-search-form-filters-button-inner'}},{'c':[{'c':{'pr':'quantity','p':$.g('quantity')},'t':42,'p':{'c':'app-search-form-filters-button-quantity'}},{'t':0,'p':{'c':'app-search-form-filters-button-plus'}}],'t':0,'p':{'c':'app-search-form-filters-button-side'}},{'cmp':SearchFormFilterMenu}],'t':0,'p':{'c':function(){return 'app-search-form-filters-button'+(!$.g('quantity')?' with-plus':'')}},'n':{'c':'quantity'}},{'c':{'pr':'filterName','p':$.g('filterName')},'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-name'}},{'c':__[9],'t':0,'e':[0,$.onSaveFilterClick],'p':{'c':'app-search-form-filter-save-button'}}],'t':0,'p':{'c':'app-search-form-filters','sc':1}}]
 };
 SearchFormFilters.prototype.getInitials = function() {
 	return {
-		'controllers':[{'controller': Filters,'on': {'load': this.onLoadFilters}}],
-		'props':{'filterName': 'Master'}
+		'controllers':[{'controller':Filters,'on':{'load':this.onLoadFilters}}],
+		'props':{'filterName':'Master'}
 	};
 };
 function AutoComplete() {};
 AutoComplete.prototype.onRendered = function() {
-	this.input = this.findElement('input[type="text"]');
-	this.container = this.findElement('.app-autocomplete-variants');
-	var url = Objects.get(this.options, 'url');
-	if (isString(url)) {}
-};
-AutoComplete.prototype.onFocus = function() {
-	this.dispatchEvent('focus');
-};
-AutoComplete.prototype.onBlur = function() {
-	this.dispatchEvent('blur');
+	var url=Objects.get(this.options,'url');
+	if(isString(url)){}
 };
 AutoComplete.prototype.onInput = function(value) {
-	var minLength = Objects.get(this.options, 'minLength', 3);
+	var minLength=Objects.get(this.options,'minLength',3);
 };
 AutoComplete.prototype.onEnter = function(value) {
-	this.dispatchEvent('enter', value);
 	this.clear();
 };
-AutoComplete.prototype.onEscape = function() {
-	this.dispatchEvent('escape');
-};
 AutoComplete.prototype.clear = function() {
-	this.input.value = '';
+	this.getElement('input').clear();
 };
 AutoComplete.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'t':14,'p':{'tp':'text','p':_['placeholder']}},{'t':0,'p':{'c':'app-autocomplete-variants'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'app-autocomplete app-input-container','sc':1}}]
+	return[{'c':[{'t':14,'p':{'tp':'text','p':_['placeholder'],'eid':'input'}},{'t':0,'p':{'c':'app-autocomplete-variants','eid':'variants'}},{'tmp':$.getTemplateContent}],'t':0,'p':{'c':'app-autocomplete app-input-container','sc':1}}]
 };
 AutoComplete.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': InputHandler,'options': {'callbacks': {'enter': this.onEnter,'esc': this.onEscape,'focus': this.onFocus,'blur': this.onBlur,'input': this.onInput},'inputSelector': 'input[type="text"]'}}]
+		'helpers':[{'helper':InputHandler,'options':{'callbacks':{'enter':this.onEnter,'esc':this.onEscape,'focus':this.onFocus,'blur':this.onBlur,'input':this.onInput},'inputSelector':'input'}}]
 	};
 };
 function KeywordsAutoComplete() {};
@@ -3730,7 +3751,7 @@ KeywordsAutoComplete.prototype.getTemplateContent = function(_,$) {
 };
 KeywordsAutoComplete.prototype.getInitials = function() {
 	return {
-		'options':{'url': CONFIG.keywords.get}
+		'options':{'url':CONFIG.keywords.get}
 	};
 };
 function Calendar() {};
@@ -3738,40 +3759,40 @@ Calendar.prototype.onRendered = function() {
 	this.reset();
 };
 Calendar.prototype.redraw = function() {
-	var day       = this.isCurrentMonth() ? Dates.getDay() : 0,
-		month     = this.month,
-		year      = this.year,
-		curDays   = Dates.getDays(month, year),
-		prevMonth = month - 1 >= 0 ? month - 1 : 11,
-		prevYear  = prevMonth < 12 ? year : year - 1,
-		prevDays  = Dates.getDays(prevMonth, prevYear),
-		firstDay  = Dates.getWeekDay(1, month, year),
-		firstCell = firstDay > 0 ? firstDay - 1 : 6,
-		count     = 1,
-		lastCell  = 0, 
-		days      = [];
-	for (var i = 0; i < firstCell; i++) {
-		days.push({num: prevDays - i, another: true});
+	var day=this.isCurrentMonth()?Dates.getDay():0,
+		month=this.month,
+		year=this.year,
+		curDays=Dates.getDays(month,year),
+		prevMonth=month-1>=0?month-1:11,
+		prevYear=prevMonth<12?year:year-1,
+		prevDays=Dates.getDays(prevMonth,prevYear),
+		firstDay=Dates.getWeekDay(1,month,year),
+		firstCell=firstDay>0?firstDay-1:6,
+		count=1,
+		lastCell=0,
+		days=[];
+	for(var i=0;i<firstCell;i++){
+		days.push({num:prevDays-i,another:true});
 	}
-	days = days.reverse();
-	for (var i = firstCell; i < curDays + firstCell; i++) {
-		days.push({num: count, current: count == day, marked: this.isMarked(count, month, year)});
-		lastCell = i;
+	days=days.reverse();
+	for(var i=firstCell;i<curDays+firstCell;i++){
+		days.push({num:count,current:count==day,marked:this.isMarked(count,month,year)});
+		lastCell=i;
 		count++;
 	}
-	var len = days.length;
-	var more =  len <= 35 ? 35 - len : 42 - len;		
-	for (var i = 1; i <= more; i++) {
-		days.push({num: i, another: true});
+	var len=days.length;
+	var more=len<=35?35-len:42-len;		
+	for(var i=1;i<=more;i++){
+		days.push({num:i,another:true});
 	}
 	this.set({'year':year,'month':Dates.getMonthName(month),'days':days});
 };
 Calendar.prototype.isCurrentMonth = function() {
-	return this.month == Dates.getMonth() && this.year == Dates.getYear();
+	return this.month==Dates.getMonth()&& this.year==Dates.getYear();
 };
 Calendar.prototype.reset = function() {
-	this.month = Dates.getMonth();
-	this.year = Dates.getYear();
+	this.month=Dates.getMonth();
+	this.year=Dates.getYear();
 	this.redraw();
 };
 Calendar.prototype.isMarked = function() {
@@ -3784,12 +3805,12 @@ Calendar.prototype.onNextClick = function() {
 	this.changeMonth(1);	
 };
 Calendar.prototype.changeMonth = function(value) {
-	this.month += value;
-	if (this.month == 12) {
-		this.month = 0;
+	this.month+=value;
+	if(this.month==12){
+		this.month=0;
 		this.year++;
-	} else if (this.month == -1) {
-		this.month = 11;
+	}else if(this.month==-1){
+		this.month=11;
 		this.year--;
 	}
 	this.redraw();
@@ -3799,37 +3820,37 @@ Calendar.prototype.getTemplateMain = function(_,$) {
 };
 function FavoritesCalendar() {};
 FavoritesCalendar.prototype.onRendered = function() {
-	this.month = Dates.getMonth();
-	this.year = Dates.getYear();
+	this.month=Dates.getMonth();
+	this.year=Dates.getYear();
 };
-FavoritesCalendar.prototype.isMarked = function(d, m, y) {
-	return Objects.has(this.tenderByDates, d + '.' + (m + 1) + '.' + y);
+FavoritesCalendar.prototype.isMarked = function(d,m,y) {
+	return Objects.has(this.tenderByDates,d+'.'+(m+1)+'.'+y);
 };
 FavoritesCalendar.prototype.onLoadFavorites = function(data) {
 	var timestamp;
-	this.tenderByDates = {};
-	for (var i = 0; i < data.length; i++) {
-		if (data[i]['phase_'] == 1) {
-			timestamp = data[i]['finishdocdate'].replace(/\.(\d+)$/, ".20$1").replace(/0(?=\d\.)/g, '');
-			this.tenderByDates[timestamp] = this.tenderByDates[timestamp] || [];
+	this.tenderByDates={};
+	for(var i=0;i<data.length;i++){
+		if(data[i]['phase_']==1){
+			timestamp=data[i]['finishdocdate'].replace(/\.(\d+)$/,".20$1").replace(/0(?=\d\.)/g,'');
+			this.tenderByDates[timestamp]=this.tenderByDates[timestamp]||[];
 			this.tenderByDates[timestamp].push(data[i]);
 		}
 	}
 	this.redraw();
 };
 FavoritesCalendar.prototype.onMarkedDayClick = function(e) {
-	var timestamp = e.target.innerHTML + '.' + (this.month + 1) + '.' + this.year;
-	if (isArray(this.tenderByDates[timestamp])) {
-		Dialoger.show(CalendarFavorites, {
-			'title': __[29] + ' ' + Dates.getFormattedDate(timestamp, __[30]),
-			'tenders': this.tenderByDates[timestamp]
+	var timestamp=e.target.innerHTML+'.'+(this.month+1)+'.'+this.year;
+	if(isArray(this.tenderByDates[timestamp])){
+		Dialoger.show(CalendarFavorites,{
+			'title':__[29]+' '+Dates.getFormattedDate(timestamp,__[30]),
+			'tenders':this.tenderByDates[timestamp]
 		});
 	}
 };
 FavoritesCalendar.prototype.getInitials = function() {
 	return {
-		'controllers':[{'controller': Favorites,'on': {'load': this.onLoadFavorites}}],
-		'helpers':[{'helper': ClickHandler,'options': {'marked': this.onMarkedDayClick}}]
+		'controllers':[{'controller':Favorites,'on':{'load':this.onLoadFavorites}}],
+		'helpers':[{'helper':ClickHandler,'options':{'marked':this.onMarkedDayClick}}]
 	};
 };
 function Dialog() {};
@@ -3839,12 +3860,14 @@ Dialog.prototype.show = function() {
 	this.onShow();
 };
 Dialog.prototype.reposition = function() {
-	var element = this.getElement();
-	var rect = element.getRect();	
-	this.set({'marginTop':Math.round(rect.height / -2) + 'px','marginLeft':Math.round(rect.width / -2) + 'px'});
+	var rect=this.getElement().getRect();	
+	this.set({'marginTop':Math.round(rect.height/-2)+'px','marginLeft':Math.round(rect.width/-2)+'px'});
 };
 Dialog.prototype.hide = function() {
 	this.set('shown',false);
+};
+Dialog.prototype.close = function() {
+	this.hide();
 	this.onHide();
 };
 Dialog.prototype.expand = function() {
@@ -3853,45 +3876,45 @@ Dialog.prototype.expand = function() {
 Dialog.prototype.onShow = function() {};
 Dialog.prototype.onHide = function() {};
 Dialog.prototype.getTemplateMain = function(_,$) {
-	return[{'t':0,'e':[0,$.hide],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.hide],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?'max-height:'+$.g('height')+'px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['marginLeft','marginTop','width']}}]
+	return[{'t':0,'e':[0,$.close],'p':{'c':function(){return 'app-dialog-mask'+($.g('shown')?' shown':'')}},'n':{'c':'shown'}},{'c':[{'c':!!_['closable']?[{'t':0,'e':[0,$.close],'p':{'c':'app-dialog-close'}}]:'','i':true},{'c':!!_['expandable']?[{'t':0,'e':[0,$.expand],'p':{'c':'app-dialog-expand'}}]:'','i':true},{'c':{'pr':'title','p':$.g('title')},'t':0,'p':{'c':'app-dialog-title'}},{'c':{'tmp':$.getTemplateContent},'t':0,'p':{'c':'app-dialog-content','st':function(){return ($.g('height')?'max-height:'+$.g('height')+'px;':'')}},'n':{'st':'height'}}],'t':0,'p':{'c':function(){return 'app-dialog'+($.g('expanded')?' expanded':'')+($.g('shown')?' shown':'')},'sc':1,'st':function(){return 'width:'+$.g('width')+'px;margin-left:'+$.g('marginLeft')+';margin-top:'+$.g('marginTop')+';'}},'n':{'c':['expanded','shown'],'st':['marginLeft','marginTop','width']}}]
 };
 Dialog.prototype.getInitials = function() {
 	return {
-		'args':{'closable': true},
-		'followers':{'width': this.reposition,'height': this.reposition},
-		'props':{'width': 600}
+		'args':{'closable':true},
+		'followers':{'width':this.reposition,'height':this.reposition},
+		'props':{'width':600}
 	};
 };
 function Form() {};
 Form.prototype.onSubmit = function() {
-	if (this.isValid()) {
-		var form = this.getElement();
-		var ajax = form.getData('ajax');
-		if (ajax) {
+	if(this.isValid()){
+		var form=this.getElement();
+		var ajax=form.getData('ajax');
+		if(ajax){
 			this.sendAjaxRequest();
-		} else {
+		}else{
 			this.setFormKey();
 			form.submit();
 		}
 	}
 };
 Form.prototype.sendAjaxRequest = function() {
-	var form = this.getElement();
-	var action = form.attr('action');
-	var method = form.attr('method');
-	if (action) {
-		this.request = this.request || new AjaxRequest(action, this.handleResponse, null, this);
-		this.request.send(method, this.getControlsData());
+	var form=this.getElement();
+	var action=form.attr('action');
+	var method=form.attr('method');
+	if(action){
+		this.request=this.request||new AjaxRequest(action,this.handleResponse,null,this);
+		this.request.send(method,this.getControlsData());
 	}
 };
 Form.prototype.setFormKey = function() {
-	this.formKey = generateRandomKey();
-	window[this.formKey] = this;
-	if (!isElement(this.keyInput)) {
-		this.keyInput = document.createElement('input');
-		this.keyInput.setAttribute('name', 'formKey');
-		this.keyInput.setAttribute('type', 'hidden');
-		this.keyInput.value = this.formKey;
+	this.formKey=generateRandomKey();
+	window[this.formKey]=this;
+	if(!isElement(this.keyInput)){
+		this.keyInput=document.createElement('input');
+		this.keyInput.setAttribute('name','formKey');
+		this.keyInput.setAttribute('type','hidden');
+		this.keyInput.value=this.formKey;
 		this.getElement().appendChild(this.keyInput);
 	}
 };
@@ -3899,82 +3922,81 @@ Form.prototype.isValid = function() {
 	return true;
 };
 Form.prototype.handleResponse = function(data) {
-	if (isString(data)) {
-		try {
-			data = JSON.parse(data);
-		} catch (e) {
-			log('incorrect form response', 'handleResponse', this, {'data': data});
+	if(isString(data)){
+		try{
+			data=JSON.parse(data);
+		}catch(e){
+			log('incorrect form response','handleResponse',this,{'data':data});
 		}
 	}
-	if (isObject(data) && data['success']) {
+	if(isObject(data)&& data['success']){
 		this.onSuccess(data);
-	} else {
+	}else{
 		this.onFailure(data);
 	}
-	if (isString(this.formKey)) {
-		this.formKey = null;
+	if(isString(this.formKey)){
+		this.formKey=null;
 		delete window[this.formKey];
 	}
 };
 Form.prototype.onSuccess = function(data) {};
 Form.prototype.onFailure = function(data) {
-	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
-	this.log(error, 'onFailure', data);
+	var error=isObject(data)&& isString(data['error'])?data['error']:'';
+	this.log(error,'onFailure',data);
 };
 Form.prototype.disposeInternal = function() {
-	this.request = null;
+	this.request=null;
 };
 Form.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'tmp':$.getTemplateContent},{'h':function(control){return[{'cmp':FormField,'p':{'a':control}}]},'p':_['controls']},{'c':!!_['submit']?[{'cmp':Submit,'e':[23,$.onSubmit],'p':{'p':_['submit']}}]:'','i':true}],'t':13,'p':{'c':'app-form-controls'+(_['className']?' '+_['className']:''),'m':_['method'],'a':_['action'],'_ajax':(_['ajax']?1:''),'_iframe':(_['iframe']?1:''),'sc':1}}]
 };
 function PopupMenu() {};
 PopupMenu.prototype.onRendered = function() {
-	var element = this.getElement();
-	this.button = element.parentNode;
-	this.addListener(this.button, 'click', this.onShowButtonClick);
+	this.button=this.getElement().parentNode;
+	this.addListener(this.button,'click',this.onShowButtonClick);
 };
 PopupMenu.prototype.onClick = function(e) {
-	var target = e.getTarget('.app-popup-menu-button');
-	if (!isNull(target)) {
-		var idx = target.getData('index');
-		var value = target.getData('value');
-		var buttons = this.get('buttons');
-		if (isArray(buttons) && isObject(buttons[idx]) && isFunction(buttons[idx]['handler'])) {
-			buttons[idx]['handler'].call(this, e);
+	var target=e.getTarget('.app-popup-menu-button');
+	if(!isNull(target)){
+		var idx=target.getData('index');
+		var value=target.getData('value');
+		var buttons=this.get('buttons');
+		if(isArray(buttons)&& isObject(buttons[idx])&& isFunction(buttons[idx]['handler'])){
+			buttons[idx]['handler'].call(this,e);
 			return;
 		}
-		this.handleClick(value, target);
+		this.handleClick(value,target);
 	}
 };
 PopupMenu.prototype.onShowButtonClick = function() {
 	this.onBeforeShow();
 	this.show();
 };
-PopupMenu.prototype.handleClick = function(value, button) {};
+PopupMenu.prototype.handleClick = function(value,button) {};
 PopupMenu.prototype.onBeforeShow = function() {};
 PopupMenu.prototype.show = function() {
-	var innerElement = this.findElement('.app-popup-menu-inner-container');
-	var rect = innerElement.getRect();
-	var height = Math.min(rect.height, Objects.get(this.options, 'maxHeight', 400));
-	this.setStyle({'max-height': height + 'px', 'height': height + 'px'});
+	var innerElement=this.findElement('.app-popup-menu-inner-container');
+	var rect=innerElement.getRect();
+	var height=Math.min(rect.height,Objects.get(this.options,'maxHeight',400));
+	this.setStyle({'max-height':height+'px','height':height+'px'});
     this.button.addClass('active');
     Popuper.watch(this);
 };
 PopupMenu.prototype.hide = function() {
-	this.setStyle({'max-height': '0', 'height': '0'});
+	this.setStyle({'max-height':'0','height':'0'});
 	this.button.removeClass('active');
 };
 PopupMenu.prototype.renderButtons = function(items) {
-	var buttons = [];
-	for (var i = 0; i < items.length; i++) {	
+	var buttons=[];
+	for(var i=0;i<items.length;i++){	
 		buttons.push(this.getButtonData(items[i]));
 	}
 	this.set('buttons',buttons);
 };
 PopupMenu.prototype.getButtonData = function(item) {
-	return {
-		'value': item['value'],
-		'name': item['name']
+	return{
+		'value':item['value'],
+		'name':item['name']
 	};
 };
 PopupMenu.prototype.getTemplateMain = function(_,$) {
@@ -3986,62 +4008,62 @@ Recommendations.prototype.getTemplateMain = function(_,$) {
 };
 function TabPanel() {};
 TabPanel.prototype.initiate = function() {
-	this.margin = 4;
+	this.margin=4;
 };
 TabPanel.prototype.onRendered = function() {
 	this.doOnParentReady(this.onParentReady);
 	this.redraw();
 };
 TabPanel.prototype.onParentReady = function() {
-	if (isArray(this.args['tabs'])) {
-		for (var i = 0; i < this.args['tabs'].length; i++) {
-			this.activateTab(i, !!this.args['tabs'][i]['active']);
+	if(isArray(this.args['tabs'])){
+		for(var i=0;i<this.args['tabs'].length;i++){
+			this.activateTab(i,!!this.args['tabs'][i]['active']);
 		}
 	}
 };
 TabPanel.prototype.redraw = function() {
-	this.hiddenTabs = [];
-	var tabPanelWidth = this.getElement().getWidth();
-	var controlWidth = this.getControlsWidth();
-	var tabs = this.findElements('.app-tab');
-	var totalWidth = 0, buttonWidth;
-	for (var i = 0; i < tabs.length; i++) {
-		tabs[i].toggleClass('first', i == 0);
-		buttonWidth = tabs[i].getWidth();
-		if (totalWidth + controlWidth + buttonWidth + this.margin > tabPanelWidth) {
+	this.hiddenTabs=[];
+	var tabPanelWidth=this.getElement().getWidth();
+	var controlWidth=this.getControlsWidth();
+	var tabs=this.findElements('.app-tab');
+	var totalWidth=0,buttonWidth;
+	for(var i=0;i<tabs.length;i++){
+		tabs[i].toggleClass('first',i==0);
+		buttonWidth=tabs[i].getWidth();
+		if(totalWidth+controlWidth+buttonWidth+this.margin>tabPanelWidth){
 			tabs[i].show(false);
 			this.hiddenTabs.push(i);
-		} else {
-			tabs[i].style.left = totalWidth + 'px';
-			totalWidth += buttonWidth + this.margin;
+		}else{
+			tabs[i].style.left=totalWidth+'px';
+			totalWidth+=buttonWidth+this.margin;
 		}
 	}
 	this.set('count',this.hiddenTabs.length);
 };
 TabPanel.prototype.getControlsWidth = function() {
-	var width = 0;
-	var restButton = this.findElement('.app-tab-rest');
-	if (restButton) width += restButton.getWidth() + this.margin;
-	var plusButton = this.findElement('.app-tab-plus');
-	if (plusButton) width += plusButton.getWidth() + this.margin;
+	var width=0;
+	var restButton=this.findElement('.app-tab-rest');
+	if(restButton)width+=restButton.getWidth()+this.margin;
+	var plusButton=this.findElement('.app-tab-plus');
+	if(plusButton)width+=plusButton.getWidth()+this.margin;
 	return width;
 };
 TabPanel.prototype.onRestTabClick = function() {};
-TabPanel.prototype.onTabClick = function(e, target) {
-	if (isNumeric(this.activeTab)) this.activateTab(this.activeTab, false);
-	this.activateTab(target.getData('index'), true);
+TabPanel.prototype.onTabClick = function(e,target) {
+	if(isNumeric(this.activeTab))this.activateTab(this.activeTab,false);
+	this.activateTab(target.getData('index'),true);
 };
-TabPanel.prototype.activateTab = function(tabIndex, isShown) {
-	var container = this.findElement('.' + Objects.get(this.getTabParamsByIndex(tabIndex), 'container'), this.getScopeElement());
-	if (container) container.show(isShown);
-	if (isShown) this.activeTab = tabIndex;
-	this.getTab(tabIndex).toggleClass('active', isShown);
+TabPanel.prototype.activateTab = function(tabIndex,isShown) {
+	var container=this.findElement('.'+Objects.get(this.getTabParamsByIndex(tabIndex),'container'),this.getScopeElement());
+	if(container)container.show(isShown);
+	if(isShown)this.activeTab=tabIndex;
+	this.getTab(tabIndex).toggleClass('active',isShown);
 };
 TabPanel.prototype.getTab = function(tabIndex) {
 	return this.findElements('.app-content-tab')[tabIndex];
 };
 TabPanel.prototype.getScopeElement = function() {
-	if (!this.scopeElement && isString(this.args['scope'])) this.scopeElement = this.findElementWithinParent('.' + this.args['scope']) || document.body;
+	if(!this.scopeElement && isString(this.args['scope']))this.scopeElement=this.findElementWithinParent('.'+this.args['scope'])||document.body;
 	return this.scopeElement;
 };
 TabPanel.prototype.getTabParamsByIndex = function(tabIndex) {
@@ -4052,27 +4074,42 @@ TabPanel.prototype.getTemplateMain = function(_,$) {
 };
 TabPanel.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ClickHandler,'options': {'app-tab-rest': this.onRestTabClick,'app-tab': this.onTabClick}}]
+		'helpers':[{'helper':ClickHandler,'options':{'app-tab-rest':this.onRestTabClick,'app-tab':this.onTabClick}}]
 	};
 };
 function Tabs() {};
+Tabs.prototype.onSelect = function(e,target) {
+	var index=target.getData('index');
+	this.set('activeTab',index);
+	this.dispatchEvent('select',index);
+};
+Tabs.prototype.onRemove = function(e,target) {
+	var tab=target.getParent();
+	var index=tab.getData('index');
+	this.dispatchEvent('remove',index);
+};
 Tabs.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'h':function(item){return[{'c':[item,{'t':0,'p':{'c':'app-tabs-remove'}}],'t':0,'p':{'c':'app-tabs-item'}}]},'p':$.g('items'),'f':'items'},'t':0,'p':{'c':'app-tabs','sc':1}}]
+	return[{'c':{'h':function(item,i){return[{'c':[item,{'t':0,'p':{'c':'app-tabs-remove'}}],'t':0,'p':{'c':function(){return 'app-tabs-item'+($.g('activeTab')==i?' active':'')},'_index':i},'n':{'c':'activeTab'}}]},'p':$.g('items'),'f':'items'},'t':0,'p':{'c':'app-tabs','sc':1}}]
+};
+Tabs.prototype.getInitials = function() {
+	return {
+		'helpers':[{'helper':ClickHandler,'options':{'app-tabs-item':this.onSelect,'app-tabs-remove':this.onRemove}}]
+	};
 };
 function TooltipPopup() {};
-TooltipPopup.prototype.correctAndSetText = function(text, changedProps) {
-	var corrector = changedProps['corrector'];
-	if (corrector == 'list') {
-		var textParts = text.split('|');
-		if (textParts[1]) {
-			var temp = [];
-			for (var i = 0; i < textParts.length; i++) {
-				textPart = textParts[i].split('^');
-				textPart = textPart[1] || textPart[0];
-				if (textPart.charAt(0) == __[3]) textPart = __[2];
+TooltipPopup.prototype.correctAndSetText = function(text,changedProps) {
+	var corrector=changedProps['corrector'];
+	if(corrector=='list'){
+		var textParts=text.split('|');
+		if(textParts[1]){
+			var temp=[];
+			for(var i=0;i<textParts.length;i++){
+				textPart=textParts[i].split('^');
+				textPart=textPart[1]||textPart[0];
+				if(textPart.charAt(0)==__[3])textPart=__[2];
 				temp.push(textPart);
 			}
-			text = temp.removeDuplicates();
+			text=temp.removeDuplicates();
 		}
 	}
 	return text;
@@ -4082,7 +4119,7 @@ TooltipPopup.prototype.getTemplateMain = function(_,$) {
 };
 TooltipPopup.prototype.getInitials = function() {
 	return {
-		'correctors':{'text': this.correctAndSetText}
+		'correctors':{'text':this.correctAndSetText}
 	};
 };
 function FilterSubscription() {};
@@ -4091,22 +4128,22 @@ FilterSubscription.prototype.onLoaded = function(filters) {
 	this.set({'total':this.getTotalCount(),'subscribed':this.getSubscribedCount()});
 };
 FilterSubscription.prototype.getTotalCount = function() {
-	return Decliner.getCount('filter', this.get('filters'));
+	return Decliner.getCount('filter',this.get('filters'));
 };
 FilterSubscription.prototype.getSubscribedCount = function() {
-	var subscribedCount = 0;
-	this.each('filters', function(filter) {
-		if (filter['isSubs'] == 1) subscribedCount++;
+	var subscribedCount=0;
+	this.each('filters', function(filter){
+		if(filter['isSubs']==1)subscribedCount++;
 	});
-	return Decliner.getCount('subscr', subscribedCount);
+	return Decliner.getCount('subscr',subscribedCount);
 };
 FilterSubscription.prototype.onFreqChange = function(e) {};
-FilterSubscription.prototype.onSubscribeButtonClick = function(e, target) {
-	var filterId = e.getTargetData('.app-subscription-filter-row', 'filterId');
-	if (filterId) {
-		Filters.doAction('subscribe', {
-			'filterId': filterId,
-			'value': target.hasClass('subscribed') ? '0' : '1'
+FilterSubscription.prototype.onSubscribeButtonClick = function(e,target) {
+	var filterId=e.getTargetData('.app-subscription-filter-row','filterId');
+	if(filterId){
+		Filters.doAction('subscribe',{
+			'filterId':filterId,
+			'value':target.hasClass('subscribed')?'0':'1'
 		});
 	}
 };
@@ -4115,43 +4152,43 @@ FilterSubscription.prototype.getTemplateMain = function(_,$) {
 };
 FilterSubscription.prototype.getInitials = function() {
 	return {
-		'loader':{'controller': Filters},
-		'helpers':[{'helper': ClickHandler,'options': {'subscr-button': this.onSubscribeButtonClick}}]
+		'loader':{'controller':Filters},
+		'helpers':[{'helper':ClickHandler,'options':{'subscr-button':this.onSubscribeButtonClick}}]
 	};
 };
 function FilterSubscriptionOptions() {};
 FilterSubscriptionOptions.prototype.onCheckboxChange = function(e) {
-	var params = {};
-	params[e['name']] = e['intChecked'];
-	Subscription.doAction('save', params);
+	var params={};
+	params[e['name']]=e['intChecked'];
+	Subscription.doAction('save',params);
 };
 FilterSubscriptionOptions.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'tenderOfFavorite','checked':$.g('opts',['tenderOfFavorite'])}},' ',__[94],' ',{'c':__[95],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFavorite','checked':$.g('opts',['protocolOfFavorite'])}},' ',__[94],' ',{'c':__[96],'t':20}],'t':0,'p':{'c':'app-subscription-option'}},{'c':[{'tmp':includeGeneralTemplateCheckbox,'p':{'name':'protocolOfFilter','checked':$.g('opts',['protocolOfFilter'])}},' ',__[94],' ',{'c':__[97],'t':20}],'t':0,'p':{'c':'app-subscription-option'}}],'t':0,'p':{'c':'app-subscription-options','sc':1}}]
 };
 FilterSubscriptionOptions.prototype.getInitials = function() {
 	return {
-		'loader':{'controller': Subscription},
-		'helpers':[{'helper': CheckboxHandler,'options': {'callback': this.onCheckboxChange,'labelClass': 'app-subscription-option'}}]
+		'loader':{'controller':Subscription},
+		'helpers':[{'helper':CheckboxHandler,'options':{'callback':this.onCheckboxChange,'labelClass':'app-subscription-option'}}]
 	};
 };
 function UserInfo() {};
 UserInfo.prototype.onLoaded = function(data) {
-	if (!User.hasFullAccess()) {
-		data['prolongButtonText'] = __[76];
-	} else if (data['needToProlong']) {
-		data['prolongButtonText'] = __[77];
+	if(!User.hasFullAccess()){
+		data['prolongButtonText']=__[76];
+	}else if(data['needToProlong']){
+		data['prolongButtonText']=__[77];
 	}
 	this.set(data);
 };
 UserInfo.prototype.onOrderCallButtonClick = function() {
-	Dialoger.show(OrderCall);	
+	Dialoger.show(OrderCall)
 };
 UserInfo.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'c':[__[66],':'],'t':6},{'c':{'pr':'userName','p':$.g('userName')},'t':6}],'t':5},{'c':[{'c':[__[67],':'],'t':6},{'c':{'pr':'companyName','p':$.g('companyName')},'t':6}],'t':5},{'c':[{'c':[__[68],':'],'t':6},{'c':{'pr':'userEmail','p':$.g('userEmail')},'t':6}],'t':5},{'c':[{'c':[__[69],':'],'t':6},{'c':{'pr':'typeAccess','p':$.g('typeAccess')},'t':6,'p':{'c':'bold'}}],'t':5},{'c':[{'c':[__[70],':'],'t':6},{'c':{'pr':'beginAccessDate','p':$.g('beginAccessDate')},'t':6}],'t':5},{'c':[{'c':[__[71],':'],'t':6},{'c':{'pr':'endAccessDate','p':$.g('endAccessDate')},'t':6,'p':{'c':function(){return ($.g('needToProlong')?'red':'')}},'n':{'c':'needToProlong'}}],'t':5}],'t':2,'p':{'c':'app-mainpage-user-info','cp':'0px','cs':'0px','sc':1}},{'c':function(){return {'c':{'pr':'prolongButtonText','p':$.g('prolongButtonText')},'t':12,'p':{'h':__[75],'tr':'_blank','c':'access standart-button red-button'}}},'p':['prolongButtonText'],'i':function(){return($.g('prolongButtonText'))}},{'c':__[73],'t':12,'p':{'h':__[72],'tr':'_blank','c':'tariffs standart-button white-button'}},{'c':__[74],'t':0,'p':{'c':'mainpage-leftcolumn-title bold'}},{'c':[{'c':{'pr':'managerName','p':$.g('managerName')},'t':0,'p':{'c':'mainpage-manager-name'}},{'c':[{'c':[' ',{'c':__[78],'t':0,'p':{'c':'mainpage-manager-large-phone'}},{'c':__[79],'t':0,'p':{'c':'mainpage-manager-free'}}],'t':0,'p':{'c':'mainpage-free-call'}},{'pr':'managerPhone','p':$.g('managerPhone')},__T[3],{'c':__[80],'t':51}],'t':0,'p':{'c':'mainpage-manager-phone'}},{'c':{'pr':'managerEmail','p':$.g('managerEmail')},'t':0,'p':{'c':'mainpage-manager-email'}}],'t':0,'p':{'c':'mainpage-manager-info'}},{'c':__[81],'t':0,'e':[0,$.onOrderCallButtonClick],'p':{'c':'standart-button green-button'}}]
 };
 UserInfo.prototype.getInitials = function() {
 	return {
-		'loader':{'controller': UserInfoLoader,'async': true }
+		'loader':{'controller':UserInfoLoader,'async':true }
 	};
 };
 function FormField() {};
@@ -4165,7 +4202,7 @@ Submit.prototype.getTemplateMain = function(_,$) {
 function Favorites() {};
 Favorites.prototype.getInitials = function() {
 	return {
-		'actions':{'load': {'url': CONFIG.favorites.get},'add': {'url': CONFIG.favorites.add},'remove': {'url': CONFIG.favorites.remove}}
+		'actions':{'load':{'url':CONFIG.favorites.get},'add':{'url':CONFIG.favorites.add},'remove':{'url':CONFIG.favorites.remove}}
 	};
 };
 function Filters() {};
@@ -4177,27 +4214,27 @@ Filters.prototype.onSubscribe = function() {
 };
 Filters.prototype.getInitials = function() {
 	return {
-		'options':{'key': 'filterId','store': false,'storeAs': 'filters','storePeriod': '1day','clone': true},
-		'actions':{'load': {'url' : CONFIG.filters.load,'method' : 'GET','callback': this.onLoad},'save': {'url' : CONFIG.filters.save,'method' : 'POST','callback': this.onAdd},'set': {'url' : CONFIG.filters.set,'method': 'POST'},'subscribe': {'url' : CONFIG.filters.subscribe,'method': 'POST','callback': this.onSubscribe}}
+		'options':{'key':'filterId','store':false,'storeAs':'filters','storePeriod':'1day','clone':true},
+		'actions':{'load':{'url':CONFIG.filters.load,'method':'GET','callback':this.onLoad},'save':{'url':CONFIG.filters.save,'method':'POST','callback':this.onAdd},'set':{'url':CONFIG.filters.set,'method':'POST'},'subscribe':{'url':CONFIG.filters.subscribe,'method':'POST','callback':this.onSubscribe}}
 	};
 };
 function FiltersStat() {};
 FiltersStat.prototype.getInitials = function() {
 	return {
-		'options':{'key': 'filterId','store': true,'storeAs': 'filterStat_$filterId','storePeriod': '4hour'},
-		'actions':{'load': {'url': CONFIG.filterStat.load,'method': 'GET'}}
+		'options':{'key':'filterId','store':true,'storeAs':'filterStat_$filterId','storePeriod':'4hour'},
+		'actions':{'load':{'url':CONFIG.filterStat.load,'method':'GET'}}
 	};
 };
 function Subscription() {};
 Subscription.prototype.getInitials = function() {
 	return {
-		'actions':{'load': {'url': CONFIG.settings.subscr,'method': 'GET','autoset': {'options': 'opts'}},'save': {'url': CONFIG.settings.set,'method': 'GET'}}
+		'actions':{'load':{'url':CONFIG.settings.subscr,'method':'GET','autoset':{'options':'opts'}},'save':{'url':CONFIG.settings.set,'method':'GET'}}
 	};
 };
 function UserInfoLoader() {};
 UserInfoLoader.prototype.getInitials = function() {
 	return {
-		'actions':{'load': {'url' : CONFIG.user.get,'method' : 'GET'}}
+		'actions':{'load':{'url':CONFIG.user.get,'method':'GET'}}
 	};
 };
 function CalendarFavorites() {};
@@ -4209,17 +4246,17 @@ CalendarFavorites.prototype.getTemplateContent = function(_,$) {
 };
 CalendarFavorites.prototype.getInitials = function() {
 	return {
-		'args':{'expandable': true},
-		'props':{'width': 1000}
+		'args':{'expandable':true},
+		'props':{'width':1000}
 	};
 };
 function FilterEdit() {};
 FilterEdit.prototype.initiate = function() {
-	this.controller = Filters;
+	this.controller=Filters;
 };
 FilterEdit.prototype.getInitials = function() {
 	return {
-		'props':{'title': __[63]}
+		'props':{'title':__[63]}
 	};
 };
 function OrderCall() {};
@@ -4228,9 +4265,9 @@ OrderCall.prototype.onSupportButtonClick = function() {
 	Dialoger.show(Support);
 };
 OrderCall.prototype.onShow = function() {
-	var form = this.getChildAt(0);
-	var handler = form.validateTime.bind(form);
-	this.interval = setInterval(handler, 60000);
+	var form=this.getChildAt(0);
+	var handler=form.validateTime.bind(form);
+	this.interval=setInterval(handler,60000);
 	handler();
 };
 OrderCall.prototype.onHide = function() {
@@ -4241,7 +4278,7 @@ OrderCall.prototype.getTemplateContent = function(_,$) {
 };
 OrderCall.prototype.getInitials = function() {
 	return {
-		'props':{'title': __[31]}
+		'props':{'title':__[31]}
 	};
 };
 function Support() {};
@@ -4254,7 +4291,7 @@ Support.prototype.getTemplateContent = function(_,$) {
 };
 Support.prototype.getInitials = function() {
 	return {
-		'props':{'title': __[33]}
+		'props':{'title':__[33]}
 	};
 };
 function AuthForm() {};
@@ -4266,90 +4303,90 @@ AuthForm.prototype.getTemplateContent = function(_,$) {
 };
 AuthForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': 'user/login.php','ajax': true,'className': 'app-authform-inputs','controls': [{'caption': __[40],'controlClass': Input,'controlProps': {'type': 'text','name': 'login','placeholder': __[39]}},{'caption': __[42],'controlClass': Input,'controlProps': {'type': 'password','name': 'password','placeholder': __[41]}}],'submit': {'value': __[43],'class': 'app-submit'}}
+		'args':{'action':'user/login.php','ajax':true,'className':'app-authform-inputs','controls':[{'caption':__[40],'controlClass':Input,'controlProps':{'type':'text','name':'login','placeholder':__[39]}},{'caption':__[42],'controlClass':Input,'controlProps':{'type':'password','name':'password','placeholder':__[41]}}],'submit':{'value':__[43],'class':'app-submit'}}
 	};
 };
 function OrderCallForm() {};
 OrderCallForm.prototype.onRendered = function() {
-	this.setControlValue('name', User.getAttribute('name'));
-	this.setControlValue('phone', User.getAttribute('phone'));
-	var email = User.getAttribute('email');
-	if (email) {
-		this.setControlValue('email', email);
-		this.enableControl('email', false);
+	this.setControlValue('name',User.getAttribute('name'));
+	this.setControlValue('phone',User.getAttribute('phone'));
+	var email=User.getAttribute('email');
+	if(email){
+		this.setControlValue('email',email);
+		this.enableControl('email',false);
 	}
 };
 OrderCallForm.prototype.getDateOptions = function() {
-	var monthNames = Dictionary.get('monthNames'),
-		date  = new Date(),
-		year  = date.getFullYear(),
-		time  = date.getHours,
-		month = date.getMonth() + 1,
-		day   = date.getDate(),
-		days  = 33 - new Date(year, month - 1, 33).getDate(),
-		dates = [], d, m = month, dayInWeek, count = 0, index = 0, txt;
-	var prev = 0;
-	while (count < 10) {
-		d = day + index;
-		if (day + index > days) {
-			d = d - days;
-			m = month + 1;
-			if (m > 12) {
+	var monthNames=Dictionary.get('monthNames'),
+		date=new Date(),
+		year=date.getFullYear(),
+		time=date.getHours,
+		month=date.getMonth()+1,
+		day=date.getDate(),
+		days=33-new Date(year,month-1,33).getDate(),
+		dates=[],d,m=month,dayInWeek,count=0,index=0,txt;
+	var prev=0;
+	while(count<10){
+		d=day+index;
+		if(day+index>days){
+			d=d-days;
+			m=month+1;
+			if(m>12){
 				break;
 			}
 		}
-		dayInWeek = new Date(year, m - 1, d).getDay();
-		if (dayInWeek == 0 || dayInWeek > 5) {
+		dayInWeek=new Date(year,m-1,d).getDay();
+		if(dayInWeek==0||dayInWeek>5){
 			index++;
 			continue;
 		}	
-		dayInWeek = Dictionary.get('dayNames')[dayInWeek];
-		txt = count > 1 || (!!prev &&prev != d - 1) ? d + ' ' + monthNames[m] + ', ' + dayInWeek : (count == 0 ? __[51] : __[52]) + ', ' + d + ' ' + monthNames[m];
-		dates.push({'value': txt, 'title': txt});
+		dayInWeek=Dictionary.get('dayNames')[dayInWeek];
+		txt=count>1||(!!prev &&prev!=d-1)?d+' '+monthNames[m]+', '+dayInWeek:(count==0?__[51]:__[52])+', '+d+' '+monthNames[m];
+		dates.push({'value':txt,'title':txt});
 		count++;
 		index++;
-		prev = d;
+		prev=d;
 	}
-	date = day + ' ' + monthNames[month];
+	date=day+' '+monthNames[month];
 	return dates;
 };
 OrderCallForm.prototype.validateTime = function() {
-	var dateSelect = this.getControl('date');
-	var timeSelect = this.getControl('time');
-	var dateValue = dateSelect.getValue();
-    var isToday = (new RegExp(__[51])).test(dateValue);
-    if (isToday) {
-	    var d = new Date();
-	    var times = [11, 13, 16];
-	    var moscowTime = d.getUTCHours() + 3;
-	    var disabledIndexes = [];
-	    for (var i = 0; i < times.length; i++) {
-	    	if (moscowTime >= times[i]) {
+	var dateSelect=this.getControl('date');
+	var timeSelect=this.getControl('time');
+	var dateValue=dateSelect.getValue();
+    var isToday=(new RegExp(__[51])).test(dateValue);
+    if(isToday){
+	    var d=new Date();
+	    var times=[11,13,16];
+	    var moscowTime=d.getUTCHours()+3;
+	    var disabledIndexes=[];
+	    for(var i=0;i<times.length;i++){
+	    	if(moscowTime>=times[i]){
 	    		disabledIndexes.push(i);
 	    	}
-	    }
-	    if (disabledIndexes.length == times.length) {
-	    	dateSelect.enableOption(0, false);
-	    } else {
-	    	for (i = 0; i < disabledIndexes.length; i++) {
-	    		timeSelect.enableOption(disabledIndexes[i], false);
+	}
+	    if(disabledIndexes.length==times.length){
+	    	dateSelect.enableOption(0,false);
+	}else{
+	    	for(i=0;i<disabledIndexes.length;i++){
+	    		timeSelect.enableOption(disabledIndexes[i],false);
 	    	}
-	    }
-	} else {
-		timeSelect.enableOption(0, true);
-		timeSelect.enableOption(1, true);
-		timeSelect.enableOption(2, true);
+	}
+	}else{
+		timeSelect.enableOption(0,true);
+		timeSelect.enableOption(1,true);
+		timeSelect.enableOption(2,true);
 	}
 };
 OrderCallForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': CONFIG.orderCall.send,'method': 'POST','className': 'app-order-call','controls': [__V[4],__V[5],__V[6],{'caption': __[47],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'topic','options': Dictionary.get('orderCallTopics')}},{'caption': __[48],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'date','options': this.getDateOptions()}},{'caption': __[49],'class': 'half-width','controlClass': Select,'controlProps': {'name': 'time','options': Dictionary.get('timeOptions')}},{'caption': __[50],'controlClass': Textarea,'controlProps': {'name': 'comment'}}],'submit': {'value': __[81],'class': __[36] + ' send-button'}}
+		'args':{'action':CONFIG.orderCall.send,'method':'POST','className':'app-order-call','controls':[__V[4],__V[5],__V[6],{'caption':__[47],'class':'half-width','controlClass':Select,'controlProps':{'name':'topic','options':Dictionary.get('orderCallTopics')}},{'caption':__[48],'class':'half-width','controlClass':Select,'controlProps':{'name':'date','options':this.getDateOptions()}},{'caption':__[49],'class':'half-width','controlClass':Select,'controlProps':{'name':'time','options':Dictionary.get('timeOptions')}},{'caption':__[50],'controlClass':Textarea,'controlProps':{'name':'comment'}}],'submit':{'value':__[81],'class':__[36]+' send-button'}}
 	};
 };
 function SupportForm() {};
 SupportForm.prototype.getInitials = function() {
 	return {
-		'args':{'action': CONFIG.support.send,'className': 'app-order-call','controls': [__V[4],__V[5],__V[6],{'caption': __[53],'controlClass': Textarea,'controlProps': {'name': 'comment'}},{'caption': __[54],'controlClass': Input,'controlProps': {'name': 'screenshot','type': 'file','accept': 'image/*'}}],'submit': {'value': __[55],'class': __[36] + ' send-button'}}
+		'args':{'action':CONFIG.support.send,'className':'app-order-call','controls':[__V[4],__V[5],__V[6],{'caption':__[53],'controlClass':Textarea,'controlProps':{'name':'comment'}},{'caption':__[54],'controlClass':Input,'controlProps':{'name':'screenshot','type':'file','accept':'image/*'}}],'submit':{'value':__[55],'class':__[36]+' send-button'}}
 	};
 };
 function KeywordsControl() {};
@@ -4357,22 +4394,17 @@ KeywordsControl.prototype.onChange = function() {
 	Globals.dispatchEvent('TenderSearchFormChanged');
 };
 KeywordsControl.prototype.setControlValue = function(value) {
-	var maxlen = 0;
-	if (isArray(value['containKeyword'])) {
-		maxlen = Math.max(maxlen, value['containKeyword'].length);
-	}
-	if (isArray(value['notcontainKeyword'])) {
-		maxlen = Math.max(maxlen, value['notcontainKeyword'].length);
-	}
-	if (maxlen > 0) {
-		var kw = [], ck, nck;
-		for (var i = 0; i < maxlen; i++) {
-			ck = Objects.get(value['containKeyword'], i, '').toArray();
-			nck = Objects.get(value['notcontainKeyword'], i, '').toArray();
-			kw.push([ck, nck]);
+	var maxlen=Objects.get(value['containKeyword'],'length',0);
+	maxlen=Math.max(maxlen,Objects.get(value['notcontainKeyword'],'length',0));
+	if(maxlen>0){
+		var kw=[],ck,nck;
+		for(var i=0;i<maxlen;i++){
+			ck=Objects.get(value['containKeyword'],i,'').toArray();
+			nck=Objects.get(value['notcontainKeyword'],i,'').toArray();
+			kw.push([ck,nck]);
 		}
 		this.set('keywords',kw);
-	} else {
+	}else{
 		this.set('keywords',[[]]);
 	}
 };
@@ -4383,19 +4415,26 @@ KeywordsControl.prototype.addRequest = function() {
 	this.addOneTo('keywords', []);
 };
 KeywordsControl.prototype.onKeywordsChange = function(kw) {
-console.log(kw)
-	this.set('keywordsCount',kw.length);
-	var tabs = [];
-	for (var i = 1; i <= kw.length; i++) tabs.push(__[28] + ' ' + i);
+	var kwlen=kw.length,tabs=[],i;
+	for(i=1;i<=kwlen;i++){
+		tabs.push(__[28]+' '+i);
+	}	
+	this.set('keywordsCount',kwlen);
 	this.set('tabs',tabs);
+	this.set('activeTab',kwlen-1);
+	this.appendChild('tabs',kwlen>1);
 };
+KeywordsControl.prototype.onSelectTab = function(index) {
+	this.getElement('area').scrollToElement(this.findElements('.app-keywords-block')[index]);
+};
+KeywordsControl.prototype.onRemoveTab = function(index) {};
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'cmp':Tabs,'p':{'p':{'items':function(){return $.g('tabs')}}},'n':{'items':'tabs'}},{'c':{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':function(){return 'app-keywords-area'+($.g('keywordsCount')>1?' multi':'')}},'n':{'c':'keywordsCount'}}]
+	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'cmp':Tabs,'e':[22,$.onSelectTab,'remove',$.onRemoveTab],'p':{'p':{'items':function(){return $.g('tabs')},'activeTab':function(){return $.g('activeTab')}},'i':'tabs'},'n':{'items':'tabs','activeTab':'activeTab'}},{'c':{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':function(){return 'app-keywords-area'+($.g('keywordsCount')>1?' multi':'')},'eid':'area'},'n':{'c':'keywordsCount'}}]
 };
 KeywordsControl.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ClickHandler,'options': {'app-keywords-add-request': this.addRequest}}],
-		'followers':{'keywords': this.onKeywordsChange}
+		'helpers':[{'helper':ClickHandler,'options':{'app-keywords-add-request':this.addRequest}}],
+		'followers':{'keywords':this.onKeywordsChange}
 	};
 };
 function Checkbox() {};
@@ -4404,7 +4443,7 @@ Checkbox.prototype.onClick = function() {
 	this.dispatchChange();
 };
 Checkbox.prototype.getControlValue = function() {
-	return this.get('checked') ? 1 : 0;
+	return this.get('checked')?1:0;
 };
 Checkbox.prototype.setControlValue = function(value) {
 	this.set('checked',!!value);
@@ -4421,23 +4460,23 @@ Input.prototype.getTemplateMain = function(_,$) {
 };
 function Select() {};
 Select.prototype.onRendered = function() {
-	var value = this.get('value');
+	var value=this.get('value');
 	var selected;
-	if (!isUndefined(value)) {
-		selected = this.selectByValue(value, true);
+	if(!isUndefined(value)){
+		selected=this.selectByValue(value,true);
 	}
-	if (!selected) {
+	if(!selected){
 		this.selectByIndex(0);
 	}
 };
-Select.prototype.selectByValue = function(value, forced) {
-	if (!forced && this.get('value') == value) return;
-	var options = this.get('options');
-	if (isArray(options)) {
-		for (var i = 0; i < options.length; i++) {
-			if (options[i]['value'] == value) {
-				this.selectedIndex = i;
-				if (!forced) this.set('value',value);
+Select.prototype.selectByValue = function(value,forced) {
+	if(!forced && this.get('value')==value)return;
+	var options=this.get('options');
+	if(isArray(options)){
+		for(var i=0;i<options.length;i++){
+			if(options[i]['value']==value){
+				this.selectedIndex=i;
+				if(!forced)this.set('value',value);
 				this.set('title',options[i]['title']);
 				this.syncTooltip(i);
 				return true;
@@ -4447,29 +4486,29 @@ Select.prototype.selectByValue = function(value, forced) {
 	return false;
 };
 Select.prototype.selectByIndex = function(index) {
-	this.selectedIndex = index;
-	var options = this.get('options');
-	if (isObject(options[index])) {
-		if (this.get('value') == options[index]['value']) return;
+	this.selectedIndex=index;
+	var options=this.get('options');
+	if(isObject(options[index])){
+		if(this.get('value')==options[index]['value'])return;
 		this.set({'value':options[index]['value'],'title':options[index]['title']});
 		this.syncTooltip(index);
 	}
 };
 Select.prototype.syncTooltip = function(index) {
-	var optionElement = this.getOptionElementAt(index);
-	var tooltipElement = this.findElement('.app-tooltip', optionElement);
+	var optionElement=this.getOptionElementAt(index);
+	var tooltipElement=this.findElement('.app-tooltip,optionElement');	
 };
-Select.prototype.enableOption = function(index, isEnabled) {
-	this.getOptionElementAt(index).toggleClass('disabled', !isEnabled);
-	if (index == this.selectedIndex) {
-		this.selectByIndex(index == 0 ? index + 1 : 0);
-    }
+Select.prototype.enableOption = function(index,isEnabled) {
+	this.getOptionElementAt(index).toggleClass('disabled',!isEnabled);
+	if(index==this.selectedIndex){
+		this.selectByIndex(index==0?index+1:0);
+}
 };
 Select.prototype.onOptionsClick = function(e) {
-	var target = e.getTarget('.app-select-option');
-	if (target && !target.hasClass('disabled')) {
-		var value = target.getData('value');
-		if (this.selectByValue(value)) this.dispatchChange();
+	var target=e.getTarget('.app-select-option');
+	if(target &&!target.hasClass('disabled')){
+		var value=target.getData('value');
+		if(this.selectByValue(value))this.dispatchChange();
 		this.hide();
 	}
 };
@@ -4516,23 +4555,23 @@ KeywordTags.prototype.getTemplateTopButtons = function(_,$) {
 };
 KeywordTags.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper': ClickHandler,'options': {'app-tags-remove-all': this.clear}}]
+		'helpers':[{'helper':ClickHandler,'options':{'app-tags-remove-all':this.clear}}]
 	};
 };
 function Tags() {};
 Tags.prototype.onEnter = function(value) {
-	var v = value.split(','), a = [], tv;
-	for (var i = 0; i < v.length; i++) {
-		tv = v[i].trim();
-		if (!tv.isEmpty() && !this.get('items').has(tv)) a.push(tv);
+	var v=value.split(','),a=[],tv;
+	for(var i=0;i<v.length;i++){
+		tv=v[i].trim();
+		if(!tv.isEmpty()&&!this.get('items').has(tv))a.push(tv);
 	}
-	if (!a.isEmpty()) {
-		this.addTo('items', a, 0);
+	if(!a.isEmpty()){
+		this.addTo('items', a,0);
 		this.dispatchChange();
 	}
 };
-Tags.prototype.onRemoveButtonClick = function(e, target) {
-	var t = target.getParent().getData('text');
+Tags.prototype.onRemoveButtonClick = function(e,target) {
+	var t=target.getParent().getData('text');
 	this.removeValueFrom('items', t);
 	this.dispatchChange();
 };
@@ -4550,8 +4589,8 @@ Tags.prototype.getTemplateInput = function(_,$) {
 };
 Tags.prototype.getInitials = function() {
 	return {
-		'props':{'items': []},
-		'helpers':[{'helper': ClickHandler,'options': {'app-tags-remove': this.onRemoveButtonClick}}]
+		'props':{'items':[]},
+		'helpers':[{'helper':ClickHandler,'options':{'app-tags-remove':this.onRemoveButtonClick}}]
 	};
 };
 function Textarea() {};

@@ -1,5 +1,5 @@
 <div class="app-autocomplete app-input-container" scope>
-	<input type="text" placeholder="{~placeholder}">
-	<div class="app-autocomplete-variants"/>
+	<input type="text" placeholder="{~placeholder}" eid="input">
+	<div class="app-autocomplete-variants" eid="variants"/>
 	<template content>
 </div>

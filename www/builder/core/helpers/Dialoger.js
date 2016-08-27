@@ -4,14 +4,22 @@ function Dialoger() {
 		currentDialogOptions;
 	this.show = function(dialogClass, options, dialogId) {
 		if (isFunction(dialogClass)) {
-			currentDialogClass = dialogClass;
 			currentDialogOptions = options;
-			defineDialogId(dialogId);
+			defineDialogId(dialogClass, dialogId);
 			defineDialog();
 			showDialog();
 		}
 	};
-	var defineDialogId = function(dialogId) {
+	this.hide = function(dialogClass, dialogId) {
+		defineDialogId(dialogClass, dialogId);
+		if (dialogs[currentDialogId]) dialogs[currentDialogId].close();
+	};
+	this.get = function(dialogClass, dialogId) {
+		defineDialogId(dialogClass, dialogId);
+		return dialogs[currentDialogId];
+	};
+	var defineDialogId = function(dialogClass, dialogId) {
+		currentDialogClass = dialogClass;
 		currentDialogId = currentDialogClass.name + (isString(dialogId) ? '_' + dialogId : '');
 	};
 	var defineDialog = function() {

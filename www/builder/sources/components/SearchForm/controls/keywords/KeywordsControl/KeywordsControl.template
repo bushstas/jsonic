@@ -9,10 +9,10 @@
 		<span>{@addRequest}</span>
 		<include tooltip className="question-tooltip" key="keywordsNewReq">
 	</div>
-	<div class="app-tooltip keywords-hint"></div>
+	<div class="app-tooltip keywords-hint"/>
 </div>
-<component class="Tabs" items="{$tabs}">
-<div class="app-keywords-area{$keywordsCount>1?' multi'}">
+<component class="Tabs" items="{$tabs}" activeTab="{$activeTab}" cmpid="tabs" onSelect="onSelectTab" onRemove="onRemoveTab">
+<div class="app-keywords-area{$keywordsCount>1?' multi'}" eid="area">
 	{foreach $keywords as &item}
 		<div class="app-keywords-block">
 			<div class="app-keywords-left{$switched?' switched'}">

@@ -14,22 +14,18 @@ initial followers = {
 }
 
 function onChange() {
-	Globals.dispatchEvent('TenderSearchFormChanged');
+	==> TenderSearchFormChanged
 }
 
 function setControlValue(value) {
-	var maxlen = 0;
-	if (isArray(value['containKeyword'])) {
-		maxlen = Math.max(maxlen, value['containKeyword'].length);
-	}
-	if (isArray(value['notcontainKeyword'])) {
-		maxlen = Math.max(maxlen, value['notcontainKeyword'].length);
-	}
+	var maxlen = value['containKeyword']{ 'length', 0 };
+	maxlen = Math.max(maxlen, value['notcontainKeyword']{ 'length', 0 });
+
 	if (maxlen > 0) {
 		var kw = [], ck, nck;
 		for (var i = 0; i < maxlen; i++) {
-			ck = Objects.get(value['containKeyword'], i, '').toArray();
-			nck = Objects.get(value['notcontainKeyword'], i, '').toArray();
+			ck = value['containKeyword']{ i, ''}.toArray();
+			nck = value['notcontainKeyword']{ i, ''}.toArray();
 			kw.push([ck, nck]);
 		}
 		$keywords = kw;
@@ -46,9 +42,21 @@ function addRequest() {
 	$keywords.addOne([]);
 };
 
-function onKeywordsChange(kw) {console.log(kw)
-	$keywordsCount = kw.length;
-	var tabs = [];
-	for (var i = 1; i <= kw.length; i++) tabs.push(@request + ' ' + i);
+function onKeywordsChange(kw) {
+	var kwlen = kw.length, tabs = [], i;
+	for (i = 1; i <= kwlen; i++) {
+		tabs.push(@request + ' ' + i);
+	}	
+	$keywordsCount = kwlen;
 	$tabs = tabs;
+	$activeTab = kwlen - 1;
+	this.appendChild('tabs', kwlen > 1);
+}
+
+function onSelectTab(index) {
+	<:area>.scrollToElement(<.app-keywords-block[index]>);
+}
+
+function onRemoveTab(index) {
+
 }

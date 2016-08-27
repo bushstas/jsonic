@@ -59,6 +59,7 @@ function Level() {
 				if (isString(props['p'][k]) || isNumber(props['p'][k])) {
 					attrName = __A[k] || k;
 					if (attrName == 'scope') component.setScope(element);
+					else if (attrName == 'eid') component.registerElement(element, props['p'][k]);
 					else element.attr(attrName, props['p'][k]);
 				} else if (isFunction(props['p'][k])) {
 					pn = props['n'][k];

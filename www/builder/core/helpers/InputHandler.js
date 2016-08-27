@@ -2,7 +2,7 @@ function InputHandler() {
 	var subscribers = [];
 	var options = [];	
 	this.subscribe = function(subscriber, opts) {
-		if (isObject(opts['callbacks']) && isString(opts['inputSelector']) && subscribers.indexOf(subscriber) == -1) {
+		if (isObject(opts['callbacks']) && isString(opts['inputSelector']) && subscribers.indexOf(subscriber) == -1) {			
 			var input = subscriber.findElement(opts['inputSelector']);
 			var actions = Objects.getKeys(opts['callbacks']);
 			if (input) {
@@ -11,8 +11,8 @@ function InputHandler() {
 				options.push(opts);
 				var index = subscribers.length - 1;
 				if (actions.hasExcept('focus', 'blur')) input.addEventListener('keyup', onInput.bind(null, index), false);
-				if (actions.has('focus')) input.addEventListener('focus', onFocus.bind(null, index), false);
-				if (actions.has('blur')) input.addEventListener('blur', onBlur.bind(null, index), false);				
+				if (actions.has('focus')) input.addEventListener('focus', onEvent.bind(null, index, 'focus'), false);
+				if (actions.has('blur')) input.addEventListener('blur', onEvent.bind(null, index, 'blur'), false);				
 			}
 		}
 	};
@@ -23,18 +23,22 @@ function InputHandler() {
 		var subscriber = subscribers[index];
 		var cb = opts['callbacks'];
 		var value = e.target.value;
-		if (keyName && isFunction(cb[keyName])) cb[keyName].call(subscriber, value, e);
-		else if (isFunction(cb[keyCode])) cb[keyCode].call(subscriber, value, e);
-		if (isFunction(cb['input'])) cb['input'].call(subscriber, value, e);
+		callSubscriber(index, 'input', value);		
+		if (keyName && isFunction(cb[keyName])) callSubscriber(index, keyName, value);
+		else if (isFunction(cb[keyCode])) callSubscriber(index, keyCode, value);
+		
 	};
 	var getKeyName = function(keyCode) {
 		return ({'13': 'enter', '27': 'esc'})[keyCode];
 	};
-	var onFocus = function(index, e) {
-		options[index]['callbacks']['focus'].call(subscribers[index]);
+	var onEvent = function(index, eventName, e) {
+		callSubscriber(index, eventName, e.target.value);
 	};
-	var onBlur = function(index, e) {
-		options[index]['callbacks']['blur'].call(subscribers[index]);
-	};
+	var callSubscriber = function(index, eventName, value) {
+		var s = subscribers[index];
+		var cb = Objects.get(options[index]['callbacks'], eventName);
+		if (isFunction(cb)) cb.call(s, value);
+		if (isString(eventName)) s.dispatchEvent(eventName, value);
+	}; 
 }
 InputHandler = new InputHandler();

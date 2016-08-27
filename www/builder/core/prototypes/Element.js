@@ -155,12 +155,30 @@ Element.prototype.attr = function(attrName) {
 	}
 };
 Element.prototype.show = function(isShown) {
-	var display = isString(isShown) ? isShown : (isShown ? 'block' : 'none');
+	var display = isString(isShown) ? isShown : (isUndefined(isShown) || isShown ? 'block' : 'none');
 	this.style.display = display;
+};
+Element.prototype.hide = function() {
+	this.show(false);
 };
 Element.prototype.find = function(selector) {
 	return this.querySelector(selector);
 };
 Element.prototype.getParent = function() {
 	return this.parentNode;
+};
+Element.prototype.scrollTo = function(pxy, speed) {
+	alert(pxy)
+};
+Element.prototype.scrollToElement = function(element, speed) {
+	this.scrollTo(element.getRelativePosition(this).y, speed);
+};
+Element.prototype.getRelativePosition = function(element) {
+	var a = this.getRect();
+	var b = element.getRect();
+	return {x: a.x - b.x, y: a.y - b.y};
+};
+Element.prototype.clear = function() {
+	if (isString(this.value)) this.value = '';
+	else this.innerHTML = '';
 };

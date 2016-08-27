@@ -20,19 +20,22 @@ function show() {
 }
 
 function reposition() {
-	var element = this.getElement();
-	var rect = element.getRect();	
+	var rect = <>.getRect();	
 	$marginTop = Math.round(rect.height / -2) + 'px',
 	$marginLeft = Math.round(rect.width / -2) + 'px';	
 }
 
 function hide() {
 	$shown = false;
+}
+
+function close() {
+	this.hide();
 	this.onHide();
 }
 
 function expand() {
-	this.toggle('expanded');
+	$expanded!;
 }
 
 function onShow() {}
