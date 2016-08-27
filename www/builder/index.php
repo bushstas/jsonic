@@ -52,6 +52,7 @@
 	<form class="hint-form" method="GET" target="iframe" action="hint.php">
 		<input type="submit" value="Подсказка по" style="padding: 5px 10px;">
 		<select class="topic-select" name="topic">
+			<option value="shortcut">сокращениям</option>
 			<option value="tmp">шаблонам</option>
 			<option value="tmpcode">коду в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>

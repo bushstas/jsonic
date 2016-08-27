@@ -4,6 +4,98 @@
 
 	$items = array();
 	switch ($topic) {
+		case 'shortcut':
+			$items[] = true;
+			$items[] = 'Объекты DOM';
+			$items[] = false;
+
+			$items[] = '<b>&lt;&gt;</b> - Возвращает элемент компонента помеченный как scope или элемент, в котором компонент отредерен
+			<xmp>var scope = <>;</xmp><xmp>var scope = this.getElement();</xmp>
+			<xmp>var r = <>.getRect();</xmp><xmp>var r = this.getElement().getRect();</xmp>';
+
+			$items[] = '<b>&lt;input&gt;</b> - Возвращает первый элемент в переделах компонента с тегом input
+			<xmp>var input = <input>;</xmp><xmp>var input = this.findElement(\'input\');</xmp>
+			<xmp>var v = <input>.value;</xmp><xmp>var v = this.findElement(\'input\').value;</xmp>
+			<xmp><input>.clear();</xmp><xmp>this.findElement(\'input\').clear();</xmp>';
+
+			$items[] = '<b>&lt;#container&gt;</b> - Возвращает первый элемент в переделах компонента, имеющий id = container
+			<xmp>var cnt = <#container>;</xmp><xmp>var cnt = this.findElement(\'#container\');</xmp>
+			<xmp>var h = <#container>.innerHTML;</xmp><xmp>var h = this.findElement(\'#container\').innerHTML;</xmp>
+			<xmp><#container>.hide();</xmp><xmp>this.findElement(\'#container\').hide();</xmp>';
+
+			$items[] = '<b>&lt;.item&gt;</b> - Возвращает первый элемент в переделах компонента, имеющий class = item
+			<xmp>var i = <.item>;</xmp><xmp>var i = this.findElement(\'.item\');</xmp>
+			<xmp>var h = <.item>.innerHTML;</xmp><xmp>var h = this.findElement(\'.item\').innerHTML;</xmp>
+			<xmp><.item>.show();</xmp><xmp>this.findElement(\'.item\').show();</xmp>';
+
+			$items[] = '<b>&lt;.block[]&gt;</b> - Возвращает все элементы в переделах компонента, имеющие class = block
+			<xmp>var blocks = <.block[]>;</xmp><xmp>var blocks = this.findElements(\'.block\');</xmp>
+			<xmp>var firstBlock = <.block[]>[0];</xmp><xmp>var firstBlock = this.findElements(\'.block\')[0];</xmp>';
+
+			$items[] = '<b>&lt;.item[2]&gt;</b> - Возвращает элемент с заданным индексом в переделах компонента, имеющий class = item
+			<xmp>var i = <.item[2]>;</xmp><xmp>var i = this.findElements(\'.item\')[2];</xmp>
+			<xmp>var h = <.item[2]>.innerHTML;</xmp><xmp>var h = this.findElements(\'.item\')[2].innerHTML;</xmp>
+			<xmp><.item[2]>.show();</xmp><xmp>this.findElements(\'.item\')[2].show();</xmp>';
+
+			$items[] = '<b>&lt;.item[idx]&gt;</b> - Возвращает элемент с индексом из переменной в переделах компонента, имеющий class = item
+			<xmp>var i = <.item[idx]>;</xmp><xmp>var i = this.findElements(\'.item\')[idx];</xmp>
+			<xmp>var h = <.item[idx]>.innerHTML;</xmp><xmp>var h = this.findElements(\'.item\')[idx].innerHTML;</xmp>
+			<xmp><.item[idx]>.show();</xmp><xmp>this.findElements(\'.item\')[idx].show();</xmp>';
+
+			$items[] = '<b>&lt;:list&gt;</b> - Возвращает уже закешированный элемент в переделах компонента, имеющий eid = list
+			<xmp><ul class="items-list" eid="list">'."\n\t<li>list item</li>\n".'</ul></xmp>
+			<xmp>var l = <:list>;</xmp><xmp>var l = this.getElement(\'list\');</xmp>
+			<xmp>var h = <:list>.innerHTML;</xmp><xmp>var h = this.getElement(\'list\').innerHTML;</xmp>
+			<xmp><:list>.show();</xmp><xmp>this.getElement(\'list\').show();</xmp>';
+
+			$items[] = '<b>&lt;::userInfo&gt;</b> - Возвращает уже закешированный дочерний компонент, имеющий cmpid = userInfo
+			<xmp><component class="UserInfo" cmpid="userInfo"></xmp>
+			<xmp>var ui = <::userInfo>;</xmp><xmp>var ui = this.getChild(\'userInfo\');</xmp>
+			<xmp>var uie = <::userInfo>.getElement();</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>
+
+			<br><b>Во всех вышеуказанных записях пробелы не допускаются</b>
+			<br><b>Далее они могут иметь место</b>';
+
+
+			$items[] = true;
+			$items[] = 'События';
+			$items[] = false;
+
+			$items[] = '<b>--> change</b> - Инициирует событие change 
+			<xmp>--> change;</xmp><xmp>this.dispatchEvent(\'change\');</xmp>
+			<xmp>-->change(a, b);</xmp><xmp>this.dispatchEvent(\'change\', a, b);</xmp>';
+			$items[] = '<b>==> everythingReady</b> - Инициирует глобальное событие everythingReady 
+			<xmp>==> everythingReady;</xmp><xmp>Globals.dispatchEvent(\'everythingReady\');</xmp>
+			<xmp>==> everythingReady (a[0], b[0]);</xmp><xmp>Globals.dispatchEvent(\'everythingReady\', (a[0], b[0]));</xmp>';
+
+			$items[] = true;
+			$items[] = 'Диалоговые окна';
+			$items[] = false;
+
+			$items[] = '<b>+> OrderFormDialog</b> - Возвращает диалоговое окно с классом OrderFormDialog 
+			<xmp>var dialog = +> OrderFormDialog;</xmp><xmp>var dialog = Dialoger.get(OrderFormDialog);</xmp>
+			<xmp>+>OrderFormDialog(\'someUniqueId\').doSomeMethod();</xmp><xmp>Dialoger.get(OrderFormDialog, \'someUniqueId\').doSomeMethod();</xmp>';
+
+			$items[] = '<b>++> OrderFormDialog</b> - Показывает диалоговое окно с классом OrderFormDialog 
+			<xmp>++> OrderFormDialog;</xmp><xmp>Dialoger.show(OrderFormDialog);</xmp>
+			<xmp>++>OrderFormDialog(\'someUniqueId\');</xmp><xmp>Dialoger.show(OrderFormDialog, \'someUniqueId\');</xmp>';
+
+			$items[] = '<b><++ OrderFormDialog</b> - Скрывает диалоговое окно с классом OrderFormDialog 
+			<xmp><++ OrderFormDialog;</xmp><xmp>Dialoger.hide(OrderFormDialog);</xmp>
+			<xmp><++OrderFormDialog(\'someUniqueId\');</xmp><xmp>Dialoger.hide(OrderFormDialog, \'someUniqueId\');</xmp>';
+
+			$items[] = true;
+			$items[] = 'Утилиты';
+			$items[] = false;
+			$items[] = '<b>object{ \'key\' }</b> - Не вызывая ошибок возвращает поле объекта или массива, если переменная определена и имеет один из этих типов 
+			<xmp>var item = object{ \'key\' }</xmp><xmp>var item = Objects.get(object, \'key\');</xmp>';
+
+			$items[] = '<b>list{ 45, defaultValue }</b> - Не вызывая ошибок пытается получить элемент массива с индексом 45, если переменная list не массив или она не имеет указанного индекса, возвращается второй аргумент defaultValue
+			<xmp>var item = list{ 45, defaultValue }</xmp><xmp>var item = Objects.get(list, 45, defaultValue);</xmp>';
+
+		break;
+
+
 		case 'tmp':
 			$items[] = 'Место расположения не важно, но лучше располагайте шаблоны в тех же папках, что и JS файлы классов (далее компоненты)';
 			$items[] = 'Имя важно, обязательно называйте их так же, как и JS файлы, например <b>UICheckbox</b>';
