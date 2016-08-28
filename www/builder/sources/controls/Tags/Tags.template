@@ -7,7 +7,9 @@
 			<div class="app-tags-placeholder">
 				{foreach $items as &item}
 					<div class="app-tags-item" data-text="{&item}">
-						{&item}
+						<span class="app-tags-item-text">
+							{&item}
+						</span>
 						<span class="app-tags-remove"/>
 					</div>
 				{/foreach}
@@ -18,4 +20,4 @@
 </div>
 
 {template .input}
-<component class="AutoComplete" onFocus="!focus" onEnter="onEnter">
+<component class="AutoComplete" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant">

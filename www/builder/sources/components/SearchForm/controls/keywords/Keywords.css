@@ -66,6 +66,9 @@ $imgsrc = ../images/searchform
 .app-tags-top-buttons {
 	$(fright fs12)
 }
+.app-keywords-right:not(.switched) .app-tags-top-buttons {
+	$none
+}
 .app-tags-top-buttons-item {
 	$(inb h18 lh18)
 }
@@ -83,4 +86,16 @@ $imgsrc = ../images/searchform
 }
 .app-search-form-panel.keywords-panel .app-tabs {
 	$mt4
+}
+.app-keywords-index {
+	$(c#a1a1a1 fs14 regular none ml10)
+}
+.app-keywords-area.multi .app-keywords-index {
+	$inb
+}
+.app-keywords-remove-request {
+	$(pointer c#a66666 inb ml10 fs12)
+}
+.app-keywords-remove-request:hover {
+	$c#6c3a3a
 }

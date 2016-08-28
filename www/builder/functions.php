@@ -296,11 +296,11 @@
 
 		$content = preg_replace('/(\$*[\w\]\[\.]+) *\{ *([\w\]\[\.,]+) *\}/', "Objects.get($1,$2)", $content);
 		$content = str_replace('<>', 'this.getElement()', $content);
-		$content = preg_replace('/\+\+> *(\w+) *(\(([^\)]*)\))* *;*/', "Dialoger.show($1,$3)", $content);
-		$content = preg_replace('/<\+\+ *(\w+) *(\(([^\)]*)\))* *;*/', "Dialoger.hide($1,$3)", $content);
-		$content = preg_replace('/\+> *(\w+) *(\(([^\)]*)\))*/', "Dialoger.get($1,$3)", $content);
-		$content = preg_replace('/--> *(\w+) *(\(([^\)]*)\))* *;*/', "this.dispatchEvent('$1',$3);", $content);
-		$content = preg_replace('/==> *(\w+) *(\(([^\)]*)\))* *;*/', "Globals.dispatchEvent('$1',$3);", $content);
+		$content = preg_replace('/\+\+> *(\w+) *(\((.*)\))* *;*/', "Dialoger.show($1,$3)", $content);
+		$content = preg_replace('/<\+\+ *(\w+) *(\((.*)\))* *;*/', "Dialoger.hide($1,$3)", $content);
+		$content = preg_replace('/\+> *(\w+) *(\((.*)\))*/', "Dialoger.get($1,$3)", $content);
+		$content = preg_replace('/--> *(\w+) *(\((.*)\))* *;*/', "this.dispatchEvent('$1',$3);", $content);
+		$content = preg_replace('/==> *(\w+) *(\((.*)\))* *;*/', "Globals.dispatchEvent('$1',$3);", $content);
 		$content = str_replace(",)", ")", $content);
 		
 		$regexp = '/[\w\]\[\.]*<[\.\#:]*[a-z][\w\-\]\[]*>/i';
@@ -881,6 +881,14 @@
 			checkSolidMethodsUsing($functions, $component);
 			checkSuperClassesCallings($functions, $component);
 			$component['functions'] = $functions;
+			
+			$vals = array_unique($functionList);
+			if (count($vals) != count($functionList)) {
+				$vals = array_count_values($functionList);
+				foreach ($vals as $fn => $count) {
+					if ($count > 1) error('Обнаружено более одного метода с именем <b>'.$fn.'</b> в классе <b>'.$component['name'].'</b>');
+				}
+			}
 			$component['functionList'] = $functionList;
 			unset($component['content']);
 		}
@@ -1999,7 +2007,9 @@
 			$properData['a'] = array();
 		}
 		foreach ($props as $k => $v) {
-			if ($k == 'cmpid') {
+			if ($k == 'opts') {
+				$properData['op'] = $v;
+			} else if ($k == 'cmpid') {
 				$properData['i'] = $v;
 			} elseif ($k == 'props' || $k == 'args') {
 				$properData[$k == 'props' ? 'p' : 'a'] = $v;
@@ -2280,7 +2290,7 @@
 		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
 		$code = preg_replace('/^\s*::(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
 		$code = preg_replace('/^\s*::(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
-		$code = str_replace('<noeq>=', '', $code);
+		$code = preg_replace('/<noeq>=*/', '', $code);
 		if ($toPropNodes) {
 			if (preg_match('/\bcase\b/', $code)) {
 				global $isSwitchContext;
@@ -2481,14 +2491,14 @@
 			$dataIndex[$v] = $i;
 		}
 		$var = transformIntoValidJson('{'.trim(preg_replace('/;*\s*'.$regexp.'/', ",'$1':", $data), ',').'}', true);
-		
 		$var = preg_replace('/@(\w+)/', "<nq>__.$1<nq>", $var);
+		$var = preg_replace('/(CONFIG\.\w+\.\w+)/', "<nq>$1<nq>", $var);
 		$data = json_decode($var, true);
 		if ($data === null) {
 			error('Ошибка парсинга контстанты данных<br><br>'.$var);
 		}
 		$dataIndex = array_keys($dataIndex);
-		return array_values($data);
+		return array_values($data); 
 	}
 
 	function getDeclensions($decls) {

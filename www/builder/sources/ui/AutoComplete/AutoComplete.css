@@ -10,8 +10,17 @@ $imgsrc = ../images/ui
 	$(cnt abs l-22 t50% wh22 mt-11 png=enter bg bgwhite)
 }
 .app-autocomplete-variants {
-	$(abs)
+	$(abs t100% mt2 l r p5 pr0 bgwhite br2 bsh_1_1_6_#bec9d4 box z100 bo#788097 none)
 }
-.app-autocomplete-variants:empty {
-	$none
+.app-autocomplete-variants.shown {
+	$block
+}
+.app-autocomplete-variants-inner {
+	$(mah290 ova rel z2 pr5)
+}
+.app-autocomplete-variant {
+	$(block rel p6_8 lh16 pointer nowrap c#515a71 br3)
+}
+.app-autocomplete-variant:hover {
+	$(white bc#687da3)
 }

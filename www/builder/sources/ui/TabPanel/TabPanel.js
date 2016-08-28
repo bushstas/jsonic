@@ -61,7 +61,7 @@ function onRestTabClick() {
 
 }
 
-function onTabClick(e, target) {
+function onTabClick(target) {
 	if (isNumeric(this.activeTab)) this.activateTab(this.activeTab, false);
 	this.activateTab(target.getData('index'), true);
 }

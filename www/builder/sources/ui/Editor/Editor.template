@@ -1,0 +1,4 @@
+<div class="app-editor-mask{$shown?' shown'}" onClick="hide"/>
+<div class="app-editor{$shown?' shown'}" scope>
+	<component class="AutoComplete" opts="{#keywordsAutoCompleteOptions}" active="{$withAutoComplete}" onEnter="onEnter">
+</div>

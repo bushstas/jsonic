@@ -28,7 +28,7 @@ function ClickHandler() {
 			target = e.getTargetWithClass(k, true);
 			if (target) {
 				if (isFunction(opts[k])) {
-					opts[k].call(subscriber, e, target);
+					opts[k].call(subscriber, target, e);
 					e.stopPropagation();
 					break;
 				}

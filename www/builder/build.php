@@ -380,6 +380,8 @@
 				}
 			}
 			$compiledCss = implode("\n", $css);
+			$compiledCss = preg_replace('/bsh_(\d+)_(\d+)_(\d+)_\#(\w{3,6})/', "box-shadow:$1px<sp>$2px<sp>$3px<sp>#$4;", $compiledCss);
+
 			$compiledCss = preg_replace('/\bgr_(left|right|top|bottom)_(\#\w{3,6}|transparent)_(\#\w{3,6}|transparent)/', "background-image:linear-gradient(to<sp>$1,$2,$3<cbr>;", $compiledCss);
 			$regexp = '/\$\s*\(([^\)]+)\)/';
 			preg_match_all($regexp, $compiledCss, $matches);
@@ -392,10 +394,12 @@
 					$styles = preg_split('/[ \$]/', $matches[$i]);
 					foreach ($styles as $style) {
 						if (!empty($style)) {
-							if (!preg_match('/^background-image/', $style)) {
-								$compiledCss .= '$'.trim($style, '$').' ';
-							} else {
+							if (preg_match('/^box-shadow/', $style)) {
 								$compiledCss .= $style;
+							} elseif (preg_match('/^background-image/', $style)) {
+								$compiledCss .= $style;
+							} else {
+								$compiledCss .= '$'.trim($style, '$').' ';
 							}
 						}
 					}
@@ -720,6 +724,14 @@
 			$textsIndex = array();
 			$globals[] = "var __ = ".str_replace('"', "'", json_encode(getTextConstants($texts, $textsIndex))).';';
 		}
+		if (!empty($apiConfig)) {
+			$apiConfigJson = transformIntoValidJson($apiConfig);
+			$apiConfigObject = json_decode($apiConfigJson, true);
+			if ($apiConfigObject === null) {
+				error("Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>");
+			}
+			$globals[] = createObjectString('CONFIG', $apiConfig, array('/\\\/', ''));
+		}
 		if (!empty($data)) {
 			$dataIndex = array();
 			$globals[] = "var __V = ".str_replace('"', "'", json_encode(getDataConstants($data, $dataIndex))).';';
@@ -747,14 +759,6 @@
 		$globals[] = "var __PAGETITLE = '".$pageTitle."';";
 		if ($isUser) {
 			$globals[] = createObjectString('__USEROPTIONS', $user, array('/\\\/', ''));
-		}
-		if (!empty($apiConfig)) {
-			$apiConfigJson = transformIntoValidJson($apiConfig);
-			$apiConfigObject = json_decode($apiConfigJson, true);
-			if ($apiConfigObject === null) {
-				error("Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>");
-			}
-			$globals[] = createObjectString('CONFIG', $apiConfig, array('/\\\/', ''));
 		}
 		
 		$compiledJs = array();

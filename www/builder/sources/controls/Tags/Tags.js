@@ -1,17 +1,23 @@
 control Tags
 
 initial props = {
-	'items': []
+	'items': [],
+	'count': 0
 }
 
 initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> app-tags-remove': this.onRemoveButtonClick
+			'->> app-tags-remove': this.onRemoveButtonClick,
+			'->> app-tags-item-text': this.onTagClick
 		}
 	}
 ]
+
+initial followers = {
+	'items': this.onItemsChange
+}
 
 function onEnter(value) {
 	var v = value.split(','), a = [], tv;
@@ -25,10 +31,18 @@ function onEnter(value) {
 	}
 }
 
-function onRemoveButtonClick(e, target) {
+function onPickVariant(value) {
+	this.onEnter(value);
+}
+
+function onRemoveButtonClick(target) {
 	var t = target.getParent().getData('text');
 	$items.remove(t);
 	this.dispatchChange();
+}
+
+function onTagClick(target) {
+	--> edit (target)
 }
 
 function getControlValue() {
@@ -37,4 +51,9 @@ function getControlValue() {
 
 function clearControl() {
 	$items = [];
-};
+}
+
+function onItemsChange(items) {
+	$count = items.length;
+}
+

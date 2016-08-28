@@ -10,13 +10,13 @@ initial helpers = [
 	}
 ]
 
-function onSelect(e, target) {
+function onSelect(target) {
 	var index = target.getData('index');
 	$activeTab = index;
 	--> select (index)
 }
 
-function onRemove(e, target) {
+function onRemove(target) {
 	var tab = target.getParent();
 	var index = tab.getData('index');
 	--> remove (index)

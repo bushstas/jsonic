@@ -1,5 +1,5 @@
 control ContainKeywordTags extends KeywordTags
 
-function onPickRecommendation() {
-	
+function onPickRecommendation(value) {
+	alert(value)
 }

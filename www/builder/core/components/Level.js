@@ -43,7 +43,7 @@ function Level() {
 
 	var createPropertyNode = function(props) {
 		var name = props['pr'];
-		var node = document.createTextNode(props['p'] || '');
+		var node = document.createTextNode(props['p']);
 		appendChild(node);
 		propNodes = propNodes || {};
 		propNodes[name] = propNodes[name] || [];
@@ -249,10 +249,11 @@ function Level() {
 		if (isFunction(item['cmp'])) {
 			var cmp = new item['cmp']();
 			var i, k, p = item['p'];
-			var props, args, data;
+			var props, args, opts, data;
 			if (isObject(p)) {
 				props = initComponentProps(p['p'], p['ap'], item['n'], cmp);
 				args = initComponentProps(p['a'], p['aa'], item['na'], cmp, true);
+				opts = p['op'];
 				if (isString(p['i'])) {
 					cmp.setId(p['i']);
 					var waiting = component.getWaitingChild(p['i']);
@@ -268,7 +269,7 @@ function Level() {
 					component.provideWithComponent(item['w'][i], item['w'][i + 1], cmp);
 				}
 			}
-			Initialization.initiate.call(cmp, props, args);
+			Initialization.initiate.call(cmp, props, args, opts);
 			cmp.setParent(component);
 			cmp.render(pe);
 			registerChild(cmp, true);			
@@ -361,14 +362,14 @@ function Level() {
 		return component;
 	};
 
-	this.setAppended = function(isAppended) {
+	this.setAppended = function(isAppended, p) {
 		var isDetached = !isAppended;
 		if (isDetached === !!this.detached) return;
 		this.detached = isDetached;
 		var elements = getElements();
 		if (isDetached) {
 			realParentElement = parentElement;
-			parentElement = document.createElement('div'); 
+			parentElement = p || document.createElement('div'); 
 			for (var i = 0; i < elements.length; i++) parentElement.appendChild(elements[i]);
 		} else {
 			nextSiblingChild = parentLevel.getNextSiblingChild();
@@ -376,6 +377,10 @@ function Level() {
 			realParentElement = null;
 			for (var i = 0; i < elements.length; i++) appendChild(elements[i]);
 		}
+	};
+
+	this.placeTo = function(element) {
+		this.setAppended(false, element);
 	};
 
 	this.dispose = function() {

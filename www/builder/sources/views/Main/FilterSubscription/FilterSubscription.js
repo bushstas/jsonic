@@ -36,7 +36,7 @@ function onFreqChange(e) {
 
 }
 
-function onSubscribeButtonClick(e, target) {
+function onSubscribeButtonClick(target, e) {
 	var filterId = e.getTargetData('.->> app-subscription-filter-row', 'filterId');
 	if (filterId) {
 		Filters.doAction('subscribe', {

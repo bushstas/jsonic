@@ -168,7 +168,9 @@ function Component() {
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];
-				if (this.listeners[i]['type'] == eventType) this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
+				if (this.listeners[i]['type'] == eventType) {
+					this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
+				}
 			}
 		}
 	};
@@ -331,9 +333,9 @@ function Component() {
 		doRendering.call(this);
 	};
 
-	Component.prototype.delay = function(f, n) {
+	Component.prototype.delay = function(f, n, p) {
 		window.clearTimeout(this.timeout);
-		if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this), n || 200);
+		if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this, p), n || 200);
 	};
 
 	Component.prototype.addChild = function(child, parentElement) {
@@ -552,6 +554,14 @@ function Component() {
 
 	Component.prototype.setAppended = function(isAppended) {
 		if (this.level) this.level.setAppended(isAppended);
+	};
+
+	Component.prototype.placeTo = function(element) {
+		if (this.level) this.level.placeTo(element);
+	};
+
+	Component.prototype.placeBack = function() {
+		this.setAppended(true);
 	};
 
 	Component.prototype.appendChild = function(child, isAppended) {

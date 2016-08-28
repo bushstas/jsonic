@@ -50,7 +50,7 @@ contexts:
       captures: 
        1: support.class.actionscript.2
 
-    - match: '(<[\.:\#]*[\w\-]+(\[[\w]+\])*>)'
+    - match: '(<[\.:\#]*[\w\-]+(\[[\w]*\])*>)'
       captures: 
        1: keyword.control.actionscript.2
 

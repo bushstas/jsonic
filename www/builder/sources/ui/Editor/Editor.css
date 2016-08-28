@@ -1,0 +1,10 @@
+.app-editor-mask {
+	$(fix z900 rubber bc#212D42 opac65 none)
+}
+.app-editor {
+	$(abs mt0 ml0 bgwhite p12 w380 bsh_0_0_10_#383838 br3 z901 none)
+}
+.app-editor.shown,
+.app-editor-mask.shown {
+	$block
+}

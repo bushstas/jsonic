@@ -11,3 +11,5 @@
 {from &i = 10 to 20 step 1}
 
 "true" => true
+
+внедрить {ifempty} внутрь FOREACH

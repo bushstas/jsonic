@@ -8,7 +8,10 @@ $imgsrc = ../images/ui
 	$(abs t56 l r b p0_4 ovh br0_0_2_2)
 }
 .app-tags-item {
-	$(maw260 c#38986a bc#E8F3E7 bo#38986a pointer br3 pl10 pr30 m2 block fleft rel box h28 lh26 semibold)
+	$(maw260 c#38986a bc#E8F3E7 bo#38986a pointer br3 pr30 m2 block fleft rel box h28 lh26)
+}
+.app-tags-item-text {
+	$(inb maw225 ovh nowrap ell semibold pl10)
 }
 .app-tags-remove {
 	$(png=tagsclearg pointer abs r7 t6 block bg wh15 opac7)

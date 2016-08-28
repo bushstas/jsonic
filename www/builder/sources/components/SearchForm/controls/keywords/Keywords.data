@@ -22,3 +22,7 @@
 #prodCheckboxOptions = {
 	'text': @inProd
 }
+
+#keywordsAutoCompleteOptions = {
+	'url': CONFIG.keywords.get
+}

@@ -4,7 +4,7 @@
 </div>
 
 {template .input}
-<component class="KeywordsAutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter">
+<component class="KeywordsAutoComplete" arg-placeholder="{@enterKeywords}" opts="{#keywordsAutoCompleteOptions}" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant">
 
 {template .bottomContent}
 <component class="Recommendations" onPick="onPickRecommendation">

@@ -1,6 +1,5 @@
 function Popuper() {
-	var components;
-	var elements;
+	var components, elements, skippedAll;
 	var reset = function() {
 		components = [];
 		elements = [];
@@ -12,7 +11,11 @@ function Popuper() {
 			elements.push(element || component.getElement() || null);
 		}
 	};
+	this.skipAll = function(isSkipped) {
+		skippedAll = isSkipped;
+	};
 	var onBodyMouseDown = function(e) {
+		if (skippedAll) return;
 		var element;
 		for (var i = 0; i < components.length; i++) {
 			element = elements[i];

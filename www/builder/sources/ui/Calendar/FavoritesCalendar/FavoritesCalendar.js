@@ -40,8 +40,8 @@ function onLoadFavorites(data) {
 	this.redraw();
 }
 
-function onMarkedDayClick(e) {
-	var timestamp = e.target.innerHTML + '.' + (this.month + 1) + '.' + this.year;
+function onMarkedDayClick(target) {
+	var timestamp = target.innerHTML + '.' + (this.month + 1) + '.' + this.year;
 	if (isArray(this.tenderByDates[timestamp])) {
 		Dialoger.show(CalendarFavorites, {
 			'title': @calendarFavoritesTitle + ' ' + Dates.getFormattedDate(timestamp, @calendarFavoritesDateFormat),

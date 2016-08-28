@@ -40,7 +40,8 @@ function Initialization() {
 					} else if (k == 'props') {
 						addProps.call(this, initials[k]);
 					} else if (k == 'options') {
-						this.options = initials[k];
+						if (isObject(this.options)) Objects.merge(this.options, initials[k]);
+						else this.options = initials[k];
 					}
 				}
 			}
@@ -104,7 +105,7 @@ function Initialization() {
 			}
 		}
 	};
-	this.initiate = function(props, args) {
+	this.initiate = function(props, args, opts) {
 		var initials = null;
 		if (isFunction(this.constructor.prototype.getInitials)) {
 			initials = this.constructor.prototype.getInitials();
@@ -136,6 +137,7 @@ function Initialization() {
 		}
 		this.initials = initials;
 		this.args = args;
+		if (opts) this.options = opts;
 		Initialization.processInitials.call(this);
 	};
 	this.initiateControllers = function(controllers) {

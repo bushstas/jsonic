@@ -43,6 +43,7 @@ $opac9      : opacity: 0.9;
 $opac8      : opacity: 0.8;
 $opac7      : opacity: 0.7;
 $opac6      : opacity: 0.6;
+$opac65     : opacity: 0.65;
 $opac5      : opacity: 0.5;
 $opac4      : opacity: 0.4;
 $opac0      : opacity: 0;

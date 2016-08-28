@@ -18,15 +18,20 @@
 			<div class="app-keywords-left{$switched?' switched'}">
 				<div class="app-keywords-tags-title">
 					{@contains}
+					<span class="app-keywords-index">
+						{@request} {::index}
+						<span class="app-keywords-remove-request">{@removeRequest}</span>
+					</span>
 				</div>
-				<control class="ContainKeywordTags" name="containKeyword" items="{&item[0]}" onFocus="onFocus(false)">
+				<control class="ContainKeywordTags" name="containKeyword" items="{&item[0]}" onFocus="onFocus(false)" onEdit="onTagEdit">
 			</div>
 			<div class="app-keywords-right{$switched?' switched'}">
 				<div class="app-keywords-tags-title">
 					{@excludes}
 				</div>
-				<control class="ExcludeKeywordTags" name="notcontainKeyword" items="{&item[1]}" onFocus="onFocus(true)">
+				<control class="ExcludeKeywordTags" name="notcontainKeyword" items="{&item[1]}" onFocus="onFocus(true)" onEdit="onTagEdit">
 			</div>
 		</div>
 	{/foreach}
 </div>
+<component class="KeywordTagEditor" cmpid="editor" onHide="onTagEdited">
