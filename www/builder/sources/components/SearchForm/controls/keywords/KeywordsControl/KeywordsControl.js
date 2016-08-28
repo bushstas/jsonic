@@ -39,7 +39,7 @@ function onFocus(isSwitched) {
 }
 
 function addRequest() {
-	$keywords.addOne([]);
+	$keywords.addOne([], 0);
 };
 
 function onKeywordsChange(kw) {
@@ -54,9 +54,10 @@ function onKeywordsChange(kw) {
 }
 
 function onSelectTab(index) {
-	<:area>.scrollToElement(<.app-keywords-block[index]>);
+	index = $keywordsCount - index - 1;
+	<:area>.scrollToElement(<.app-keywords-block[index]>, 300);
 }
 
 function onRemoveTab(index) {
-
+	$keywords.removeAt(index);
 }

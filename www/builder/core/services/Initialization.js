@@ -76,7 +76,7 @@ function Initialization() {
 		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
 	};
 	this.inherits = function(list) {
-		var children, parent, child, initials;
+		var children, parent, child, initials, sc;
 		for (var k = 0; k < list.length; k++) {
 			parent = list[k];
 			children = list[++k];
@@ -86,7 +86,15 @@ function Initialization() {
 					if (!child.prototype.inheritedSuperClasses) {
 						child.prototype.inheritedSuperClasses = [];
 					}
-					child.prototype.inheritedSuperClasses.push(parent);
+					sc = child.prototype.inheritedSuperClasses;
+					var cb = function(p) {
+						if (sc.indexOf(p) == -1) sc.push(p);
+						var psc = p.prototype.inheritedSuperClasses;
+						if (isArray(psc)) {
+							for (var n = 0; n < psc.length; n++) cb(psc[n]);
+						}
+					};
+					cb(parent);
 				}
 				for (var method in parent.prototype) {
 					if (!child.prototype[method] && isMethodToInherit(method)) {

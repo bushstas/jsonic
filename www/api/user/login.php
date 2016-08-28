@@ -19,11 +19,18 @@
 		));
 	} else {
 		$output = json_encode(array(
-			'accessLevel' => (int)$_SESSION['accessLevel'],
-		 	'type' => 'guest',
-		 	'name' => 'Бушмакин Стас',
-		 	'email' => 'bushstas@mail.ru',
-		 	'phone' => '89125954311'
+			'status' => array(
+				'type' => 'guest',
+				'accessLevel' => (int)$_SESSION['accessLevel']
+			),
+			'attributes' => array(				
+			 	'name' => 'Бушмакин Стас',
+			 	'email' => 'bushstas@mail.ru',
+			 	'phone' => '89125954311'
+			 ),
+			'settings' => array(
+
+			)
 		));
 	}
 	if (isset($_POST['formKey'])) {

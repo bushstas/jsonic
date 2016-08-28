@@ -19,7 +19,7 @@ var __TC = TooltipPopup;
 var __TA = 'tooltip/get.php';
 var __APIDIR = 'api';
 var __PAGETITLE = 'Page title';
-var __USEROPTIONS = {'login':'user/login.php','logout':'user/logout.php','save':'user/save.php','fullAccess':11};
+var __USEROPTIONS = {'login':'user/login.php','logout':'user/logout.php','save':'user/save.php','fullAccess':11,'adminAccess':100};
 var CONFIG = {'user': {'get': 'user/get.php'},'filters': {'load': 'filters/get.php','save': 'filters/add.php','set': 'filters/set.php','subscribe': 'filters/subscribe.php'},'support': {'send': 'support/send.php'},'orderCall': {'send': 'orderCall/send.php'},'favorites': {'get': 'favorites/get.php','add': 'favorites/add.php','remove': 'favorites/remove.php'},'filterStat': {'load': 'filters/count.php'},'settings': {'subscr': 'settings/get.php','set': 'settings/set.php'},'keywords': {'get': 'keywords/get.php'}};
 function Application() {
 	if (this !== window) return;
@@ -353,12 +353,14 @@ function Component() {
 	};
 	Component.prototype.removeByIndexFrom = function(propName, index) {
 		var prop = this.get(propName);
+		if (isString(index) && isNumeric(index)) index = ~~index;
 		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
 			prop.splice(index, 1);
 			var activities = this.propActivities['for'];
 			if (activities && isArray(activities[propName])) {
 				for (i = 0; i < activities[propName].length; i++) activities[propName][i].remove(index);
 			}
+			callFollower.call(this, propName, prop);
 		}
 	};
 	Component.prototype.plusTo = function(propName, add, sign) {
@@ -508,6 +510,19 @@ function Component() {
 		this.children[child.getId() || this.childrenCount] = child;
 		this.childrenCount++;
 	};
+	Component.prototype.unregisterChildComponent = function(child) {
+		var id = child.getId();		
+		if (!id) {
+			for (var k in this.children) {
+				if (this.children[k] == child) {
+					id = k;
+					break;
+				}
+			}
+		}
+		if (isString(id)) delete this.children[id];
+		if (isControl(child)) this.unregisterControl(child);
+	};
 	Component.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
 	 	if (!isUndefined(this.controls[name])) {
@@ -515,6 +530,11 @@ function Component() {
 	 		this.controls[name].push(control);
 	 	} else this.controls[name] = control;
 	 	control.setName(name);
+	};
+	Component.prototype.unregisterControl = function(control) {
+		var name = control.getName();
+		if (isArray(this.controls[name])) this.controls[name].removeItem(control);
+		else delete this.controls[name];
 	};
 	Component.prototype.getControl = function(name) {
 		return Objects.get(this.controls, name) || this.forEachChild(function(child) {
@@ -1553,7 +1573,12 @@ function Level() {
 		}
 	};
 	this.dispose = function() {
-		for (var i = 0; i < children.length; i++) children[i].dispose();
+		for (var i = 0; i < children.length; i++) {
+			if (isComponentLike(children[i])) {
+				component.unregisterChildComponent(children[i]);
+			}
+			children[i].dispose();
+		}
 		if (eventHandler) {
 			eventHandler.dispose();
 			eventHandler = null;
@@ -2523,16 +2548,28 @@ Element.prototype.find = function(selector) {
 Element.prototype.getParent = function() {
 	return this.parentNode;
 };
-Element.prototype.scrollTo = function(pxy, speed) {
-	alert(pxy)
+Element.prototype.scrollTo = function(pxy, duration) {
+	if (!duration || !isNumber(duration)) this.scrollTop = pxy;
+	else {
+		var px = pxy - this.scrollTop, ratio = 15,
+		steps = duration / ratio, step = Math.round(px / steps),
+		currentStep = 0, e = this, 
+		cb = function() {
+			currentStep++;
+			e.scrollTop = e.scrollTop + step;
+			if (currentStep < steps) setTimeout(cb, ratio);
+			else e.scrollTop = pxy;
+		};
+		if (px != 0) cb();
+	}
 };
-Element.prototype.scrollToElement = function(element, speed) {
-	this.scrollTo(element.getRelativePosition(this).y, speed);
+Element.prototype.scrollToElement = function(element, duration) {
+	this.scrollTo(element.getRelativePosition(this).y, duration);
 };
 Element.prototype.getRelativePosition = function(element) {
 	var a = this.getRect();
 	var b = element.getRect();
-	return {x: a.x - b.x, y: a.y - b.y};
+	return {x: Math.round(a.left - b.left + element.scrollLeft), y:  Math.round(a.top - b.top + element.scrollTop)};
 };
 Element.prototype.clear = function() {
 	if (isString(this.value)) this.value = '';
@@ -2787,7 +2824,7 @@ function Initialization() {
 		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
 	};
 	this.inherits = function(list) {
-		var children, parent, child, initials;
+		var children, parent, child, initials, sc;
 		for (var k = 0; k < list.length; k++) {
 			parent = list[k];
 			children = list[++k];
@@ -2797,7 +2834,15 @@ function Initialization() {
 					if (!child.prototype.inheritedSuperClasses) {
 						child.prototype.inheritedSuperClasses = [];
 					}
-					child.prototype.inheritedSuperClasses.push(parent);
+					sc = child.prototype.inheritedSuperClasses;
+					var cb = function(p) {
+						if (sc.indexOf(p) == -1) sc.push(p);
+						var psc = p.prototype.inheritedSuperClasses;
+						if (isArray(psc)) {
+							for (var n = 0; n < psc.length; n++) cb(psc[n]);
+						}
+					};
+					cb(parent);
 				}
 				for (var method in parent.prototype) {
 					if (!child.prototype[method] && isMethodToInherit(method)) {
@@ -3047,12 +3092,9 @@ function Router() {
 	};
 }
 function User() {
-	var app;
-	var loadedItems = 0;
-	var attributes = {};
-	var loaded = false;
-	var loadRequest;
-	var saveRequest;
+	var app, loadedItems = 0, status = {},
+	attributes = {}, settings = {}, loaded = false, 
+	loadRequest, saveRequest;
 	var initOptions = function() {
 		var userOptions = __USEROPTIONS;
 		if (isObject(userOptions)) {
@@ -3078,8 +3120,10 @@ function User() {
 		}
 		onLoad(getDefaultAttributes());
 	};
-	var onLoad = function(attrs) {
-		attributes = attrs;
+	var onLoad = function(data) {
+		status = data['status'];
+		attributes = data['attributes'];
+		settings = data['settings'];
 		loadedItems++;
 		onLoadItem();
 	};
@@ -3097,20 +3141,34 @@ function User() {
 	};
 	this.hasFullAccess = function() {
 		var fullAccess = Objects.get(__USEROPTIONS, 'fullAccess', null);
-		var accessLevel = ~~attributes['accessLevel'];
+		var accessLevel = ~~status['accessLevel'];
 		return !isNumber(fullAccess) || accessLevel >= fullAccess;
+	};
+	this.isAdmin = function() {
+		var adminAccess = Objects.get(__USEROPTIONS, 'adminAccess', null);
+		var accessLevel = ~~status['accessLevel'];
+		return !isNumber(adminAccess) || accessLevel >= adminAccess;
+	};
+	this.isBlocked = function() {
+		return !!status['isBlocked'];
+	};
+	this.getBlockedReason = function() {
+		return status['blockReason'];
 	};
 	this.hasAccessLevel = function(accessLevel, isEqual) {
 		if (!isEqual) {
-			return attributes['accessLevel'] >= accessLevel;
+			return status['accessLevel'] >= accessLevel;
 		}
-		return attributes['accessLevel'] == accessLevel;
+		return status['accessLevel'] == accessLevel;
 	};
 	this.hasType = function(userType) {
-		return attributes['type'] == userType;
+		return status['type'] == userType;
 	};
 	this.isAuthorized = function() {
-		return attributes['accessLevel'] > 0;
+		return status['accessLevel'] > 0;
+	};
+	this.getAttributes = function() {
+		return attributes;
 	};
 	this.getAttribute = function(attributeName) {
 		return attributes[attributeName];
@@ -3128,6 +3186,18 @@ function User() {
 			if (isToSave && saveRequest) {
 				saveRequest.execute(attributes);
 			}
+		}
+	};
+	this.getSettings = function() {
+		return settings;
+	};
+	this.getSetting = function(settingName) {
+		return settings[settingName];
+	};
+	this.setSetting = function(settingName, settingValue) {
+		settings[settingName] = settingValue;
+		if (saveRequest) {
+			saveRequest.execute({'isSetting': true, 'name': settingName, 'value': settingValue});
 		}
 	};
 	var getDefaultAttributes = function() {
@@ -4412,7 +4482,7 @@ KeywordsControl.prototype.onFocus = function(isSwitched) {
 	this.set('switched',isSwitched);
 };
 KeywordsControl.prototype.addRequest = function() {
-	this.addOneTo('keywords', []);
+	this.addOneTo('keywords', [],0);
 };
 KeywordsControl.prototype.onKeywordsChange = function(kw) {
 	var kwlen=kw.length,tabs=[],i;
@@ -4425,9 +4495,12 @@ KeywordsControl.prototype.onKeywordsChange = function(kw) {
 	this.appendChild('tabs',kwlen>1);
 };
 KeywordsControl.prototype.onSelectTab = function(index) {
-	this.getElement('area').scrollToElement(this.findElements('.app-keywords-block')[index]);
+	index=this.get('keywordsCount')-index-1;
+	this.getElement('area').scrollToElement(this.findElements('.app-keywords-block')[index],300);
 };
-KeywordsControl.prototype.onRemoveTab = function(index) {};
+KeywordsControl.prototype.onRemoveTab = function(index) {
+	this.removeByIndexFrom('keywords', index);
+};
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'cmp':Tabs,'e':[22,$.onSelectTab,'remove',$.onRemoveTab],'p':{'p':{'items':function(){return $.g('tabs')},'activeTab':function(){return $.g('activeTab')}},'i':'tabs'},'n':{'items':'tabs','activeTab':'activeTab'}},{'c':{'h':function(item){return[{'c':[{'c':[{'c':__[22],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false)],'p':{'p':{'items':item[0]}}}],'t':0,'p':{'c':function(){return 'app-keywords-left'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true)],'p':{'p':{'items':item[1]}}}],'t':0,'p':{'c':function(){return 'app-keywords-right'+($.g('switched')?' switched':'')}},'n':{'c':'switched'}}],'t':0,'p':{'c':'app-keywords-block'}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':function(){return 'app-keywords-area'+($.g('keywordsCount')>1?' multi':'')},'eid':'area'},'n':{'c':'keywordsCount'}}]
 };

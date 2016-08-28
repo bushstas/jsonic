@@ -1760,7 +1760,7 @@
 	}
 
 	function hasFunctionCall($code) {
-		preg_match_all('/\.([a-z]\w*)\(|^\s*\.([a-z]\w*)|[^\w\]]\.([a-z]\w*)/i', $code, $matches);
+		preg_match_all('/^\s*\.([a-z]\w*)|[^\w\]]\.([a-z]\w*)/i', $code, $matches);
 		$funcs = array();
 		foreach ($matches[1] as $i => $match) {
 			if (!empty($match)) {

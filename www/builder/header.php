@@ -13,6 +13,7 @@
 				padding: 0 3px;
 				background-color: #f1e600;
 				border-radius: 2px;
+				line-height: 18px;
 			}
 		</style>
 	</head>

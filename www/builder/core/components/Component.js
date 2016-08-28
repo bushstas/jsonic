@@ -194,12 +194,14 @@ function Component() {
 
 	Component.prototype.removeByIndexFrom = function(propName, index) {
 		var prop = this.get(propName);
+		if (isString(index) && isNumeric(index)) index = ~~index;
 		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
 			prop.splice(index, 1);
 			var activities = this.propActivities['for'];
 			if (activities && isArray(activities[propName])) {
 				for (i = 0; i < activities[propName].length; i++) activities[propName][i].remove(index);
 			}
+			callFollower.call(this, propName, prop);
 		}
 	};
 
@@ -371,6 +373,20 @@ function Component() {
 		this.childrenCount++;
 	};
 
+	Component.prototype.unregisterChildComponent = function(child) {
+		var id = child.getId();		
+		if (!id) {
+			for (var k in this.children) {
+				if (this.children[k] == child) {
+					id = k;
+					break;
+				}
+			}
+		}
+		if (isString(id)) delete this.children[id];
+		if (isControl(child)) this.unregisterControl(child);
+	};
+
 	Component.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
 	 	if (!isUndefined(this.controls[name])) {
@@ -378,6 +394,12 @@ function Component() {
 	 		this.controls[name].push(control);
 	 	} else this.controls[name] = control;
 	 	control.setName(name);
+	};
+
+	Component.prototype.unregisterControl = function(control) {
+		var name = control.getName();
+		if (isArray(this.controls[name])) this.controls[name].removeItem(control);
+		else delete this.controls[name];
 	};
 
 	Component.prototype.getControl = function(name) {

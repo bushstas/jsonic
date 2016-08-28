@@ -379,7 +379,12 @@ function Level() {
 	};
 
 	this.dispose = function() {
-		for (var i = 0; i < children.length; i++) children[i].dispose();
+		for (var i = 0; i < children.length; i++) {
+			if (isComponentLike(children[i])) {
+				component.unregisterChildComponent(children[i]);
+			}
+			children[i].dispose();
+		}
 		if (eventHandler) {
 			eventHandler.dispose();
 			eventHandler = null;

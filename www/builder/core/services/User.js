@@ -1,10 +1,7 @@
 function User() {
-	var app;
-	var loadedItems = 0;
-	var attributes = {};
-	var loaded = false;
-	var loadRequest;
-	var saveRequest;
+	var app, loadedItems = 0, status = {},
+	attributes = {}, settings = {}, loaded = false, 
+	loadRequest, saveRequest;
 
 	var initOptions = function() {
 		var userOptions = __USEROPTIONS;
@@ -31,8 +28,10 @@ function User() {
 		}
 		onLoad(getDefaultAttributes());
 	};
-	var onLoad = function(attrs) {
-		attributes = attrs;
+	var onLoad = function(data) {
+		status = data['status'];
+		attributes = data['attributes'];
+		settings = data['settings'];
 		loadedItems++;
 		onLoadItem();
 	};
@@ -50,20 +49,34 @@ function User() {
 	};
 	this.hasFullAccess = function() {
 		var fullAccess = Objects.get(__USEROPTIONS, 'fullAccess', null);
-		var accessLevel = ~~attributes['accessLevel'];
+		var accessLevel = ~~status['accessLevel'];
 		return !isNumber(fullAccess) || accessLevel >= fullAccess;
+	};
+	this.isAdmin = function() {
+		var adminAccess = Objects.get(__USEROPTIONS, 'adminAccess', null);
+		var accessLevel = ~~status['accessLevel'];
+		return !isNumber(adminAccess) || accessLevel >= adminAccess;
+	};
+	this.isBlocked = function() {
+		return !!status['isBlocked'];
+	};
+	this.getBlockedReason = function() {
+		return status['blockReason'];
 	};
 	this.hasAccessLevel = function(accessLevel, isEqual) {
 		if (!isEqual) {
-			return attributes['accessLevel'] >= accessLevel;
+			return status['accessLevel'] >= accessLevel;
 		}
-		return attributes['accessLevel'] == accessLevel;
+		return status['accessLevel'] == accessLevel;
 	};
 	this.hasType = function(userType) {
-		return attributes['type'] == userType;
+		return status['type'] == userType;
 	};
 	this.isAuthorized = function() {
-		return attributes['accessLevel'] > 0;
+		return status['accessLevel'] > 0;
+	};
+	this.getAttributes = function() {
+		return attributes;
 	};
 	this.getAttribute = function(attributeName) {
 		return attributes[attributeName];
@@ -81,6 +94,18 @@ function User() {
 			if (isToSave && saveRequest) {
 				saveRequest.execute(attributes);
 			}
+		}
+	};
+	this.getSettings = function() {
+		return settings;
+	};
+	this.getSetting = function(settingName) {
+		return settings[settingName];
+	};
+	this.setSetting = function(settingName, settingValue) {
+		settings[settingName] = settingValue;
+		if (saveRequest) {
+			saveRequest.execute({'isSetting': true, 'name': settingName, 'value': settingValue});
 		}
 	};
 	var getDefaultAttributes = function() {

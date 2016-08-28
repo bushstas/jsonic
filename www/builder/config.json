@@ -6,6 +6,7 @@
 	"cssFolder"  : "css",
 	"compiledJs" : "base",
 	"compiledCss": "styles",
+	"container"  : "app-view-container",
 
 	"entry"      : "App",
 	"scope"      : "./sources",
@@ -13,7 +14,6 @@
 	"tests"      : "./tests",
 	"blanks"     : "./blanks",
 	"scripts"    : "./scripts",
-	"container"  : "app-view-container",
 	"views"      : "views",
 	"pathToApi"  : "api",
 	
@@ -63,7 +63,8 @@
 		"login": "user/login.php",
 		"logout": "user/logout.php",
 		"save": "user/save.php",
-		"fullAccess": 11
+		"fullAccess": 11,
+		"adminAccess": 100
 	},
 
 	"pathToDictionary": "dictionary/get.php",

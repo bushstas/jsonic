@@ -52,10 +52,14 @@
 	<form class="hint-form" method="GET" target="iframe" action="hint.php">
 		<input type="submit" value="ѕодсказка по" style="padding: 5px 10px;">
 		<select class="topic-select" name="topic">
+			<option value="config">конфигу приложени€</option>
+			<option value="user">авторизации пользовател€</option>
+			<option value="chain">жизненному циклу</option>
 			<option value="shortcut">сокращени€м</option>
 			<option value="tmp">шаблонам</option>
 			<option value="tmpcode">коду в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>
+			<option value="helper">классам хелперам</option>
 		</select>
 	</form>
 	<form class="testform" metod="GET" target="iframe" action="test.php">

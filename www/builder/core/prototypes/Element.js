@@ -167,16 +167,28 @@ Element.prototype.find = function(selector) {
 Element.prototype.getParent = function() {
 	return this.parentNode;
 };
-Element.prototype.scrollTo = function(pxy, speed) {
-	alert(pxy)
+Element.prototype.scrollTo = function(pxy, duration) {
+	if (!duration || !isNumber(duration)) this.scrollTop = pxy;
+	else {
+		var px = pxy - this.scrollTop, ratio = 15,
+		steps = duration / ratio, step = Math.round(px / steps),
+		currentStep = 0, e = this, 
+		cb = function() {
+			currentStep++;
+			e.scrollTop = e.scrollTop + step;
+			if (currentStep < steps) setTimeout(cb, ratio);
+			else e.scrollTop = pxy;
+		};
+		if (px != 0) cb();
+	}
 };
-Element.prototype.scrollToElement = function(element, speed) {
-	this.scrollTo(element.getRelativePosition(this).y, speed);
+Element.prototype.scrollToElement = function(element, duration) {
+	this.scrollTo(element.getRelativePosition(this).y, duration);
 };
 Element.prototype.getRelativePosition = function(element) {
 	var a = this.getRect();
 	var b = element.getRect();
-	return {x: a.x - b.x, y: a.y - b.y};
+	return {x: Math.round(a.left - b.left + element.scrollLeft), y:  Math.round(a.top - b.top + element.scrollTop)};
 };
 Element.prototype.clear = function() {
 	if (isString(this.value)) this.value = '';
