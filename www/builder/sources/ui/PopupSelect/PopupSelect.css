@@ -1,0 +1,9 @@
+.app-popup-select {
+	$(abs z900 bo#bec8da t100% l0 mt5 ml-6 bgwhite p6_10_12_10 w290 bsh_0_0_5_#bec8da br3 none)
+}
+.app-popup-select.shown {
+	$block
+}
+.app-popup-select-title {
+	$(bold pb6 c#5f6b7f fs14)
+}

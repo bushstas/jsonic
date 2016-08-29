@@ -303,7 +303,7 @@
 		$content = preg_replace('/==> *(\w+) *(\((.*)\))* *;*/', "Globals.dispatchEvent('$1',$3);", $content);
 		$content = str_replace(",)", ")", $content);
 		
-		$regexp = '/[\w\]\[\.]*<[\.\#:]*[a-z][\w\-\]\[]*>/i';
+		$regexp = '/[\w\]\[\.]*<[\.\#:]*[a-z][\w\-\.\#\]\[]*>/i';
 		$parts = preg_split($regexp, $content);
 		preg_match_all($regexp, $content, $matches);
 		$matches = $matches[0];
@@ -329,7 +329,7 @@
 					}
 				}
 				$tag = preg_replace('/[^\.\#:\-\w]/', '', $tag);
-				preg_match_all('/([\.\#:]*)([\w\-]+)/', $tag, $ms);
+				preg_match_all('/([\.\#:]*)([\w\-\.\#]+)/', $tag, $ms);
 				if ($ms[1][0] == ':') {
 					$content .= "this.getElement('".$ms[2][0]."')";
 				} elseif ($ms[1][0] == '::') {

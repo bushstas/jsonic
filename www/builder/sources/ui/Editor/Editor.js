@@ -8,7 +8,13 @@ function edit(element) {
 	this.editedElement = element;
 	$text = element.innerHTML,
 	$shown = true;
+	this.reposition();
+}
+
+function reposition(text) {
 	this.placeTo(document.body);
+	var rect = this.editedElement.getRect();
+	this.setPosition(rect.left, rect.top);
 }
 
 function onChangeText(text) {
@@ -22,9 +28,12 @@ function onEnter(value) {
 	this.hide();
 }
 
-
 function hide() {
-	$shown = false;
+	this.close();
 	this.placeBack();
 	--> hide
+}
+
+function close() {
+	$shown = false;
 }

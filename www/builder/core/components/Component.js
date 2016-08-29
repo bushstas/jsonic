@@ -265,6 +265,10 @@ function Component() {
 		if (this.isRendered()) this.getElement().setStyle(styles);
 	};
 
+	Component.prototype.setPosition = function(x, y) {
+		this.setStyle({'top': y + 'px', 'left': x + 'px'});
+	};
+
 	Component.prototype.setVisible = function(isVisible) {
 		if (this.isRendered() && !this.isDisposed()) this.getElement().show(isVisible);
 	};

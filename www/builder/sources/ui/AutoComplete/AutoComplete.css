@@ -21,6 +21,7 @@ $imgsrc = ../images/ui
 .app-autocomplete-variant {
 	$(block rel p6_8 lh16 pointer nowrap c#515a71 br3)
 }
+.app-autocomplete-variant.active,
 .app-autocomplete-variant:hover {
 	$(white bc#687da3)
 }

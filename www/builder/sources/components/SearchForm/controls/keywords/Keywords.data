@@ -26,3 +26,45 @@
 #keywordsAutoCompleteOptions = {
 	'url': CONFIG.keywords.get
 }
+
+#wordOrderOptions = [
+	{
+		'value': '1',
+		'title': @noOrder
+	},
+	{
+		'value': '2',
+		'title': @exactOrder
+	}
+]
+
+#wordDistanceOptions = [
+	{
+		'value': '1',
+		'title': @withinParagraph
+	},
+	{
+		'value': '2',
+		'title': @zeroWords
+	},
+	{
+		'value': '3',
+		'title': @oneWord
+	},
+	{
+		'value': '4',
+		'title': @twoWords
+	},
+	{
+		'value': '5',
+		'title': @threeWords
+	},
+	{
+		'value': '6',
+		'title': @fourWords
+	},
+	{
+		'value': '7',
+		'title': @fiveWords
+	}
+]

@@ -1,4 +1,5 @@
 $imgsrc = ../images/searchform
+$imgsrc = ../images/ui
 
 .app-keywords-options {
 	$(nowrap pl5 bob#e0e4eb h34 rel)
@@ -61,7 +62,7 @@ $imgsrc = ../images/searchform
 	$t75
 }
 .app-tags-top {
-	$(h16 nowrap p2_0_2_0)
+	$(h16 nowrap p2_0_2_0 rel z2)
 }
 .app-tags-top-buttons {
 	$(fright fs12)
@@ -98,4 +99,10 @@ $imgsrc = ../images/searchform
 }
 .app-keywords-remove-request:hover {
 	$c#6c3a3a
+}
+.app-tags-select-button {
+	$(fs12 c#444c61 mr12 inb pointer png2=select-arrow-small norep pr12 bp100%_50% opac9 rel)
+}
+.app-tags-select-button:hover {
+	$(opac10)
 }

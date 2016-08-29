@@ -1,0 +1,6 @@
+<div class="app-popup-select{$shown?' shown'}" scope>
+	<div class="app-popup-select-title">
+		{$title}
+	</div>
+	<control class="Select" name="option" options="{~options}">
+</div>

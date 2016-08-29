@@ -1,5 +1,13 @@
 {template .topContent}
 <div class="app-tags-top">
+	<span class="app-tags-select-button" data-index="1">
+		{$opt1}
+		<component class="PopupSelect" cmpid="opt1" arg-options="{#wordOrderOptions}" title="{@wordOrder}">
+	</span>
+	<span class="app-tags-select-button" data-index="2">
+		{$opt2}
+		<component class="PopupSelect" cmpid="opt2" arg-options="{#wordDistanceOptions}" title="{@wordDistance}">
+	</span>
 	<template topButtons>
 </div>
 

@@ -369,14 +369,19 @@
 			foreach ($css as $i => &$cssFile) {
 				$regexp = '/\$imgsrc\s*=\s*([^\s]+)/';
 				preg_match_all($regexp, $cssFile, $matches);
-				if (count($matches[0]) > 1) {
-					error('Обнаружено более одного <b>$imgsrc</b> определения пути к фоновым изображениям в файле стилей <b>'.$cssData[$i]['path'].'</b>');
-				}
-				$pathToImages = '';
-				if (count($matches[1]) > 0) {
-					$pathToImages = rtrim($matches[1][0], '/').'/';
-					$cssFile = preg_replace($regexp, '', $cssFile);
-					$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)\s*=\s*([^\s\)]+)/i', "background-image:url<obr>".$pathToImages."$2.$1<cbr>;", $cssFile);
+				$pathsToImages = array();
+				if (count($matches[1]) > 0) {					
+					for ($j = 0; $j < count($matches[1]); $j++) {
+						$pathsToImages[] = rtrim($matches[1][$j], '/').'/';
+						$cssFile = preg_replace($regexp, '', $cssFile);
+						$cssFile = preg_replace('/\$*(png|jpg|jpeg|gif)(\d*)\s*=\s*([^\s\)]+)/i', "background-image:url<obr><pathtoimg$2>$3.$1<cbr>;", $cssFile);
+					}
+					$len = count($pathsToImages);
+					for ($j = 0; $j < $len; $j++) {
+						$idx = $j == 0 ? '' : $j + 1;
+						$cssFile = str_replace('<pathtoimg'.$idx.'>', $pathsToImages[$j], $cssFile);	
+					}
+					
 				}
 			}
 			$compiledCss = implode("\n", $css);
@@ -417,7 +422,7 @@
 				'maw' => 'max-width', 'miw' => 'min-width', 'bp' => 'background-position'
 			);
 			foreach ($shorts as $k => $v) {
-				$regexp = '/\$'.$k.' *(-*\#*[\d\._]+)(%)*/';
+				$regexp = '/\$'.$k.' *(-*\#*[\d\._\%]+)(%)*/';
 				$px = !in_array($k, array('z')) ? 'px' : '';
 				$compiledCss = preg_replace($regexp, $v.":$1".$px."$2;", $compiledCss);
 				$compiledCss = preg_replace('/([:\s])(\d+%*)_(?=\d)/', "$1$2px ", $compiledCss);

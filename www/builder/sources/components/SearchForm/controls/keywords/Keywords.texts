@@ -14,3 +14,14 @@
 @removeAll: Удалить все
 @request: Запрос
 @removeRequest: удалить запрос
+@wordOrder: Порядок введенных слов
+@wordDistance: Расстояние между словами
+@noOrder: в любом порядке
+@exactOrder: в указанном порядке
+@withinParagraph: не далее абзаца
+@zeroWords: 0 слов (обязательно рядом)
+@oneWord: 1 слово и менее
+@twoWords: 2 слова и менее
+@threeWords: 3 слова и менее
+@fourWords: 4 слова и менее
+@fiveWords: 5 слов и менее
