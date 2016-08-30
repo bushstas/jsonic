@@ -6,12 +6,7 @@
 		<div class="app-tags-content">
 			<div class="app-tags-placeholder">
 				{foreach $items as &item}
-					<div class="app-tags-item" data-text="{&item}">
-						<span class="app-tags-item-text">
-							{&item}
-						</span>
-						<span class="app-tags-remove"/>
-					</div>
+					<template tag text="{&item}">
 				{/foreach}
 			</div>
 		</div>
@@ -21,3 +16,11 @@
 
 {template .input}
 <component class="AutoComplete" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant">
+
+{template .tag}
+<div class="app-tags-item">
+	<span class="app-tags-item-text" data-text="{~text}">
+		{~text}
+	</span>
+	<span class="app-tags-remove"/>
+</div>

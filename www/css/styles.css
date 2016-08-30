@@ -83,15 +83,16 @@
 .app-keywords-block{position:relative;z-index:1;margin-top:20px;height:97%;min-height:500px;}
 .app-keywords-block:first-child{margin-top:0;}
 .app-keywords-left{position:absolute;top:0;left:0;bottom:0;right:33%;z-index:2;}
-.app-keywords-left.switched{right:68.5%;}
+.app-keywords-block.switched .app-keywords-left{right:68.5%;}
 .app-keywords-right{position:absolute;top:0;left:68.5%;bottom:0;right:0;z-index:1;}
-.app-keywords-right.switched{left:33%;}
+.app-keywords-block.switched .app-keywords-right{left:33%;}
 .app-keywords-tags-title{font-family:ptsansbold;color:#3B4452;font-size:16px;line-height:16px;}
-.app-keywords-area .app-tags-container{position:absolute;min-height:0;max-height:none;height:auto;top:22px;left:0;right:0;bottom:50%;}
+.app-keywords-area .app-tags-container{position:absolute;min-height:0;max-height:none;height:auto;top:22px;left:0;right:0;bottom:0;}
+.app-keywords-area .app-keywords-block.with-recommendations:not(.switched) .app-tags-container{bottom:50%;}
 .app-keywords-area .app-tags-content{top:75px;}
 .app-tags-top{height:16px;white-space:nowrap;padding:2px 0 2px 0;position:relative;z-index:2;}
 .app-tags-top-buttons{float:right;font-size:12px;}
-.app-keywords-right:not(.switched) .app-tags-top-buttons{display:none;}
+.app-keywords-block.switched .app-keywords-left .app-tags-top-buttons,.app-keywords-block:not(.switched) .app-keywords-right .app-tags-top-buttons{display:none;}
 .app-tags-top-buttons-item{display:inline-block;height:18px;line-height:18px;}
 .app-tags-top-buttons-item:first-child{color:#5f6b7f;padding-right:12px;}
 .app-tags-top-buttons-item:nth-child(2){padding-left:14px;border-left:1px solid #cfd5e1;padding-right:3px;}
@@ -102,8 +103,11 @@
 .app-keywords-area.multi .app-keywords-index{display:inline-block;}
 .app-keywords-remove-request{cursor:pointer;color:#a66666;display:inline-block;margin-left:10px;font-size:12px;}
 .app-keywords-remove-request:hover{color:#6c3a3a;}
-.app-tags-select-button{font-size:12px;color:#444c61;margin-right:12px;display:inline-block;cursor:pointer;background-image:url(../images/ui/select-arrow-small.png);background-repeat:no-repeat;padding-right:12px;background-position:100% 50%;opacity:0.9;position:relative;}
-.app-tags-select-button:hover{opacity:1;}
+.app-tags-select-button{font-size:12px;color:#5f6b7f;margin-right:12px;display:inline-block;cursor:pointer;background-image:url(../images/ui/select-arrow-small.png);background-repeat:no-repeat;padding-right:12px;background-position:100% 50%;position:relative;}
+.app-tags-select-button:hover{color:#444c61;}
+.app-keywords-block .app-recommendations{position:absolute;left:0;right:-327px;top:50%;bottom:0;display:none;}
+.app-keywords-block.with-recommendations .app-recommendations{display:block;}
+.app-keywords-block.switched .app-recommendations{display:none !important;}
 /* SearchFormCreateFilterMenu */
 .app-popup-menu-outer-container.create-filters-menu .app-popup-menu-inner-container{border:none;}
 .app-popup-menu-outer-container.create-filters-menu{margin-top:3px;-webkit-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);-moz-box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);box-shadow:0 5px 14px 0 rgba(0,0,0,0.75);border:none;width:278px;}
@@ -162,6 +166,7 @@
 .app-tags-container{position:relative;margin-bottom:6px;background-color:#f3f5f7;padding:5px;color:#666;font-size:13px;border:1px solid #dde5f3;border-radius:2px;min-height:182px;max-height:182px;height:182px;box-shadow:1px 1px 6px #f0f4f7;}
 .app-tags-content{position:absolute;top:56px;left:0;right:0;bottom:0;padding:0 4px;overflow:hidden;border-radius:0 0 2px 2px;}
 .app-tags-item{max-width:260px;color:#38986a;background-color:#E8F3E7;border:1px solid #38986a;cursor:pointer;border-radius:3px;padding-right:30px;margin:2px;display:block;float:left;position:relative;box-sizing:border-box;height:28px;line-height:26px;}
+.app-tags-item.optioned{background-color:#8ebe8d;border-color:#689a67;color:#fff;text-shadow:1px 1px 1px #204029;font-family:ptsansbold;}
 .app-tags-item-text{display:inline-block;max-width:225px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:segoesemibold;padding-left:10px;}
 .app-tags-remove{background-image:url(../images/ui/tagsclearg.png);cursor:pointer;position:absolute;right:7px;top:6px;display:block;background-position:center center;background-repeat:no-repeat;width:15px;height:15px;opacity:0.7;}
 .app-tags-remove:hover{opacity:1;}

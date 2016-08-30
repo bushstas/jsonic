@@ -1,0 +1,3 @@
+<?php
+
+die('{"data":[{"keyword":"\u043c\u043e\u043b\u043e\u0447\u043d\u0430\u044f \u043f\u0440\u043e\u0434\u0443\u043a\u0446\u0438\u044f","wide_word":"0"},{"keyword":"\u0442\u0432\u043e\u0440\u043e\u0433","wide_word":"0"},{"keyword":"\u0442\u0432\u043e\u0440\u043e\u0436\u043d\u0430\u044f \u043f\u0440\u043e\u0434\u0443\u043a\u0446\u0438\u044f","wide_word":"0"}],"limit":9999999,"totalCount":3,"log":"log: "}');

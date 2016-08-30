@@ -27,19 +27,8 @@ function onResetConfirmed() {
 
 function onChange() {
 	var data = this.getProperData();
-	console.log(this.getControlsData())
 }
 
-function setParams(params) {
-	var data = {
-		'keywords': {
-			'nonmorph': params['nonmorph'],
-			'registryContracts': params['registryContracts'],
-			'registryProducts': params['registryProducts'],
-			'searchInDocumentation': params['searchInDocumentation'],
-			'containKeyword': params['containKeyword'],
-			'notcontainKeyword': params['notcontainKeyword']
-		}
-	};
-	this.setControlsData(data);
+function setParams(params:SearchForm) {
+	this.setControlsData(params);
 }

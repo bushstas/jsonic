@@ -173,7 +173,7 @@ contexts:
           pop: true
         - match: '[^,)\n]+'
           scope: variable.parameter.function.actionscript.2
-    - match: '\b(application|component|view|controller|form|menu|control|plugin|dialog|class)\s+(\w+)(?:\w|\.)*(?:\s+(extends)\s+([a-zA-Z\d, ]+(?:\w|\.)*))?'
+    - match: '\b(application|component|view|controller|corrector|form|menu|control|plugin|dialog|class)\s+(\w+)(?:\w|\.)*(?:\s+(extends)\s+([a-zA-Z\d, ]+(?:\w|\.)*))?'
       scope: meta.class.actionscript.2
       captures:
         1: storage.type.class.actionscript.2

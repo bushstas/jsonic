@@ -60,6 +60,7 @@
 			<option value="tmpcode">коду в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>
 			<option value="helper">классам хелперам</option>
+			<option value="corrector">классам корректорам</option>
 		</select>
 	</form>
 	<form class="testform" metod="GET" target="iframe" action="test.php">

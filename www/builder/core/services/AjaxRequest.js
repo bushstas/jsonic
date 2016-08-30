@@ -43,6 +43,9 @@ function AjaxRequest(url, callback, params, thisObj) {
 		request.withCredentials = withCredentials;
 		request.send(content);
 	};
+	this.setCallback = function(cb) {
+		callback = cb;
+	};
 	this.send = function(method, pars, u) {
 		this.method = method;
 		tempUrl = u;

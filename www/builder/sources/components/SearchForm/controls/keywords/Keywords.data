@@ -68,3 +68,14 @@
 		'title': @fiveWords
 	}
 ]
+
+#wordExcludeOptions = [
+	{
+		'value': '1',
+		'title': @withinElement
+	},
+	{
+		'value': '2',
+		'title': @anyElement
+	}
+]

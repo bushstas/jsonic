@@ -27,6 +27,7 @@ var CONFIG = {
 		'set': 'settings/set.php'
 	},
 	'keywords': {
-		'get': 'keywords/get.php'
+		'get': 'keywords/get.php',
+		'recommendations': 'keywords/getRecommendations.php'
 	}
 };

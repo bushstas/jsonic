@@ -194,3 +194,9 @@ Element.prototype.clear = function() {
 	if (isString(this.value)) this.value = '';
 	else this.innerHTML = '';
 };
+Element.prototype.getPrev = function() {
+	return this.previousSibling;
+};
+Element.prototype.getNext = function() {
+	return this.nextSibling;
+};

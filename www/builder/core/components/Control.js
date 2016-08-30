@@ -6,10 +6,14 @@ function Control() {
 
 	Control.prototype.onChange = function(e) {};
 
-	Control.prototype.dispatchChange = function() {
-		var event = {'value': this.getValue(), 'instance': this};
-		this.onChange(event);
-		this.dispatchEvent('change', event);
+	Control.prototype.dispatchChange = function() {		
+		var params = this.getChangeEventParams();
+		this.onChange(params);
+		this.dispatchEvent('change', params);
+	};
+
+	Control.prototype.getChangeEventParams = function() {
+		return {value: this.getValue()};
 	};
 
 	Control.prototype.getInitials = function() {
@@ -51,7 +55,7 @@ function Control() {
 		return value;
 	};
 
-	Control.prototype.setValue = function(value, fireChange) {
+	Control.prototype.setValue = function(value, fireChange) {console.log(this)
 		if (this.hasControls()) {
 			this.setControlsData(value);
 		} 

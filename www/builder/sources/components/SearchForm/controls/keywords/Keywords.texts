@@ -25,3 +25,6 @@
 @threeWords: 3 слова и менее
 @fourWords: 4 слова и менее
 @fiveWords: 5 слов и менее
+@findExcludes: Искать слова исключения
+@withinElement: в рамках одного элемента
+@anyElement: в любом элементе

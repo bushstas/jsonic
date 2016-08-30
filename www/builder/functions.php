@@ -401,7 +401,6 @@
 		if ($className != $file['name']) {
 			error('Файл <b>'.$file['path'].'</b> должен содержать класс <b>'.$file['name'].'</b>, тогда как содержит класс с именем <b>'.$className.'</b>');
 		}
-
 		$properExtends = array();
 		foreach ($extends as $superClassName) {
 			if (!preg_match($classNameRegExp, $superClassName)) {
@@ -410,6 +409,10 @@
 			$properExtends[] = $superClassName;
 		}
 		array_unshift($properExtends, ucfirst($classType));
+		if ($classType == 'corrector') {
+			$className .=  'Crr';
+			$properExtends = array();
+		}
 		$classes[$classType][$className] = array(
 			'content' => $content,
 			'extends' => $properExtends,
@@ -694,13 +697,15 @@
 			if (empty($value['controller'])) {
 				error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет элемент с индексом <b>'.$i.'</b>, у которого отсутствует параметр <b>controller</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
 			}
-			if (empty($value['on'])) {
-				error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет элемент с индексом <b>'.$i.'</b>, у которого отсутствует параметр <b>on</b><xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
-			}
-			validateObjectFields($value['on'], $initialValue, $initialType, $component);
-			foreach ($value['on'] as $action => $callback) {
-				validateCallback($callback, $initialValue, $initialType, $component, $i, 'callback');
-				$component['onActions'][] = array('controller' => $value['controller'], 'action' => $action);
+			if (isset($value['on'])) {
+				if (!is_array($value['on'])) {
+					error('Initial параметр <b>'.$initialType.'</b> в классе <b>'.$component['name'].'</b> имеет элемент с индексом <b>'.$i.'</b>, у которого параметр <b>on</b> не является массивом<xmp>initial '.$initialType.' = '.$initialValue.'</xmp><b>Параметр должен иметь вид:</b> '.getInitialParamExample($initialType));
+				}
+				validateObjectFields($value['on'], $initialValue, $initialType, $component);
+				foreach ($value['on'] as $action => $callback) {
+					validateCallback($callback, $initialValue, $initialType, $component, $i, 'callback');
+					$component['onActions'][] = array('controller' => $value['controller'], 'action' => $action);
+				}
 			}
 			$component['controllers'][] = $value['controller'];
 		}
@@ -1027,7 +1032,7 @@
 
 	function checkSuperClassesCallings(&$functions, $component) {
 		foreach ($functions as &$func) {
-			$regExp = '/\bsuper\(([^\)]*)\)/';
+			$regExp = '/\bsuper\((.*)\)/';
 			$parts = preg_split($regExp, $func['code']);
 			if (count($parts) > 1) {
 				preg_match_all($regExp, $func['code'], $matches);
@@ -1035,14 +1040,16 @@
 				foreach ($callings as &$call) {
 					$arguments = '';
 					$errorText = 'Ошибка вызова <b>super('.$call.')</b> в методе <b>'.$func['name'].'</b> класса <b>'.$component['name'].'</b>. ';
+					$method = $func['name'];
 					if (empty($call)) {
 						$superClass = getSuperClassWithMethod($func['name'], $component, $errorText);
 					} else {
 						$callOpts = getArgumentsOfSuperClassCalling($call, $func['name'], $errorText);
 						$arguments = $callOpts['args'];
 						$superClass = $callOpts['superClass'];
+						$method = $callOpts['method'];
 					}
-					$call = $superClass.'.prototype.'.$func['name'].'.call(this'.$arguments.')';
+					$call = $superClass.'.prototype.'.$method.'.call(this'.$arguments.')';
 				}
 				$func['code'] = '';
 				foreach ($parts as $i => $part) {
@@ -1059,6 +1066,11 @@
 		global $classesList;
 		$args = explode(',', $call);
 		$superClass = trim($args[0]);
+		$parts = explode('.', $superClass);
+		if (isset($parts[1])) {
+			$funcName = $parts[1];
+			$superClass = $parts[0];
+		}
 		$args[0] = '';
 		$arguments = implode(',', $args);
 		if (!isset($classesList[$superClass])) {
@@ -1066,9 +1078,9 @@
 		}
 		$code = $classesList[$superClass]['content'];
 		if (empty($code) || !preg_match('/\bfunction +'.$funcName.'*\(/', $code)) {
-			error($errorText."Данный метод отсутствует у супер-класса <b>".$superClass.'</b>');
+			error($errorText."Метод <b>".$funcName."</b> отсутствует у супер-класса <b>".$superClass.'</b>');
 		}
-		return array('args' => $arguments, 'superClass' => $superClass);
+		return array('args' => $arguments, 'superClass' => $superClass, 'method' => $funcName);
 	}
 
 	function getSuperClassWithMethod($funcName, $component, $errorText) {
@@ -2390,7 +2402,39 @@
 	}
 
 	function addPrototypeFunction(&$js, $class, $name, $args = '', $code = '') {
+		global $correctorsList;
+		$parts = explode(',', $args);
+		$args = array();
+		$corrs = array();
+		foreach ($parts as $part) {
+			$part = trim($part);
+			$p = explode(':', $part);
+			$arg = $p[0];
+			$args[] = $arg;
+			if (isset($p[1])) {				
+				foreach ($p as $i => $v) {
+					if ($i > 0) {
+						if (!is_array($corrs[$arg])) {
+							$corrs[$arg] = array();
+						}
+						$corrs[$arg][] = $v;
+					}
+				}
+			}
+		}
+		$args = implode(',', $args);
 		$js[] = $class.'.prototype.'.$name.' = function('.$args.') {';
+		foreach ($corrs as $k => $v) {
+			foreach ($v as $crr) {
+				if (!preg_match('/^[a-z]\w*/i', $crr)) {
+					error('Некоррекнтое имя корректора <b>'.$crr.'</b> в методе <b>'.$name.'</b> класса <b>'.$class.'</b>');
+				}
+				if (!in_array($crr.'Crr', $correctorsList)) {
+					error('Неизвестный корректор <b>'.$crr.'</b> в методе <b>'.$name.'</b> класса <b>'.$class.'</b>');
+				}
+				$code = "\t".$k."=Corrector.correct('".$crr."',".$k.");\n".$code;
+			}
+		}
 		$js[] = $code;
 		$js[] = '};';
 	}

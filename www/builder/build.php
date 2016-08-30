@@ -245,12 +245,12 @@
 		);
 		$reservedNames = array(
 			'Component', 'Controller', 'Application', 'View', 'Level',
-			'Control', 'AjaxRequest', 'Router', 'Objects',
+			'Control', 'AjaxRequest', 'Router', 'Objects', 'Corrector',
 			'Condition', 'Core', 'Menu', 'EventHandler', 'Dialoger', 'Foreach',
 			'Globals', 'User', 'StoreKeeper', 'Switch', 'Tooltiper', 'IfSwitch',
 
 			'__', '__T', '__ROUTES', '__TAGS', '__A', '__EVENTTYPES', '__HASHROUTER', '__DEFAULTROUTE', '__ERRORROUTES',
-			'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V', '__DW'
+			'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V', '__DW', '__CRRS'
 		);
 
 		$classes = array(
@@ -262,7 +262,8 @@
 			'dialog'      => array(),			
 			'form'        => array(),
 			'control'     => array(),
-			'menu'        => array()
+			'menu'        => array(),
+			'corrector'   => array()
 		);
 
 		$superClasses = array('component', 'dialog', 'form', 'control', 'menu');
@@ -325,6 +326,11 @@
 				$decls[] = $content;
 			}
 		}
+
+		$correctorsList = array();
+		foreach ($classes['corrector'] as $crr) {
+			$correctorsList[] = $crr['name'];
+		}
 		$templateClasses = array_keys($templates);
 		$classesFromTemplates = array();
 		foreach ($templateClasses as $templateClass) {
@@ -386,6 +392,7 @@
 			}
 			$compiledCss = implode("\n", $css);
 			$compiledCss = preg_replace('/bsh_(\d+)_(\d+)_(\d+)_\#(\w{3,6})/', "box-shadow:$1px<sp>$2px<sp>$3px<sp>#$4;", $compiledCss);
+			$compiledCss = preg_replace('/tsh_(\d+)_(\d+)_(\d+)_\#(\w{3,6})/', "text-shadow:$1px<sp>$2px<sp>$3px<sp>#$4;", $compiledCss);
 
 			$compiledCss = preg_replace('/\bgr_(left|right|top|bottom)_(\#\w{3,6}|transparent)_(\#\w{3,6}|transparent)/', "background-image:linear-gradient(to<sp>$1,$2,$3<cbr>;", $compiledCss);
 			$regexp = '/\$\s*\(([^\)]+)\)/';
@@ -399,7 +406,7 @@
 					$styles = preg_split('/[ \$]/', $matches[$i]);
 					foreach ($styles as $style) {
 						if (!empty($style)) {
-							if (preg_match('/^box-shadow/', $style)) {
+							if (preg_match('/^(box|text)-shadow/', $style)) {
 								$compiledCss .= $style;
 							} elseif (preg_match('/^background-image/', $style)) {
 								$compiledCss .= $style;
@@ -757,6 +764,7 @@
 		$globals[] = "var __GI = '".($advancedMode ? '_gi' : 'getInitials')."';";
 		$globals[] = "var __TC = ".(!empty($tooltipClass) ? $tooltipClass : 'null').";";
 		$globals[] = "var __TA = '".$tooltipApi."';";
+		$globals[] = "var __CRRS = ".str_replace('"', '', json_encode($correctorsList)).";";
 
 		if (!empty($pathToApi)) {
 			$globals[] = "var __APIDIR = '".$pathToApi."';";

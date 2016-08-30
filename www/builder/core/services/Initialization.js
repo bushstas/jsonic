@@ -53,7 +53,7 @@ function Initialization() {
 	var attachController = function(options) {
 		if (isObject(options['on'])) {
 			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
-		}
+		} else options.controller.subscribe('', null, this);
 	};
 	var addCorrector = function(name, handler) {
 		if (isFunction(handler)) {

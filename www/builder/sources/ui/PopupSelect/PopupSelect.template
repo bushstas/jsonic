@@ -2,5 +2,5 @@
 	<div class="app-popup-select-title">
 		{$title}
 	</div>
-	<control class="Select" name="option" options="{~options}">
+	<control class="Select" name="option" options="{~options}" onChange="!change">
 </div>

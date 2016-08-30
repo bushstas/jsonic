@@ -11,6 +11,10 @@ function onRendered() {
 	}
 }
 
+function getChangeEventParams() {
+	return {value: $value, title: $title};
+}
+
 function selectByValue(value, forced) {
 	if (!forced && $value == value) return;
 	var options = $options;

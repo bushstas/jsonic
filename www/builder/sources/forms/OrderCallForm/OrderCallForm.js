@@ -101,16 +101,18 @@ function validateTime() {
 	var dateValue = dateSelect.getValue();
     var isToday = (new RegExp(@today)).test(dateValue);
     if (isToday) {
-	    var d = new Date();
-	    var times = [11, 13, 16];
+ 		var d = new Date();
+	    var hours = [11, 13, 15];
+	    var minutes = [0, 0, 30];
 	    var moscowTime = d.getUTCHours() + 3;
+	    var minute = d.getMinutes();
 	    var disabledIndexes = [];
-	    for (var i = 0; i < times.length; i++) {
-	    	if (moscowTime >= times[i]) {
+	    for (var i = 0; i < hours.length; i++) {
+	    	if (moscowTime > hours[i] || (moscowTime == hours[i] && minute >= minutes[i])) {
 	    		disabledIndexes.push(i);
 	    	}
 	    }
-	    if (disabledIndexes.length == times.length) {
+	    if (disabledIndexes.length == hours.length) {
 	    	dateSelect.enableOption(0, false);
 	    } else {
 	    	for (i = 0; i < disabledIndexes.length; i++) {

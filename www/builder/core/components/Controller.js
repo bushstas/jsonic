@@ -10,42 +10,45 @@ function Controller() {
 		}
 		return url;
 	};
-	var gotFromStore = function(actionName, options) {
+	var gotFromStore = function(actionName, options, owner) {
 		if (shouldStore.call(this)) {
 			var storeAs = getStoreAs.call(this, options);
 			if (isString(storeAs) && typeof StoreKeeper != 'undefined') {
 				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 				if (isArrayLike(storedData)) {
-					onActionComplete.call(this, actionName, storedData, true);
+					onActionComplete.call(this, actionName, true, owner, storedData);
 					return true;
 				}
 			}
 		}
 		return false;
 	};
-	var onActionComplete = function(actionName, data, isFromStorage) {
+	var onActionComplete = function(actionName, isFromStorage, owner, data) {
 		this.data = this.data || {};
 		this.data[actionName] = data;
 		var action = getAction.call(this, actionName);
 		if (isObject(action) && isFunction(action['callback'])) {
 			action['callback'].call(this, data);
 		}
-		if (action['autoset']) autoset.call(this, action['autoset'], data);
-		this.dispatchEvent(actionName, data);
+		if (action['autoset']) autoset.call(this, action['autoset'], data, owner);
+		this.dispatchEvent(actionName, data, owner);
 		if (!isFromStorage && actionName == 'load' && shouldStore.call(this)) {
 			store.call(this, true, data);
 		}
 		this.activeRequests.removeItem(actionName);
 	};
-	var autoset = function(opts, data) {
+	var autoset = function(opts, data, owner) {
 		var props = {};
 		if (isString(opts)) {
 			props[opts] = data; 
 		} else if (isObject(opts)) {
 			for (var k in opts) props[opts[k]] = data[k];
 		}
-		for (var i = 0; i < this.subscribers.length; i++) {
-			this.subscribers[i][2].set(props);
+		if (owner) owner.set(props);
+		else {
+			for (var i = 0; i < this.subscribers.length; i++) {
+				this.subscribers[i][2].set(props);
+			}
 		}
 	};
 	var shouldStore = function() {
@@ -143,12 +146,12 @@ function Controller() {
 		}
 	};
 
-	Controller.prototype.dispatchEvent = function(eventType, data) {
+	Controller.prototype.dispatchEvent = function(eventType, data, owner) {
 		var dataToDispatch = data;
 		if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
 		if (isArray(this.subscribers)) {
 			for (var i = 0; i < this.subscribers.length; i++) {
-				if (this.subscribers[i][0] == eventType && isFunction(this.subscribers[i][1])) {
+				if ((!owner || owner == this.subscribers[i][2]) && this.subscribers[i][0] == eventType && isFunction(this.subscribers[i][1])) {
 					this.subscribers[i][1].call(this.subscribers[i][2] || null, dataToDispatch, this);
 				}
 			}
@@ -175,14 +178,22 @@ function Controller() {
 		return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
 	};
 
+	Controller.prototype.loadFor = function(owner, options) {
+		this.doActionFor(owner, 'load', options);
+	};
+
 	Controller.prototype.load = function(options) {
 		this.doAction('load', options);
 	};
 
-	Controller.prototype.doAction = function(actionName, options, url) {
+	Controller.prototype.doActionFor = function(owner, actionName, options, url) {
+		this.doAction(actionName, options, url, owner);
+	};
+
+	Controller.prototype.doAction = function(actionName, options, url, owner) {
 		if (this.activeRequests.indexOf(actionName) > -1) return;
 		var action = getAction.call(this, actionName);
-		if (actionName == 'load' && gotFromStore.call(this, actionName, options)) return;
+		if (actionName == 'load' && gotFromStore.call(this, actionName, options, owner)) return;
 		if (!isObject(options)) options = {};
 		if (action && isObject(action) && action['options'] && isObject(action['options'])) {
 			Objects.merge(options, action['options']);
@@ -192,9 +203,8 @@ function Controller() {
 		if (!url || !isString(url)) {
 			log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
 		}		
-		if (!this.requests[actionName]) {
-			this.requests[actionName] = new AjaxRequest(url, onActionComplete.bind(this, actionName));
-		}
+		if (!this.requests[actionName]) this.requests[actionName] = new AjaxRequest(url);
+		this.requests[actionName].setCallback(onActionComplete.bind(this, actionName, false, owner));
 		this.requests[actionName].send(method, options, url);
 		this.activeRequests.push(actionName);		
 	};
@@ -216,6 +226,7 @@ function Controller() {
 		this.initials = null;
 		this.activeRequests = null;
 		this.requests = null;
+		this.owner = null;
 	};
 }
 Controller();

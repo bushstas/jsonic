@@ -164,12 +164,12 @@ function Component() {
 		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
 	};
 
-	Component.prototype.dispatchEvent = function(eventType, eventParams) {
+	Component.prototype.dispatchEvent = function(eventType, eventParams) {console.log(eventType)
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];
 				if (this.listeners[i]['type'] == eventType) {
-					this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams);
+					this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams, this);
 				}
 			}
 		}
@@ -459,6 +459,15 @@ function Component() {
 
 	Component.prototype.getChildAt = function(index) {
 		return Objects.getByIndex(this.children, index);
+	};
+
+	Component.prototype.getChildIndex = function(child, same) {
+		var idx = -1;
+		this.forEachChild(function(ch) {
+			if (!same || (same && ch.constructor == child.constructor)) idx++;
+			if (ch == child) return true;
+		});
+		return idx;
 	};
 
 	Component.prototype.getChildren = function(classFunc) {

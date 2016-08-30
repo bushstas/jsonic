@@ -188,10 +188,15 @@
 		$items[] = '<b>hasAccessLevel</b> - Возвращает TRUE или FALSE. Имеет ли пользователь указанный уровень доступа. Второй аргумент говорит о том, что пользователь должен иметь именно такой уровень, а не больший или равный<xmp>var hasAccess = User.hasAccessLevel(40);</xmp><xmp>var hasExactAccess = User.hasAccessLevel(10, true);</xmp>';
 		$items[] = '<b>isBlocked</b> - Возвращает TRUE или FALSE. Заблокирован пользователь или нет<xmp>var isBlocked = User.isBlocked();</xmp>';
 		$items[] = '<b>getBlockReason</b> - Возвращает причину блокировки пользователя<xmp>var whyBlocked = User.getBlockReason();</xmp>';
+		$items[] = '<b>getAttributes</b> - Возвращает все атрибуты пользователя<xmp>var userData = User.getAttributes();</xmp>';
 		$items[] = '<b>getAttribute</b> - Возвращает указанный атрибут пользователя<xmp>var username = User.getAttribute(\'name\');</xmp>';
 		$items[] = '<b>setAttribute</b> - Устанавливает указанный атрибут пользователя, если третий аргумент == TRUE и в конфиге пользователя (смотрите подсказку по <b>конфигу приложения</b>) задан параметр <b>save</b> атрибут будет сохранен в БД<xmp>User.setAttribute(\'type\', \'usual\', true);</xmp>';
 		$items[] = '<b>setAttributes</b> - То же самое, только первым аргументом передается объект с полями атрибутами, а второй метка сохранять или нет в БД
 		<xmp>User.setAttributes({\'type\': \'usual\', ... });</xmp>';
+
+		$items[] = '<b>getSettings</b> - Возвращает все персональные настройки пользователя<xmp>var userSettings = User.getSettings();</xmp>';
+		$items[] = '<b>getSetting</b> - Возвращает указанную персональную настройку пользователя<xmp>var myFontSize = User.getSetting(\'fontSize\');</xmp>';
+		$items[] = '<b>setSetting</b> - Сохраняет указанную настройку локально и на сервере (если указан корректный параметр в конфиге <b>save</b>)<xmp>User.setSetting(\'fontSize\', 18);</xmp>';
 
 		$items[] = true;
 		$items[] = 'Login API';
@@ -221,10 +226,35 @@
 		$items[] = "<b>attributes</b> - Здесь содержатся данные пользователя: имя, телефон, email и т.д. Данный список атрибутов свободный
 		<xmp>\"attributes\": \"{ ... }\"</xmp>";
 
+		$items[] = "<b>settings</b> - Здесь содержатся персональные настройки пользователя относящиеся к работе клиента, например цвет фона сайта или размер шрифта.
+		<xmp>\"settings\": \"{ ... }\"</xmp>";
+
+		
+
 
 		break;
 
 		case 'shortcut':
+			$items[] = true;
+			$items[] = 'Функции';
+			$items[] = false;
+			$items[] = "<b>super(ParentClass)</b> - Вызов одноименного метода супер-класса с заданными параметрами или без, где первый аргумент имя родительского класса без кавычек
+			<xmp>function doSome() {\n\tsuper(ParentClass, arg1, arg2);\n}</xmp>преобразуется в:
+			<xmp>ChildClass.prototype.doSome = function() {\n\tParentClass.prototype.doSome.call(this, arg1, arg2);\n}</xmp>";
+
+			$items[] = "<b>super(ParentClass.doSomeOther)</b> - Вызов другого метода супер-класса с заданными параметрами или без, где первый аргумент имя родительского класса без кавычек
+			<xmp>function doSome() {\n\tsuper(ParentClass.doSomeOther, arg1, arg2);\n}</xmp>преобразуется в:
+			<xmp>ChildClass.prototype.doSome = function() {\n\tParentClass.prototype.doSomeOther.call(this, arg1, arg2);\n}</xmp>";
+
+			$items[] = "<b>function a(b:Corrector) {</b> - Применение корректора к аргументу функции, в данному случае корректора <b>DigitFilter</b>
+			<xmp>function setParams(data:DigitFilter) {\n\t...\n}</xmp>преобразуется в:
+			<xmp>Component.prototype.setParams = function(data) {\n\tdata = Corrector.correct('DigitFilter', data);\n\t...\n}</xmp>Подробнее о корректорах смотрите подсказку по классам корректорам";
+
+			$items[] = true;
+			$items[] = 'Реактивные переменные';
+			$items[] = false;
+
+
 			$items[] = true;
 			$items[] = 'Объекты DOM';
 			$items[] = false;
