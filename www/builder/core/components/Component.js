@@ -160,8 +160,8 @@ function Component() {
 		return this.disabled;
 	};
 
-	Component.prototype.instanceOf = function(parent) {
-		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
+	Component.prototype.instanceOf = function(classFunc) {
+		return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 	};
 
 	Component.prototype.dispatchEvent = function(eventType, eventParams) {
@@ -367,6 +367,14 @@ function Component() {
 		}
 	};
 	
+	Component.prototype.forChildren = function(classFunc, callback) {
+		var children = this.getChildren(classFunc), result;
+		for (var i = 0; i < children.length; i++) {
+			result = callback.call(this, children[i], i);
+			if (result) return result;
+		}
+	};
+	
 	Component.prototype.registerElement = function(element, id) {
 		this.elements = this.elements || {};
 		this.elements[id] = element;
@@ -380,6 +388,7 @@ function Component() {
 	};
 
 	Component.prototype.unregisterChildComponent = function(child) {
+		if (isControl(child)) this.unregisterControl(child);
 		var id = child.getId();		
 		if (!id) {
 			for (var k in this.children) {
@@ -390,7 +399,6 @@ function Component() {
 			}
 		}
 		if (isString(id)) delete this.children[id];
-		if (isControl(child)) this.unregisterControl(child);
 	};
 
 	Component.prototype.registerControl = function(control, name) {
@@ -403,9 +411,11 @@ function Component() {
 	};
 
 	Component.prototype.unregisterControl = function(control) {
-		var name = control.getName();
-		if (isArray(this.controls[name])) this.controls[name].removeItem(control);
-		else delete this.controls[name];
+		if (this.controls) {
+			var name = control.getName();
+			if (isArray(this.controls[name])) this.controls[name].removeItem(control);
+			else delete this.controls[name];
+		}
 	};
 
 	Component.prototype.getControl = function(name) {
@@ -471,6 +481,7 @@ function Component() {
 	};
 
 	Component.prototype.getChildren = function(classFunc) {
+		if (!isFunction(classFunc)) return this.children;
 		var children = [];
 		this.forEachChild(function(child) {
 			if (isComponentLike(child) && child.instanceOf(classFunc)) children.push(child);

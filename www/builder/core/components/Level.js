@@ -385,17 +385,6 @@ function Level() {
 	};
 
 	this.dispose = function() {
-		for (var i = 0; i < children.length; i++) {
-			if (isComponentLike(children[i])) {
-				component.unregisterChildComponent(children[i]);
-			}
-			children[i].dispose();
-		}
-		if (eventHandler) {
-			eventHandler.dispose();
-			eventHandler = null;
-		}
-		disposeDom();
 		if (propComps) {
 			component.disposePropActivities('cmp', propComps);
 			propComps = null;
@@ -424,6 +413,17 @@ function Level() {
 			component.disposePropActivities('swt', switches);
 			switches = null;
 		}
+		for (var i = 0; i < children.length; i++) {
+			if (isComponentLike(children[i])) {
+				component.unregisterChildComponent(children[i]);
+			}
+			children[i].dispose();
+		}
+		if (eventHandler) {
+			eventHandler.dispose();
+			eventHandler = null;
+		}
+		disposeDom();
 		children = null;
 		parentElement = null;
 		parentLevel = null;

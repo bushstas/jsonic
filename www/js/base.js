@@ -325,8 +325,8 @@ function Component() {
 	Component.prototype.isDisabled = function() {
 		return this.disabled;
 	};
-	Component.prototype.instanceOf = function(parent) {
-		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
+	Component.prototype.instanceOf = function(classFunc) {
+		return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 	};
 	Component.prototype.dispatchEvent = function(eventType, eventParams) {
 		if (isArray(this.listeners)) {
@@ -506,6 +506,13 @@ function Component() {
 			}
 		}
 	};
+	Component.prototype.forChildren = function(classFunc, callback) {
+		var children = this.getChildren(classFunc), result;
+		for (var i = 0; i < children.length; i++) {
+			result = callback.call(this, children[i], i);
+			if (result) return result;
+		}
+	};
 	Component.prototype.registerElement = function(element, id) {
 		this.elements = this.elements || {};
 		this.elements[id] = element;
@@ -517,6 +524,7 @@ function Component() {
 		this.childrenCount++;
 	};
 	Component.prototype.unregisterChildComponent = function(child) {
+		if (isControl(child)) this.unregisterControl(child);
 		var id = child.getId();		
 		if (!id) {
 			for (var k in this.children) {
@@ -527,7 +535,6 @@ function Component() {
 			}
 		}
 		if (isString(id)) delete this.children[id];
-		if (isControl(child)) this.unregisterControl(child);
 	};
 	Component.prototype.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
@@ -538,9 +545,11 @@ function Component() {
 	 	control.setName(name);
 	};
 	Component.prototype.unregisterControl = function(control) {
-		var name = control.getName();
-		if (isArray(this.controls[name])) this.controls[name].removeItem(control);
-		else delete this.controls[name];
+		if (this.controls) {
+			var name = control.getName();
+			if (isArray(this.controls[name])) this.controls[name].removeItem(control);
+			else delete this.controls[name];
+		}
 	};
 	Component.prototype.getControl = function(name) {
 		return Objects.get(this.controls, name) || this.forEachChild(function(child) {
@@ -594,6 +603,7 @@ function Component() {
 		return idx;
 	};
 	Component.prototype.getChildren = function(classFunc) {
+		if (!isFunction(classFunc)) return this.children;
 		var children = [];
 		this.forEachChild(function(child) {
 			if (isComponentLike(child) && child.instanceOf(classFunc)) children.push(child);
@@ -1610,17 +1620,6 @@ function Level() {
 		this.setAppended(false, element);
 	};
 	this.dispose = function() {
-		for (var i = 0; i < children.length; i++) {
-			if (isComponentLike(children[i])) {
-				component.unregisterChildComponent(children[i]);
-			}
-			children[i].dispose();
-		}
-		if (eventHandler) {
-			eventHandler.dispose();
-			eventHandler = null;
-		}
-		disposeDom();
 		if (propComps) {
 			component.disposePropActivities('cmp', propComps);
 			propComps = null;
@@ -1649,6 +1648,17 @@ function Level() {
 			component.disposePropActivities('swt', switches);
 			switches = null;
 		}
+		for (var i = 0; i < children.length; i++) {
+			if (isComponentLike(children[i])) {
+				component.unregisterChildComponent(children[i]);
+			}
+			children[i].dispose();
+		}
+		if (eventHandler) {
+			eventHandler.dispose();
+			eventHandler = null;
+		}
+		disposeDom();
 		children = null;
 		parentElement = null;
 		parentLevel = null;
@@ -4684,11 +4694,10 @@ Keywords.prototype.onKeywordsChange = function(kw) {
 		tabs.push(__[28]+' '+i);
 	}	
 	this.set({'keywordsCount':kwlen,'tabs':tabs,'activeTab':kwlen-1});
-	this.appendChild('tabs',kwlen>1);
-	var markers=this.findElements('.app-keywords-index');
-	for(i=0;i<markers.length;i++){
-		this.fill(markers[i],{'index':kwlen-i});
-	}
+	this.appendChild('tabs',kwlen>1);	
+	this.forChildren(KeywordsControl,function(child,i){
+		child.set('index',kwlen-i);
+	});
 };
 Keywords.prototype.onSelectTab = function(index) {
 	index=this.get('keywordsCount')-index-1;
@@ -4701,12 +4710,17 @@ Keywords.prototype.onTagEdit = function(tag) {
 Keywords.prototype.onTagEdited = function() {
 	Popuper.skipAll(false);
 };
+Keywords.prototype.onRemoveRequestClick = function(target) {
+	var block=target.getAncestor('.app-keywords-block');
+	var blocks=this.findElements('.app-keywords-block');
+	this.removeRequest(blocks.indexOf(block),true);
+};
 Keywords.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':__[16],'t':1,'p':{'c':'bold'}},{'cmp':Select,'nm':'nonmorph','p':{'p':{'options':__V[0]},'a':{'className':'frameless','tooltip':'true'}}},{'c':__[17],'t':1,'p':{'c':'bold'}},{'cmp':Checkbox,'nm':'searchInDocumentation','p':{'a':__V[1]}},{'cmp':Checkbox,'nm':'registryContracts','p':{'a':__V[2]}},{'cmp':Checkbox,'nm':'registryProducts','p':{'a':__V[3]}},{'c':[{'c':__[21],'t':1},{'tmp':includeGeneralTemplateTooltip,'p':{'className':'question-tooltip','key':'keywordsNewReq'}}],'t':0,'p':{'c':'app-keywords-add-request'}},{'t':0,'p':{'c':'app-tooltip keywords-hint'}}],'t':0,'p':{'c':'app-keywords-options'}},{'cmp':Tabs,'e':[22,$.onSelectTab,'remove',$.removeRequest],'p':{'p':{'items':function(){return $.g('tabs')},'activeTab':function(){return $.g('activeTab')}},'i':'tabs'},'n':{'items':'tabs','activeTab':'activeTab'}},{'c':{'h':function(item){return[{'cmp':KeywordsControl,'nm':'tags','e':['edit',$.onTagEdit],'p':{'a':{'items':item}}}]},'p':$.g('keywords'),'f':'keywords'},'t':0,'p':{'c':function(){return 'app-keywords-area'+($.g('keywordsCount')>1?' multi':'')},'eid':'area'},'n':{'c':'keywordsCount'}},{'cmp':KeywordTagEditor,'e':['hide',$.onTagEdited],'p':{'i':'editor'}}]
 };
 Keywords.prototype.getInitials = function() {
 	return {
-		'helpers':[{'helper':ClickHandler,'options':{'app-keywords-add-request':this.addRequest}}],
+		'helpers':[{'helper':ClickHandler,'options':{'app-keywords-add-request':this.addRequest,'app-keywords-remove-request':this.onRemoveRequestClick}}],
 		'followers':{'keywords':this.onKeywordsChange}
 	};
 };
@@ -4714,20 +4728,11 @@ function KeywordsControl() {};
 KeywordsControl.prototype.onFocus = function(isSwitched) {
 	this.set('switched',isSwitched);
 };
-KeywordsControl.prototype.onRemoveRequestClick = function(target) {
-	var block=target.getAncestor('.app-keywords-block');
-	var blocks=this.findElements('.app-keywords-block');
-};
 KeywordsControl.prototype.onRecommendationsChange = function(count) {
 	this.set('hasRecomm',count>0);
 };
 KeywordsControl.prototype.getTemplateMain = function(_,$) {
 	return[{'c':[{'c':[{'c':[__[22],{'c':[__[28],' ',{'pr':'index','p':$.g('index')},{'c':__[29],'t':1,'p':{'c':'app-keywords-remove-request'}}],'t':1,'p':{'c':'app-keywords-index'}}],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ContainKeywordTags,'nm':'containKeyword','e':[15,$.onFocus.bind($,false),'edit','edit','recchange',$.onRecommendationsChange],'p':{'p':{'items':_['items'][0]}}}],'t':0,'p':{'c':'app-keywords-left'}},{'c':[{'c':__[23],'t':0,'p':{'c':'app-keywords-tags-title'}},{'cmp':ExcludeKeywordTags,'nm':'notcontainKeyword','e':[15,$.onFocus.bind($,true),'edit','edit'],'p':{'p':{'items':_['items'][1]}}}],'t':0,'p':{'c':'app-keywords-right'}}],'t':0,'p':{'c':function(){return 'app-keywords-block'+($.g('switched')?' switched':'')+($.g('hasRecomm')?' with-recommendations':'')},'sc':1},'n':{'c':['hasRecomm','switched']}}]
-};
-KeywordsControl.prototype.getInitials = function() {
-	return {
-		'helpers':[{'helper':ClickHandler,'options':{'app-keywords-remove-request':this.onRemoveRequestClick}}]
-	};
 };
 function Checkbox() {};
 Checkbox.prototype.onClick = function() {

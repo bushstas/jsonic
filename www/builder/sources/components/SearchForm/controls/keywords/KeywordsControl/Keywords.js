@@ -4,7 +4,8 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> app-keywords-add-request': this.addRequest
+			'->> app-keywords-add-request': this.addRequest,
+			'->> app-keywords-remove-request': this.onRemoveRequestClick
 		}
 	}
 ]
@@ -15,7 +16,7 @@ initial followers = {
 
 function setControlValue(value) {
 	$keywords = value['tags'];
-};
+}
 
 function onChange() {
 	==> TenderSearchFormChanged
@@ -23,12 +24,12 @@ function onChange() {
 
 function addRequest() {
 	$keywords.addOne([], 0);
-};
+}
 
 function removeRequest(index, isExact) {
 	var total = $keywordsCount;
 	$keywords.removeAt(isExact ? index : total - index - 1);
-};
+}
 
 function onKeywordsChange(kw) {
 	var kwlen = kw.length, tabs = [], i;
@@ -38,11 +39,10 @@ function onKeywordsChange(kw) {
 	$keywordsCount = kwlen,
 	$tabs = tabs,
 	$activeTab = kwlen - 1;
-	this.appendChild('tabs', kwlen > 1);
-	var markers = <.app-keywords-index[]>;
-	for (i = 0; i < markers.length; i++) {
-		this.fill(markers[i], {'index': kwlen - i});
-	}
+	this.appendChild('tabs', kwlen > 1);	
+	this.forChildren(KeywordsControl, function(child, i) {
+		child.set('index', kwlen - i);
+	});
 }
 
 function onSelectTab(index) {
@@ -57,4 +57,10 @@ function onTagEdit(tag) {
 
 function onTagEdited() {
 	Popuper.skipAll(false);
+}
+
+function onRemoveRequestClick(target) {
+	var block = target.getAncestor('.->> app-keywords-block');
+	var blocks = <.app-keywords-block[]>;
+	this.removeRequest(blocks.indexOf(block), true);
 }
