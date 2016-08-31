@@ -852,6 +852,7 @@
 			$functions = array();
 			$functionList = array();
 			$functionName = "__constructor";
+			$component['calledMethods'] = array();
 			for ($i = 1; $i < count($properParts); $i++) {				
 				$part = $properParts[$i];
 				if ($part == '{') {
@@ -863,7 +864,15 @@
 					$closing++;
 				}
 				if ($opening > 0 && $opening == $closing) {
-					$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => parseJsFunctionCode($temp));
+					$code = parseJsFunctionCode($temp);
+					preg_match_all('/\bthis\.(\w+)\(/', $code, $ms);
+					$ms = $ms[1];
+					if (!empty($ms)) {
+						foreach ($ms as $msi) {
+							$component['calledMethods'][] = array('method' => $functionName, 'called' => $msi);
+						}						
+					}
+					$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => $code);
 					$functionList[] = $functionName;
 					$nextPart = $properParts[$i + 1];
 					if (preg_replace("/[\s;]/", "", $nextPart) != "") {
@@ -1901,6 +1910,7 @@
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
 				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
 				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
+
 				$regexp = '/\{([^\}]*)\}/';
 				$hasClassVar = hasClassVar($propValue);
 				preg_match_all($regexp, $propValue, $matches);
@@ -2311,17 +2321,39 @@
 			if (preg_match('/\#\w/', $code)) {
 				error('Обнаружено использование контстанты данных <b>'.$code.'</b> внутри текстового нода в шаблоне класса <b>'.$component['name'].'</b><br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>');
 			}
-			preg_match_all('/^\s*\$([a-z][\w+\.\-]*)\s*$/i', $code, $matches);
-			$match = $matches[1][0];
-			if (!empty($match)) {
-				$parts = explode('.', $match);
-				if (count($parts) == 1) {
-					$code = "{'pr':'".$match."','p':\<this>g('".$match."')}";
-				} else {
-					$name = $parts[0];
-					array_shift($parts);
-					$code = "{'pr':'".$name."','p':\<this>g('".$name."',['".implode("','",$parts)."'])}";
+			if (preg_match('/\$\w/', $code)) {
+				$regexp = '/\$([a-z][\w+\.]*)/i';
+				preg_match_all($regexp, $code, $matches);
+				$matches = array_unique($matches[1]);
+				sort($matches);
+				$p = array();
+				$n = array();
+				foreach ($matches as $i => $match) {
+					$parts = explode('.', $match);
+					if (count($parts) > 1) {
+						$name = $parts[0];
+						$n[] = $name;
+						array_shift($parts);
+						$p[] = "\<this>g('".$name."',['".implode("','",$parts)."'])";
+					} else {
+						$n[] = $match;
+						$p[] = "\<this>g('".$match."')";
+					}
 				}
+				$parts = preg_split($regexp, $code);
+				$c = '';
+				foreach ($parts as $i => $part) {
+					$c .= $part;
+					if (isset($p[$i])) {
+						$c .= $p[$i];
+					}
+				}
+				if (count($n) > 1) {
+					$n = '<nq>'.json_encode($n).'<nq>';
+				} else {
+					$n = "'".$n[0]."'";
+				}
+				$code = "{'pr':".$n.",'p':".$c."}";
 			}
 		} else {
 			$regexp = '/\$([a-z][\w+\.\-]*)/i';
@@ -2352,6 +2384,7 @@
 	function checkTernary($code, $component) {
 		$originalCode = $code;
 		if (preg_match('/\?/', $code)) {
+			$originalCode = '('.trim(trim($originalCode, ')'), '(').')';
 			$strings = array();
 			$signs = array("'", '"');
 			for ($i = 0; $i < 2; $i++) {
@@ -2695,16 +2728,23 @@
 
 	function getComponentClassData() {
 		global $config;
+		global $componentLikeClassTypes;
 		$data = array();
-		$classes = array('Component', 'Control');
+		$classes = array('Component', 'Control', 'Application', 'Menu', 'View', 'Controller');
+		$cmps = array('Control', 'Application', 'Menu', 'View');
 		foreach ($classes as $class) {
+			$extends = array();
+			$isCmp = in_array($class, $cmps);
+			if ($isCmp) {
+				$extends[] = 'Component';
+			}
 			$pathToComponentClass = $config['sources'].'/components/'.$class.'.js';
 			if (!file_exists($pathToComponentClass)) {
 				error('Класс <b>'.$class.'</b> не найден по указанному пути <b>'.$pathToComponentClass.'</b>');
 			}
 			$content = file_get_contents($pathToComponentClass);
 			preg_match_all('/\b'.$class.'\.prototype\.(\w+)\s*=\s*function\s*\(/', $content, $matches);
-			$data[$class] = array('functionList' => $matches[1]);
+			$data[$class] = array('functionList' => $matches[1], 'extends' => $extends);
 		}
 		return $data;
 	}	
@@ -2721,6 +2761,16 @@
 			}
 		}
 		return $extends;
+	}
+
+	function getChildClasses($className, &$classes) {
+		global $classesList;
+		foreach ($classesList as $class => $data) {
+			if (is_array($data['extends']) && in_array($className, $data['extends'])) {
+				$classes[] = $class;
+				getChildClasses($class, $classes);
+			}
+		}
 	}
 
 ?>

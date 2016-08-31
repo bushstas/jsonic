@@ -1,16 +1,19 @@
 $imgsrc = ../images/mainpage
 
-.main-view-content {
+.main-view-content ==c {
 	$(rel width ma)
 }
-.main-view-content table {
+~c table {
 	$w100%
 }
-.app-mainpage-table > tr > td {
+.app-mainpage-table ==tb > tr > td {
 	$vtop
 }
-.app-mainpage-table .app-mainpage-left-column {
+~tb .app-mainpage-left-column {
 	$(w354 p12)
+}
+~tb .app-mainpage-content-column {
+    $(pt12 rel)
 }
 .app-mainpage-left-column-area {
 	$(rel mih180 br3 fs14 p49_20_12_20)
@@ -23,14 +26,11 @@ $imgsrc = ../images/mainpage
     $(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
-.mainpage-leftcolumn-title {
+.mainpage-leftcolumn-title ==t {
     $(mt27 fs16 c#4c546b pb7)
 }
-.mainpage-leftcolumn-title .app-tooltip {
+~t .app-tooltip {
     $fright
-}
-.app-mainpage-table .app-mainpage-content-column {
-    $(pt12 rel)
 }
 .app-mainpage-content {
     $(abs b12 t46 l r12 br3 ova p12_15 box)

@@ -297,6 +297,7 @@
 			$cache[$file['ext']][] = $content;
 			if ($file['ext'] == 'js') {
 				$content = preg_replace("/\/\*[\S\s]*?\*\//", "", $content);
+				$content = preg_replace("/\n\s*\/\/[^\n]*/", "\n", $content);
 				if ($file['name'] == 'config') {
 					if (!preg_match('/^\s*var +CONFIG *= *\{/', $content)) {
 						error("Файл конфигурации путей к api <b>config.js</b> должен иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>");
@@ -312,7 +313,8 @@
 				$templates[$file['name']] = preg_replace("/<\!--.*?-->/", "", $content);
 			} elseif ($file['ext'] == 'css') {
 				$cssData[] = $file;
-				$css[] =  '/* '.$file['name'].' */'.preg_replace("/\/\*[^\*]*\*\//", "", $content);
+				$css[] =  '/* '.$file['name'].' */
+				'.preg_replace("/\/\*[^\*]*\*\//", "", $content);
 			} elseif ($file['ext'] == 'texts') {
 				$texts[] = array('text' => $content, 'file' => $file['name']);
 			} elseif ($file['ext'] == 'data') {
@@ -373,6 +375,26 @@
 		// compiling CSS
 		if (!empty($css)) {
 			foreach ($css as $i => &$cssFile) {
+				$keys = array();
+				preg_match_all('/([~\.\#a-z\- \*]+) *==(\w+)/i', $cssFile, $matches);
+				for ($j = 0; $j < count($matches[1]); $j++) {
+					if (preg_match_all('/~(\w+)/', $matches[1][$j], $ms)) {
+						foreach ($ms[1] as $m) {
+							if (isset($keys[$m])) {
+								$matches[1][$j] = str_replace('~'.$m, trim($keys[$m]), $matches[1][$j]);
+							} else {
+								error('Ошибка при парсинге CSS файла <b>'.$cssData[$i]['name'].'</b>. Переменная <b>'.$matches[2][$j].'</b> содержит не определенную переменную <b>'.$m.'</b>, которая должна быть определена выше');
+							}
+						}
+					}
+					$keys[$matches[2][$j]] = $matches[1][$j];
+				}
+				
+				foreach ($keys as $k => $v) {
+					$cssFile = str_replace('~'.$k, trim($v), $cssFile);
+				}
+
+
 				$regexp = '/\$imgsrc\s*=\s*([^\s]+)/';
 				preg_match_all($regexp, $cssFile, $matches);
 				$pathsToImages = array();
@@ -456,6 +478,8 @@
 			$compiledCss = preg_replace('/\s0(px|%)/', " 0", $compiledCss);
 			$compiledCss = preg_replace('/:0(px|%)/', ":0", $compiledCss);
 			$compiledCss = preg_replace('/;{2,}/', ';', $compiledCss);
+			$compiledCss = preg_replace('/==\w+/', '', $compiledCss);
+			$compiledCss = preg_replace('/ {2,}/', ' ', $compiledCss);
 			$regexp = '/\$\w+/';
 			preg_match_all($regexp, $compiledCss, $matches);
 			$matches = $matches[0];
@@ -820,6 +844,25 @@
 						}
 					}
 				}
+				if (is_array($component['calledMethods'])) {
+					foreach ($component['calledMethods'] as $callback) {
+						if (!hasComponentMethod($callback['called'], $component)) {
+							$isError = true;
+							if (!in_array($component['name'], $usedComponents)) {
+								$childClasses = array();
+								getChildClasses($component['name'], $childClasses);
+								foreach ($childClasses as $chcls) {
+									if (hasComponentMethod($callback['called'], $classesList[$chcls])) {
+										$isError = false;
+										break;
+									}
+								}
+							}
+							if ($isError) error("Обработчик события <b>".$callback['called']."</b> не найден среди методов класса <b>".$component['name']."</b>");
+						}
+					}
+				}
+				
 			}
 		}
 

@@ -164,7 +164,7 @@ function Component() {
 		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
 	};
 
-	Component.prototype.dispatchEvent = function(eventType, eventParams) {console.log(eventType)
+	Component.prototype.dispatchEvent = function(eventType, eventParams) {
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];

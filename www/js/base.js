@@ -328,7 +328,7 @@ function Component() {
 	Component.prototype.instanceOf = function(parent) {
 		return this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(parent) > -1;
 	};
-	Component.prototype.dispatchEvent = function(eventType, eventParams) {console.log(eventType)
+	Component.prototype.dispatchEvent = function(eventType, eventParams) {
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];
@@ -856,7 +856,7 @@ function Control() {
 	Control.prototype.getProperValue = function(value) {
 		return value;
 	};
-	Control.prototype.setValue = function(value, fireChange) {console.log(this)
+	Control.prototype.setValue = function(value, fireChange) {
 		if (this.hasControls()) {
 			this.setControlsData(value);
 		} 
@@ -1290,6 +1290,7 @@ function Level() {
 	};
 	var createPropertyNode = function(props) {
 		var name = props['pr'];
+		if (isUndefined(props['p'])) props['p'] = '';
 		var node = document.createTextNode(props['p']);
 		appendChild(node);
 		propNodes = propNodes || {};
@@ -4414,7 +4415,7 @@ FilterSubscription.prototype.onSubscribeButtonClick = function(target,e) {
 	}
 };
 FilterSubscription.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':[__[114],' ',{'c':__[115],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[119],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[120],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[121],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[11],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+filter['isSubs']==1?__[51]+' subscribed':__[53]}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
+	return[{'c':[{'c':[__[114],' ',{'c':__[115],'t':20}],'t':0,'p':{'c':'app-subscription-title'}},{'c':[{'c':{'pr':'total','p':$.g('total')},'t':0,'p':{'c':'app-subscription-head-total'}},{'c':{'pr':'subscribed','p':$.g('subscribed')},'t':0,'p':{'c':'app-subscription-head-subscribed'}}],'t':0,'p':{'c':'app-subscription-head'}},{'c':[{'c':{'c':[{'c':__[119],'t':7,'p':{'c':'settings-filter-name'}},{'c':__[120],'t':7,'p':{'c':'settings-filter-freq'}},{'c':__[121],'t':7,'p':{'c':'settings-filter-subscrbttn'}},{'c':__T[1],'t':7,'p':{'c':'settings-filter-delete'}}],'t':5},'t':4},{'c':{'h':function(filter){return[{'c':[{'c':{'c':filter['header'],'t':1,'p':{'c':'settings-filter'}},'t':6},{'c':{'cmp':Select,'nm':'freqSubs','e':[14,$.onFreqChange],'p':{'p':{'options':__V[11],'value':filter['freqSubs']}}},'t':6},{'c':{'t':0,'p':{'c':'subscr-button '+(filter['isSubs']==1?__[51]+' subscribed':__[53])}},'t':6},{'c':__T[2],'t':6}],'t':5,'p':{'_filterid':filter['filterId'],'c':'app-subscription-filter-row'}}]},'p':$.g('filters'),'f':'filters'},'t':3}],'t':2,'p':{'c':'app-subscription-table','cp':'0px','cs':'0px'}}],'t':0,'p':{'c':'app-subscription','sc':1}}]
 };
 FilterSubscription.prototype.getInitials = function() {
 	return {
@@ -4716,7 +4717,6 @@ KeywordsControl.prototype.onFocus = function(isSwitched) {
 KeywordsControl.prototype.onRemoveRequestClick = function(target) {
 	var block=target.getAncestor('.app-keywords-block');
 	var blocks=this.findElements('.app-keywords-block');
-	this.removeRequest(blocks.indexOf(block),true);
 };
 KeywordsControl.prototype.onRecommendationsChange = function(count) {
 	this.set('hasRecomm',count>0);
@@ -5013,7 +5013,7 @@ SearchFormCrr.prototype.correct = function(params) {
 	};
 };
 function includeGeneralTemplateUnavailable(_) {
-	return[{'t':0,'p':{'c':'app-unavailable-info '+_['tariff']?'unavailable':'auth','st':(_['width']?'width:'+_['width']:'')}}]
+	return[{'t':0,'p':{'c':'app-unavailable-info '+(_['tariff']?'unavailable':'auth'),'st':(_['width']?'width:'+_['width']:'')}}]
 }
 function includeGeneralTemplateCheckbox(_) {
 	return[{'t':0,'p':{'c':'app-ui-checkbox'+(_['checked']?' checked':''),'_name':_['name'],'_value':_['value']}}]
@@ -5021,7 +5021,7 @@ function includeGeneralTemplateCheckbox(_) {
 function includeGeneralTemplateTooltip(_) {
 	return[{'t':0,'p':{'c':'tooltiped app-tooltip '+_['className'],'_text':_['text'],'_key':_['key'],'_class':_['class'],'_caption':_['caption']}}]
 }
-Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,FiltersForm,SearchFormFilters,AutoComplete,Calendar,Dialog,Editor,Form,PopupMenu,PopupSelect,Recommendations,TabPanel,Tabs,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo,FormField,Submit],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],FiltersForm,[TenderSearchForm],AutoComplete,[KeywordsAutoComplete],Calendar,[FavoritesCalendar],Editor,[KeywordTagEditor],Controller,[Favorites,Filters,FiltersStat,RecommendationsLoader,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Keywords,KeywordsControl,Checkbox,Input,Select,Tags,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu],Tags,[KeywordTags],KeywordTags,[ContainKeywordTags,ExcludeKeywordTags]]);
+Initialization.inherits([Core,[Component,Foreach,Condition],Component,[Application,View,Form,Control,Menu,Control,Application,Menu,View,DataTable,DataTableFragmets,DataTableRow,FilterStatistics,SearchForm,SearchFormButton,SearchFormPanel,FiltersForm,SearchFormFilters,AutoComplete,Calendar,Dialog,Editor,Form,PopupMenu,PopupSelect,Recommendations,TabPanel,Tabs,TooltipPopup,FilterSubscription,FilterSubscriptionOptions,UserInfo,FormField,Submit],Foreach,[Switch,IfSwitch],Application,[App],View,[Analytics,Error401,Error404,Favorite,Main,Search],DataTableRow,[DataTableStandartRow],DataTable,[TendersDataTable],SearchFormButton,[SearchFormPanelButton],SearchFormPanelButton,[KeywordsButton],SearchFormPanel,[KeywordsPanel],FiltersForm,[TenderSearchForm],AutoComplete,[KeywordsAutoComplete],Calendar,[FavoritesCalendar],Editor,[KeywordTagEditor],Controller,[Favorites,Filters,FiltersStat,RecommendationsLoader,Subscription,UserInfoLoader],Dialog,[CalendarFavorites,FilterEdit,OrderCall,Support],Form,[AuthForm,OrderCallForm],OrderCallForm,[SupportForm],Control,[Keywords,KeywordsControl,Checkbox,Input,Select,Tags,Textarea],Menu,[TopMenu],TabPanel,[DataTableTabPanel],PopupMenu,[SearchFormCreateFilterMenu,SearchFormFilterMenu],Tags,[KeywordTags],KeywordTags,[ContainKeywordTags,ExcludeKeywordTags]]);
 Router = new Router();
 User = new User();
 Favorites = new Favorites();

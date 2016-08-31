@@ -335,7 +335,7 @@ contexts:
             1: comment2.block.actionscript.2
             2: variable.parameter.function.actionscript.2
 
-        - match: ' +(\?|:) +'
+        - match: '([\?:&])'
           captures:
             0: comment2.block.actionscript.2
 
@@ -375,7 +375,7 @@ contexts:
           captures:         
             1: constant.language.actionscript.2
 
-        - match: ([\$&@\#~]\w+|\.\w+)
+        - match: ([\^\$&~\.@\#:]\w+)
           captures:
             0: support.class.actionscript.2
 

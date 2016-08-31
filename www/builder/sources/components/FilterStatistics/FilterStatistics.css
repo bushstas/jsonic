@@ -9,33 +9,33 @@ $imgsrc = ../images/filterstat
 .app-filter-stat-refresh:hover {
 	$c#5c6ea0
 }
-.app-filter-stat-head th {
+.app-filter-stat-row ==r {
+	$(nowrap p12_0 bob#E0E6F3)
+}
+.app-filter-stat-head ==h th {
 	$(c#4c546b fs14 normal left p10_0 bob#E0E6F3 w12% box)
 }
-.app-filter-stat-row span:nth-child(1),
-.app-filter-stat-head th:nth-child(1) {
+~r span:nth-child(1),
+~h th:nth-child(1) {
     $(pl19 pr20 w40% wrap)
 }
-.app-filter-stat-row span:nth-child(2),
-.app-filter-stat-row span:nth-child(3),
-.app-filter-stat-head th:nth-child(2),
-.app-filter-stat-head th:nth-child(3) {
+~r span:nth-child(2),
+~r span:nth-child(3),
+~h th:nth-child(2),
+~h th:nth-child(3) {
     $c#3EB562
 }
-.app-filter-stat-row span:nth-child(4),
+~r span:nth-child(4),
 .app-filter-stat-head th:nth-child(4) {
 	$pl10
 }
-.app-filter-stat-row {
-	$(nowrap p12_0 bob#E0E6F3)
-}
-.app-filter-stat-row span {
+~r span {
 	$(inb w12% box bold)
 }
-.app-filter-stat-row span:nth-child(1) {
+~r span:nth-child(1) {
 	$(pointer regular)
 }
-.app-filter-stat-row span:nth-child(1):hover {
+~r span:nth-child(1):hover {
 	$c#6484ca
 }
 .app-filter-stat-content {

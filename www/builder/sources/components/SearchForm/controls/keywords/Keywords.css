@@ -1,77 +1,77 @@
 $imgsrc = ../images/searchform
 $imgsrc = ../images/ui
 
-.app-keywords-options {
+.app-keywords-options ==o {
 	$(nowrap pl5 bob#e0e4eb h34 rel)
 }
-.app-keywords-options .bold {
+~o .bold {
 	$(inb vmid)
 }
-.app-keywords-options .app-select {
+~o .app-select {
 	$(w200 inb vmid regular ml12)
 }
-.app-keywords-options .app-checkbox-label {
+~o .app-checkbox-label {
 	$(vmid ml10 pr10)
 }
-.app-keywords-options .app-ui-checkbox {
+~o .app-ui-checkbox {
 	$(mt2)
 }
-.app-keywords-add-request {
-	$(abs r35 t7)
-}
-.app-keywords-add-request span {
-	$(inb pl14 png=plusreq bp0_50% norep pointer c#5e79a3)
-}
-.app-keywords-add-request span:hover {
-	$c#49658f
-}
-.app-keywords-options .keywords-hint {
+~o .keywords-hint {
 	$(abs r2 t8)
 }
-.app-keywords-area {
+.app-keywords-add-request ==r {
+	$(abs r35 t7)
+}
+~r span {
+	$(inb pl14 png=plusreq bp0_50% norep pointer c#5e79a3)
+}
+~r span:hover {
+	$c#49658f
+}
+.app-keywords-area ==a {
 	$(abs t100 l r b4 ova p0_15 z1)
 }
-.app-keywords-area.multi {
+~a.multi {
 	$t132
 }
-.app-keywords-block {
+.app-keywords-block ==b {
 	$(rel z1 mt20 h97% mih500)
 }
-.app-keywords-block:first-child {
+~b:first-child {
 	$mt0
 }
 .app-keywords-left {
 	$(abs t l b r33% z2)
 }
-.app-keywords-block.switched .app-keywords-left {
+~b.switched .app-keywords-left {
 	$r68.5%
 }
 .app-keywords-right {
 	$(abs t l68.5% b r z1)	
 }
-.app-keywords-block.switched .app-keywords-right {
+~b.switched .app-keywords-right {
 	$l33%
 }
 .app-keywords-tags-title {
 	$(bold c#3B4452 fs16 lh16)
 }
-.app-keywords-area .app-tags-container {
+~a .app-tags-container {
 	$(abs mih0 nomaxh ha t22 l r b)
 }
-.app-keywords-area .app-keywords-block.with-recommendations:not(.switched) .app-tags-container {
+~a ~b.with-recommendations:not(.switched) .app-tags-container {
 	$b50%
 }
-.app-keywords-area .app-tags-content {
+~a .app-tags-content {
 	$t75
 }
 .app-tags-top {
-	$(h16 nowrap p2_0_2_0 rel z2)
+	$(h16 nowrap p2_0_2_0 rel z12)
 }
 .app-tags-top-buttons {
 	$(fright fs12)
 }
-.app-keywords-block.switched .app-keywords-left .app-tags-top-buttons,
-.app-keywords-block:not(.switched) .app-keywords-right .app-tags-top-buttons {
+~b.switched .app-keywords-left .app-tags-top-buttons,
+~b:not(.switched) .app-keywords-right .app-tags-top-buttons {
 	$none
 }
 .app-tags-top-buttons-item {
@@ -95,7 +95,7 @@ $imgsrc = ../images/ui
 .app-keywords-index {
 	$(c#a1a1a1 fs14 regular none ml10)
 }
-.app-keywords-area.multi .app-keywords-index {
+~a.multi .app-keywords-index {
 	$inb
 }
 .app-keywords-remove-request {
@@ -110,12 +110,12 @@ $imgsrc = ../images/ui
 .app-tags-select-button:hover {
 	$(c#444c61)
 }
-.app-keywords-block .app-recommendations {
+~b .app-recommendations {
 	$(abs l r-327 t50% b none)
 }
-.app-keywords-block.with-recommendations .app-recommendations {
+~b.with-recommendations .app-recommendations {
 	$block
 }
-.app-keywords-block.switched .app-recommendations {
+~b.switched .app-recommendations {
 	display: none !important;
 }

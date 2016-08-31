@@ -43,6 +43,7 @@ function Level() {
 
 	var createPropertyNode = function(props) {
 		var name = props['pr'];
+		if (isUndefined(props['p'])) props['p'] = '';
 		var node = document.createTextNode(props['p']);
 		appendChild(node);
 		propNodes = propNodes || {};

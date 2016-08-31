@@ -55,7 +55,7 @@ function Control() {
 		return value;
 	};
 
-	Control.prototype.setValue = function(value, fireChange) {console.log(this)
+	Control.prototype.setValue = function(value, fireChange) {
 		if (this.hasControls()) {
 			this.setControlsData(value);
 		} 

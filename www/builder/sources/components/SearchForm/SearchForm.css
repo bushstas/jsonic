@@ -1,64 +1,76 @@
 $imgsrc = ../images/searchform
 
-.app-search-form {
+.app-search-form ==f {
 	$(abs z2 t7 l-300 b7 w330 br4 c#222121 bc#444b57)
 }
-.view-content.form-expanded .app-search-form {
+.view-content.form-expanded ~f {
     $l7
 }
-.app-search-form-title {
+
+
+.app-search-form-title ==t {
     $(h37 lh39 pl31 bold fs14 box c#edf0f4 bob#3e4552 br4_4_0_0 gr_bottom_#647188_#4d5768)
 }
-.app-search-form-title:before {
+~t:before {
     $(cnt inb w11 h11 mr8 png = search)
 }
-.app-search-form-close-side {
+
+
+.app-search-form-close-side ==s {
     $(abs noimg t r b pointer w30 z25 bc#6279A7 br0_3_3_0 ha)
 }
-.app-search-form-close-side:hover {
+~s:hover {
     $bc#6E88BD
 }
-.app-search-form-close-side:after {
+~s:after {
     content: 'Расширенный поиск';
     $(rot-90 fs16 white lh20 abs r-83 t90 w200 bold)
 }
-.view-content.form-expanded .app-search-form-close-side {
+.view-content.form-expanded ~s {
     $none
 }
-.app-search-form-close {
+
+
+.app-search-form-close ==c {
     $(rot180 block abs r t7 norep pointer z26 wh23 png = close bp100%_50%)
     transition: all 0.2s ease-out;
 }
-.view-content.form-expanded .app-search-form-close {
+.view-content.form-expanded ~c {
     $rot0 $r10
 }
-.app-search-form-reset {
+
+
+.app-search-form-reset ==a {
     $(abs r34 t5 pl22 lh16 h25 w0 fs14 bold norep pointer nowrap z10 png = clear c#5c606a bp100%_50%)
 }
-.app-search-form-reset .hover-label {
+~a .hover-label {
     $(none abs white r lh36 t50% mt-18 bc#D35655 p0_10_0_11)
 }
-.app-search-form-reset:hover .hover-label {
+~a:hover .hover-label {
     $block
 }
-.app-search-form-reset.active .hover-label {
-    $none
-}
-.app-search-form-reset.active {
-    $(w134 h36 t bc#D35655)
-}
-.app-search-form-reset .confirm-label {
+~a .confirm-label {
     $(none nowrap white right lh36)
 }
-.app-search-form-reset .confirm-reset-filter {
+~a .confirm-reset-filter {
     $ml15
 }
-.app-search-form-reset.active .confirm-label {
+
+
+~a.active ==b {
+    $(w134 h36 t bc#D35655)
+}
+~b .hover-label {
+    $none
+}
+~b .confirm-label {
     $block
 }
-.app-search-form-reset.active .confirm-reset-filter {
+~b .confirm-reset-filter {
     $(lh36 pointer bc#B35050 p9_15)
 }
+
+
 .app-tender-search-form-content {
     $(abs l r b t130)
 }
