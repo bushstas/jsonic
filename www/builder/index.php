@@ -63,7 +63,8 @@
 			<option value="corrector">классам корректорам</option>
 		</select>
 	</form>
-	<form class="testform" metod="GET" target="iframe" action="test.php">
+	<form class="testform" metod="GET" target="iframe" action="build.php">
+		<input type="hidden" name="istest" value="1"/>
 		<input name="submit" type="submit" value="Запустить тест" style="padding: 5px 10px;">
 	</form>
 	<form metod="GET" target="iframe" action="build.php">
@@ -84,7 +85,7 @@
 			<label>
 				<input type="checkbox" vlaue="1" name="obfuscate"> 
 				Обфускация css классов
-			</label>			
+			</label>
 		</div>
 	</form>
 </body>

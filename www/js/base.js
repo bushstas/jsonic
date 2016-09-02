@@ -4468,14 +4468,6 @@ UserInfo.prototype.getInitials = function() {
 		'loader':{'controller':UserInfoLoader,'async':true }
 	};
 };
-function FormField() {};
-FormField.prototype.getTemplateMain = function(_,$) {
-	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'p':_['controlProps']}}],'t':0,'p':{'c':'app-input-container'+(_['class']?' '+_['class']:''),'sc':1}}]
-};
-function Submit() {};
-Submit.prototype.getTemplateMain = function(_,$) {
-	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,'submit'],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
-};
 function Favorites() {};
 Favorites.prototype.getInitials = function() {
 	return {
@@ -5016,6 +5008,14 @@ SearchFormCrr.prototype.correct = function(params) {
 			'tags':tags
 		}
 	};
+};
+function FormField() {};
+FormField.prototype.getTemplateMain = function(_,$) {
+	return[{'c':[{'c':!!_['caption']?[{'c':_['caption'],'t':0,'p':{'c':'app-input-caption'}}]:'','i':true},{'cmp':_['controlClass'],'nm':_['controlProps']['name'],'p':{'p':_['controlProps']}}],'t':0,'p':{'c':'app-input-container'+(_['class']?' '+_['class']:''),'sc':1}}]
+};
+function Submit() {};
+Submit.prototype.getTemplateMain = function(_,$) {
+	return[{'c':{'c':{'pr':'value','p':$.g('value')},'t':0,'e':[0,'submit'],'p':{'c':function(){return $.g('class')}},'n':{'c':'class'}},'t':0,'p':{'c':'app-submit-container'}}]
 };
 function includeGeneralTemplateUnavailable(_) {
 	return[{'t':0,'p':{'c':'app-unavailable-info '+(_['tariff']?'unavailable':'auth'),'st':(_['width']?'width:'+_['width']:'')}}]

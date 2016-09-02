@@ -3,6 +3,7 @@
 		$advancedMode = !empty($_GET['advanced']);
 		$create = !empty($_GET['create']);
 		$obfuscate = !empty($_GET['obfuscate']);
+		$isTest = !empty($_GET['istest']);
 		include_once 'functions.php';
 	
 		define('CONFIG_FILENAME', 'config.json');
@@ -46,8 +47,8 @@
 
 		$cssFolder = $config['cssFolder'];
 		$jsFolder = $config['jsFolder'];
-		$compiledCss = $config['compiledCss'];
-		$compiledJs = $config['compiledJs'];		
+		$compiledCssFileName = $config['compiledCss'];
+		$compiledJsFileName = $config['compiledJs'];		
 		$pathToIndexFile = $config['indexPage'];
 		if (empty($cssFolder)) {
 			$cssFolder = DEFAULT_CSS_FOLDER;
@@ -55,17 +56,22 @@
 		if (empty($cssFolder)) {
 			$jsFolder = DEFAULT_JS_FOLDER;
 		}
-		if (empty($compiledCss)) {
-			$compiledCss = DEFAULT_CSS_COMPILED;
+		if (empty($compiledCssFileName)) {
+			$compiledCssFileName = DEFAULT_CSS_COMPILED;
 		}
-		if (empty($compiledJs)) {
-			$compiledJs = DEFAULT_JS_COMPILED;
+		if (empty($compiledJsFileName)) {
+			$compiledJsFileName = DEFAULT_JS_COMPILED;
 		}
 		if (empty($pathToIndexFile)) {
 			$pathToIndexFile = DEFAULT_PAGE;
 		}
-		$pathToCompiledCss = $cssFolder.'/'.$compiledCss.'.css';
-		$pathToCompiledJs = $jsFolder.'/'.$compiledJs.'.js';
+		$pathToCompiledCss = $cssFolder.'/'.$compiledCssFileName.'.css';
+		if (!$isTest) {
+			$pathToCompiledJs = $jsFolder.'/'.$compiledJsFileName.'.js';
+		} else {
+			$pathToIndexFile = 'test_'.$pathToIndexFile;
+			$pathToCompiledJs = $jsFolder.'/test_'.$compiledJsFileName.'.js';
+		}
 
 		$pageTitle = $config['title'];
 		if (empty($pageTitle)) {
@@ -190,7 +196,24 @@
 				$errorViews[$errorCode] = $router[$errorCode];
 				$errorRoutes[$errorCode] = $router[$errorCode];
 			}
-		}		
+		}
+		if (!empty($isTest)) {
+			if (empty($config['tests'])) {
+				error("\nПараметр конфигурации <b>tests</b>, содержащий путь к тестам не указан.");
+			}
+			if (!is_string($config['tests'])) {
+				error("\nПараметр конфигурации <b>tests</b> присутствует, но не является строкой.");
+			}
+			if (!is_dir($config['tests'])) {
+				error("\nДиректория, указанная в параметре конфигурации <b>tests</b> не найдена.");
+			}
+			$tests = array();
+			gatherTests($config['tests'], $tests);
+			if (empty($tests)) {
+				error("\nВ директории с тестами, указанной в параметре конфигурации <b>tests</b>, нет соответствующих файлов со скриптами тестов.<br>Файлы должны иметь расширение <b>JS</b> и содержать код следующего вида:<xmp>test before gotData {\n\tif (!isObject(data)) error('error text');\n}</xmp><xmp>test after onRendered {\n\tif (!this.has('name')) error('error text');\n}</xmp>Для подробной информации по тестам, смотрите соответствующую подсказку");
+			}
+			parseTests($tests);
+		}
 
 		if (!empty($create)) {
 			$defaultViewCode = '';
@@ -806,65 +829,97 @@
 			}
 		}
 
-	
-		$types = array_keys($classes);
-		foreach ($types as $type) {
-			foreach ($classes[$type] as $className => &$component) {
-				if (is_array($component['functions'])) {
-					foreach ($component['functions'] as $func) {
-						$constructorCode = '';
-						$args = !empty($func['args']) ? $func['args'] : '';
-						if ($func['name'] != '__constructor') {						
-							addPrototypeFunction($compiledJs, $className, $func['name'], $args, $func['code']);
-						} else {
-							addConstructorFunction($compiledJs, $className, isComponent($type));
-						}						
+		if (is_array($tests)) {
+			foreach ($tests as $cls => $test) {
+				if (is_array($test['functions']) && !empty($test['functions'])) {
+					if (!isset($classesList[$cls])) {
+						error('Класс <b>'.$cls.'</b>, который необходимо протестировать, не существует');
 					}
-				}
-				if (!empty($templates[$className])) {
-					addTemplateFunction($compiledJs, $className, $templates[$className], $component);
-					if (!empty($component['tmpCallbacks'])) {
-						foreach ($component['tmpCallbacks'] as $callback) {
-							if (!hasComponentMethod($callback, $component)) {
-								error("Ошибка вызова метода <b>".$callback."</b> класса <b>".$component['name']."</b> из его шаблона. Метод не найден");
+					$funcs = $classesList[$cls]['functionList'];
+					if (!is_array($funcs)) $funcs = array();
+					foreach ($test['functions'] as $funcName => $testFunc) {
+						if (!hasComponentMethod($funcName, $classesList[$cls])) {
+						 	error("Метод <b>".$funcName."</b> класса <b>".$cls."</b>, который необходимо протестировать, не существует");
+						}
+						if (!in_array($funcName, $funcs)) {
+							$parentName = '';
+							$args = '';
+							getParentalFunction($funcName, $classesList[$cls], $parentName, $args);
+							if (empty($parentName)) {
+								error("Метод <b>".$funcName."</b> класса <b>".$cls."</b>, который необходимо протестировать, не существует");
 							}
-						}
-					}
-				}
-				if (!empty($component['initials'])) {
-					addGetInitialsFunction($compiledJs, $className, $component['initials']);
-				}
-				if ($type == 'view') {
-					addLoadControllerFunction($compiledJs, $className);
-				}
-				if (is_array($component['callbacks'])) {
-					foreach ($component['callbacks'] as $callback) {
-						if (!hasComponentMethod($callback, $component)) {
-							error("Обработчик события <b>".$callback."</b> не найден среди методов класса <b>".$component['name']."</b>");
-						}
-					}
-				}
-				if (is_array($component['calledMethods'])) {
-					foreach ($component['calledMethods'] as $callback) {
-						if (!hasComponentMethod($callback['called'], $component)) {
-							$isError = true;
-							if (!in_array($component['name'], $usedComponents)) {
-								$childClasses = array();
-								getChildClasses($component['name'], $childClasses);
-								foreach ($childClasses as $chcls) {
-									if (hasComponentMethod($callback['called'], $classesList[$chcls])) {
-										$isError = false;
-										break;
-									}
-								}
+							$code = "\t".$parentName.".prototype.".$funcName.".call(this".(!empty($args) ? ','.$args : '').');';
+							if (!empty($testFunc['before'])) {
+								$code = $testFunc['before']."\n".$code;
 							}
-							if ($isError) error("Обработчик события <b>".$callback['called']."</b> не найден среди методов класса <b>".$component['name']."</b>");
+							if (!empty($testFunc['after'])) {
+								$code .= "\n".$testFunc['after'];
+							}
+							addFunctionToClass($cls, $funcName, $code, $args);
 						}
 					}
 				}
-				
 			}
 		}
+	
+
+		foreach ($classesList as $className => &$component) {
+			$type = $component['type'];
+			if (is_array($component['functions'])) {
+				foreach ($component['functions'] as $func) {
+					$constructorCode = '';
+					$args = !empty($func['args']) ? $func['args'] : '';
+					if ($func['name'] != '__constructor') {						
+						addPrototypeFunction($compiledJs, $className, $func['name'], $args, $func['code']);
+					} else {
+						addConstructorFunction($compiledJs, $className, isComponent($type));
+					}						
+				}
+			}
+			if (!empty($templates[$className])) {
+				addTemplateFunction($compiledJs, $className, $templates[$className], $component);
+				if (!empty($component['tmpCallbacks'])) {
+					foreach ($component['tmpCallbacks'] as $callback) {
+						if (!hasComponentMethod($callback, $component)) {
+							error("Ошибка вызова метода <b>".$callback."</b> класса <b>".$component['name']."</b> из его шаблона. Метод не найден");
+						}
+					}
+				}
+			}
+			if (!empty($component['initials'])) {
+				addGetInitialsFunction($compiledJs, $className, $component['initials']);
+			}
+			if ($type == 'view') {
+				addLoadControllerFunction($compiledJs, $className);
+			}
+			if (is_array($component['callbacks'])) {
+				foreach ($component['callbacks'] as $callback) {
+					if (!hasComponentMethod($callback, $component)) {
+						error("Обработчик события <b>".$callback."</b> не найден среди методов класса <b>".$component['name']."</b>");
+					}
+				}
+			}
+			if (is_array($component['calledMethods'])) {
+				foreach ($component['calledMethods'] as $callback) {
+					if (!hasComponentMethod($callback['called'], $component)) {
+						$isError = true;
+						if (!in_array($component['name'], $usedComponents)) {
+							$childClasses = array();
+							getChildClasses($component['name'], $childClasses);
+							foreach ($childClasses as $chcls) {
+								if (hasComponentMethod($callback['called'], $classesList[$chcls])) {
+									$isError = false;
+									break;
+								}
+							}
+						}
+						if ($isError) error("Обработчик события <b>".$callback['called']."</b> не найден среди методов класса <b>".$component['name']."</b>");
+					}
+				}
+			}
+			
+		}
+
 
 		foreach ($includes as $incl) {
 			addGeneralTemplateFunction($compiledJs, $incl['content'], $incl['path']);
@@ -1015,6 +1070,7 @@
 			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
 			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);
 		}
+		$jsfilename = 
 		$compiledJs = preg_replace('/\{\s+\}/', '{}', $compiledJs);
 		if ($advancedMode) {
 			createFile('base.js', $compiledJs);			
@@ -1065,5 +1121,8 @@
 			generateTree($routes, $pathToIndexFile, $indexFileContent);
 		}
 
+		if ($isTest) {
+			die('<script>window.location.href = "http://'.$_SERVER['HTTP_HOST'].'/test_index.html"</script>');
+		}
 		include_once 'footer.php';
 	?>

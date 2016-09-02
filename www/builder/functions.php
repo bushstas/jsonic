@@ -81,16 +81,25 @@
 	}
 
 	function gatherFiles($dir, $list, $getContent = false) {
+		global $config;
+		$scriptsPath = preg_replace('/^\.\//', '', $config['scripts']);
+		$testsPath = preg_replace('/^\.\//', '', $config['tests']);
 		$extensions = array('js', 'css', 'template', 'texts', 'data', 'cssconst', 'include', 'decl');
 		if (is_dir($dir)) {
 			$files = scandir($dir);
 			if (is_array($files)) {
 				foreach ($files as $file) {
+					if ($file == '..' || $file == '.') continue;
 					$path = $dir."/".$file;
-					if (is_dir($path)) {
-						if ($file != '..' && $file != '.') {
-							$list = gatherFiles($path, $list, $getContent);
+					if (is_dir($path)) {						
+						$cleanPath = preg_replace('/^\.\//', '', $path);
+						if ($cleanPath == $testsPath) {
+							error('Директория с тестами указанная в файле конфигурации <b>'.$config['tests'].'</b> должна располагаться вне директории с исходными кодами <b>'.$config['scope'].'</b>');
 						}
+						if ($cleanPath == $scriptsPath) {
+							error('Директория со сторонними скриптами указанная в файле конфигурации <b>'.$config['scripts'].'</b> должна располагаться вне директории с исходными кодами <b>'.$config['scope'].'</b>');
+						}
+						$list = gatherFiles($path, $list, $getContent);
 					} elseif (file_exists($path)) {
 						$path_info = pathinfo($path);
 						$ext = strtolower($path_info['extension']);
@@ -2743,8 +2752,8 @@
 				error('Класс <b>'.$class.'</b> не найден по указанному пути <b>'.$pathToComponentClass.'</b>');
 			}
 			$content = file_get_contents($pathToComponentClass);
-			preg_match_all('/\b'.$class.'\.prototype\.(\w+)\s*=\s*function\s*\(/', $content, $matches);
-			$data[$class] = array('functionList' => $matches[1], 'extends' => $extends);
+			preg_match_all('/\b'.$class.'\.prototype\.(\w+)\s*=\s*function\s*\(([^\)]*)\)/', $content, $matches);
+			$data[$class] = array('functionList' => $matches[1], 'extends' => $extends, 'args' => $matches[2]);
 		}
 		return $data;
 	}	
@@ -2773,4 +2782,131 @@
 		}
 	}
 
+	function gatherTests($dir, &$tests) {
+		$extensions = array('js');
+		$files = scandir($dir);
+		if (is_array($files)) {
+			foreach ($files as $file) {
+				if ($file == '..' || $file == '.') continue;
+				$path = $dir."/".$file;
+				if (is_dir($path)) {
+					$tests = gatherTests($path, $tests);
+				} elseif (file_exists($path)) {
+					$path_info = pathinfo($path);
+					$ext = strtolower($path_info['extension']);
+    				if (array_search($ext, $extensions) !== false) {
+						$data = array('class' => $path_info['filename'], 'content' => file_get_contents($path));
+						$tests[] = $data;
+					}
+				}
+			}
+		}
+		return $tests;
+	}
+
+	function parseTests(&$tests) {
+		$regexp = '/(--)*\s*\btest +(after|before) +(\w+)\s*\{/';
+		foreach ($tests as &$test) {
+			$names = array();
+			$codes = array();
+			$locs = array();
+			$funcs = array();
+			preg_match_all($regexp, $test['content'], $matches);
+			$parts = preg_split($regexp, $test['content']);
+			foreach ($parts as $i => $part) {
+				$part = trim($part);
+				$pureCode = preg_replace('/\s/', '', $part);
+				if ($i == 0) {
+					if (strtolower($pureCode) == 'exit') {
+						break;
+					}
+					if ($pureCode != '') {
+						error('Ошибка в файле теста класса <b>'.$test['class'].'</b>. Некорректный код в начале файла');
+					}
+					continue;
+				}
+				$off = !empty($matches[1][$i - 1]);
+				if ($off) continue;
+				$match = $matches[3][$i - 1];
+				$loc = $matches[2][$i - 1];
+				if ($pureCode != '') {
+					$isExit = preg_match('/exit$/i', $part);
+					if (!preg_match('/\}$/', $part) && !$isExit) {
+						error('Ошибка в файле теста класса <b>'.$test['name'].'</b>. Некорректный код после функции <b>test '.$loc.' '.$match.'</b>');
+					}
+				}
+				$names[] = $loc.' '.$match;
+				$codes[] = parseTestFunctionCode(trim($part, '}'));
+				$locs[] = $loc;
+				$funcs[] = $match;
+				if ($isExit) {
+					break;
+				}
+			}
+			unset($test['content']);
+			if (!empty($names)) {
+				$test['functions'] = array();
+				foreach ($codes as $j => $code) {
+					$test['functions'][] = array('name' => $funcs[$j], 'loc' => $locs[$j], 'code' => $code);
+				}
+			}
+		}
+		$properTests = array();
+		foreach ($tests as $test) {
+			$properFuncs = array();
+			foreach ($test['functions'] as $f) {
+				if (!is_array($properFuncs[$f['name']])) {
+					$properFuncs[$f['name']] = array();
+				}
+				if ($f['loc'] == 'before') {
+					$properFuncs[$f['name']]['before'] = $f['code'];
+				} elseif ($f['loc'] == 'after') {
+					$properFuncs[$f['name']]['after'] = $f['code'];
+				}
+			}
+			$test['functions'] = $properFuncs;
+			$properTests[$test['class']] = $test;
+		}
+		$tests = $properTests;
+	}
+
+	function parseTestFunctionCode($code) {
+		$code = preg_replace('/\n/', ';', $code);
+		$code = preg_replace('/;\s*;/', ';', $code);
+		$parts = explode(';', $code);
+		foreach ($parts as &$part) {
+			$part = "\t".trim($part);
+		}
+		return implode(";\n", $parts);
+	}
+
+	function getParentalFunction($funcName, $component, &$parentName, &$args) {
+		global $classesList;
+		$superClass = getSuperClassWithMethod($funcName, $component, '');
+		if (!empty($superClass) && isset($classesList[$superClass])) {
+			if (is_array($classesList[$superClass]['functions'])) {
+				foreach ($classesList[$superClass]['functions'] as $f) {
+					if ($f['name'] == $funcName) {
+						$args = $f['args'];
+						break;
+					}
+				}
+			} elseif (is_array($classesList[$superClass]['functionList']) && is_array($classesList[$superClass]['args'])) {
+				$idx = array_search($funcName, $classesList[$superClass]['functionList']);
+				if ($idx !== false) $args = $classesList[$superClass]['args'][$idx];
+			}
+			$parentName = $superClass;
+		}
+	}
+
+	function addFunctionToClass($className, $funcName, $code, $args) {
+		global $classesList;
+		$classesList[$className]['functions'][] = array(
+			'name' => $funcName,
+			'code' => $code,
+			'args' => $args
+		);
+		$classesList[$className]['functionList'][] = $funcName;
+	}
+ 
 ?>
