@@ -2854,6 +2854,7 @@
 		$properTests = array();
 		foreach ($tests as $test) {
 			$properFuncs = array();
+			if (!is_array($test['functions'])) continue;
 			foreach ($test['functions'] as $f) {
 				if (!is_array($properFuncs[$f['name']])) {
 					$properFuncs[$f['name']] = array();
@@ -2907,6 +2908,21 @@
 			'args' => $args
 		);
 		$classesList[$className]['functionList'][] = $funcName;
+	}
+
+	function addCodeToFunction($className, $funcName, $testFunc) {
+		global $classesList;
+		$class = &$classesList[$className];
+		foreach ($class['functions'] as &$f) {
+			if ($f['name'] == $funcName) {
+				if (!empty($testFunc['before'])) {
+					$f['code'] = $testFunc['before'].$f['code'];
+				}
+				if (!empty($testFunc['after'])) {
+					$f['code'] .= $testFunc['after'];
+				}
+			}
+		}
 	}
  
 ?>

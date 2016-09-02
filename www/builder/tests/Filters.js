@@ -1,7 +1,10 @@
-test after subscribe {
+
+test after onLoadFilters {
 	console.log('subscribe function tested')
+	this.findElement('.->> aaa');
+	--> fuck
 }
 
-test before unsubscribe {
-	console.log('unsubscribe function tested')
+test before onSubscribe {
+	console.log('onSubscribe function tested')
 }

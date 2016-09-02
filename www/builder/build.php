@@ -197,7 +197,7 @@
 				$errorRoutes[$errorCode] = $router[$errorCode];
 			}
 		}
-		if (!empty($isTest)) {
+		if ($isTest) {
 			if (empty($config['tests'])) {
 				error("\nПараметр конфигурации <b>tests</b>, содержащий путь к тестам не указан.");
 			}
@@ -209,10 +209,12 @@
 			}
 			$tests = array();
 			gatherTests($config['tests'], $tests);
-			if (empty($tests)) {
-				error("\nВ директории с тестами, указанной в параметре конфигурации <b>tests</b>, нет соответствующих файлов со скриптами тестов.<br>Файлы должны иметь расширение <b>JS</b> и содержать код следующего вида:<xmp>test before gotData {\n\tif (!isObject(data)) error('error text');\n}</xmp><xmp>test after onRendered {\n\tif (!this.has('name')) error('error text');\n}</xmp>Для подробной информации по тестам, смотрите соответствующую подсказку");
-			}
+			$error = "В директории с тестами, указанной в параметре конфигурации <b>tests</b>, нет соответствующих файлов со скриптами тестов.<br>Файлы должны иметь расширение <b>JS</b> и содержать код следующего вида:<xmp>test before gotData {\n\tif (!isObject(data)) error('error text');\n}</xmp><xmp>test after onRendered {\n\tif (!this.has('name')) error('error text');\n}</xmp>Для подробной информации по тестам, смотрите соответствующую подсказку";
+			if (empty($tests)) error($error);
 			parseTests($tests);
+			if (empty($tests)) {
+				error("Не найдено ни одного активного теста");
+			}
 		}
 
 		if (!empty($create)) {
@@ -829,7 +831,7 @@
 			}
 		}
 
-		if (is_array($tests)) {
+		if ($isTest && is_array($tests)) {
 			foreach ($tests as $cls => $test) {
 				if (is_array($test['functions']) && !empty($test['functions'])) {
 					if (!isset($classesList[$cls])) {
@@ -856,6 +858,8 @@
 								$code .= "\n".$testFunc['after'];
 							}
 							addFunctionToClass($cls, $funcName, $code, $args);
+						} else {
+							addCodeToFunction($cls, $funcName, $testFunc);
 						}
 					}
 				}
