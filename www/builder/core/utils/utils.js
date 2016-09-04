@@ -67,6 +67,12 @@ function isNull(a) {
 function isNone(a) {
 	return isUndefined(a) || isNull(a) || a === false || a === 0 || a === '0' || a === '';
 }
+function isZero(a) {
+	return a === 0 || a === '0';
+}
+function isNotEmptyString(a) {
+	return isString(a) && (/[^\s]/).test(a);
+}
 function stringToNumber(str) {
 	return Number(str);
 }

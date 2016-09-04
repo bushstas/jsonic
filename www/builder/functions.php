@@ -2836,7 +2836,7 @@
 					}
 				}
 				$names[] = $loc.' '.$match;
-				$codes[] = parseTestFunctionCode(trim($part, '}'));
+				$codes[] = parseTestFunctionCode(trim($part, '}'), $test['class'], $loc.' '.$match);
 				$locs[] = $loc;
 				$funcs[] = $match;
 				if ($isExit) {
@@ -2871,14 +2871,35 @@
 		$tests = $properTests;
 	}
 
-	function parseTestFunctionCode($code) {
-		$code = preg_replace('/\n/', ';', $code);
-		$code = preg_replace('/;\s*;/', ';', $code);
-		$parts = explode(';', $code);
-		foreach ($parts as &$part) {
-			$part = "\t".trim($part);
+	function parseTestFunctionCode($code, $className, $funcName) {
+		$texts = array();
+		$error = 'Ошибка в файле теста класса <b>'.$className.'</b>. Некорректный код в функции <b>test '.$funcName.'</b>.';
+		$code = transformQuotedText($code, $texts);
+		$methods = 'String|Number|Numeric|Bool|Function|Array|Object|ArrayLike|Element|Node|Text|ComponentLike|Component|Control|Null|Undefined|Empty|NotEmptyString|Zero';
+		$regexp = '/\b(assert|is)('.$methods.')\(([^\)]+)\)/';
+		preg_match_all($regexp, $code, $matches);
+		$funcs = $matches[1];
+		$types = $matches[2];
+		$args = $matches[3];
+		if (!empty($matches[0])) {
+			$parts = preg_split($regexp, $code);
+			$code = '';
+			foreach ($parts as $i => $part) {
+				$code .= $part;
+				if (isset($funcs[$i])) {
+					$func = $funcs[$i] == 'is' ? 'check' : 'assert';
+					$a = explode(',', $args[$i]);
+					$errorLine = '<xmp>'.$matches[0][$i].'</xmp>';
+					if ($func == 'check' && count($a) != 1) {
+						error($error.' Метод <b>'.$funcs[$i].$types[$i].'</b> должен принимать не более одного аргумента'.$errorLine);
+					} elseif ($func == 'assert' && count($a) != 2) {
+						error($error.' Метод <b>'.$funcs[$i].$types[$i].'</b> должен принимать не более двух аргументов'.$errorLine);
+					}
+					$code .= 'Tester.'.$func."('".lcfirst($types[$i])."',".$args[$i].')';
+				}
+			}
 		}
-		return implode(";\n", $parts);
+		return "\t".$code;
 	}
 
 	function getParentalFunction($funcName, $component, &$parentName, &$args) {

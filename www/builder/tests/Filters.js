@@ -1,10 +1,11 @@
 
 test after onLoadFilters {
-	console.log('subscribe function tested')
-	this.findElement('.->> aaa');
-	--> fuck
+	assertObject(data, 'error text');
+	assertArrayLike(data['data']['items'][0], 'error text');
 }
 
 test before onSubscribe {
-	console.log('onSubscribe function tested')
+	if (!isNumber(index, 2)) {
+		log('error text');
+	}
 }
