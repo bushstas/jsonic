@@ -222,6 +222,7 @@ function Component() {
 		}
 		this.rendered = true;
 		this.onRendered();
+		this.onRenderComplete();
 		if (isArray(this.callbacks)) {
 			for (var i = 0; i < this.callbacks.length; i++) {
 				if (isFunction(this.callbacks[i])) this.callbacks[i]();
@@ -767,6 +768,7 @@ function Component() {
 	};
 	Component.prototype.initOptions = f;
 	Component.prototype.onRendered = f;
+	Component.prototype.onRenderComplete = f;
 	Component.prototype.onLoaded = f;
 	Component.prototype.getTemplateMain = f;
 	Component.prototype.disposeInternal = f;
@@ -1748,6 +1750,7 @@ View.prototype.dispatchReadyEvent = function() {
 	if (isFunction(this.onReadyHandler)) {
 		this.onReadyHandler();
 	}
+	this.onReady();
 };
 View.prototype.activate = function(isActivated) {
 	if (isActivated) {
@@ -1765,9 +1768,8 @@ View.prototype.initControllers = function() {
 	}
 };
 View.prototype.getTitleParams = function() {};
-View.prototype.getControllersToLoad = function() {
-	return null;
-};
+View.prototype.onReady = function() {};
+View.prototype.getControllersToLoad = function() {};
 function CheckboxHandler() {
 	var subscribers = [];
 	var options = [];
@@ -3168,6 +3170,71 @@ function Router() {
 		}
 	};
 }
+function Tester() {
+	this.assert = function(t, a, c, e) {
+		var i = this.check(t, a, c);
+		if (!i) this.log(e);
+		return i;
+	};
+	this.check = function(t, a, c) {
+		var d = [], isa = isArray(c);
+		if (isa) {
+			for (var i = 0; i < c.length; i++) {
+				d.push(c[i]);
+				if (i < c.length - 1 && !this.check('arrayLike', a, d)) return false;
+			}
+		}
+		d = null;
+		if (isa) {
+			for (var i = 0; i < c.length; i++) a = a[c[i]];
+		}
+		switch (t) {
+			case 'string':
+				return isString(a);
+			case 'number':
+				return isNumber(a);
+			case 'numeric':
+				return isNumeric(a);
+			case 'bool':
+				return isBool(a);
+			case 'function':
+				return isFunction(a);
+			case 'array':
+				return isArray(a);
+			case 'object':
+				return isObject(a);
+			case 'arrayLike':
+				return isArrayLike(a);
+			case 'element':
+				return isElement(a);
+			case 'node':
+				return isNode(a);
+			case 'text':
+				return isText(a);
+			case 'componentLike':
+				return isComponentLike(a);
+			case 'component':
+				return isComponent(a);
+			case 'control':
+				return isControl(a);
+			case 'null':
+				return isNull(a);
+			case 'undefined':
+				return isUndefined(a);
+			case 'empty':
+				return isNone(a);
+			case 'notEmptyString':
+				return isNotEmptyString(a);
+			case 'zero':
+				return isZero(a);
+		}
+		return true;
+	};
+	this.log = function(t, c, m) {
+		window.console.log(c + '.' + m + ': ' + t);
+	};
+}
+Tester = new Tester();
 function User() {
 	var app, loadedItems = 0, status = {},
 	attributes = {}, settings = {}, loaded = false, 
@@ -3569,6 +3636,12 @@ function isNull(a) {
 }
 function isNone(a) {
 	return isUndefined(a) || isNull(a) || a === false || a === 0 || a === '0' || a === '';
+}
+function isZero(a) {
+	return a === 0 || a === '0';
+}
+function isNotEmptyString(a) {
+	return isString(a) && (/[^\s]/).test(a);
 }
 function stringToNumber(str) {
 	return Number(str);

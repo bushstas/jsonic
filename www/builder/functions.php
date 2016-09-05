@@ -299,6 +299,7 @@
 	function parseSpecialJSCode($content) {
 		$texts = array();
 		$content = transformQuotedText($content, $texts);
+		$content = preg_replace('/\#([a-z]\w*)/i', "__#$1", $content);
 		$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
 		$content = preg_replace('/'.$regexp.' {1,}/', "$1", $content);
 		$content = preg_replace('/ {1,}'.$regexp.'/', "$1", $content);
@@ -355,7 +356,11 @@
 				}				
 			}
 		}
-		$parts = explode('__TEXT__', $content);
+		return restoreTexts($content, $texts);
+	}
+
+	function restoreTexts($content, $texts) {
+		$parts = explode('__TEXT__', $content);		
 		$content = '';
 		foreach ($parts as $i => $part) {
 			$content .= $part;
@@ -881,6 +886,7 @@
 							$component['calledMethods'][] = array('method' => $functionName, 'called' => $msi);
 						}						
 					}
+					parseArgsForCorrectors($arguments, $code, $component['name'], $functionName);
 					$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => $code);
 					$functionList[] = $functionName;
 					$nextPart = $properParts[$i + 1];
@@ -914,6 +920,41 @@
 			}
 			$component['functionList'] = $functionList;
 			unset($component['content']);
+		}
+	}
+
+	function parseArgsForCorrectors(&$args, &$code, $class, $name) {
+		global $correctorsList;
+		$parts = explode(',', $args);
+		$args = array();
+		$corrs = array();
+		foreach ($parts as $part) {
+			$part = trim($part);
+			$p = explode(':', $part);
+			$arg = $p[0];
+			$args[] = $arg;
+			if (isset($p[1])) {				
+				foreach ($p as $i => $v) {
+					if ($i > 0) {
+						if (!is_array($corrs[$arg])) {
+							$corrs[$arg] = array();
+						}
+						$corrs[$arg][] = $v;
+					}
+				}
+			}
+		}
+		$args = implode(',', $args);
+		foreach ($corrs as $k => $v) {
+			foreach ($v as $crr) {
+				if (!preg_match('/^[a-z]\w*/i', $crr)) {
+					error('Некоррекнтое имя корректора <b>'.$crr.'</b> в методе <b>'.$name.'</b> класса <b>'.$class.'</b>');
+				}
+				if (!in_array($crr.'Crr', $correctorsList)) {
+					error('Неизвестный корректор <b>'.$crr.'</b> в методе <b>'.$name.'</b> класса <b>'.$class.'</b>');
+				}
+				$code = "\t".$k."=Corrector.correct('".$crr."',".$k.");\n".$code;
+			}
 		}
 	}
 
@@ -1916,6 +1957,7 @@
 			}
 			$props[$propName] = $propValue;
 			if ($hasCode) {
+				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{__#$1}", $propValue);
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
 				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
 				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
@@ -2384,6 +2426,7 @@
 				}
 			}
 		}
+		$code = preg_replace('/\#([a-z]\w*)/i', "__#$1", $code);
 		$code = preg_replace('/^&([a-z])/i', "$1", $code);
 		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
 		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
@@ -2444,43 +2487,10 @@
 	}
 
 	function addPrototypeFunction(&$js, $class, $name, $args = '', $code = '') {
-		global $correctorsList;
-		$parts = explode(',', $args);
-		$args = array();
-		$corrs = array();
-		foreach ($parts as $part) {
-			$part = trim($part);
-			$p = explode(':', $part);
-			$arg = $p[0];
-			$args[] = $arg;
-			if (isset($p[1])) {				
-				foreach ($p as $i => $v) {
-					if ($i > 0) {
-						if (!is_array($corrs[$arg])) {
-							$corrs[$arg] = array();
-						}
-						$corrs[$arg][] = $v;
-					}
-				}
-			}
-		}
-		$args = implode(',', $args);
 		$js[] = $class.'.prototype.'.$name.' = function('.$args.') {';
-		foreach ($corrs as $k => $v) {
-			foreach ($v as $crr) {
-				if (!preg_match('/^[a-z]\w*/i', $crr)) {
-					error('Некоррекнтое имя корректора <b>'.$crr.'</b> в методе <b>'.$name.'</b> класса <b>'.$class.'</b>');
-				}
-				if (!in_array($crr.'Crr', $correctorsList)) {
-					error('Неизвестный корректор <b>'.$crr.'</b> в методе <b>'.$name.'</b> класса <b>'.$class.'</b>');
-				}
-				$code = "\t".$k."=Corrector.correct('".$crr."',".$k.");\n".$code;
-			}
-		}
 		$js[] = $code;
 		$js[] = '};';
 	}
-
 
 	function addTemplateFunction(&$js, $class, $templateHtml, &$component) {
 		$tmpids = array();
@@ -2836,7 +2846,7 @@
 					}
 				}
 				$names[] = $loc.' '.$match;
-				$codes[] = parseTestFunctionCode(trim($part, '}'), $test['class'], $loc.' '.$match);
+				$codes[] = parseTestFunctionCode(trim($part, '}'), $test['class'], $loc, $match);
 				$locs[] = $loc;
 				$funcs[] = $match;
 				if ($isExit) {
@@ -2852,7 +2862,7 @@
 			}
 		}
 		$properTests = array();
-		foreach ($tests as $test) {
+		foreach ($tests as &$test) {
 			$properFuncs = array();
 			if (!is_array($test['functions'])) continue;
 			foreach ($test['functions'] as $f) {
@@ -2871,9 +2881,9 @@
 		$tests = $properTests;
 	}
 
-	function parseTestFunctionCode($code, $className, $funcName) {
+	function parseTestFunctionCode($code, $className, $loc, $funcName) {
 		$texts = array();
-		$error = 'Ошибка в файле теста класса <b>'.$className.'</b>. Некорректный код в функции <b>test '.$funcName.'</b>.';
+		$error = 'Ошибка в файле теста класса <b>'.$className.'</b>. Некорректный код в функции <b>test '.$loc.' '.$funcName.'</b>.';
 		$code = transformQuotedText($code, $texts);
 		$methods = 'String|Number|Numeric|Bool|Function|Array|Object|ArrayLike|Element|Node|Text|ComponentLike|Component|Control|Null|Undefined|Empty|NotEmptyString|Zero';
 		$regexp = '/\b(assert|is)('.$methods.')\(([^\)]+)\)/';
@@ -2899,7 +2909,8 @@
 				}
 			}
 		}
-		return "\t".$code;
+		$code = preg_replace('/\blog\(__TEXT__\)/', "Tester.log(__TEXT__, '".$className."', '".$funcName."')", $code);
+		return "\t".restoreTexts($code, $texts);
 	}
 
 	function getParentalFunction($funcName, $component, &$parentName, &$args) {

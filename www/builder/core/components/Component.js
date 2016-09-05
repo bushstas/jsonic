@@ -48,6 +48,7 @@ function Component() {
 		}
 		this.rendered = true;
 		this.onRendered();
+		this.onRenderComplete();
 		if (isArray(this.callbacks)) {
 			for (var i = 0; i < this.callbacks.length; i++) {
 				if (isFunction(this.callbacks[i])) this.callbacks[i]();
@@ -675,6 +676,7 @@ function Component() {
 	};
 	Component.prototype.initOptions = f;
 	Component.prototype.onRendered = f;
+	Component.prototype.onRenderComplete = f;
 	Component.prototype.onLoaded = f;
 	Component.prototype.getTemplateMain = f;
 	Component.prototype.disposeInternal = f;

@@ -9,6 +9,7 @@ View.prototype.dispatchReadyEvent = function() {
 	if (isFunction(this.onReadyHandler)) {
 		this.onReadyHandler();
 	}
+	this.onReady();
 };
 View.prototype.activate = function(isActivated) {
 	if (isActivated) {
@@ -26,7 +27,5 @@ View.prototype.initControllers = function() {
 	}
 };
 View.prototype.getTitleParams = function() {};
-
-View.prototype.getControllersToLoad = function() {
-	return null;
-};
+View.prototype.onReady = function() {};
+View.prototype.getControllersToLoad = function() {};

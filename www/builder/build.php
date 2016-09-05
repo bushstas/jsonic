@@ -1028,7 +1028,7 @@
 			}
 		}
 		if (is_array($dataIndex)) {
-			$regexp = '/[=:\[,]\s*\#\w+/';
+			$regexp = '/__\#\w+/';
 			preg_match_all($regexp, $compiledJs, $matches);
 			$codes = $matches[0];
 			$parts = preg_split($regexp, $compiledJs);			
@@ -1036,7 +1036,7 @@
 			foreach ($parts as $i => $part) {
 				$compiledJs .= $part;
 				if (isset($codes[$i])) {
-					$parts2 = explode('#', $codes[$i]);
+					$parts2 = explode('__#', $codes[$i]);
 					$index = array_search($parts2[1], $dataIndex);
 					if (is_bool($index)) {
 						error('Константа данных <b>'.$parts2[1].'</b> не найдена');
