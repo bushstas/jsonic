@@ -1,27 +1,22 @@
 	<?php
-		include_once 'header.php';
+		
+		$isTest = !empty($_GET['istest']);
+
+		include_once 'engine/header.php';
+		include_once 'engine/functions.php';
+		include_once 'engine/builder.core.php';
+
+		
+		if ($isTest) {
+			include_once 'engine/builder.tests.php';	
+		}
+		
+
 		$advancedMode = !empty($_GET['advanced']);
 		$create = !empty($_GET['create']);
 		$obfuscate = !empty($_GET['obfuscate']);
-		$isTest = !empty($_GET['istest']);
-		include_once 'functions.php';
-	
-		define('CONFIG_FILENAME', 'config.json');
-		define('DEFAULT_PATH', '../');
 		
-		define('DEFAULT_CSS_FOLDER', 'css');
-		define('DEFAULT_JS_FOLDER', 'js');
-		define('DEFAULT_CSS_COMPILED', 'styles');
-		define('DEFAULT_JS_COMPILED', 'base');
-
-		define('DEFAULT_SCOPE', './sources');
-		define('DEFAULT_ENTRY', 'App');
-		define('DEFAULT_PAGE', 'index.html');
-		define('PATH_TO_SOURCES', './core');
-		define('PATH_TO_BLANKS', './blanks');
-		define('DEFAULT_CONTAINER', 'app-view-container');
-		define('DEFAULT_PAGETITLE', 'Page title');
-		define('DEFAULT_CHARSET', 'windows-1251');
+		
 
 		$defaultConfig = array(
 			"indexPage" => DEFAULT_PAGE,
@@ -53,7 +48,7 @@
 		if (empty($cssFolder)) {
 			$cssFolder = DEFAULT_CSS_FOLDER;
 		}
-		if (empty($cssFolder)) {
+		if (empty($jsFolder)) {
 			$jsFolder = DEFAULT_JS_FOLDER;
 		}
 		if (empty($compiledCssFileName)) {
@@ -1128,5 +1123,5 @@
 		if ($isTest) {
 			die('<script>window.location.href = "http://'.$_SERVER['HTTP_HOST'].'/test_index.html"</script>');
 		}
-		include_once 'footer.php';
+		include_once 'engine/footer.php';
 	?>
