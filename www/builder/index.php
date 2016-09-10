@@ -49,7 +49,7 @@
 </style>
 </head>
 <body>
-	<form class="hint-form" method="GET" target="iframe" action="hint.php">
+	<form class="hint-form" method="GET" target="iframe" action="engine/hint.php">
 		<input type="submit" value="Подсказка по" style="padding: 5px 10px;">
 		<select class="topic-select" name="topic">
 			<option value="config">конфигу приложения</option>
@@ -61,6 +61,7 @@
 			<option value="attr">зарезерв. атрибуты тегов</option>
 			<option value="helper">классам хелперам</option>
 			<option value="corrector">классам корректорам</option>
+			<option value="corrector">css файлам</option>
 		</select>
 	</form>
 	<form class="testform" metod="GET" target="iframe" action="build.php">

@@ -1,23 +1,24 @@
 {
-	"indexPage"  : "index.html",
-	"title"      : "Page title",
-	"charset"    : "UTF-8",
-	"jsFolder"   : "js",
-	"cssFolder"  : "css",
-	"compiledJs" : "base",
-	"compiledCss": "styles",
-	"container"  : "app-view-container",
+	"indexPage"   : "index.html",
+	"title"       : "Page title",
+	"charset"     : "UTF-8",
+	"jsFolder"    : "js",
+	"cssFolder"   : "css",
+	"imagesFolder": "images",
+	"compiledJs"  : "base",
+	"compiledCss" : "styles",
+	"container"   : "app-view-container",
 
-	"entry"      : "App",
-	"scope"      : "./sources",
-	"sources"    : "./core",
-	"tests"      : "./tests",
-	"blanks"     : "./blanks",
-	"scripts"    : "./scripts",
-	"views"      : "views",
-	"pathToApi"  : "api",
+	"entry"       : "App",
+	"scope"       : "./sources",
+	"sources"     : "./core",
+	"tests"       : "./tests",
+	"blanks"      : "./blanks",
+	"scripts"     : "./scripts",
+	"views"       : "views",
+	"pathToApi"   : "api",
 	
-	"router"     : {
+	"router"      : {
 		"routes": [
 			{
 				"name": "main", 

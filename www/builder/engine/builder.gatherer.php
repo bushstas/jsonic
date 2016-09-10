@@ -35,8 +35,10 @@ class Gatherer
 
 	public function gatherFiles() {
 		
-		$this->core = $this->gather($this->config['pathToCore']);
-		$this->sources = $this->gather($this->config['pathToSrc']);
+		$this->core = array();
+		$this->gather($this->config['pathToCore'], $this->core);
+		$this->sources = array();
+		$this->gather($this->config['pathToSrc'], $this->sources);
 		
 		$files = array(
 			'core' => $this->core
@@ -51,7 +53,7 @@ class Gatherer
 		return $files;
 	}
 
-	private function gather($dir) {
+	private function gather($dir, &$list) {
 		$testsPath = preg_replace('/^\.\//', '', $this->config['pathToTests']);
 		$scriptsPath = preg_replace('/^\.\//', '', $this->config['pathToScripts']);
 		if (is_dir($dir)) {
@@ -68,15 +70,18 @@ class Gatherer
 						if ($cleanPath == $scriptsPath) {
 							new Error($this->errors['scriptsDirInScope'], array($scriptsPath, $this->config['pathToSrc']));
 						}
-						$list = gatherFiles($path, $list, $getContent);
+						$this->gather($path, $list);
 					} elseif (file_exists($path)) {
 						$path_info = pathinfo($path);
 						$ext = strtolower($path_info['extension']);
-    					if (array_search($ext, $extensions) !== false) {
-							$data = array('path' => $path, 'ext' => $ext, 'filename' => $file, 'name' => $path_info['filename']);
-							if ($getContent === true) {
-								$data['content'] = file_get_contents($data['path']);
-							}
+    					if (array_search($ext, $this->extensions) !== false) {
+							$data = array(
+								'path' => $path,
+								'ext' => $ext,
+								'filename' => $file,
+								'name' => $path_info['filename'],
+								'content' => file_get_contents($path)
+							);
 							$list[] = $data;
 						}
 					}

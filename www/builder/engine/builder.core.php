@@ -39,7 +39,7 @@ class Builder
 		$this->config->init();
 		
 		$this->cssCompiler = new CSSCompiler($this->config);
-		$this->cssCompiler->init();
+		
 
 		$this->jsCompiler = new JSCompiler($this->config);
 		$this->jsCompiler->init();
@@ -61,7 +61,7 @@ class Builder
 		$this->files = $this->gatherer->gatherFiles();
 		
 		$this->htmlCompiler->run();
-		$this->cssCompiler->run($this->files);
+		$this->cssCompiler->run($this->files['css'], $this->files['cssconst']);
 		$this->templateCompiler->run($this->files);
 	}
 }

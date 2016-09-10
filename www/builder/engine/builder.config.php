@@ -33,6 +33,7 @@ class Config
 
 	public function getCssConfig() {
 		$cssFolder = $this->config['cssFolder'];
+		$imagesFolder = $this->config['imagesFolder'];
 		$compiledCssFileName = $this->config['compiledCss'];
 		if (empty($cssFolder)) {
 			$cssFolder = DEFAULT_CSS_FOLDER;
@@ -42,6 +43,7 @@ class Config
 		}
 		return array(
 			'folder' => $cssFolder,
+			'images' => $imagesFolder,
 			'file' => $compiledCssFileName,
 			'path' => trim($cssFolder, '/').'/'.$compiledCssFileName
 		);
@@ -132,5 +134,9 @@ class Config
 			$pathToBlanks = PATH_TO_BLANKS;
 		}
 		return $pathToBlanks;
+	}
+
+	public function needCssObfuscation() {
+		return !empty($_GET['obfuscate']);
 	}
 }
