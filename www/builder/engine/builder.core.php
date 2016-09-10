@@ -19,12 +19,18 @@ include_once 'engine/builder.error.php';
 include_once 'engine/builder.config.php';
 include_once 'engine/builder.gatherer.php';
 include_once 'engine/builder.css.php';
+include_once 'engine/builder.js.php';
+include_once 'engine/builder.templates.php';
+include_once 'engine/builder.html.php';
 
 
 class Builder 
 {
-	private $config, $cssCompiler, $gatherer, $testsCompiler;
-	private $isTest = false;
+	private $config, $gatherer, $testsCompiler,
+			$cssCompiler, $jsCompiler, $htmlCompiler,
+			$templateCompiler;
+
+	private $isTest = false, $files;
 	
 	public function run() {
 		$this->isTest = !empty($_GET['istest']);
@@ -35,6 +41,14 @@ class Builder
 		$this->cssCompiler = new CSSCompiler($this->config);
 		$this->cssCompiler->init();
 
+		$this->jsCompiler = new JSCompiler($this->config);
+		$this->jsCompiler->init();
+
+		$this->templateCompiler = new TemplateCompiler();
+
+		$this->htmlCompiler = new HTMLCompiler($this->config);
+		$this->htmlCompiler->init();
+
 		$this->gatherer = new Gatherer($this->config);
 		$this->gatherer->init();
 		
@@ -44,7 +58,11 @@ class Builder
 		}
 
 
-		$this->gatherer->run();
+		$this->files = $this->gatherer->gatherFiles();
+		
+		$this->htmlCompiler->run();
+		$this->cssCompiler->run($this->files);
+		$this->templateCompiler->run($this->files);
 	}
 }
 $builder = new Builder();

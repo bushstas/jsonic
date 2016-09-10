@@ -1,12 +1,12 @@
 <?php
 
-class CSSCompiler 
+class JSCompiler 
 {
 	private $configProvider, $config;
 
 	private $errors = array(
-		'folderIsNotString' => 'Значение параметра конфигурации <b>cssFolder</b> не является строкой',
-		'folderNameIsInvalid' => 'Значение параметра конфигурации <b>cssFolder</b> содержит запрещенные символы {??}'
+		'folderIsNotString' => 'Значение параметра конфигурации <b>jsFolder</b> не является строкой',
+		'folderNameIsInvalid' => 'Значение параметра конфигурации <b>jsFolder</b> содержит запрещенные символы {??}'
 	);
 
 	public function __construct($configProvider) {
@@ -14,7 +14,7 @@ class CSSCompiler
 	}
 
 	public function init() {
-		$this->config = $this->configProvider->getCssConfig();
+		$this->config = $this->configProvider->getJsConfig();
 
 		if (!is_string($this->config['folder'])) {
 			new Error($this->errors['folderIsNotString']);
@@ -29,9 +29,5 @@ class CSSCompiler
 			}
 			new Error($this->errors['folderNameIsInvalid'], array('&laquo;'.implode('&raquo;, &laquo;', $symbols).'&raquo;'));
 		}
-	}
-
-	public function run() {
-		
 	}
 }

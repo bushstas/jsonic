@@ -5,10 +5,10 @@ class Config
 
 	private $config = null;
 	private $errors = array(
-		'noConfig' => 'Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅ. Р”Р°РЅРЅС‹Р№ С„Р°Р№Р» РґРѕР»Р¶РµРЅ СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РІ РґРёСЂРµРєС‚РѕСЂРёРё <b>builder</b>',
-		'incorrectConfig' => 'Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РєРѕСЂСЂРµРєС‚РµРЅ',
-		'noBlanksDir' => 'Р”РёСЂРµРєС‚РѕСЂРёСЏ СЃ С€Р°Р±Р»РѕРЅР°РјРё С„Р°Р№Р»РѕРІ {??} РЅРµ РЅР°Р№РґРµРЅР°',
-		'noIndexBlank' => 'РЁР°Р±Р»РѕРЅ РёРЅРґРµРєСЃРЅРѕРіРѕ С„Р°Р№Р»Р° <b>index.html</b> РІ РґРёСЂРµРєС‚РѕСЂРёРё {??} РЅРµ РЅР°Р№РґРµРЅ'
+		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
+		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
+		'noBlanksDir' => 'Директория с шаблонами файлов {??}, указанная в параметре конфигурации <b>blanks</b> не найдена',
+		'noIndexBlank' => 'Шаблон индексного файла <b>index.html</b> в директории {??} не найден'
 	);
 
 	public function init() {
@@ -19,11 +19,6 @@ class Config
 		$this->config = json_decode($configJson, true);
 		if (!is_array($this->config)) {
 			new Error($this->errors['incorrectConfig'], array(CONFIG_FILENAME));
-		}
-		
-		$pathToBlanks = $this->getPathToBlanks();
-		if (!is_dir($pathToBlanks)) {
-			new Error($this->errors['noBlanksDir'], array($pathToBlanks));	
 		}
 	}
 
@@ -47,7 +42,59 @@ class Config
 		}
 		return array(
 			'folder' => $cssFolder,
-			'file' => $compiledCssFileName
+			'file' => $compiledCssFileName,
+			'path' => trim($cssFolder, '/').'/'.$compiledCssFileName
+		);
+	}
+
+	public function getJsConfig() {
+		$jsFolder = $this->config['jsFolder'];
+		$compiledJsFileName = $this->config['compiledJs'];
+		if (empty($jsFolder)) {
+			$jsFolder = DEFAULT_JS_FOLDER;
+		}
+		if (empty($compiledJsFileName)) {
+			$compiledJsFileName = DEFAULT_JS_COMPILED;
+		}
+		return array(
+			'folder' => $jsFolder,
+			'file' => $compiledJsFileName,
+			'path' => trim($jsFolder, '/').'/'.$compiledJsFileName
+		);
+	}
+
+	public function getHtmlConfig() {
+		$pathToIndexFile = $this->config['indexPage'];
+		if (empty($pathToIndexFile)) {
+			$pathToIndexFile = DEFAULT_PAGE;
+		}
+
+		$pathToBlanks = $this->getPathToBlanks();
+		if (!is_dir($pathToBlanks)) {
+			new Error($this->errors['noBlanksDir'], array($pathToBlanks));
+		}
+		$pathToBlankIndexFile = rtrim($pathToBlanks, '/').'/index.html';		
+		if (!file_exists($pathToBlankIndexFile)) {
+			new Error($this->errors['noIndexBlank'], array($pathToBlanks));
+		}
+		$charset = $this->config['charset'];
+		if (empty($charset)) {
+			$charset = DEFAULT_CHARSET;
+		}
+		$pageTitle = $this->config['title'];
+		if (empty($pageTitle)) {
+			$pageTitle = DEFAULT_PAGETITLE;
+		}
+		$cssConfig = $this->getCssConfig();
+		$jsConfig = $this->getJsConfig();
+		return array(
+			'index' => $pathToIndexFile,
+			'dir' => $pathToBlanks,
+			'blank' => $pathToBlankIndexFile,
+			'charset' => $charset,
+			'title' => $pageTitle,
+			'css' => $cssConfig['path'],
+			'js' => $jsConfig['path']
 		);
 	}
 
@@ -58,7 +105,6 @@ class Config
 	public function getPathToCore() {
 		$pathToCore = $this->config['sources'];
 		if (empty($pathToCore)) {
-			print("РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>sources</b> РЅРµ РЅР°Р№РґРµРЅ. РСЃРїРѕР»СЊР·РѕРІР°РЅС‹ РЅР°СЃС‚СЂРѕР№РєРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.<br>");
 			$pathToCore = PATH_TO_SOURCES;
 		}
 		return $pathToCore;
@@ -67,7 +113,6 @@ class Config
 	public function getPathToScope() {
 		$pathToSrc = $this->config['scope'];
 		if (empty($pathToSrc)) {
-			print("РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>scope</b> РЅРµ РЅР°Р№РґРµРЅ. РСЃРїРѕР»СЊР·РѕРІР°РЅС‹ РЅР°СЃС‚СЂРѕР№РєРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.<br>");
 			$pathToSrc = DEFAULT_SCOPE;
 		}
 		return $pathToSrc;
@@ -84,7 +129,6 @@ class Config
 	public function getPathToBlanks() {
 		$pathToBlanks = $this->config['blanks'];
 		if (empty($pathToBlanks)) {
-			print("РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>blanks</b> РЅРµ РЅР°Р№РґРµРЅ. РСЃРїРѕР»СЊР·РѕРІР°РЅС‹ РЅР°СЃС‚СЂРѕР№РєРё РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ.<br>");
 			$pathToBlanks = PATH_TO_BLANKS;
 		}
 		return $pathToBlanks;

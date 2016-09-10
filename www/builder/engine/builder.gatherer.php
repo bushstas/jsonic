@@ -20,10 +20,10 @@ class Gatherer
 	public function init() {
 		$this->config = $this->configProvider->getGathererConfig();
 		if (!is_dir($this->config['pathToCore'])) {
-			$this->showError('noPathToCore');
+			new Error($this->errors['noPathToCore']);
 		}
 		if (!is_dir($this->config['pathToSrc'])) {
-			$this->showError('noPathToSrc');
+			new Error($this->errors['noPathToSrc']);
 		}
 		if (empty($this->config['pathToTests'])) {
 			$this->config['pathToTests'] = '';
@@ -33,9 +33,22 @@ class Gatherer
 		}
 	}
 
-	public function run() {
+	public function gatherFiles() {
+		
 		$this->core = $this->gather($this->config['pathToCore']);
 		$this->sources = $this->gather($this->config['pathToSrc']);
+		
+		$files = array(
+			'core' => $this->core
+		);
+
+		foreach ($this->sources as $file) {
+			if (!is_array($files[$file['ext']])) {
+				$files[$file['ext']] = array();
+			}
+			$files[$file['ext']][] = $file;
+		}
+		return $files;
 	}
 
 	private function gather($dir) {
@@ -50,10 +63,10 @@ class Gatherer
 					if (is_dir($path)) {						
 						$cleanPath = preg_replace('/^\.\//', '', $path);
 						if ($cleanPath == $testsPath) {
-							$this->showError('testDirInScope', array($testsPath, $this->config['pathToSrc']));
+							new Error($this->errors['testDirInScope'], array($testsPath, $this->config['pathToSrc']));
 						}
 						if ($cleanPath == $scriptsPath) {
-							$this->showError('scriptsDirInScope', array($scriptsPath, $this->config['pathToSrc']));
+							new Error($this->errors['scriptsDirInScope'], array($scriptsPath, $this->config['pathToSrc']));
 						}
 						$list = gatherFiles($path, $list, $getContent);
 					} elseif (file_exists($path)) {
@@ -73,7 +86,29 @@ class Gatherer
 		return $list;
 	}
 
-	public function showError($err, $args = null) {
-		new Error($this->errors[$err], $args);
+	public static function createFile($path, $content) {
+		$parts = explode('/', $path);
+		if (count($parts) > 1) {
+			$parts[count($parts) - 1] = '';
+			$pathToFolder = implode('/', $parts);
+			if (!is_dir($pathToFolder)) {
+				self::createDir($pathToFolder);
+			}
+		}
+		file_put_contents($path, $content);
+	}
+
+	public static function createDir($path) {
+		$parts = explode('/', trim($path));
+		$path = array();
+		foreach ($parts as $part) {
+			$path[] = $part;
+			if (!empty($part) && $part != '.' && $parts != '..') {
+				$currentPath = implode('/', $path);
+				if (!is_dir($currentPath)) {
+					mkdir($currentPath);
+				}
+			}
+		}
 	}
 }

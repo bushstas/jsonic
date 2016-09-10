@@ -1,4 +1,4 @@
-	<?php
+<?php
 		
 		$isTest = !empty($_GET['istest']);
 
@@ -6,10 +6,7 @@
 		include_once 'engine/functions.php';
 		include_once 'engine/builder.core.php';
 
-		
-		if ($isTest) {
-			include_once 'engine/builder.tests.php';	
-		}
+		die();
 		
 
 		$advancedMode = !empty($_GET['advanced']);
