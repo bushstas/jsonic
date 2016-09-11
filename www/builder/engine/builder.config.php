@@ -3,12 +3,14 @@
 class Config 
 {
 
-	private $config = null;
+	private $config, $pathToApiDir;
 	private $errors = array(
 		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
 		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
 		'noBlanksDir' => 'Директория с шаблонами файлов {??}, указанная в параметре конфигурации <b>blanks</b> не найдена',
-		'noIndexBlank' => 'Шаблон индексного файла <b>index.html</b> в директории {??} не найден'
+		'noIndexBlank' => 'Шаблон индексного файла <b>index.html</b> в директории {??} не найден',
+		'invalidPathToApi' => 'Параметр конфигурации <b>pathToApi</b> существует, но пуст или не является строкой',
+		'noApiDir' => 'Директория {??}, указанная в параметре конфигурации <b>pathToApi</b>, не найдена в корневом каталоге'
 	);
 
 	public function init() {
@@ -19,6 +21,16 @@ class Config
 		$this->config = json_decode($configJson, true);
 		if (!is_array($this->config)) {
 			new Error($this->errors['incorrectConfig'], array(CONFIG_FILENAME));
+		}
+		if (isset($this->config['pathToApi'])) {
+			$this->pathToApiDir = $this->config['pathToApi'];
+			if (empty($this->pathToApiDir) || !is_string($this->pathToApiDir)) {
+				new Error($this->errors['invalidPathToApi']);
+			}
+			$this->pathToApiDir = '../'.$this->pathToApiDir;
+			if (!is_dir($this->pathToApiDir)) {
+				new Error($this->errors['noApiDir'], array($this->pathToApiDir));
+			}
 		}
 	}
 
@@ -98,6 +110,10 @@ class Config
 			'css' => $cssConfig['path'],
 			'js' => $jsConfig['path']
 		);
+	}
+
+	public function getRoutesConfig() {
+		return $this->config['router'];
 	}
 
 	public function getTestsConfig() {

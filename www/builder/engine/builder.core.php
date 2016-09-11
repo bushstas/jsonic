@@ -22,6 +22,7 @@ include_once 'engine/builder.css.php';
 include_once 'engine/builder.js.php';
 include_once 'engine/builder.templates.php';
 include_once 'engine/builder.html.php';
+include_once 'engine/builder.routes.php';
 
 
 class Builder 
@@ -51,6 +52,9 @@ class Builder
 
 		$this->gatherer = new Gatherer($this->config);
 		$this->gatherer->init();
+
+		$this->routesCompiler = new RoutesCompiler($this->config);
+		$this->routesCompiler->init();
 		
 		if ($this->isTest) {
 			$this->testsCompiler = new TestsCompiler($this->config);
