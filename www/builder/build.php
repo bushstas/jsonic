@@ -166,6 +166,13 @@
 		if ($isHashRouter !== null && !is_bool($isHashRouter)) {
 			error("Параметр конфигурации <b>router['hash']</b> должен быть равен null, true или false");
 		}
+
+
+
+		// =======================================================
+
+
+
 		$user = $config['user'];
 		$isUser = is_array($user);
 		if ($isUser) {
