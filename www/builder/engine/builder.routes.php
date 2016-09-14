@@ -2,9 +2,13 @@
 
 class RoutesCompiler 
 {
-	private $configProvider, $config;
+	private $configProvider, $config, 
+			$defaultRoute, $indexRoute, $isHashRouter;
+
 	private $routeControllersToLoad = array();
 	private $routeControllersByViews = array();
+	private $errorRoutes = array();
+	private $errorCodes = array('404', '401');
 
 	private $errors = array(
 		'incorrectRouter' => 'Параметр конфигурации <b>router</b> отсутствует или не является массивом',
@@ -28,7 +32,16 @@ class RoutesCompiler
 		'loadItemEmpty' => "Один из элементов параметра <b>load</b> у маршрута с именем {??} пуст",
 		'childrenNotAnArray' => "Параметр <b>children</b> одного из пунктов routes не является массивом",
 		'menuNotString' => "Параметр конфигурации <b>router['menu']</b> не является строкой",
-		'noPatternMenuClass' => "Параметр конфигурации <b>router['menu']</b> содержит название класса {??} не удовлетворяющее паттерну ^[A-Z]\w*$"
+		'noPatternMenuClass' => "Параметр конфигурации <b>router['menu']</b> содержит название класса {??} не удовлетворяющее паттерну ^[A-Z]\w*$",
+		'noDefaultAnd404Routes' => "Параметры конфигурации <b>router['defaultRoute']</b> и <b>router['404']</b> оба отсутствуют. Хотя один из них должен обязательно присутствовать",
+		'defaultRouteNotString' => "Параметр конфигурации <b>router['defaultRoute']</b> не является строкой",
+		'defaultRouteNotFound' => "Параметр конфигурации <b>router['defaultRoute']</b> = '{??}' не найден среди указанных в <b>router['routes']</b>",
+		'indexRoutNotString' => "Параметр конфигурации <b>router['indexRoute']</b> отсутствует или не является строкой",
+		'indexRoutNotFound' => "Параметр конфигурации <b>router['indexRoute']<b/> = '{??}' не найден среди указанных в <b>router['routes']</b>",
+		'incorrectHash' => "Параметр конфигурации <b>router['hash']</b> должен быть равен null, true или false",
+		'errorRouteNotString' => "Параметр <b>router['{?}']</b> не является строкой",
+		'errorRouteHasForbiddenSymbols' => "Параметр <b>router['{?}']</b> = '{??}' содержит запрещенные символы",
+		'noPatternErrorRoute' => "Параметр <b>router['{?}']</b> = '{??}' не соответствует паттерну [A-Z]\w+"
 	);
 
 	public function __construct($configProvider) {
@@ -48,32 +61,18 @@ class RoutesCompiler
 		}
 		$this->validateRoutes($routes);
 		$this->validateRouteMenu();
+		$this->validateDefaultRoute();
+		$this->validateIndexRoute();
+		$this->validateErrorRoutes();
+		
+		$this->isHashRouter = $this->config['hash'];
+		if ($this->isHashRouter !== null && !is_bool($this->isHashRouter)) {
+			new Error($this->errors['incorrectHash']);
+		}
+	}
 
-
-		if (empty($router['defaultRoute']) && empty($router['404'])) {
-			error("Параметры конфигурации <b>router['defaultRoute']</b> и <b>router['404']</b> оба отсутствуют. Хотя один из них должен обязательно присутствовать");
-		}
-		$defaultRoute = null;
-		if (!empty($router['defaultRoute'])) {
-			if (!is_string($router['defaultRoute'])) {
-				error("Параметр конфигурации <b>router['defaultRoute']</b> не является строкой");
-			}
-			if (!isRoute($router['defaultRoute'], $routes)) {
-				error("Параметр конфигурации <b>router['defaultRoute']</b> = '<b>".$router['defaultRoute']."</b>' не найден среди указанных в <b>router['routes']</b>");
-			}
-			$defaultRoute = $router['defaultRoute'];
-		}
-		$indexRoute = $router['indexRoute'];
-		if (empty($indexRoute) || !is_string($indexRoute)) {
-			error("Параметр конфигурации <b>router['indexRoute']</b> отсутствует или не является строкой");
-		}
-		if (!isRoute($indexRoute, $routes)) {
-			error("Параметр конфигурации <b>router['indexRoute']<b/> = '<b>".$indexRoute."</b>' не найден среди указанных в <b>router['routes']</b>");
-		}
-		$isHashRouter = $router['hash'];
-		if ($isHashRouter !== null && !is_bool($isHashRouter)) {
-			error("Параметр конфигурации <b>router['hash']</b> должен быть равен null, true или false");
-		}
+	public function getErrorRoutes() {
+		return $this->errorRoutes;
 	}
 
 	private	function validateRoutes($routes) {
@@ -171,5 +170,63 @@ class RoutesCompiler
 			}
 			$routerMenu = $properRouterMenu;
 		}
+	}
+
+	private function validateDefaultRoute() {
+		$this->defaultRoute = $this->config['defaultRoute'];
+		if (empty($this->defaultRoute) && empty($this->config['404'])) {
+			new Error($this->errors['noDefaultAnd404Routes']);
+		}
+		if (!empty($this->defaultRoute)) {
+			if (!is_string($this->defaultRoute)) {
+				new Error($this->errors['defaultRouteNotString']);
+			}
+			if (!$this->isRoute($this->defaultRoute, $this->config['routes'])) {
+				new Error($this->errors['defaultRouteNotFound'], array($this->defaultRoute));
+			}
+		}
+	}
+
+	private function validateIndexRoute() {
+		$this->indexRoute = $this->config['indexRoute'];
+		if (empty($this->indexRoute) || !is_string($this->indexRoute)) {
+			new Error($this->errors['indexRoutNotString']);
+		}
+		if (!$this->isRoute($this->indexRoute, $this->config['routes'])) {
+			new Error($this->errors['indexRoutNotFound'], array($this->indexRoute));
+		}
+	}
+
+	private function validateErrorRoutes() {
+		foreach ($this->errorCodes as $errorCode) {
+			if (!empty($this->config[$errorCode])) {
+				$this->checkErrorRoute($this->config[$errorCode], $errorCode);
+				$this->errorRoutes[$errorCode] = $this->config[$errorCode];
+			}
+		}
+	}
+
+	private	function checkErrorRoute($route, $name) {
+		if (!is_string($route)) {
+			new Error($this->errors['errorRouteNotString'], array($name));
+		}
+		if (preg_match('/[^\w]/', $route)) {
+			new Error($this->errors['errorRouteHasForbiddenSymbols'], array($name, $route));
+		}
+		if (!preg_match('/^[A-Z]\w*/', $route)) {
+			new Error($this->errors['noPatternErrorRoute'], array($name, $route));
+		}		
+	}
+
+	private	function isRoute($routeName, $routes) {
+		foreach ($routes as $route) {
+			if ($route['name'] == $routeName) {
+				return true;
+			}
+			if (is_array($route['children']) && $this->isRoute($routeName, $route['children'])) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

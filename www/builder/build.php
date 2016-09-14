@@ -168,11 +168,6 @@
 		}
 
 
-
-		// =======================================================
-
-
-
 		$user = $config['user'];
 		$isUser = is_array($user);
 		if ($isUser) {
@@ -186,6 +181,7 @@
 				error("Параметр конфигурации <b>user['save']</b> должен быть строкой");
 			}
 		}
+
 		$errorViews = array();
 		$errorRoutes = array();
 		$errorCodes = array('404', '401');
@@ -196,6 +192,8 @@
 				$errorRoutes[$errorCode] = $router[$errorCode];
 			}
 		}
+
+
 		if ($isTest) {
 			if (empty($config['tests'])) {
 				error("\nПараметр конфигурации <b>tests</b>, содержащий путь к тестам не указан.");
@@ -239,6 +237,8 @@
 			createViewDirs($routes, $pathToViews);
 			createErrorViewDirs($errorViews, $pathToViews);
 		}
+
+
 		if (isset($config['tooltipClass']) && $config['tooltipClass'] !== null && $config['tooltipClass'] !== false) {
 			if (!is_string($config['tooltipClass'])) {
 				error("Параметр конфигурации <b>tooltipClass</b> должен быть строкой, содержащей название класса");
@@ -252,6 +252,7 @@
 			$tooltipApi = $config['tooltipApi'];
 		}
 
+// =======================================================
 
 		if (empty($config['entry'])) {
 			print("\nПараметр конфигурации entry не найден. Использованы настройки по умолчанию.");

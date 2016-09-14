@@ -23,6 +23,7 @@ include_once 'engine/builder.js.php';
 include_once 'engine/builder.templates.php';
 include_once 'engine/builder.html.php';
 include_once 'engine/builder.routes.php';
+include_once 'engine/builder.tests.php';
 
 
 class Builder 
@@ -37,7 +38,7 @@ class Builder
 		$this->isTest = !empty($_GET['istest']);
 
 		$this->config = new Config();
-		$this->config->init();
+		$this->config->init($this);
 		
 		$this->cssCompiler = new CSSCompiler($this->config);
 		
@@ -47,14 +48,14 @@ class Builder
 
 		$this->templateCompiler = new TemplateCompiler();
 
+		$this->routesCompiler = new RoutesCompiler($this->config);
+		$this->routesCompiler->init();
+
 		$this->htmlCompiler = new HTMLCompiler($this->config);
 		$this->htmlCompiler->init();
 
 		$this->gatherer = new Gatherer($this->config);
 		$this->gatherer->init();
-
-		$this->routesCompiler = new RoutesCompiler($this->config);
-		$this->routesCompiler->init();
 		
 		if ($this->isTest) {
 			$this->testsCompiler = new TestsCompiler($this->config);
@@ -67,6 +68,23 @@ class Builder
 		$this->htmlCompiler->run();
 		$this->cssCompiler->run($this->files['css'], $this->files['cssconst']);
 		$this->templateCompiler->run($this->files);
+	}
+
+	public function getCompiler($compilerName) {
+		switch ($compilerName) {
+			case 'css':
+				return $this->cssCompiler;
+			case 'js':
+				return $this->jsCompiler;
+			case 'template':
+				return $this->templateCompiler;
+			case 'html':
+				return $this->htmlCompiler;
+			case 'routes':
+				return $this->routesCompiler;
+			case 'tests':
+				return $this->testsCompiler;
+		}
 	}
 }
 $builder = new Builder();
