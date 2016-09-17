@@ -76,11 +76,13 @@ class Config
 			$compiledJsFileName = DEFAULT_JS_COMPILED;
 		}
 		return array(
+			'entry' => $this->config['entry'],
 			'folder' => $jsFolder,
 			'file' => $compiledJsFileName,
 			'path' => trim($jsFolder, '/').'/'.$compiledJsFileName,
 			'tooltipClass' => $this->config['tooltipClass'],
-			'tooltipApi' => $this->config['tooltipApi']
+			'tooltipApi' => $this->config['tooltipApi'],
+			'pathToCore' => $this->getPathToCore()
 		);
 	}
 
@@ -138,7 +140,7 @@ class Config
 	}
 
 	public function getPathToCore() {
-		$pathToCore = $this->config['sources'];
+		$pathToCore = $this->config['core'];
 		if (empty($pathToCore)) {
 			$pathToCore = PATH_TO_SOURCES;
 		}
@@ -175,6 +177,10 @@ class Config
 
 	public function needToCreateEnvironment() {
 		return !empty($_GET['create']);
+	}
+
+	public function isTest() {
+		return !empty($_GET['istest']);
 	}
 
 	private function validateUserConfig() {

@@ -2,9 +2,9 @@
 		
 		$isTest = !empty($_GET['istest']);
 
-		include_once 'engine/header.php';
-		include_once 'engine/functions.php';
-		include_once 'engine/builder.core.php';
+		include_once 'builder.php.classes/header.php';
+		include_once 'builder.php.classes/functions.php';
+		include_once 'builder.php.classes/builder.core.php';
 
 		die();
 		
@@ -20,7 +20,7 @@
 			"title"     => DEFAULT_PAGETITLE,
 			"entry"     => DEFAULT_ENTRY,
 			"scope"     => DEFAULT_SCOPE,
-			"sources"   => PATH_TO_SOURCES,
+			"core"      => PATH_TO_SOURCES,
 			"blanks"    => PATH_TO_BLANKS
 		);
 
@@ -259,8 +259,8 @@
 			$config['entry'] = DEFAULT_ENTRY;
 		}
 
-		if (empty($config['sources'])) {
-			$config['sources'] = $defaultConfig['sources'];
+		if (empty($config['core'])) {
+			$config['core'] = $defaultConfig['core'];
 		}
 
 		$files = gatherFiles($pathToSrc, array());
@@ -293,7 +293,7 @@
 
 		$superClasses = array('component', 'dialog', 'form', 'control', 'menu');
 		$componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
-		$jsSourcesFiles = gatherFiles($config['sources'], array(), true);
+		$jsSourcesFiles = gatherFiles($config['core'], array(), true);
 		$sourcesList = array();
 		$helpers = array();
 		foreach ($jsSourcesFiles as $jsSourcesFile) {

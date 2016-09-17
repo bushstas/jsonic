@@ -11,7 +11,7 @@
 
 	"entry"       : "App",
 	"scope"       : "./sources",
-	"sources"     : "./core",
+	"core"        : "./core",
 	"tests"       : "./tests",
 	"blanks"      : "./blanks",
 	"scripts"     : "./scripts",

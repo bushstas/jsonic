@@ -12,14 +12,14 @@ function User() {
 		}
 	};
 	var loadDictionary = function() {
-		Dictionary.load(onLoadDictionary.bind(this));
+		if (typeof Dictionary != 'undefined') {
+			Dictionary.load(onLoadDictionary.bind(this));
+		}
 	};
 	this.load = function(application) {
 		if (!loaded) {
 			initOptions();
-			if (typeof Dictionary != 'undefined') {
-				loadDictionary();
-			}
+			loadDictionary();
 			app = application;
 			if (loadRequest) {
 				loadRequest.execute();
