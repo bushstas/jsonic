@@ -39,6 +39,10 @@ class Config
 		$this->validateUserConfig();
 	}
 
+	public function getBuilder() {
+		return $this->builder;
+	}
+
 	public function getGathererConfig() {
 		return array(
 			'pathToSrc' => $this->getPathToScope(),

@@ -252,8 +252,6 @@
 			$tooltipApi = $config['tooltipApi'];
 		}
 
-// =======================================================
-
 		if (empty($config['entry'])) {
 			print("\nПараметр конфигурации entry не найден. Использованы настройки по умолчанию.");
 			$config['entry'] = DEFAULT_ENTRY;
@@ -536,6 +534,7 @@
 			createFile(DEFAULT_PATH.$pathToCompiledCss, $compiledCss);
 		}
 
+
 		$classNames = array();
 		$doubles = array();
 		$classesList = getComponentClassData();
@@ -553,6 +552,9 @@
 		if (!empty($doubles)) {
 		 	error('Найдены классы с одинаковыми именами: <b>'.implode(', ', $doubles).'</b>');
 		}
+
+
+	// =======================================================
 
 		// Checking application
 		if (empty($classes['application'])) {
