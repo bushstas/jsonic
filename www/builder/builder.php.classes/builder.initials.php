@@ -22,7 +22,9 @@ class InitialsParser
 		'incorrectOptions' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но он не €вл€етс€ ассоциативным массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'itemNotAssocArray' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, который не €вл€етс€ ассоциативным массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'itemNoParam' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого отсутствует параметр {??}><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
-		'paramNotArray' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого параметр {??} не €вл€етс€ массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}'
+		'paramNotArray' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого параметр {??} не €вл€етс€ массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
+		'typeError' => ' ласс {??} с типом {??} не может содержать initial параметр {??}'
+
 	);
 
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
@@ -180,7 +182,6 @@ class InitialsParser
 	}
 
 	private function initialError($type) {
-		error(' ласс {??} с типом {??} не может содержать initial параметр {??}');
 		new Error($this->errors['typeError'], array($this->currentClassName, $this->currentClass['type'], $type));	
 	}
 

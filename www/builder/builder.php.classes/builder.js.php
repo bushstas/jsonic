@@ -24,10 +24,16 @@ class JSCompiler
 		'unknownClassType' => 'Неизвестный тип класса {??} в файле {??}.<br>Допустимые значения: {?}',
 		'incorrectClassName' => 'Название класса {??} недопустимо. Используйте запись вида <b>ClassName</b>',
 		'extendsExpected' => 'Недопустимое ключевое слово {??} в первой строке файла {??}. Ожидается ключевое слово <b>extends</b>',
+		'extendsEmpty' => 'Супер-классы не указаны после ключевого слова <b>extends</b> в первой строке файла {??}. Ожидается имя класса или имена классов через запятую',
 		'incorrectFirstLine' => 'Недопустимое определение класса {??} в файле {??}',
 		'differentNames' => 'Файл {??} должен содержать класс {??}, тогда как содержит класс с именем {??}',
 		'incorrectSuper' => 'Название супер-класса {??} для {??} недопустимо. Используйте запись вида <b>ClassName</b>',
-		'classExists' => 'Найдено несколько классов с одинаковым именем {??}'
+		'classExists' => 'Найдено несколько классов с одинаковым именем {??}',
+		'appNotFound' => 'Класс с типом <b>application</b> не найден',
+		'fewAppClasses' => 'Найдено несколько классов с типом <b>application</b>',
+		'appExtends' => 'Класс {??} имеет тип <b>application</b> и не может расширяться другими классами',
+		'viewNotFound' => 'Класс {??} с типом <b>view</b> упомянутый в параметре конфигурации routes не найден',
+		'404NotFound' => 'Класс {??} с типом <b>view</b>, указанный для обработки ошибки 404, не найден'
 	);
 
 	private $coreClasses = array(
@@ -57,6 +63,7 @@ class JSCompiler
 	private $jsCode = '';
 	private $initialsParser;
 	private $templateCompiler;
+	private $componentsUsedInTemplates;
 
 
 	public function __construct($configProvider) {
@@ -80,8 +87,70 @@ class JSCompiler
 		foreach ($jsFiles as $jsFile) {
 			$this->processJSFile($jsFile);
 		}
+		$this->validateApplication();
+		$this->validateViews();
+		$this->unsetNotUsedClasses();
 		$this->initCore($coreFiles);
 		$this->initialsParser->run($this->classes);
+
+		printArr($this->classes);
+	}
+
+	private function validateApplication() {
+		if (empty($this->classesByTypes['application'])) {
+			new Error($this->errors['appNotFound']);
+		}
+		$appClasses = array_keys($this->classesByTypes['application']);
+		if (count($appClasses) > 1) {
+			new Error($this->errors['fewAppClasses']);
+		}
+		$application = $this->classesByTypes['application'][$appClasses[0]];
+		if (count($application['extends']) > 1) {
+			new Error($this->errors['appExtends'], array($appClasses[0]));
+		}
+	}
+
+	private function validateViews() {
+		$views = $this->classesByTypes['view'];
+		$router = $this->config['router'];
+		if (is_array($router['routes'])) {
+			foreach ($router['routes'] as $route) {
+				if (!empty($route['view']) && !isset($views[$route['view']])) {
+					new Error($this->errors['viewNotFound'], array($route['view']));
+				}
+			}
+		}
+		if (!empty($router['404']) && !isset($views[$router['404']])) {
+			new Error($this->errors['404NotFound'], array($router['404']));
+		}		
+	}
+
+	private function unsetNotUsedClasses() {
+		$configJson = $this->configProvider->getConfigJson();
+		$used = $this->templateCompiler->getUsedComponents();
+		$notUsedClasses = array();
+		$parentalClasses = array();
+		foreach ($this->classes as $className => $classData) {
+			if (is_array($classData['extends'])) {
+				$parentalClasses = array_merge($parentalClasses, $classData['extends']);
+			}
+			if (in_array($classData['type'], $this->superClasses) && !in_array($className, $used)) {
+				$notUsedClasses[] = $className;
+			}
+		}
+		$parentalClasses = array_unique($parentalClasses);
+		$properNotUsedComponents = array();
+		foreach ($notUsedClasses as $className) {
+			$regexp = '/\b'.$className.'\b/';
+			$modifiedJs = preg_replace('/(component|control|menu|form|dialog)\s+'.$className.'\b/', '', $this->jsCode);
+			if (!in_array($className, $parentalClasses) && !preg_match($regexp, $modifiedJs) && !preg_match($regexp, $configJson)) {
+				$properNotUsedComponents[] = $className;
+			}
+		}
+		foreach ($properNotUsedComponents as $className) {
+			unset($this->classes[$className]);
+		}
+		$this->componentsUsedInTemplates = $used;
 	}
 
 	private function initCore($coreFiles) {
@@ -140,7 +209,7 @@ class JSCompiler
 		}
 	}
 
-	private function defineJsClass(&$content, &$jsFile) {		
+	private function defineJsClass(&$content, &$jsFile) {
 		$parts = preg_split('/\n/', trim($content));
 		$originalFirstLine = trim($parts[0]);
 		$firstLine = trim(preg_replace('/\s*,\s*/', ',', $originalFirstLine), ';');
@@ -170,10 +239,23 @@ class JSCompiler
 		if (isset($lineParts[2]) && $lineParts[2] != 'extends') {
 			new Error($this->errors['extendsExpected'], array($lineParts[2], $jsFile['path']));
 		}
+		if ($lineParts[2] == 'extends' && empty($lineParts[3])) {
+			new Error($this->errors['extendsEmpty'], array($jsFile['path']));	
+		}
 		$extends = array();
 		if (isset($lineParts[3])) {
 			$extendsString = $lineParts[3];
 			$extends = explode(',', $extendsString);
+			$index = array_search('Component', $extends);
+			if (is_int($index)) {
+				array_splice($extends, $index, 1);
+			}
+			if ($classType == 'application') {
+				$index = array_search('Application', $extends);
+				if (is_int($index)) {
+					array_splice($extends, $index, 1);
+				}	
+			}
 		}
 		if (isset($lineParts[4])) {
 			new Error($this->errors['incorrectFirstLine'], array($originalFirstLine, $jsFile['path']));

@@ -3,7 +3,7 @@
 class Config 
 {
 
-	private $config, $pathToApiDir, $builder;
+	private $config, $pathToApiDir, $builder, $configJson;
 	private $errors = array(
 		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
 		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
@@ -21,8 +21,8 @@ class Config
 		if (!file_exists(CONFIG_FILENAME)) {
 			new Error($this->errors['noConfig'], array(CONFIG_FILENAME));
 		}
-		$configJson = file_get_contents(CONFIG_FILENAME);
-		$this->config = json_decode($configJson, true);
+		$this->configJson = file_get_contents(CONFIG_FILENAME);
+		$this->config = json_decode($this->configJson, true);
 		if (!is_array($this->config)) {
 			new Error($this->errors['incorrectConfig'], array(CONFIG_FILENAME));
 		}
@@ -86,7 +86,8 @@ class Config
 			'path' => trim($jsFolder, '/').'/'.$compiledJsFileName,
 			'tooltipClass' => $this->config['tooltipClass'],
 			'tooltipApi' => $this->config['tooltipApi'],
-			'pathToCore' => $this->getPathToCore()
+			'pathToCore' => $this->getPathToCore(),
+			'router' => $this->getRoutesConfig()
 		);
 	}
 
@@ -185,6 +186,10 @@ class Config
 
 	public function isTest() {
 		return !empty($_GET['istest']);
+	}
+
+	public function getConfigJson() {
+		return $this->configJson;
 	}
 
 	private function validateUserConfig() {

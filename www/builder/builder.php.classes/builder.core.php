@@ -38,13 +38,13 @@ class Builder
 		
 		$this->cssCompiler = new CSSCompiler($this->config);		
 
-		$this->jsCompiler = new JSCompiler($this->config);
-		$this->jsCompiler->init();
+		$this->routesCompiler = new RoutesCompiler($this->config);
+		$this->routesCompiler->init();
 
 		$this->templateCompiler = new TemplateCompiler();
 
-		$this->routesCompiler = new RoutesCompiler($this->config);
-		$this->routesCompiler->init();
+		$this->jsCompiler = new JSCompiler($this->config);
+		$this->jsCompiler->init();
 
 		$this->htmlCompiler = new HTMLCompiler($this->config);
 		$this->htmlCompiler->init();

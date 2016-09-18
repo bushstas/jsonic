@@ -553,9 +553,6 @@
 		 	error('Найдены классы с одинаковыми именами: <b>'.implode(', ', $doubles).'</b>');
 		}
 
-
-	// =======================================================
-
 		// Checking application
 		if (empty($classes['application'])) {
 			error('Класс с типом <b>application</b> не найден');
@@ -620,9 +617,16 @@
 				}
 			}
 		}
+
+	
+
+	// =======================================================
+
+
+
 		$notUsedClasses = array();
 		$parentalClasses = array();
-		foreach ($classesList as $key => $value) {			
+		foreach ($classesList as $key => $value) {
 			if (is_array($value['extends'])) {
 				$parentalClasses = array_merge($parentalClasses, $value['extends']);
 			}
@@ -645,6 +649,14 @@
 				unset($classesByType[$className]);
 			}
 		}
+
+
+
+
+
+
+
+
 	
 		foreach ($classesFromTemplates as $classFromTemplate) {
 			if (isset($calledComponentsTypes2[$classFromTemplate])) {
