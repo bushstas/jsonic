@@ -19,7 +19,6 @@ class TemplateCompiler
 				$this->initUsedComponents($templateFile['name'], $content);
 			}
 		}
-		printArr($this->usedComponents, true);
 	}
 
 	public function hasTemplate($className) {

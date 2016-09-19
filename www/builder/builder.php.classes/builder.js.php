@@ -92,8 +92,6 @@ class JSCompiler
 		$this->unsetNotUsedClasses();
 		$this->initCore($coreFiles);
 		$this->initialsParser->run($this->classes);
-
-		printArr($this->classes);
 	}
 
 	private function validateApplication() {
