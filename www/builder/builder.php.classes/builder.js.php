@@ -33,11 +33,16 @@ class JSCompiler
 		'fewAppClasses' => 'Найдено несколько классов с типом <b>application</b>',
 		'appExtends' => 'Класс {??} имеет тип <b>application</b> и не может расширяться другими классами',
 		'viewNotFound' => 'Класс {??} с типом <b>view</b> упомянутый в параметре конфигурации routes не найден',
-		'404NotFound' => 'Класс {??} с типом <b>view</b>, указанный для обработки ошибки 404, не найден'
+		'404NotFound' => 'Класс {??} с типом <b>view</b>, указанный для обработки ошибки 404, не найден',
+		'superClassNotFound' => 'Используемый в качестве супер-класса для {??}, класс {??} не найден',
+		'incorrectSuperClass' => 'Класс {??} не может быть унаследован от класса {??}. Они должны быть одинакового типа',
+		'usedClassNotFound' => 'Класс {??}, упомянутый в шаблоне класс{?} {??}, не найден',
+		'usedClassNotFound2' => 'Класс {??} не найден',
+		'duplicateMethod' => 'Обнаружено более одного метода с именем {??} в классе {??}'
 	);
 
 	private $coreClasses = array(
-		'Component', 'Controller', 'Application', 'View', 'Dialog', 'Menu'
+		'Component', 'Controller', 'Application', 'View', 'Dialog', 'Menu', 'Control'
 	);
 
 	private $reservedNames = array(
@@ -63,7 +68,8 @@ class JSCompiler
 	private $jsCode = '';
 	private $initialsParser;
 	private $templateCompiler;
-	private $componentsUsedInTemplates;
+	private $usedComponents;
+	private $usedComponentsNames;
 
 
 	public function __construct($configProvider) {
@@ -87,11 +93,15 @@ class JSCompiler
 		foreach ($jsFiles as $jsFile) {
 			$this->processJSFile($jsFile);
 		}
+		$this->initCore($coreFiles);
 		$this->validateApplication();
 		$this->validateViews();
+		$this->validateSuperClasses();
 		$this->unsetNotUsedClasses();
-		$this->initCore($coreFiles);
+		$this->addClassesFromTemplates();
+		$this->validateUsedClasses();
 		$this->initialsParser->run($this->classes);
+		$this->parseClasses();
 	}
 
 	private function validateApplication() {
@@ -123,9 +133,50 @@ class JSCompiler
 		}		
 	}
 
+	private function validateSuperClasses() {
+		$this->usedComponents = $this->templateCompiler->getUsedComponents();
+		foreach ($this->classes as $class) {
+			if (is_array($class['extends'])) {
+				foreach ($class['extends'] as $superClass) {
+					if (array_search($superClass, $this->coreClasses) === false) {
+						if (!isset($this->classes[$superClass])) {
+							new Error($this->errors['superClassNotFound'], array($class['name'], $superClass));
+						}
+						if ($this->classes[$superClass]['type'] != 'component' && $this->classes[$superClass]['type'] != $class['type']) {
+							new Error($this->errors['incorrectSuperClass'], array($class['name'], $superClass));
+						}
+						if (!isset($this->usedComponents[$superClass])) {
+							$this->usedComponents[$superClass] = array();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private function validateUsedClasses() {
+		foreach ($this->usedComponents as $usedComponent => $data) {
+			if (!preg_match("/^[A-Z][a-zA-Z\d]+$/", $usedComponent)) {
+				new Error($this->errors['incorrectClassName'], array($usedComponent));
+			}
+			$inClasses = '';
+			if (!isset($this->classes[$usedComponent])) {
+				if (is_array($data['classes'])) {
+					$ending = count($data['classes']) > 1 ? 'ов' : 'а';
+					$inClasses = implode(', ', $data['classes']);
+				}
+				if (!empty($inClasses)) {
+					new Error($this->errors['usedClassNotFound'], array($usedComponent, $ending, $inClasses));
+				} else {
+					new Error($this->errors['usedClassNotFound2'], array($usedComponent));
+				}
+			}
+		}
+	}
+
 	private function unsetNotUsedClasses() {
 		$configJson = $this->configProvider->getConfigJson();
-		$used = $this->templateCompiler->getUsedComponents();
+		$used = array_keys($this->usedComponents);
 		$notUsedClasses = array();
 		$parentalClasses = array();
 		foreach ($this->classes as $className => $classData) {
@@ -148,7 +199,23 @@ class JSCompiler
 		foreach ($properNotUsedComponents as $className) {
 			unset($this->classes[$className]);
 		}
-		$this->componentsUsedInTemplates = $used;
+		$this->usedComponentsNames = array_reverse(array_unique(array_keys($this->usedComponents)));
+	}
+
+	private function addClassesFromTemplates() {
+		$templateClasses = $this->templateCompiler->getTemplateClasses();
+		$jsClasses = array_keys($this->classes);
+		foreach ($templateClasses as $templateClass) {
+			if (!in_array($templateClass, $jsClasses)) {				
+				$this->classes[$templateClass] = array(
+					'name' => $templateClass,
+					'content' => '',
+					'type' => $this->usedComponents[$templateClass]['type'],
+					'extends' => array(ucfirst($this->usedComponents[$templateClass]['type'])),
+					'isSuper' => true
+				);
+			}
+		}
 	}
 
 	private function initCore($coreFiles) {
@@ -286,7 +353,7 @@ class JSCompiler
 			'isSuper' => in_array($type, $this->superClasses)
 		);
 		$this->initialsParser->fetch($content, $this->classes[$className]);
-		$this->parseSpecialJSCode($content);
+		$this->parseSpecialJSCode($content, $className);
 		if (!is_array($this->classesByTypes[$classType])) {
 			$this->classesByTypes[$classType] = array();
 		}
@@ -298,8 +365,8 @@ class JSCompiler
 		return '<b>'.implode('</b>, <b>', $this->classTypes).'</b>';
 	}
 
-	private function parseSpecialJSCode(&$content) {
-		TextParser::encodeThis($content);
+	private function parseSpecialJSCode(&$content, $className) {
+		TextParser::encode($content, $className);
 		$content = preg_replace('/\#([a-z]\w*)/i', "__#$1", $content);
 		$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
 		$content = preg_replace('/'.$regexp.' {1,}/', "$1", $content);
@@ -357,7 +424,6 @@ class JSCompiler
 				}				
 			}
 		}
-		TextParser::decodeThis($content);
 	}
 	
 	private function validateEntry() {
@@ -401,5 +467,73 @@ class JSCompiler
 		if (isset($api) && !is_string($api)) {
 			new Error($this->errors['tooltipApiNotString']);
 		}
+	}
+
+	private function parseClasses() {
+		foreach ($this->classes as &$class) {
+			JSParser::parse($class);
+			$this->checkSolidMethodsUsing($class);
+			$this->checkSuperClassesCallings($class);
+
+			$vals = array_unique($class['functionList']);
+			if (count($vals) != count($class['functionList'])) {
+				$vals = array_count_values($class['functionList']);
+				foreach ($vals as $functionName => $count) {
+					if ($count > 1) {
+						new Error($this->errors['duplicateMethod'], array($functionName, $class['name']));
+					}
+				}
+			}
+		}
+	}
+
+	private function checkSolidMethodsUsing($class) {
+		global $componentLikeClassTypes, $solidMethods, $methods;
+		$isComponentLike = in_array($component['type'], $componentLikeClassTypes);
+		foreach ($functions as $func) {
+			if ($isComponentLike) {
+				if (isset($solidMethods[$func['name']])) {
+					if (is_numeric($solidMethods[$func['name']])) {
+						error("Класс <b>".$component['name']."</b> не может иметь метод <b>".$func['name']."</b>, т.к. он приватный и наследуется от класса <b>Component</b>. Вместо этого используйте метод <b>".$methods[$solidMethods[$func['name']]]."</b>");
+					} elseif (!empty($solidMethods[$func['name']])) {
+						error("Класс <b>".$component['name']."</b> не может иметь метод <b>".$func['name']."</b>, т.к. он приватный и наследуется от класса <b>Component</b>. Вместо этого используйте ".$solidMethods[$func['name']]);
+					} else {
+						error("Класс <b>".$component['name']."</b> не может иметь метод <b>".$func['name']."</b>, т.к. он приватный и наследуется от класса <b>Component</b>");
+					}
+				}
+			}
+		}
+	}
+
+	private function checkSuperClassesCallings(&$class) {
+		foreach ($class['functions'] as &$func) {
+			$regExp = '/\bsuper\((.*)\)/';
+			$parts = preg_split($regExp, $func['code']);
+			if (count($parts) > 1) {
+				preg_match_all($regExp, $func['code'], $matches);
+				$callings = $matches[1];
+				foreach ($callings as &$call) {
+					$arguments = '';
+					$errorText = 'Ошибка вызова <b>super('.$call.')</b> в методе <b>'.$func['name'].'</b> класса <b>'.$component['name'].'</b>. ';
+					$method = $func['name'];
+					if (empty($call)) {
+						$superClass = getSuperClassWithMethod($func['name'], $component, $errorText);
+					} else {
+						$callOpts = getArgumentsOfSuperClassCalling($call, $func['name'], $errorText);
+						$arguments = $callOpts['args'];
+						$superClass = $callOpts['superClass'];
+						$method = $callOpts['method'];
+					}
+					$call = $superClass.'.prototype.'.$method.'.call(this'.$arguments.')';
+				}
+				$func['code'] = '';
+				foreach ($parts as $i => $part) {
+					$func['code'] .= $part;
+					if (isset($callings[$i])) {
+						$func['code'] .= $callings[$i];
+					}
+				}
+			}
+		}		
 	}
 }

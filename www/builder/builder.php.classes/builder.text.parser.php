@@ -21,6 +21,8 @@ class TextParser
 
 	public static function encode(&$content, $key = null) {
 		self::initTexts($key);
+		$content = preg_replace('/\\\"/', '<sldq>', $content);
+		$content = preg_replace("/\\\'/", '<slq>', $content);
 		preg_match_all(self::$regexp, $content, $matches);
 		$matches = $matches[0];
 		$parts = preg_split(self::$regexp, $content);
@@ -114,6 +116,8 @@ class TextParser
 				$content .= self::$texts[$key][$i];
 			}
 		}
+		$content = str_replace('<sldq>', '\"', $content);
+		$content = str_replace("<slq>", "\'", $content);
 	}
 
 	public static function decodeThis(&$content) {

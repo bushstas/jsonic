@@ -25,8 +25,12 @@ class TemplateCompiler
 		return isset($this->templates[$className]);
 	}
 
+	public function getTemplateClasses() {
+		return array_keys($this->templates);
+	}
+
 	public function getUsedComponents() {
-		return array_keys($this->usedComponents);
+		return $this->usedComponents;
 	}
 
 	private function initUsedComponents($className, $content) {
@@ -37,6 +41,7 @@ class TemplateCompiler
 		foreach ($tagContents as $i => $tagContent) {
 			preg_match_all("/class=[\"'](\w+)[\"']/i", $tagContent, $matches);
 			$name = $matches[1][0];
+			if (empty($name)) continue;
 			if (!is_array($used[$name])) {
 				$used[$name] = array('classNames' => array());
 			}				

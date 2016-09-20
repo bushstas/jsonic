@@ -644,14 +644,6 @@
 			}
 		}
 
-
-
-
-		// =======================================================
-
-
-
-	
 		foreach ($classesFromTemplates as $classFromTemplate) {
 			if (isset($calledComponentsTypes2[$classFromTemplate])) {
 				$classes[$calledComponentsTypes2[$classFromTemplate]][$classFromTemplate] = array(
@@ -680,6 +672,7 @@
 				}
 			}
 		}
+
 		$usedComponents = array_reverse(array_unique($usedComponents));
 		foreach ($usedComponents as $usedComponent) {
 			if (!preg_match("/^[A-Z][a-zA-Z\d]+$/", $usedComponent)) {
@@ -699,6 +692,12 @@
 				error($error);
 			}
 		}
+
+		
+
+		// =======================================================
+
+
 
 		foreach ($classes as $classType => &$classesByType) {
 			parseClassInitials($classesByType);
