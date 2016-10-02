@@ -14,17 +14,13 @@ function initiate() {
 	this.margin = 4;
 }
 
-function onRendered() {
-	this.doOnParentReady(this.onParentReady);
-	this.redraw();
-}
-
-function onParentReady() {
+function onParentRendered() {
 	if (isArray(this.args['tabs'])) {
 		for (var i = 0; i < this.args['tabs'].length; i++) {
 			this.activateTab(i, !!this.args['tabs'][i]['active']);
 		}
 	}
+	this.redraw();
 }
 
 function redraw() {

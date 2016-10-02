@@ -38,7 +38,24 @@ class JSCompiler
 		'incorrectSuperClass' => 'Класс {??} не может быть унаследован от класса {??}. Они должны быть одинакового типа',
 		'usedClassNotFound' => 'Класс {??}, упомянутый в шаблоне класс{?} {??}, не найден',
 		'usedClassNotFound2' => 'Класс {??} не найден',
-		'duplicateMethod' => 'Обнаружено более одного метода с именем {??} в классе {??}'
+		'duplicateMethod' => 'Обнаружено более одного метода с именем {??} в классе {??}',
+		'noSuperClasses' => '{?}У данного класса отсутствуют супер-классы',
+		'noSuperClassMethod' => '{?}Данный метод не найден у супер-классов',
+		'fewSuperMethods' => '{?}У данного класса есть несколько супер-классов с данным методом. Используйте запись <b>super(ClassName)</b>',
+		'noSuperClass' => '{?}Супер-класс {??} не найден',
+		'noThisSuperClassMethod' => '{?}Метод {??} отсутствует у супер-класса {??}',
+		'nameReserved' => 'Название класса {??} зарезервировано системой',
+		'noController' => 'Контроллер {??} упомянутый в классе {??} не найден',
+		'noHelper' => 'Хелпер {??} упомянутый в классе {??} не найден',
+		'noHelperSubscribe' => 'У хелпера {??} упомянутого в классе {??} отсутствует метод <b>subscribe</b>',
+		'noDialog' => 'Диалоговое окно {??} упомянутое в классе {??} не найдено',
+		'actionNotFound' => 'Событие {??} указаннное в initial параметре <b>controllers</b> класса {??} не найдено в initial параметре <b>actions</b> контроллера {??}',
+		'noRouterMenuClass' => "Класс {??}, указанный в параметре конфигурации <b>router['menu']</b>, не найден",
+		'incorrectRouterMenuClass' => "Класс {??}, указанный в параметре конфигурации <b>router['menu']</b>, должен иметь тип <b>menu</b>",
+		'diffClassType' => 'Класс {??} имеет тип {??}, однако вызывается с типом {??} в шаблоне класса {??}',
+		'dialogCalling' => 'Недопустимая попытка вызвать компонент с типом <b>dialog</b> из шаблона в классе {??}<br><br>Для диалога синглтона используйте код вида<xmp>Dialoger.show(CommentsDialog, options)</xmp>в противном случае используйте третий аргумент в качестве id параметра<xmp>Dialoger.show(ItemDialog, options, itemId)</xmp>',
+		'noRouteController' => 'Контроллер {??} упомянутый в конфигурации роутера не найден',
+		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден'
 	);
 
 	private $coreClasses = array(
@@ -63,11 +80,17 @@ class JSCompiler
 	private $classes = array();
 	private $classesByTypes = array();
 	private $sources = array();
+	private $correctors = array();
 	private $helpers = array();
 	private $JSFileNames = array();
 	private $jsCode = '';
+	private $jsOutput = '';
 	private $initialsParser;
 	private $templateCompiler;
+	private $textsCompiler;
+	private $dataCompiler;
+	private $declCompiler;
+	private $routesCompiler;
 	private $usedComponents;
 	private $usedComponentsNames;
 
@@ -80,6 +103,10 @@ class JSCompiler
 	public function init() {
 		$this->config = $this->configProvider->getJsConfig();
 		$this->templateCompiler = $this->configProvider->getBuilder()->getCompiler('template');
+		$this->textsCompiler = $this->configProvider->getBuilder()->getCompiler('texts');
+		$this->dataCompiler = $this->configProvider->getBuilder()->getCompiler('data');
+		$this->declCompiler = $this->configProvider->getBuilder()->getCompiler('decl');
+		$this->routesCompiler = $this->configProvider->getBuilder()->getCompiler('routes');
 
 		$this->validateEntry();
 		$this->validateJsFolder();
@@ -102,6 +129,8 @@ class JSCompiler
 		$this->validateUsedClasses();
 		$this->initialsParser->run($this->classes);
 		$this->parseClasses();
+		$this->checkClasses();
+		$this->addGlobals();
 	}
 
 	private function validateApplication() {
@@ -130,7 +159,7 @@ class JSCompiler
 		}
 		if (!empty($router['404']) && !isset($views[$router['404']])) {
 			new Error($this->errors['404NotFound'], array($router['404']));
-		}		
+		}
 	}
 
 	private function validateSuperClasses() {
@@ -340,6 +369,7 @@ class JSCompiler
 		array_unshift($properExtends, ucfirst($classType));
 		if ($classType == 'corrector') {
 			$className .=  'Crr';
+			$this->correctors[] = $className;
 			$properExtends = array();
 		}
 		if (isset($this->classes[$className])) {
@@ -469,10 +499,120 @@ class JSCompiler
 		}
 	}
 
+	private function checkClasses() {
+		$routerMenuClasses = $this->config['routerMenu'];
+		if (is_array($routerMenuClasses)) {
+			foreach ($routerMenuClasses as $routerMenuClass) {
+				if (!isset($this->classes[$routerMenuClass])) {
+					new Error($this->errors['noRouterMenuClass'], $routerMenuClass);
+				}
+				if (!isset($this->classesByTypes['menu'][$routerMenuClass])) {
+					new Error($this->errors['incorrectRouterMenuClass'], $routerMenuClass);
+				}
+			}
+		}
+		$routeControllersToLoad = $this->config['routerControllers'];
+		foreach ($routeControllersToLoad as $routeControllersToLoad) {
+			if (!isset($this->classesByTypes['controller'][$routeControllersToLoad])) {
+				new Error($this->errors['noRouteController'], $routeControllersToLoad);
+			}
+		}
+		$tooltipClass = $this->config['tooltipClass'];
+		if (!empty($tooltipClass) && !isset($this->classes[$tooltipClass])) {
+			new Error($this->errors['noTooltipClass'], $tooltipClass);
+		}
+		foreach ($this->classes as $className => &$class) {
+			if (in_array($className, $this->reservedNames)) {
+				new Error($this->errors['nameReserved'], $className);
+			}
+			if (is_array($class['controllers'])) {
+				foreach ($class['controllers'] as $controller) {
+					if (!isset($this->classesByTypes['controller'][$controller])) {
+						new Error($this->errors['noController'], array($controller, $class['name']));
+					}
+				}
+			}
+			if (is_array($class['helpers'])) {
+				foreach ($class['helpers'] as $helper) {						
+					if (!isset($this->sources[$helper])) {
+						new Error($this->errors['noHelper'], array($helper, $class['name']));
+					}
+					$code = $this->sources[$helper]['content'];
+					if (!preg_match('/\bthis\.subscribe\s*=\s*function\b/', $code) && !preg_match('/\b'.$helper.'\.prototype\.subscribe\s*=\s*function\b/', $code)) {
+						new Error($this->errors['noHelperSubscribe'], array($helper, $class['name']));
+					}
+				}
+			}
+			if (is_array($class['dialogs'])) {
+				if (is_array($class['dialogs'])) {
+					foreach ($class['dialogs'] as $dialog) {
+						if (!isset($this->classesByTypes['dialog'][$dialog])) {
+							new Error($this->errors['noDialog'], array($dialog, $class['name']));
+						}
+					}
+				}
+			}
+			if (is_array($class['onActions'])) {
+				foreach ($class['onActions'] as $action) {
+					$controller = $this->classesByTypes['controller'][$action['controller']];
+					$actions = $controller['actions'];
+					if (!is_array($actions)) {
+						$actions = array();
+					}
+					if (!isset($actions[$action['action']])) {
+						new Error($this->errors['actionNotFound'], array($action['action'], $class['name'], $action['controller']));
+					}
+				}
+			}
+			if (isset($this->usedComponents[$className]) && isset($this->usedComponents[$className]['type']) && $class['type'] != $this->usedComponents[$className]['type']) {
+				if ($class['type'] == 'dialog') {
+					new Error($this->errors['dialogCalling'], $this->usedComponents[$className]['classNames'][0]);
+				}
+				new Error($this->errors['diffClassType'], array($className, $class['type'], $this->usedComponents[$className]['type'], $this->usedComponents[$className]['classNames'][0]));
+			}
+			$class['extends'] = array_unique($this->getAllExtendClasses($class['extends']));
+		}
+	}
+
+	private function addGlobals() {
+		$data = array(
+			'texts' => $this->textsCompiler->get(),
+			'config' => $this->apiConfig,
+			'data' => $this->dataCompiler->get(),
+			'pathToDictionary' => $this->config['pathToDictionary'],
+			'tags' => Tags::getList(),
+			'props' => Props::getList(),
+			'events' => Events::getList(),
+			'decls' => $this->declCompiler->get(),
+			'routes' => $this->config['router']['routes'],
+			'errorRoutes' => $this->routesCompiler->getErrorRoutes(),
+			'hashRouter' => $this->routesCompiler->getHashRouter(),
+			'indexRoute' => $this->routesCompiler->getIndexRoute(),
+			'defaultRoute' => $this->routesCompiler->getDefaultRoute(),
+			'viewContainer' => $this->config['viewContainer']
+		);
+		$jsOutput = JSGlobals::run($data);
+	}
+
+	
+	private	function getAllExtendClasses($extends) {
+		if (!is_array($extends)) return array();
+		foreach ($extends as $class) {
+			if (is_array($this->classes[$class])) {
+				$extClasses = $this->classes[$class]['extends'];
+				if (is_array($extClasses)) {
+					$extends = array_merge($extends, $this->getAllExtendClasses($extClasses));	
+				}
+			}
+		}
+		return $extends;
+	}
+
 	private function parseClasses() {
+		JSParser::setCorrectors($this->correctors);
 		foreach ($this->classes as &$class) {
 			JSParser::parse($class);
-			$this->checkSolidMethodsUsing($class);
+			JSChecker::check($class);
 			$this->checkSuperClassesCallings($class);
 
 			$vals = array_unique($class['functionList']);
@@ -481,24 +621,6 @@ class JSCompiler
 				foreach ($vals as $functionName => $count) {
 					if ($count > 1) {
 						new Error($this->errors['duplicateMethod'], array($functionName, $class['name']));
-					}
-				}
-			}
-		}
-	}
-
-	private function checkSolidMethodsUsing($class) {
-		global $componentLikeClassTypes, $solidMethods, $methods;
-		$isComponentLike = in_array($component['type'], $componentLikeClassTypes);
-		foreach ($functions as $func) {
-			if ($isComponentLike) {
-				if (isset($solidMethods[$func['name']])) {
-					if (is_numeric($solidMethods[$func['name']])) {
-						error("Класс <b>".$component['name']."</b> не может иметь метод <b>".$func['name']."</b>, т.к. он приватный и наследуется от класса <b>Component</b>. Вместо этого используйте метод <b>".$methods[$solidMethods[$func['name']]]."</b>");
-					} elseif (!empty($solidMethods[$func['name']])) {
-						error("Класс <b>".$component['name']."</b> не может иметь метод <b>".$func['name']."</b>, т.к. он приватный и наследуется от класса <b>Component</b>. Вместо этого используйте ".$solidMethods[$func['name']]);
-					} else {
-						error("Класс <b>".$component['name']."</b> не может иметь метод <b>".$func['name']."</b>, т.к. он приватный и наследуется от класса <b>Component</b>");
 					}
 				}
 			}
@@ -514,12 +636,12 @@ class JSCompiler
 				$callings = $matches[1];
 				foreach ($callings as &$call) {
 					$arguments = '';
-					$errorText = 'Ошибка вызова <b>super('.$call.')</b> в методе <b>'.$func['name'].'</b> класса <b>'.$component['name'].'</b>. ';
+					$errorText = 'Ошибка вызова <b>super('.$call.')</b> в методе <b>'.$func['name'].'</b> класса <b>'.$class['name'].'</b>. ';
 					$method = $func['name'];
 					if (empty($call)) {
-						$superClass = getSuperClassWithMethod($func['name'], $component, $errorText);
+						$superClass = $this->getSuperClassWithMethod($func['name'], $class, $errorText);
 					} else {
-						$callOpts = getArgumentsOfSuperClassCalling($call, $func['name'], $errorText);
+						$callOpts = $this->getArgumentsOfSuperClassCalling($call, $func['name'], $errorText);
 						$arguments = $callOpts['args'];
 						$superClass = $callOpts['superClass'];
 						$method = $callOpts['method'];
@@ -535,5 +657,49 @@ class JSCompiler
 				}
 			}
 		}		
+	}
+
+	private	function getSuperClassWithMethod($funcName, $class, $errorText) {
+		$extends = $class['extends'];
+		if (empty($extends) || !is_array($extends)) {
+			new Error($this->errors['noSuperClasses'], $errorText);
+		}
+		$superClasses = array();
+		foreach ($extends as $className) {
+			$code = $this->classes[$className]['content'];
+			if (!empty($code) && preg_match('/\bfunction +'.$funcName.'*\(/', $code)) {
+				$superClasses[] = $className;
+			}
+			$code = $this->sources[$className]['content'];
+			if (!empty($code) && preg_match('/\bprototype\.'.$funcName.'\b/', $code)) {
+				$superClasses[] = $className;
+			}
+		}
+		if (empty($superClasses)) {
+			new Error($this->errors['noSuperClassMethod'], $errorText);
+		} else if (count($superClasses) > 1) {
+			new Error($this->errors['fewSuperMethods'], $errorText);
+		}
+		return $superClasses[0];
+	}
+
+	private function getArgumentsOfSuperClassCalling($call, $funcName, $errorText) {
+		$args = explode(',', $call);
+		$superClass = trim($args[0]);
+		$parts = explode('.', $superClass);
+		if (isset($parts[1])) {
+			$funcName = $parts[1];
+			$superClass = $parts[0];
+		}
+		$args[0] = '';
+		$arguments = implode(',', $args);
+		if (!isset($this->classes[$superClass])) {
+			new Error($this->errors['noSuperClass'], array($errorText, $superClass));
+		}
+		$code = $this->classes[$superClass]['content'];
+		if (empty($code) || !preg_match('/\bfunction +'.$funcName.'*\(/', $code)) {
+			new Error($this->errors['noThisSuperClassMethod'], array($errorText, $funcName, $superClass));
+		}
+		return array('args' => $arguments, 'superClass' => $superClass, 'method' => $funcName);
 	}
 }

@@ -81,7 +81,7 @@ function Application() {
 		this.viewContainer = viewContainer;
 	};
 	var activateView = function(view, isActivated, isSameView) {
-		var parentElement = view.getParentElement();
+		var parentElement = view._getParentElement();
 		if (!isActivated) {
 			this.viewContainer.removeChild(parentElement);
 		} else {

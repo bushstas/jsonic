@@ -20,4 +20,8 @@ class DeclCompiler
 			}
 		}
 	}
+
+	public function get() {
+		return $this->declensions;
+	}
 }

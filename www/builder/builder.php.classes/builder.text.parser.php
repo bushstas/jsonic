@@ -123,4 +123,19 @@ class TextParser
 	public static function decodeThis(&$content) {
 		self::decode($content, '_this_');
 	}
+
+	public static function createObjectString(&$object, $replacements = null) {
+		if (is_array($object)) {
+			$object = json_encode($object);
+		}
+		if (is_array($replacements)) {
+			for ($i = 0; $i < count($replacements); $i++) {
+				if (is_string($replacements[$i + 1])) {
+					$object = preg_replace($replacements[$i], $replacements[$i + 1], $object);
+				}
+				$i++;
+			}
+		}
+ 		$object = str_replace('"', "'", $object);
+	}
 }

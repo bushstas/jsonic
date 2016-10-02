@@ -4,6 +4,9 @@ class Error
 {	
 	public function __construct($errors, $args = null) {
 		if (!is_array($errors)) {
+			if (is_string($args) && !empty($args)) {
+				$args = array($args);
+			}
 			if (is_array($args) && !empty($args)) {
 				$errors = str_replace('{??}', '<b>{?}</b>', $errors);
 				$regexp = '/\{\?\}/';

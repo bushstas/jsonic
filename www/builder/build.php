@@ -693,16 +693,11 @@
 			}
 		}
 
-		
-
-		// =======================================================
-
-
-
 		foreach ($classes as $classType => &$classesByType) {
 			parseClassInitials($classesByType);
 			parseClassFunctions($classesByType);
 		}
+
 		foreach ($classes['controller'] as $controller) {
 			if (empty($controller['initials']['actions'])) {
 				error('У контроллера <b>'.$controller['name'].'</b> отсутствуют initial параметр <b>actions</b>.<br><br><b>Параметр должен иметь вид:</b> '.getInitialParamExample('actions'));
@@ -711,6 +706,7 @@
 				error('У контроллера <b>'.$controller['name'].'</b> initial параметр <b>actions</b> обязательно должен содержать action <b>load</b>. Используйте запись <b>initial actions = {"load": {"url": "items/load.php" ...}}</b>');
 			}
 		}
+		
 		$routerMenuClasses = $routerMenu;
 		$types = array_keys($classes);
 		foreach ($types as $type) {
@@ -766,6 +762,7 @@
 				}
 			}
 		}
+
 		foreach ($classesList as &$class) {
 			$class['extends'] = array_unique(getAllExtendClasses($class['extends']));
 			if (isset($calledComponentsTypes[$class['name']]) && $class['type'] != $calledComponentsTypes[$class['name']]['type']) {
@@ -774,7 +771,8 @@
 				}
 				error("Неверный тип вызываемого компонента <b>".$class['name']."</b> в шаблоне класса <b>".$calledComponentsTypes[$class['name']]['file']."</b><br><br>Найдено: <b>".$calledComponentsTypes[$class['name']]['type']."</b>, требуется: <b>".$class['type']."</b>");
 			}
-		}
+		}	
+
 		foreach ($routeControllersToLoad as $routeControllersToLoad) {
 			if (!is_array($classes['controller'][$routeControllersToLoad])) {
 				error("Контроллер <b>".$routeControllersToLoad."</b> упомянутый в конфигурации роутера не найден");
@@ -782,7 +780,7 @@
 		}
 		if (!empty($routerMenuClasses)) {
 			error("Класс(ы) <b>".implode(', ', $routerMenuClasses)."</b> указанные в параметре конфигурации <b>router['menu']</b> не найдены");
-		}
+		}	
 		if (!empty($tooltipClass) && !isset($classNames[$tooltipClass])) {
 			error("Класс <b>".$tooltipClass."</b> указанный в параметре конфигурации <b>tooltipClass</b> не найден");
 		}
@@ -806,6 +804,7 @@
 		}
 		$dictionaryUrl = $config['pathToDictionary'];
 		$globals[] = "var __DICTURL = '".$dictionaryUrl."';";
+
 		$globals[] = "var __TAGS = ".str_replace('"', "'", json_encode(getTagShortcuts())).';';
 		$globals[] = "var __A = ".str_replace('"', "'", json_encode($propsShortcutsFlipped)).';';
 		$globals[] = "var __DW = ".str_replace('"', "'", json_encode($declensions)).';';
@@ -814,6 +813,9 @@
 		$globals[] = createObjectString('__ERRORROUTES', $errorRoutes, array('/":"([^"]+)"/', "':$1"));
 		$globals[] = "var __HASHROUTER = ".($isHashRouter ? 'true' : 'false').';';
 		$globals[] = "var __INDEXROUTE = ".($indexRoute ? "'".$indexRoute."'" : 'null').';';
+
+		// =========================================
+
 		$globals[] = "var __DEFAULTROUTE = ".($defaultRoute ? "'".$defaultRoute."'" : 'null').';';
 		$globals[] = "var __VIEWCONTAINER = '->>".$viewContainer."';";
 		$globals[] = "var __I = '".($advancedMode ? '_i' : 'initiate')."';";

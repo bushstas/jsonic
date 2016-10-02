@@ -2,7 +2,18 @@
 
 class JSParser
 {
-	
+	private static $correctors;
+
+	private static $errors = array(
+		'validationError' => 'Ошибка в валидации кода класса {??}',
+		'incorrectCorrName' => 'Некоррекнтое имя корректора {??} в методе {??} класса {??}',
+		'unknownCorr' => 'Неизвестный корректор {??} в методе {??} класса {??}'
+	);
+
+	public static function setCorrectors($correctors) {
+		self::$correctors = $correctors;
+	}
+
 	public static function parse(&$class) {
 		$code = 'function(){}'.trim($class['content']);
 		$code = preg_replace("/@(\w+)/", "__.$1", $code);
@@ -42,7 +53,7 @@ class JSParser
 						$class['calledMethods'][] = array('method' => $functionName, 'called' => $msi);
 					}						
 				}
-				parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
+				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
 				$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => $code);
 				$functionList[] = $functionName;
 				$nextPart = $properParts[$i + 1];
@@ -53,7 +64,7 @@ class JSParser
 					$i++;
 					
 					if ($properParts[$i + 2] == '{' || empty($functionName)) {
-						error("Ошибка в валидации кода класса <b>".$class['name'].'</b>');
+						new Error(self::$errors['validationError'], array($class['name']));
 					}
 				}
 				$opening = 0;
@@ -144,6 +155,40 @@ class JSParser
 
 		}
 		return $code;
+	}
+
+	private static function parseArgsForCorrectors(&$args, &$code, $class, $name) {
+		$parts = explode(',', $args);
+		$args = array();
+		$corrs = array();
+		foreach ($parts as $part) {
+			$part = trim($part);
+			$p = explode(':', $part);
+			$arg = $p[0];
+			$args[] = $arg;
+			if (isset($p[1])) {				
+				foreach ($p as $i => $v) {
+					if ($i > 0) {
+						if (!is_array($corrs[$arg])) {
+							$corrs[$arg] = array();
+						}
+						$corrs[$arg][] = $v;
+					}
+				}
+			}
+		}
+		$args = implode(',', $args);
+		foreach ($corrs as $k => $v) {
+			foreach ($v as $crr) {
+				if (!preg_match('/^[a-z]\w*/i', $crr)) {
+					new Error(self::$errors['incorrectCorrName'], array($crr, $name, $class));
+				}
+				if (!in_array($crr.'Crr', self::$correctors)) {
+					new Error(self::$errors['unknownCorr'], array($crr, $name, $class));
+				}
+				$code = "\t".$k."=Corrector.correct('".$crr."',".$k.");\n".$code;
+			}
+		}
 	}
 
 }

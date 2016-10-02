@@ -23,7 +23,8 @@ class InitialsParser
 		'itemNotAssocArray' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, который не €вл€етс€ ассоциативным массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'itemNoParam' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого отсутствует параметр {??}><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'paramNotArray' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого параметр {??} не €вл€етс€ массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
-		'typeError' => ' ласс {??} с типом {??} не может содержать initial параметр {??}'
+		'typeError' => ' ласс {??} с типом {??} не может содержать initial параметр {??}',
+		'noActions' => '” контроллера {??} отсутствуют initial параметр <b>actions</b>.<br><br><b>ѕараметр должен иметь вид:</b> {?}'
 
 	);
 
@@ -61,7 +62,16 @@ class InitialsParser
 			$this->defineForClass($classes[$className]);
 			foreach ($initials as $type => &$value) {
 				$this->validateInitialValue($type, $value);
+				if ($this->currentClass['type'] == 'controller') {
+					$this->validateControllerInitials($this->currentClass['initials']);
+				}
 			}
+		}
+	}
+
+	private function validateControllerInitials($initials) {
+		if (empty($initials['actions'])) {
+			new Error($this->errors['noActions'], array($this->currentClassName, $this->getInitialParamExample('actions')));
 		}
 	}
 

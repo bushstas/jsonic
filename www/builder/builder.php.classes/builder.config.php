@@ -87,7 +87,12 @@ class Config
 			'tooltipClass' => $this->config['tooltipClass'],
 			'tooltipApi' => $this->config['tooltipApi'],
 			'pathToCore' => $this->getPathToCore(),
-			'router' => $this->getRoutesConfig()
+			'router' => $this->getRoutesConfig(),
+			'routerMenu' => $this->getRouterMenu(),
+			'routerControllers' => $this->getRouterControllers(),
+			'tooltipClass' => $this->config['tooltipClass'],
+			'pathToDictionary' => $this->config['pathToDictionary'],
+			'viewContainer' => $this->config['container']
 		);
 	}
 
@@ -129,6 +134,14 @@ class Config
 
 	public function getRoutesConfig() {
 		return $this->config['router'];
+	}
+
+	public function getRouterMenu() {
+		return $this->builder->getCompiler('routes')->getMenu();
+	}
+
+	public function getRouterControllers() {
+		return $this->builder->getCompiler('routes')->getControllers();
 	}
 
 	public function getRoutes() {

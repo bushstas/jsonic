@@ -128,11 +128,11 @@ function Controller() {
 		this.activeRequests = [];
 	};
 
-	Controller.prototype.subscribe = function(eventType, callback, subscriber) {
+	Controller.prototype._subscribe = function(eventType, callback, subscriber) {
 		this.subscribers.push([eventType, callback, subscriber]);
 	};
 
-	Controller.prototype.unsubscribe = function(subscriber, eventType) {
+	Controller.prototype._unsubscribe = function(subscriber, eventType) {
 		var done = false;
 		while (!done) {
 			done = true;

@@ -29,7 +29,7 @@ Foreach.prototype.createLevel = function(items, isUpdating, index) {
 	if (isNumber(index) && this.levels[index]) {
 		nextSiblingChild = this.levels[index].getFirstNodeChild();
 	} else {
-		nextSiblingChild = isUpdating ? this.getNextSiblingChild() : null;
+		nextSiblingChild = isUpdating ? this._getNextSiblingChild() : null;
 	}
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
 	this.levels.insertAt(level, index);
@@ -52,10 +52,8 @@ Foreach.prototype.remove = function(index) {
 	}
 };
 
-Foreach.prototype.getFirstNodeChild = function() {
-	if (this.levels[0]) {
-		return this.levels[0].getFirstNodeChild();
-	}
+Foreach.prototype._getFirstNodeChild = function() {
+	if (this.levels[0]) return this.levels[0].getFirstNodeChild();
 	return null;
 };
 
@@ -67,7 +65,7 @@ Foreach.prototype.disposeLevels = function() {
 };
 
 Foreach.prototype.dispose = function() {
-	this.disposeLinks();
+	this._disposeLinks();
 	this.disposeLevels();
 	this.levels = null;
 	this.parentElement = null;

@@ -1,36 +1,24 @@
 function Core() {}
-Core.prototype.getNextSiblingChild = function() {
-	if (!this.nextSiblingChild) {
-		return null;
-	}
-	if (this.nextSiblingChild instanceof Node) {
-		return this.nextSiblingChild;
-	}
-	var firstNodeChild = this.nextSiblingChild.getFirstNodeChild();
-	if (firstNodeChild) {
-		return firstNodeChild;
-	}
-	return this.nextSiblingChild.getNextSiblingChild();	
+Core.prototype._getNextSiblingChild = function() {
+	if (!this.nextSiblingChild) return null;
+	if (this.nextSiblingChild instanceof Node) return this.nextSiblingChild;
+	var firstNodeChild = this.nextSiblingChild._getFirstNodeChild();
+	if (firstNodeChild) return firstNodeChild;
+	return this.nextSiblingChild._getNextSiblingChild();	
 };
-Core.prototype.setNextSiblingChild = function(nextSiblingChild) {
+Core.prototype._setNextSiblingChild = function(nextSiblingChild) {
 	this.nextSiblingChild = nextSiblingChild;
-	if (!(nextSiblingChild instanceof Node)) {
-		this.nextSiblingChild.setPrevSiblingChild(this);
-	}
+	if (!(nextSiblingChild instanceof Node)) this.nextSiblingChild._setPrevSiblingChild(this);
 };
-Core.prototype.setPrevSiblingChild = function(prevSiblingChild) {
+Core.prototype._setPrevSiblingChild = function(prevSiblingChild) {
 	this.prevSiblingChild = prevSiblingChild;
 };
-Core.prototype.disposeLinks = function() {
-	if (this.prevSiblingChild) {
-		this.prevSiblingChild.setNextSiblingChild(this.nextSiblingChild);
-	}
+Core.prototype._disposeLinks = function() {
+	if (this.prevSiblingChild) this.prevSiblingChild._setNextSiblingChild(this.nextSiblingChild);
 	this.prevSiblingChild = null;
 	this.nextSiblingChild = null;
 };
-Core.prototype.setScope = function(scope) {
-	this.parentLevel.setScope(scope);
-};
-Core.prototype.getPropName = function(i) {
-	this.parentLevel.getPropName(i);
+Core.prototype._getFirstNodeChild = function() {
+	if (this.level) return this.level.getFirstNodeChild();
+	return null;
 };

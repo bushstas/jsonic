@@ -15,7 +15,9 @@ define('DEFAULT_PAGETITLE', 'Page title');
 define('DEFAULT_CHARSET', 'windows-1251');
 
 $includes = array(
-	'error', 'core.validator', 'config', 'gatherer', 'css', 'js', 'templates', 'html', 'routes', 'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser'
+	'error', 'core.validator', 'config', 'gatherer', 'css', 'js', 'templates', 'html', 'routes',
+	'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser', 'js.checker', 'js.globals',
+	'data', 'tags', 'props', 'events'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
@@ -25,7 +27,7 @@ class Builder
 {
 	private $config, $gatherer, $testsCompiler,
 			$cssCompiler, $jsCompiler, $htmlCompiler,
-			$templateCompiler;
+			$templateCompiler, $dataCompiler;
 
 	private $files;
 	
@@ -42,15 +44,15 @@ class Builder
 		$this->routesCompiler->init();
 
 		$this->templateCompiler = new TemplateCompiler();
+		$this->textsCompiler = new TextsCompiler();
+		$this->dataCompiler = new DataCompiler();
+		$this->declCompiler = new DeclCompiler();
 
 		$this->jsCompiler = new JSCompiler($this->config);
 		$this->jsCompiler->init();
 
 		$this->htmlCompiler = new HTMLCompiler($this->config);
 		$this->htmlCompiler->init();
-		
-		$this->textsCompiler = new TextsCompiler();
-		$this->declCompiler = new DeclCompiler();
 		
 		$this->gatherer = new Gatherer($this->config);
 		$this->gatherer->init();
@@ -59,7 +61,7 @@ class Builder
 			$this->testsCompiler = new TestsCompiler($this->config);
 			$this->testsCompiler->init();
 		}
-		$this->files = $this->gatherer->gatherFiles();		
+		$this->files = $this->gatherer->gatherFiles();
 		$this->runCompilers();
 	}
 
@@ -67,6 +69,7 @@ class Builder
 		$this->htmlCompiler     -> run ();
 		$this->cssCompiler      -> run ($this->files['css'], $this->files['cssconst']);
 		$this->textsCompiler    -> run ($this->files['texts']);
+		$this->dataCompiler     -> run ($this->files['data']);
 		$this->declCompiler     -> run ($this->files['decl']);
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
 		$this->jsCompiler       -> run ($this->files['js'], $this->files['core']);
@@ -88,6 +91,8 @@ class Builder
 				return $this->testsCompiler;
 			case 'texts':
 				return $this->textsCompiler;
+			case 'data':
+				return $this->dataCompiler;
 			case 'decl':
 				return $this->declCompiler;
 		}

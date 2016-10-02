@@ -2,7 +2,7 @@
 
 class RoutesCompiler 
 {
-	private $configProvider, $config, 
+	private $configProvider, $config, $routerMenu,
 			$defaultRoute, $indexRoute, $isHashRouter;
 
 	private $routeControllersToLoad = array();
@@ -73,6 +73,26 @@ class RoutesCompiler
 
 	public function getErrorRoutes() {
 		return $this->errorRoutes;
+	}
+
+	public function getMenu() {
+		return $this->routerMenu;
+	}
+
+	public function getControllers() {
+		return $this->routeControllersToLoad;
+	}
+
+	public function getIndexRoute() {
+		return $this->indexRoute;
+	}
+
+	public function getDefaultRoute() {
+		return $this->defaultRoute;
+	}
+
+	public function getHashRouter() {
+		return $this->isHashRouter;
 	}
 
 	private	function validateRoutes($routes) {
@@ -168,7 +188,7 @@ class RoutesCompiler
 					$properRouterMenu[] = $menuClass;
 				}
 			}
-			$routerMenu = $properRouterMenu;
+			$this->routerMenu = $properRouterMenu;
 		}
 	}
 
