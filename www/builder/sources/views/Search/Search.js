@@ -12,7 +12,6 @@ function onRendered() {
 	this.openInformer();
 }
 
-
 function openInformer() {
 	var datatable = <::datatable>;
 }

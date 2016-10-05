@@ -92,7 +92,10 @@ class Config
 			'routerControllers' => $this->getRouterControllers(),
 			'tooltipClass' => $this->config['tooltipClass'],
 			'pathToDictionary' => $this->config['pathToDictionary'],
-			'viewContainer' => $this->config['container']
+			'viewContainer' => $this->config['container'],
+			'pathToApi' => $this->config['pathToApi'],
+			'pagetitle' => $this->config['title'],
+			'user' => $this->config['user']
 		);
 	}
 

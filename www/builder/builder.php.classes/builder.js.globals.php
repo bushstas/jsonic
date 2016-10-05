@@ -17,7 +17,13 @@ class JSGlobals
 		'hashRouter'       => '__HASHROUTER',
 		'indexRoute'       => '__INDEXROUTE',
 		'defaultRoute'     => '__DEFAULTROUTE',
-		'viewContainer'    => '__VIEWCONTAINER'
+		'viewContainer'    => '__VIEWCONTAINER',
+		'tooltipClass'     => '__TC',
+		'tooltipApi'       => '__TA',
+		'correctors'       => '__CRRS',
+		'pathToApi'        => '__APIDIR',
+		'pagetitle'        => '__PAGETITLE',
+		'user'             => '__USEROPTIONS'
 	);
 
 	private static $errors = array(
@@ -39,11 +45,22 @@ class JSGlobals
 		self::addIndexRoute($data['indexRoute']);
 		self::addDefaultRoute($data['defaultRoute']);
 		self::addViewContainer($data['viewContainer']);
-		printArr(self::$output);
+		self::addTooltipClass($data['tooltipClass']);
+		self::addTooltipApi($data['tooltipApi']);
+		self::addCorrectors($data['correctors']);
+		self::addPathToApi($data['pathToApi']);
+		self::addPagetitle($data['pagetitle']);
+		self::addUserOptions($data['user']);
+
+		return self::$output;
 	}
 
 	public static function getVarName($key) {
 		return self::$varNames[$key];
+	}
+
+	public static function getVarNames() {
+		return self::$varNames;
 	}
 
 	private static function add($key, $content) {
@@ -119,7 +136,28 @@ class JSGlobals
 		self::add('viewContainer', "'->>".$viewContainer."'");
 	}
 
-	
+	private static function addTooltipClass($tooltipClass) {
+		self::add('tooltipClass', !empty($tooltipClass) ? $tooltipClass : 'null');
+	}
 
-	
+	private static function addTooltipApi($tooltipApi) {
+		self::add('tooltipApi', "'".$tooltipApi."'");
+	}
+
+	private static function addCorrectors($correctors) {
+		self::add('correctors', str_replace('"', '', json_encode($correctors)));
+	}
+
+	private static function addPathToApi($pathToApi) {
+		self::add('pathToApi', "'".$pathToApi."'");
+	}
+
+	private static function addPagetitle($pagetitle) {
+		self::add('pagetitle', "'".$pagetitle."'");
+	}
+
+	private static function addUserOptions($userOptions) {
+		TextParser::createObjectString($userOptions, array('/\\\/', ''));
+		self::add('user', $userOptions);
+	}	
 }

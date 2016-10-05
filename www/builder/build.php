@@ -813,9 +813,6 @@
 		$globals[] = createObjectString('__ERRORROUTES', $errorRoutes, array('/":"([^"]+)"/', "':$1"));
 		$globals[] = "var __HASHROUTER = ".($isHashRouter ? 'true' : 'false').';';
 		$globals[] = "var __INDEXROUTE = ".($indexRoute ? "'".$indexRoute."'" : 'null').';';
-
-		// =========================================
-
 		$globals[] = "var __DEFAULTROUTE = ".($defaultRoute ? "'".$defaultRoute."'" : 'null').';';
 		$globals[] = "var __VIEWCONTAINER = '->>".$viewContainer."';";
 		$globals[] = "var __I = '".($advancedMode ? '_i' : 'initiate')."';";
@@ -823,7 +820,6 @@
 		$globals[] = "var __TC = ".(!empty($tooltipClass) ? $tooltipClass : 'null').";";
 		$globals[] = "var __TA = '".$tooltipApi."';";
 		$globals[] = "var __CRRS = ".str_replace('"', '', json_encode($correctorsList)).";";
-
 		if (!empty($pathToApi)) {
 			$globals[] = "var __APIDIR = '".$pathToApi."';";
 		}
@@ -831,6 +827,7 @@
 		if ($isUser) {
 			$globals[] = createObjectString('__USEROPTIONS', $user, array('/\\\/', ''));
 		}
+		// =========================================
 		
 		$compiledJs = array();
 		$compiledJs[] = implode("\n", $globals);

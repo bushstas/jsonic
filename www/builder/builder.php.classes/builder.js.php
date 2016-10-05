@@ -62,15 +62,6 @@ class JSCompiler
 		'Component', 'Controller', 'Application', 'View', 'Dialog', 'Menu', 'Control'
 	);
 
-	private $reservedNames = array(
-		'Component', 'Controller', 'Application', 'View', 'Level',
-		'Control', 'AjaxRequest', 'Router', 'Objects', 'Corrector',
-		'Condition', 'Core', 'Menu', 'EventHandler', 'Dialoger', 'Foreach',
-		'Globals', 'User', 'StoreKeeper', 'Switch', 'Tooltiper', 'IfSwitch',
-		'__', '__T', '__ROUTES', '__TAGS', '__A', '__EVENTTYPES', '__HASHROUTER', '__DEFAULTROUTE', '__ERRORROUTES',
-		'__VIEWCONTAINER', '__USEROPTIONS', '__D', '__V', '__DW', '__CRRS'
-	);
-
 	private $classTypes = array(
 		'application', 'view', 'component', 'controller', 'dialog', 'form', 'control', 'menu', 'corrector'
 	);
@@ -83,6 +74,7 @@ class JSCompiler
 	private $correctors = array();
 	private $helpers = array();
 	private $JSFileNames = array();
+	private $reservedNames = array();
 	private $jsCode = '';
 	private $jsOutput = '';
 	private $initialsParser;
@@ -90,6 +82,7 @@ class JSCompiler
 	private $textsCompiler;
 	private $dataCompiler;
 	private $declCompiler;
+	private $testsCompiler;
 	private $routesCompiler;
 	private $usedComponents;
 	private $usedComponentsNames;
@@ -101,12 +94,15 @@ class JSCompiler
 	}
 
 	public function init() {
-		$this->config = $this->configProvider->getJsConfig();
-		$this->templateCompiler = $this->configProvider->getBuilder()->getCompiler('template');
-		$this->textsCompiler = $this->configProvider->getBuilder()->getCompiler('texts');
-		$this->dataCompiler = $this->configProvider->getBuilder()->getCompiler('data');
-		$this->declCompiler = $this->configProvider->getBuilder()->getCompiler('decl');
-		$this->routesCompiler = $this->configProvider->getBuilder()->getCompiler('routes');
+		$provider = $this->configProvider;
+		$builder = $provider->getBuilder();
+		$this->config = $provider->getJsConfig();
+		$this->templateCompiler = $builder->getCompiler('template');
+		$this->textsCompiler = $builder->getCompiler('texts');
+		$this->dataCompiler = $builder->getCompiler('data');
+		$this->declCompiler = $builder->getCompiler('decl');
+		$this->routesCompiler = $builder->getCompiler('routes');
+		$this->testsCompiler = $builder->getCompiler('tests');
 
 		$this->validateEntry();
 		$this->validateJsFolder();
@@ -131,6 +127,11 @@ class JSCompiler
 		$this->parseClasses();
 		$this->checkClasses();
 		$this->addGlobals();
+		$this->addSources();
+		if ($this->configProvider->isTest()) {
+			$this->addTests();
+		}
+		printArr($this->jsOutput);
 	}
 
 	private function validateApplication() {
@@ -248,6 +249,7 @@ class JSCompiler
 	}
 
 	private function initCore($coreFiles) {
+		$this->reservedNames = array_values(JSGlobals::getVarNames());
 		if (!is_array($coreFiles) || empty($coreFiles)) {
 			new Error($this->errors['coreFilesNotFound']);
 		}
@@ -257,6 +259,9 @@ class JSCompiler
 				$coreFile['isHelper'] = true;
 			}
 			$this->sources[$coreFile['name']] = $coreFile;
+			if (preg_match('/[A-Z]\w*/', $coreFile['name'])) {
+				$this->reservedNames[] = $coreFile['name'];
+			}
 		}
 		$this->checkHelpersUse();
 	}
@@ -576,24 +581,39 @@ class JSCompiler
 
 	private function addGlobals() {
 		$data = array(
-			'texts' => $this->textsCompiler->get(),
-			'config' => $this->apiConfig,
-			'data' => $this->dataCompiler->get(),
+			'texts'            => $this->textsCompiler->get(),
+			'config'           => $this->apiConfig,
+			'data'             => $this->dataCompiler->get(),
 			'pathToDictionary' => $this->config['pathToDictionary'],
-			'tags' => Tags::getList(),
-			'props' => Props::getList(),
-			'events' => Events::getList(),
-			'decls' => $this->declCompiler->get(),
-			'routes' => $this->config['router']['routes'],
-			'errorRoutes' => $this->routesCompiler->getErrorRoutes(),
-			'hashRouter' => $this->routesCompiler->getHashRouter(),
-			'indexRoute' => $this->routesCompiler->getIndexRoute(),
-			'defaultRoute' => $this->routesCompiler->getDefaultRoute(),
-			'viewContainer' => $this->config['viewContainer']
+			'tags'             => Tags::getList(),
+			'props'            => Props::getList(),
+			'events'           => Events::getList(),
+			'decls'            => $this->declCompiler->get(),
+			'routes'           => $this->config['router']['routes'],
+			'errorRoutes'      => $this->routesCompiler->getErrorRoutes(),
+			'hashRouter'       => $this->routesCompiler->getHashRouter(),
+			'indexRoute'       => $this->routesCompiler->getIndexRoute(),
+			'defaultRoute'     => $this->routesCompiler->getDefaultRoute(),
+			'viewContainer'    => $this->config['viewContainer'],
+			'tooltipClass'     => $this->config['tooltipClass'],
+			'tooltipApi'       => $this->config['tooltipApi'],
+			'correctors'       => $this->correctors,
+			'pathToApi'        => $this->config['pathToApi'],
+			'pagetitle'        => $this->config['pagetitle'],
+			'user'             => $this->config['user']
 		);
-		$jsOutput = JSGlobals::run($data);
+		$this->jsOutput = JSGlobals::run($data);
 	}
 
+	private function addSources() {
+		foreach ($this->sources as $src) {
+			$this->jsOutput[] = $src['content'];
+		}
+	}
+
+	private function addTests() {
+		$this->testsCompiler->checkClasses($this->classes, $this->sources);
+	}
 	
 	private	function getAllExtendClasses($extends) {
 		if (!is_array($extends)) return array();
@@ -659,7 +679,7 @@ class JSCompiler
 		}		
 	}
 
-	private	function getSuperClassWithMethod($funcName, $class, $errorText) {
+	public	function getSuperClassWithMethod($funcName, $class, $errorText) {
 		$extends = $class['extends'];
 		if (empty($extends) || !is_array($extends)) {
 			new Error($this->errors['noSuperClasses'], $errorText);

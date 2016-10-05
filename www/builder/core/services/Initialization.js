@@ -1,7 +1,4 @@
 function Initialization() {
-	var isMethodToInherit = function(method) {
-		return method != __I && method != __GI;
-	};
 	var extendInitials = function(initials1, initials2) {
 		if (isNull(initials1)) {
 			initials1 = initials2;
@@ -98,7 +95,7 @@ function Initialization() {
 					cb(parent);
 				}
 				for (var method in parent.prototype) {
-					if (!child.prototype[method] && isMethodToInherit(method)) {
+					if (!child.prototype[method]) {
 						child.prototype[method] = parent.prototype[method];
 					}
 				}

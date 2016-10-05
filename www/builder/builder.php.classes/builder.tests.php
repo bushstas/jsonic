@@ -5,6 +5,9 @@ class TestsCompiler
 	private $configProvider, $config;
 	private $tests = array();
 	private $extensions = array('js');
+	private $classes;
+	private $sources;
+	private $jsCompiler;
 
 	private $errors = array(
 		'noTestsParam' => "Параметр конфигурации <b>tests</b>, содержащий путь к тестам не указан.",
@@ -13,7 +16,9 @@ class TestsCompiler
 		'noTestsFound' => "В директории с тестами, указанной в параметре конфигурации <b>tests</b>, нет соответствующих файлов со скриптами тестов.<br>Файлы должны иметь расширение <b>JS</b> и содержать код следующего вида:<xmp>test before gotData {\n\tif (!isObject(data)) error('error text');\n}</xmp><xmp>test after onRendered {\n\tif (!this.has('name')) error('error text');\n}</xmp>Для подробной информации по тестам, смотрите соответствующую подсказку",
 		'noActiveTestFound' => "Не найдено ни одного активного теста",
 		'testFileIncorrectBeginning' => 'Ошибка в файле теста класса {??}. Некорректный код в начале файла',
-		'testFileIncorrectCode' => 'Ошибка в файле теста класса {??}. Некорректный код после функции <b>test {?} {?}</b>'
+		'testFileIncorrectCode' => 'Ошибка в файле теста класса {??}. Некорректный код после функции <b>test {?} {?}</b>',
+		'noClassToTest' => 'Класс {??}, который необходимо протестировать, не существует',
+		'noMethodToTest' => 'Метод {??} класса {??}, который необходимо протестировать, не существует'
 	);
 
 	public function __construct($configProvider) {
@@ -40,6 +45,108 @@ class TestsCompiler
 		$this->parseTests();
 		if (empty($this->tests)) {
 			new Error($this->errors['noActiveTestFound']);
+		}
+	}
+
+	public function checkClasses(&$classes, $sources) {
+		$this->jsCompiler = $this->configProvider->getBuilder()->getCompiler('js');
+		$this->classes = &$classes;
+		$this->sources = $sources;
+		foreach ($this->tests as $cls => $test) {
+			if (is_array($test['functions']) && !empty($test['functions'])) {
+				if (!isset($classes[$cls])) {
+					new Error($this->errors['noClassToTest'], $cls);
+				}
+				$funcs = $classes[$cls]['functionList'];
+				if (!is_array($funcs)) $funcs = array();
+				foreach ($test['functions'] as $funcName => $testFunc) {
+					if (!$this->hasComponentMethod($funcName, $classes[$cls])) {
+						new Error($this->errors['noMethodToTest'], array($funcName, $cls));
+					}
+					if (!in_array($funcName, $funcs)) {
+						$parentName = '';
+						$args = '';
+						$this->getParentalFunction($funcName, $classes[$cls], $parentName, $args);
+						if (empty($parentName)) {
+							new Error($this->errors['noMethodToTest'], array($funcName, $cls));
+						}
+						$code = "\t".$parentName.".prototype.".$funcName.".call(this".(!empty($args) ? ','.$args : '').');';
+						if (!empty($testFunc['before'])) {
+							$code = $testFunc['before']."\n".$code;
+						}
+						if (!empty($testFunc['after'])) {
+							$code .= "\n".$testFunc['after'];
+						}
+						$this->addFunctionToClass($cls, $funcName, $code, $args);
+					} else {
+						$this->addCodeToFunction($cls, $funcName, $testFunc);
+					}
+				}
+			}
+		}
+	}
+
+	private function hasComponentMethod($method, $class) {
+		if (is_array($class['functionList']) && in_array($method, $class['functionList'])) return true;
+		$parents = $class['extends'];
+		if (is_array($parents)) {
+			foreach ($parents as $parent) {
+				if (is_array($this->classes[$parent]) && $this->hasComponentMethod($method, $this->classes[$parent])) {
+					return true;
+				}
+				if (is_array($this->sources[$parent]) && preg_match('/\b'.$parent.'\.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
+					return true;	
+				}
+			}
+		}
+		return false;		
+	}
+
+	private	function getParentalFunction($funcName, $class, &$parentName, &$args) {
+		$classes = $this->classes;
+		$sources = $this->sources;
+		$superClass = $this->jsCompiler->getSuperClassWithMethod($funcName, $class, '');
+		if (!empty($superClass)) {
+			if (is_array($classes[$superClass])) {
+				if (is_array($classes[$superClass]['functions'])) {
+					foreach ($classes[$superClass]['functions'] as $f) {
+						if ($f['name'] == $funcName) {
+							$args = $f['args'];
+							break;
+						}
+					}
+				} elseif (is_array($classes[$superClass]['functionList']) && is_array($classes[$superClass]['args'])) {
+					$idx = array_search($funcName, $classes[$superClass]['functionList']);
+					if ($idx !== false) $args = $classes[$superClass]['args'][$idx];
+				}
+			} elseif (is_array($sources[$superClass])) {
+				preg_match('/\b'.$superClass.'\.prototype\.'.$funcName.'\s*=\s*function\s*\(([^\)]*)\)/', $sources[$superClass]['content'], $matches);
+				$args = $matches[1];
+			}
+			$parentName = $superClass;
+		}
+	}
+
+	private	function addFunctionToClass($className, $funcName, $code, $args) {
+		$this->classes[$className]['functions'][] = array(
+			'name' => $funcName,
+			'code' => $code,
+			'args' => $args
+		);
+		$this->classes[$className]['functionList'][] = $funcName;
+	}
+
+	private function addCodeToFunction($className, $funcName, $testFunc) {
+		$class = &$this->classes[$className];
+		foreach ($class['functions'] as &$f) {
+			if ($f['name'] == $funcName) {
+				if (!empty($testFunc['before'])) {
+					$f['code'] = $testFunc['before'].$f['code'];
+				}
+				if (!empty($testFunc['after'])) {
+					$f['code'] .= $testFunc['after'];
+				}
+			}
 		}
 	}
 

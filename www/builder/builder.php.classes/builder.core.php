@@ -47,6 +47,10 @@ class Builder
 		$this->textsCompiler = new TextsCompiler();
 		$this->dataCompiler = new DataCompiler();
 		$this->declCompiler = new DeclCompiler();
+		if ($this->config->isTest()) {
+			$this->testsCompiler = new TestsCompiler($this->config);
+			$this->testsCompiler->init();
+		}
 
 		$this->jsCompiler = new JSCompiler($this->config);
 		$this->jsCompiler->init();
@@ -57,10 +61,6 @@ class Builder
 		$this->gatherer = new Gatherer($this->config);
 		$this->gatherer->init();
 		
-		if ($this->config->isTest()) {
-			$this->testsCompiler = new TestsCompiler($this->config);
-			$this->testsCompiler->init();
-		}
 		$this->files = $this->gatherer->gatherFiles();
 		$this->runCompilers();
 	}
