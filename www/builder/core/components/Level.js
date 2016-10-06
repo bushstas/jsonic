@@ -48,7 +48,7 @@ function Level() {
 		appendChild(node);
 		propNodes = propNodes || {};
 		propNodes[name] = propNodes[name] || [];
-		propNodes[name].push(component._registerPropActivity('nod', name, node));
+		propNodes[name].push(Core.registerPropActivity.call(component, 'nod', name, node));
 	};
 
 	var createElement = function(props) {
@@ -60,7 +60,7 @@ function Level() {
 				if (isString(props['p'][k]) || isNumber(props['p'][k])) {
 					attrName = __A[k] || k;
 					if (attrName == 'scope') component.setScope(element);
-					else if (attrName == 'eid') component._registerElement(element, props['p'][k]);
+					else if (attrName == 'eid') Core.registerElement.call(component, element, props['p'][k]);
 					else element.attr(attrName, props['p'][k]);
 				} else if (isFunction(props['p'][k])) {
 					pn = props['n'][k];
@@ -69,11 +69,11 @@ function Level() {
 						attr = [element, k, props['p'][k]];					
 						if (isString(pn)) {
 							propAttrs[pn] = propAttrs[pn] || [];
-							propAttrs[pn].push(component._registerPropActivity('atr', pn, attr));
+							propAttrs[pn].push(Core.registerPropActivity.call(component, 'atr', pn, attr));
 						} else {
 							for (var i = 0; i < pn.length; i++) {					
 								propAttrs[pn[i]] = propAttrs[pn[i]] || [];
-								propAttrs[pn[i]].push(component._registerPropActivity('atr', pn[i], attr));
+								propAttrs[pn[i]].push(Core.registerPropActivity.call(component, 'atr', pn[i], attr));
 							}
 						}
 					}
@@ -137,7 +137,7 @@ function Level() {
 				for (var i = 0; i < propNames.length; i++) {
 					pn = propNames[i];
 					conditions[pn] = conditions[pn] || [];
-					conditions[pn].push(component._registerPropActivity('cnd', pn, condition));
+					conditions[pn].push(Core.registerPropActivity.call(component, 'cnd', pn, condition));
 				}
 				registerChild(condition);
 			} else if (params['i']()) {
@@ -156,7 +156,7 @@ function Level() {
 			foreach.render(parentElement, self);
 			foreaches = foreaches || {};
 			foreaches[propName] = foreaches[propName] || [];
-			foreaches[propName].push(component._registerPropActivity('for', propName, foreach));
+			foreaches[propName].push(Core.registerPropActivity.call(component, 'for', propName, foreach));
 			registerChild(foreach);
 		} else {
 			if (isArray(params['p'])) {
@@ -176,7 +176,7 @@ function Level() {
 			ifSwitches = ifSwitches || {};
 			for (var i = 0; i < propNames.length; i++) {
 				ifSwitches[propNames[i]] = ifSwitches[propNames[i]] || [];
-				ifSwitches[propNames[i]].push(component._registerPropActivity('isw', propNames[i], swtch));
+				ifSwitches[propNames[i]].push(Core.registerPropActivity.call(component, 'isw', propNames[i], swtch));
 			}
 		} else {
 			for (var i = 0; i < params['is'].length; i++) {
@@ -197,7 +197,7 @@ function Level() {
 			swtch.render(parentElement, self);
 			switches = switches || {};
 			switches[propName] = switches[propName] || [];
-			switches[propName].push(component._registerPropActivity('swt', propName, swtch));
+			switches[propName].push(Core.registerPropActivity.call(component, 'swt', propName, swtch));
 		} else {
 			for (var i = 0; i < params['s'].length; i++) {
 				if (params['sw'] === params['s'][i]) {
@@ -218,14 +218,14 @@ function Level() {
 
 	var registerChild = function(child, isComponent) {
 		var isNodeChild = isNode(child);
-		if (prevChild) prevChild._setNextSiblingChild(child);
+		if (prevChild) Core.setNextSiblingChild.call(prevChild, child);
 		prevChild = isNodeChild ? null : child;
 		if (!firstChild) firstChild = child;
 		if (isNodeChild) {
 			if (!firstNodeChild) firstNodeChild = child;
 			lastNodeChild = child;
 		} else children.push(child);
-		if (isComponent) component._registerChildComponent(child);
+		if (isComponent) Core.registerChildComponent.call(component, child);
 	};
 
 	var includeTemplate = function(item) {
@@ -236,7 +236,7 @@ function Level() {
 			for (var k in args) tempArgs[k] = args[k];
 			args = tempArgs;
 		}
-		if (isString(item['tmp'])) item['tmp'] = component._getTemplateById(item['tmp']);
+		if (isString(item['tmp'])) item['tmp'] = Core.getTemplateById.call(component, item['tmp']);
 		if (isFunction(item['tmp'])) {		
 			var items = item['tmp'].call(component, args, component);
 			if (isArray(items)) {
@@ -257,7 +257,7 @@ function Level() {
 				opts = p['op'];
 				if (isString(p['i'])) {
 					cmp.setId(p['i']);
-					var waiting = component._getWaitingChild(p['i']);
+					var waiting = Core.getWaitingChild.call(component, p['i']);
 					if (isArray(waiting)) {
 						for (i = 0; i < waiting.length; i++) {
 							waiting[i][0].set(waiting[i][1], cmp);
@@ -267,22 +267,22 @@ function Level() {
 			}
 			if (isArray(item['w'])) {
 				for (i = 0; i < item['w'].length; i += 2) {
-					component._provideWithComponent(item['w'][i], item['w'][i + 1], cmp);
+					Core.provideWithComponent.call(component, item['w'][i], item['w'][i + 1], cmp);
 				}
 			}
-			Initialization.initiate.call(cmp, props, args, opts);
-			cmp._setParent(component);
+			Core.initiate.call(cmp, props, args, opts);
+			Core.setParent.call(cmp, component);
 			cmp.render(pe);
 			registerChild(cmp, true);			
 			var events = item['e'];
 			if (isArray(events)) {
 				for (i = 0; i < events.length; i++) {
 					if (isString(events[i + 1])) events[i + 1] = component.dispatchEvent.bind(component, events[i + 1]);
-					cmp._subscribe(events[i], events[i + 1], component);
+					Core.subscribe.call(cmp, events[i], events[i + 1], component);
 					i++;	
 				}
 			}
-			if (item['nm']) component._registerControl(cmp, item['nm']);
+			if (item['nm']) Core.registerControl.call(component, cmp, item['nm']);
 		} else if (item && isObject(item)) {
 			if (!item.isRendered()) item.render(pe);
 			registerChild(item, true);
@@ -309,7 +309,7 @@ function Level() {
 
 	var registerPropComp = function(pn, data) {
 		propComps[pn] = propComps[pn] || [];
-		propComps[pn].push(component._registerPropActivity('cmp', pn, data));
+		propComps[pn].push(Core.registerPropActivity.call(component, 'cmp', pn, data));
 	};
 
 	var disposeDom = function() {
@@ -348,9 +348,9 @@ function Level() {
 		if (isNode(firstChild)) return firstChild;
 		var firstLevel = children[0];
 		if (firstLevel instanceof Level) {
-			return firstLevel._getParentElement();
+			return Core.getParentElement.call(firstLevel);
 		} else if (firstLevel) {
-			return firstLevel._getFirstNodeChild();
+			return Core.getFirstNodeChild.call(firstLevel);
 		}
 		return null;
 	};
@@ -373,7 +373,7 @@ function Level() {
 			parentElement = p || document.createElement('div'); 
 			for (var i = 0; i < elements.length; i++) parentElement.appendChild(elements[i]);
 		} else {
-			nextSiblingChild = parentLevel._getNextSiblingChild();
+			nextSiblingChild = Core.getNextSiblingChild.call(parentLevel);
 			parentElement = realParentElement;
 			realParentElement = null;
 			for (var i = 0; i < elements.length; i++) appendChild(elements[i]);
@@ -386,36 +386,36 @@ function Level() {
 
 	this.dispose = function() {
 		if (propComps) {
-			component._disposePropActivities('cmp', propComps);
+			Core.disposePropActivities.call(component, 'cmp', propComps);
 			propComps = null;
 		}
 		if (conditions) {
-			component._disposePropActivities('cnd', conditions);
+			Core.disposePropActivities.call(component, 'cnd', conditions);
 			conditions = null;
 		}
 		if (foreaches) {
-			component._disposePropActivities('for', foreaches);
+			Core.disposePropActivities.call(component, 'for', foreaches);
 			foreaches = null;
 		}
 		if (propNodes) {
-			component._disposePropActivities('nod', propNodes);
+			Core.disposePropActivities.call(component, 'nod', propNodes);
 			propNodes = null;
 		}
 		if (propAttrs) {
-			component._disposePropActivities('atr', propAttrs);
+			Core.disposePropActivities.call(component, 'atr', propAttrs);
 			propAttrs = null;
 		}
 		if (ifSwitches) {
-			component._disposePropActivities('isw', ifSwitches);
+			Core.disposePropActivities.call(component, 'isw', ifSwitches);
 			ifSwitches = null;
 		}
 		if (switches) {
-			component._disposePropActivities('swt', switches);
+			Core.disposePropActivities.call(component, 'swt', switches);
 			switches = null;
 		}
 		for (var i = 0; i < children.length; i++) {
 			if (isComponentLike(children[i])) {
-				component._unregisterChildComponent(children[i]);
+				Core.unregisterChildComponent.call(component, children[i]);
 			}
 			children[i].dispose();
 		}

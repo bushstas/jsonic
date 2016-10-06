@@ -827,7 +827,6 @@
 		if ($isUser) {
 			$globals[] = createObjectString('__USEROPTIONS', $user, array('/\\\/', ''));
 		}
-		// =========================================
 		
 		$compiledJs = array();
 		$compiledJs[] = implode("\n", $globals);
@@ -872,7 +871,6 @@
 			}
 		}
 	
-
 		foreach ($classesList as $className => &$component) {
 			$type = $component['type'];
 			if (is_array($component['functions'])) {
@@ -930,6 +928,8 @@
 			
 		}
 
+		// =========================================
+
 
 		foreach ($includes as $incl) {
 			addGeneralTemplateFunction($compiledJs, $incl['content'], $incl['path']);
@@ -956,7 +956,6 @@
 		$usedClassesCount = count($usedClasses) + count($addedClasses);
 		
 		$inherited = array(
-			'Core' => array('Component','Foreach','Condition'),
 			'Component' => array('Application','View','Form','Control','Menu'),
 			'Foreach' => array('Switch', 'IfSwitch')
 		);
@@ -982,17 +981,17 @@
 			$inherits[] = '['.implode(',',$childClasses).']';
 		}
 		
-		$compiledJs[] = "Initialization.inherits([".implode(',', $inherits).']);';
+		$compiledJs[] = "Core.inherits([".implode(',', $inherits).']);';
 		$controllers = array('Router', 'User');
 		$controllers = array_merge($controllers, array_keys($classes['controller']));
 		if (!empty($controllers)) {
 			foreach ($controllers as $controller) {
 				$compiledJs[] = $controller." = new ".$controller."();";
 			}
-			$compiledJs[] = 'Initialization.initiateControllers(['.implode(',', array_keys($classes['controller'])).']);';
+			$compiledJs[] = 'Core.initiateControllers(['.implode(',', array_keys($classes['controller'])).']);';
 		}
 		$compiledJs[] = $config['entry']." = new ".$config['entry']."();";
-		$compiledJs[] = "Initialization.initiate.call(".$config['entry'].");";
+		$compiledJs[] = "Core.initiate.call(".$config['entry'].");";
 		$compiledJs[] = "User.load(".$config['entry'].");";		
 		$compiledJs[] = "})();";
 

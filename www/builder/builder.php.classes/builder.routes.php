@@ -83,6 +83,10 @@ class RoutesCompiler
 		return $this->routeControllersToLoad;
 	}
 
+	public function getControllersByView() {
+		return $this->routeControllersByViews;
+	}
+
 	public function getIndexRoute() {
 		return $this->indexRoute;
 	}

@@ -25,6 +25,10 @@ class TemplateCompiler
 		return isset($this->templates[$className]);
 	}
 
+	public function getTemplates() {
+		return $this->templates;
+	}
+
 	public function getTemplateClasses() {
 		return array_keys($this->templates);
 	}

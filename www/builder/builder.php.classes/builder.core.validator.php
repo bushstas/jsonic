@@ -9,14 +9,14 @@ class CoreValidator
 
 	private $content = array(
 		'components' => array(
-			'Application', 'Component', 'Condition', 'Control', 'Controller', 'Core', 'Foreach', 'IfSwitch', 'Level', 'Menu', 'Switch', 'View'
+			'Application', 'Component', 'Condition', 'Control', 'Controller', 'Foreach', 'IfSwitch', 'Level', 'Menu', 'Switch', 'View'
 		),
 		'helpers' => array(),
 		'prototypes' => array(
 			'Array', 'Element', 'MouseEvent', 'String'
 		),
 		'services' => array(
-			'AjaxRequest', 'Corrector', 'EventHandler', 'Initialization', 'Router', 'Tester', 'User'
+			'Core', 'AjaxRequest', 'Corrector', 'EventHandler', 'Router', 'Tester', 'User'
 		),
 		'utils' => array(
 			'utils', 'Objects'

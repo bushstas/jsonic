@@ -50,7 +50,7 @@ function onLoaded(filters) {
 }
 
 function updateFilterCount(data) {
-	this.fill(this.findElement('.->> row' + data['filterId']), data['numbers']);
+	this.fill('.->> row' + data['filterId'], data['numbers']);
 	this.currentFilterIndex++;
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 }

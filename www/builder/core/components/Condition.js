@@ -12,7 +12,7 @@ Condition.prototype.render = function(parentElement, parentLevel) {
 Condition.prototype.createLevel = function(isUpdating) {
 	this.level = new Level();
 	this.level.setComponent(this.parentLevel.getComponent());
-	var nextSiblingChild = isUpdating ? this._getNextSiblingChild() : null;
+	var nextSiblingChild = isUpdating ? Core.getNextSiblingChild.call(this) : null;
 	this.level.render(this.getChildren(), this.parentElement, this.parentLevel, nextSiblingChild);
 };
 
@@ -37,7 +37,7 @@ Condition.prototype.disposeLevel = function() {
 };
 
 Condition.prototype.dispose = function() {
-	this._disposeLinks();
+	Core.disposeLinks.call(this);
 	this.disposeLevel();
 	this.parentElement = null;
 	this.parentLevel = null;

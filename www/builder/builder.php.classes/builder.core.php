@@ -17,7 +17,7 @@ define('DEFAULT_CHARSET', 'windows-1251');
 $includes = array(
 	'error', 'core.validator', 'config', 'gatherer', 'css', 'js', 'templates', 'html', 'routes',
 	'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser', 'js.checker', 'js.globals',
-	'data', 'tags', 'props', 'events'
+	'data', 'tags', 'props', 'events', 'template.parser'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	

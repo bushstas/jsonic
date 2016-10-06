@@ -5,7 +5,7 @@ function Component() {
 		if (isObject(loader) && isObject(loader['controller'])) {
 			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
-			this.loader._subscribe('load', onDataLoad.bind(this, isAsync), this);
+			this.loader.subscribe('load', onDataLoad.bind(this, isAsync), this);
 			var options = loader['options'];
 			if (isFunction(options)) options = options();
 			this.loader.doAction('load', options);
@@ -34,7 +34,7 @@ function Component() {
 				this.parentElement.removeChild(this.tempPlaceholder);
 				this.tempPlaceholder = null;
 			}
-			Initialization.processPostRenderInitials.call(this);
+			Core.processPostRenderInitials.call(this);
 		}
 	};
 
@@ -146,7 +146,7 @@ function Component() {
 
 	var unrender = function() {
 		this.elements = null;
-		this._disposeLinks();
+		Core.disposeLinks.call(this);
 		this.disposeInternal();
 		this.level.dispose();
 		this.level = this.listeners = null;
@@ -411,10 +411,6 @@ function Component() {
 		return data;
 	};
 
-	Component.prototype._setParent = function(parentalComponent) {
-		this.parentalComponent = parentalComponent;
-	};
-
 	Component.prototype.getParent = function() {
 		return this.parentalComponent;
 	};
@@ -547,109 +543,5 @@ function Component() {
 	Component.prototype.disposeInternal = f;
 	Component.prototype.getArgs = f;	
 	Component.prototype.g = Component.prototype.get;
-
-	/**  inner system methods. do not call it  */
-
-	Component.prototype._getWaitingChild = function(componentName) {
-		return Objects.get(this.waiting, componentName);
-	};
-
-	Component.prototype._registerPropActivity = function(type, name, data) {
-		this.propActivities = this.propActivities || {};
-		this.propActivities[type] = this.propActivities[type] || {};
-		this.propActivities[type][name] = this.propActivities[type][name] || [];
-		this.propActivities[type][name].push(data);
-		return this.propActivities[type][name].length - 1;
-	};
-
-	Component.prototype._disposePropActivities = function(type, data) {
-		var activities = this.propActivities[type];
-		if (isObject(data)) {
-			var deleted;
-			for (var pn in data) {
-				if (isArray(activities[pn])) {
-					deleted = 0;
-					for (var i = 0; i < data[pn].length; i++) {
-						activities[pn].splice(data[pn][i] - deleted, 1);
-						deleted++;
-					}
-				}
-			}
-		}
-	};
-
-	Component.prototype._getTemplateById = function(tmpid) {
-		if (isObject(this.templatesById)) return this.templatesById[tmpid];
-		var parents = this.inheritedSuperClasses;
-		if (isArrayLike(parents)) {
-			for (var i = 0; i < parents.length; i++) {
-				if (isObject(parents[i].prototype.templatesById) && isFunction(parents[i].prototype.templatesById[tmpid])) {
-					return parents[i].prototype.templatesById[tmpid];
-				}
-			}
-		}
-	};
-
-	Component.prototype._subscribe = function(eventType, handler, subscriber) {
-		this.listeners = this.listeners || [];
-		this.listeners.push({'type': eventType, 'handler': handler, 'subscriber': subscriber});
-	};
-
-	Component.prototype._registerElement = function(element, id) {
-		this.elements = this.elements || {};
-		this.elements[id] = element;
-	};
-
-	Component.prototype._registerChildComponent = function(child) {
-		this.childrenCount = this.childrenCount || 0;
-		this.children = this.children || {};
-		this.children[child.getId() || this.childrenCount] = child;
-		this.childrenCount++;
-	};
-
-	Component.prototype._unregisterChildComponent = function(child) {
-		if (isControl(child)) this._unregisterControl(child);
-		var id = child.getId();		
-		if (!id) {
-			for (var k in this.children) {
-				if (this.children[k] == child) {
-					id = k;
-					break;
-				}
-			}
-		}
-		if (isString(id)) delete this.children[id];
-	};
-
-	Component.prototype._registerControl = function(control, name) {
-	 	this.controls = this.controls || {};
-	 	if (!isUndefined(this.controls[name])) {
-	 		if (!isArray(this.controls[name])) this.controls[name] = [this.controls[name]];
-	 		this.controls[name].push(control);
-	 	} else this.controls[name] = control;
-	 	control.setName(name);
-	};
-
-	Component.prototype._unregisterControl = function(control) {
-		if (this.controls) {
-			var name = control.getName();
-			if (isArray(this.controls[name])) this.controls[name].removeItem(control);
-			else delete this.controls[name];
-		}
-	};
-
-	Component.prototype._provideWithComponent = function(propName, componentName, waitingChild) {
-		var cmp = this.getChild(componentName);
-		if (cmp) waitingChild.set(propName, cmp);
-		else {
-			this.waiting = this.waiting || {};
-			this.waiting[componentName] = this.waiting[componentName] || [];
-			this.waiting[componentName].push([waitingChild, propName]);
-		}
-	};
-
-	Component.prototype._getParentElement = function() {
-		return this.parentElement;
-	};
 }
 Component();

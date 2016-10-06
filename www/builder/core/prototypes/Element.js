@@ -1,4 +1,4 @@
-var StyleNameCache = {};
+var __StyleNameCache = {};
 Element.prototype.setClass = function(className) {
 	this.className = className.trim();
 }
@@ -123,10 +123,10 @@ Element.prototype.setStyle = function(style) {
 		}
 	};
 	var getVendorJsStyleName = function(style) {
-		var propertyName = StyleNameCache[style];
+		var propertyName = __StyleNameCache[style];
 		if (!propertyName) {
 			propertyName = toCamelCase(style);
-	    	StyleNameCache[style] = propertyName;
+	    	__StyleNameCache[style] = propertyName;
 	  	}	
 		return propertyName;
 	};

@@ -55,7 +55,9 @@ class JSCompiler
 		'diffClassType' => 'Класс {??} имеет тип {??}, однако вызывается с типом {??} в шаблоне класса {??}',
 		'dialogCalling' => 'Недопустимая попытка вызвать компонент с типом <b>dialog</b> из шаблона в классе {??}<br><br>Для диалога синглтона используйте код вида<xmp>Dialoger.show(CommentsDialog, options)</xmp>в противном случае используйте третий аргумент в качестве id параметра<xmp>Dialoger.show(ItemDialog, options, itemId)</xmp>',
 		'noRouteController' => 'Контроллер {??} упомянутый в конфигурации роутера не найден',
-		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден'
+		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден',
+		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
+		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}'
 	);
 
 	private $coreClasses = array(
@@ -131,6 +133,7 @@ class JSCompiler
 		if ($this->configProvider->isTest()) {
 			$this->addTests();
 		}
+		$this->addClasses();
 		printArr($this->jsOutput);
 	}
 
@@ -613,6 +616,158 @@ class JSCompiler
 
 	private function addTests() {
 		$this->testsCompiler->checkClasses($this->classes, $this->sources);
+	}
+
+	private function addClasses() {
+		foreach ($this->classes as $className => &$class) {
+			$type = $class['type'];
+			if (is_array($class['functions'])) {
+				foreach ($class['functions'] as $func) {
+					$constructorCode = '';
+					$args = !empty($func['args']) ? $func['args'] : '';
+					if ($func['name'] != '__constructor') {						
+						$this->addPrototypeFunction($className, $func['name'], $args, $func['code']);
+					} else {
+						$this->addConstructorFunction($className, in_array($type, $this->componentLikeClassTypes));
+					}						
+				}
+			}
+			if (!in_array('initiate', $class['functionList'])) {
+				$this->addPrototypeFunction($className, 'initiate');
+			}
+			if (!in_array('getInitials', $class['functionList'])) {
+				$this->addPrototypeFunction($className, 'getInitials');	
+			}
+			$templates = $this->templateCompiler->getTemplates();
+			if (!empty($templates[$className])) {
+				TemplateParser::init(
+					array(
+						'classNames' => $this->usedComponentsNames,
+						'classes' => $this->classes,
+						'templates' => $templates
+					)
+				);
+				$this->addTemplateFunction($className, $templates[$className], $class);
+				if (!is_array($class['tmpCallbacks'])) {
+					foreach ($class['tmpCallbacks'] as $callback) {
+						if (!$this->hasComponentMethod($callback, $class)) {
+							new Error($this->errors['noMethodFound'], array($callback, $className));
+						}
+					}
+				}
+			}
+			if (!empty($class['initials'])) {
+				$this->addGetInitialsFunction($className, $class['initials']);
+			}
+			if ($type == 'view') {
+				$this->addLoadControllerFunction($className);
+			}
+			if (is_array($class['callbacks'])) {
+				foreach ($class['callbacks'] as $callback) {
+					if (!$this->hasComponentMethod($callback, $class)) {
+						new Error($this->errors['noMethodFound2'], array($callback, $className));
+					}
+				}
+			}
+			if (is_array($class['calledMethods'])) {
+				foreach ($class['calledMethods'] as $callback) {
+					if (!$this->hasComponentMethod($callback['called'], $class)) {
+						$isError = true;
+						if (!isset($this->usedComponents[$className])) {
+							$childClasses = array();
+							$this->getChildClasses($className, $childClasses);
+							foreach ($childClasses as $chcls) {
+								if ($this->hasComponentMethod($callback['called'], $this->classes[$chcls])) {
+									$isError = false;
+									break;
+								}
+							}
+						}
+						if ($isError) new Error($this->errors['noMethodFound'], array($callback['called'], $className));
+					}
+				}
+			}			
+		}
+	}
+
+	private function addLoadControllerFunction($className) {
+		$routeControllersByViews = $this->routesCompiler->getControllersByView();
+		if (is_array($routeControllersByViews[$className]) && !empty($routeControllersByViews[$className])) {
+			$this->jsOutput[] = $className.'.prototype.getControllersToLoad = function() {';
+			$this->jsOutput[] = "\n\treturn [".implode(',', $routeControllersByViews[$className])."];\n};";
+		}
+	}
+
+	private function hasComponentMethod($method, $class) {
+		if (is_array($class['functionList']) && in_array($method, $class['functionList'])) return true;
+		$parents = $class['extends'];
+		if (is_array($parents)) {
+			foreach ($parents as $parent) {
+				if (is_array($this->classes[$parent]) && $this->hasComponentMethod($method, $this->classes[$parent])) {
+					return true;
+				}
+				if (is_array($this->sources[$parent]) && preg_match('/\b'.$parent.'\.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
+					return true;	
+				}
+			}
+		}
+		return false;
+	}
+
+	private	function getChildClasses($className, &$classes) {
+		foreach ($this->classes as $class => $data) {
+			if (is_array($data['extends']) && in_array($className, $data['extends'])) {
+				$classes[] = $class;
+				$this->getChildClasses($class, $classes);
+			}
+		}
+	}
+
+	private function addConstructorFunction($className, $isComponent) {
+		$routerMenuClasses = $this->config['routerMenu'];
+		$this->jsOutput[] = 'function '.$className.'() {';
+		if ($isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses)) {
+			$this->jsOutput[] = "\tRouter.addMenu(this);";
+			$this->jsOutput[] = "\tthis.isRouteMenu = true;";
+		}		
+		$this->jsOutput[] = '};';
+	}
+
+	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
+		$this->jsOutput[] = $className.'.prototype.'.$method.' = function('.$args.') {';
+		$this->jsOutput[] = $code;
+		$this->jsOutput[] = '};';
+	}
+
+	private	function addTemplateFunction($className, $templateContent, &$class) {
+		$tmpids = array();
+		$templateFunctions = TemplateParser::parse($templateContent, $class, $className, $tmpids);
+		foreach ($templateFunctions as $templateFunction) {
+			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', "\n\treturn".$templateFunction['content']);
+		}
+		if (!empty($tmpids)) {
+			foreach ($tmpids as $k => &$v) $v = '<nq>'.$className.'.prototype.getTemplate'.ucfirst($v).'<nq>';
+			$this->jsOutput[] = $className.'.prototype.templatesById = '.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
+		}
+	}
+
+	private function addGetInitialsFunction($className, $initials) {
+		$objCode = array();
+		foreach ($initials as $name => $code) {
+			if (!empty($code)) {
+				$code = preg_replace("/ {2,}/", ' ', preg_replace("/[\t\r\n]/", '', preg_replace('/(:\s*)@(\w+)/', "$1__.$2", $code)));
+				$spacelessCode = preg_replace('/\s/', '', $code);
+				if ($spacelessCode != '{}' && $spacelessCode != '[]') {
+					$objCode[] = "\n\t\t'".$name."':".$code;
+				}
+			}
+		}		
+		if (!empty($objCode)) {
+			$this->jsOutput[] = $className.".prototype.getInitials = function() {";
+			$this->jsOutput[] = "\n\treturn {\n";
+			$this->jsOutput[] = implode(",\n", $objCode);
+			$this->jsOutput[] = "\t};\n};";
+		}
 	}
 	
 	private	function getAllExtendClasses($extends) {
