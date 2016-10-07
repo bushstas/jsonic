@@ -27,8 +27,11 @@ class Props
 		'cellspacing' => 'cs'
 	);
 
-	public static function getList() {
-		return array_flip(self::$list);
+	public static function getList($isFlipped = false) {
+		if ($isFlipped) {
+			return array_flip(self::$list);
+		} 
+		return self::$list;
 	}
 
 	public static function get($name) {

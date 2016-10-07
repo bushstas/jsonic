@@ -77,7 +77,7 @@ function getControlValue() {
 }
 
 function onClick() {
-	this.toggle('active');
+	$active!;
 	Popuper.watch(this);
 }
 

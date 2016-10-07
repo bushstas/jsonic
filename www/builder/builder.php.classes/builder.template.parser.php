@@ -5,18 +5,25 @@ class TemplateParser
 	private static $calledClasses, $classes, $templates;
 	private static $regexp = "/\{template +\.(\w+) *\}/";
 	private static $simpleTags = array('br', 'input', 'img', 'hr');
-	private static $class, $className, $tmpids, $isSwitchContext;
+	private static $class, $className, $tmpids, $isSwitchContext,
+				   $propsShortcuts, $eventTypesShortcuts, $obfuscate,
+				   $tagShortcuts, $cssClassIndex;
 
 	private static $errors = array(
-		'noMainTemplate' => 'РЁР°Р±Р»РѕРЅ <b>main</b> РєР»Р°СЃСЃР° {??} РЅРµ РЅР°Р№РґРµРЅ СЃСЂРµРґРё РїСЂРѕС‡РёС…',
-		'noClosingTag' => 'РћС€РёР±РєР° РІР°Р»РёРґР°С†РёРё С€Р°Р±Р»РѕРЅРѕРІ РєР»Р°СЃСЃР° {??}. РћРґРёРЅ РёР· {?} {??} РЅРµ РёРјРµРµС‚ Р·Р°РєСЂС‹РІР°СЋС‰РµРіРѕ С‚РµРіР°',
-		'extraClosingTag' => 'РћС€РёР±РєР° РІР°Р»РёРґР°С†РёРё С€Р°Р±Р»РѕРЅРѕРІ РєР»Р°СЃСЃР° {??}. Р›РёС€РЅРёР№ Р·Р°РєСЂС‹РІР°СЋС‰РёР№СЃСЏ {?} {??}'
+		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
+		'noClosingTag' => 'Ошибка валидации шаблонов класса {??}. Один из {?} {??} не имеет закрывающего тега',
+		'extraClosingTag' => 'Ошибка валидации шаблонов класса {??}. Лишний закрывающийся {?} {??}'
 	);
 
 	public static function init($params) {
 		self::$calledClasses = $params['classNames'];
 		self::$classes = $params['classes'];
 		self::$templates = $params['templates'];
+		self::$propsShortcuts = Props::getList();
+		self::$eventTypesShortcuts = Events::getList();
+		self::$tagShortcuts = Tags::getList();
+		self::$obfuscate = $params['obfuscateCss'];
+		self::$cssClassIndex = &$params['cssClassIndex'];
 	}
 
 	public static function parse($template, &$class, $className, &$tmpids) {
@@ -193,10 +200,10 @@ class TemplateParser
 		}
 		foreach ($opened as $tn => $count) {
 			if ($count > $closed[$tn]) {
-				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'РѕРїРµСЂР°С‚РѕСЂРѕРІ' : 'С‚РµРіРѕРІ';
+				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'операторов' : 'тегов';
 				new Error(self::$errors['noClosingTag'], array(self::$class['name'], $object, $tn));
 			} elseif ($count < $closed[$tn]) {
-				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'РѕРїРµСЂР°С‚РѕСЂ' : 'С‚РµРі';
+				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'оператор' : 'тег';
 				new Error(self::$errors['extraClosingTag'], array(self::$class['name'], $object, $tn));
 			}
 		}
@@ -232,23 +239,23 @@ class TemplateParser
 					$isElse = true;
 				}
 				$content = $item['content'];
-				if (isSimpleTag($tagName))
+				if (self::isSimpleTag($tagName))
 				{
-					$child = array('t' => getTagIndex($tagName));
-					getTagProperties($item, $child, $component);
+					$child = array('t' => self::getTagIndex($tagName));
+					self::getTagProperties($item, $child);
 				}
 				elseif ($tagName == 'template')
 				{
 					preg_match("/<template +[\"']*(\w+)[\"']*[^=]/i",  $content, $match);
 					$tmpName = $match[1];
 					if (!empty($tmpName) && $tmpName == $templateName) {
-						error('РЁР°Р±Р»РѕРЅ <b>'.$templateName.'</b> РєР»Р°СЃСЃР° <b>'.$component['name'].'</b> РІС‹Р·С‹РІР°РµС‚ СЃР°Рј СЃРµР±СЏ');
+						error('Шаблон <b>'.$templateName.'</b> класса <b>'.self::$className.'</b> вызывает сам себя');
 					}
 					$child = array('tmp' => '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>');
-					getTemplateProperties($item['content'], $child, $component);
+					self::getTemplateProperties($item['content'], $child);
 					if (is_array($child['p']) && !empty($child['p']['tmpid'])) {
 						if (!empty(self::$tmpids[$child['p']['tmpid']]) && self::$tmpids[$child['p']['tmpid']] == $templateName) {
-							error('РЁР°Р±Р»РѕРЅ <b>'.$templateName.'</b> РєР»Р°СЃСЃР° <b>'.$component['name'].'</b> РІС‹Р·С‹РІР°РµС‚ СЃР°Рј СЃРµР±СЏ');
+							error('Шаблон <b>'.$templateName.'</b> класса <b>'.self::$className.'</b> вызывает сам себя');
 						}
 						$child['tmp'] = strip_tags($child['p']['tmpid']);
 						unset($child['p']['tmpid']);
@@ -261,11 +268,11 @@ class TemplateParser
 				{
 					preg_match("/<include +[\"']*(\w+)[\"']*/i",  $content, $match);
 					$child = array('tmp' => '<nq>includeGeneralTemplate'.ucfirst($match[1]).'<nq>');
-					getTemplateProperties($item['content'], $child, $component);
+					self::getTemplateProperties($item['content'], $child);
 				}
 				elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
 				{
-					getTagProperties($item, $child, $component, true);
+					self::getTagProperties($item, $child, true);
 				}
 				else
 				{					
@@ -315,17 +322,17 @@ class TemplateParser
 						$child['c'] = array();
 					}
 					if ($tagName == 'switch') {
-						getSwitch($item, $child, $component);
+						self::getSwitch($item, $child);
 					} elseif ($tagName != 'foreach' && $tagName != 'if') {
 						if ($tagName == 'forma') $tagName = 'form';
-						$child['t'] = getTagIndex($tagName);
-						getTagProperties($item, $child, $component);
+						$child['t'] = self::getTagIndex($tagName);
+						self::getTagProperties($item, $child);
 					} else {
 						if ($tagName == 'if') {
 							if ($ifContentIsEmpty) {
-								getIfSwitch($item, $child, $component);
+								getIfSwitch($item, $child);
 							} else {
-								checkIfConditionForContainigProps($match[1], $child, $component);
+								checkIfConditionForContainigProps($match[1], $child);
 							}
 							if (!empty($child['e'])) {
 								if ($child['e'][0]['t'] == 'else') {
@@ -337,7 +344,7 @@ class TemplateParser
 								}
 							}
 						} elseif ($tagName == 'foreach') {
-							getForeach($item, $child, $component);
+							getForeach($item, $child);
 						}	
 					}
 				}
@@ -390,6 +397,378 @@ class TemplateParser
 		}
 	}
 
+	private static function getSwitch($item, &$child) {
+		preg_match('/^\{\s*switch\s*([^\s\}]+)\s*\}$/', $item['content'], $match);
+		$switch = $match[1];
+		if (empty($switch)) {
+			error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>'."<xmp>".$item['content']."</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>");
+		}
+		preg_match('/\$(\w+)/', $switch, $match);
+		$param = $match[1];
+		$switch = self::parseCode($switch, 'sw');
+
+		$error = 'Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Ожидается оператор <b>case</b>'."<xmp>{case 'triangle'}</xmp>или<xmp>{case 2}</xmp>";
+		$cases = array();
+		$children = array();
+		$default = array();
+		$isDefault = false;
+		$count = -1;
+		$shouldBeCase = true;
+		foreach ($child['c'] as $item) {
+			$isString = is_string($item);
+			if ($shouldBeCase && !$isString) {
+				error($error);
+			}
+			if ($isString) {
+				$it = trim(strip_tags($item));
+				if ($it == 'default') {
+					if (!empty($default)) {
+						error('Обнаружено более одного условия <b>default</b> в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>');
+					}
+					if (!empty($shouldBeContent)) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Оператор <b>'.$shouldBeContent.'</b> не содержит контента');
+					}
+					$isDefault = true;
+					$shouldBeCase = false;
+					$shouldBeContent = $item;
+					continue;
+				}
+				$pos = strpos($it, 'case');
+				if (is_int($pos)) {
+					if ($pos !== 0) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+					}
+					if (!empty($shouldBeContent)) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Условие <b>'.$shouldBeContent.'</b> не содержит контента');
+					}
+					if (!preg_match('/^\s*case\s*\'[^\']*\'\s*$/', $it) && !preg_match('/^\s*case\s*"[^"]*"\s*$/', $it) && !preg_match('/^\s*case\s+\-*\d+\s*$/', $it) && !preg_match('/^\s*case\s+(true|false|null|undefined)\s*$/', $it)) {
+						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+					}
+					$it = trim(preg_replace('/\s*case\s*/', '', $it));
+					if (!is_numeric($it) && $it[0] != '"' && $it[0] != "'") {
+						$it = '<nq>'.$it.'<nq>';
+					} elseif (!is_numeric($it)) {
+						$it = preg_replace('/[\'"]/', '', $it);
+					}
+					$cases[] = $it;
+					$shouldBeCase = false;
+					$shouldBeContent = $item;
+					$count++;
+					continue;
+				} elseif ($shouldBeCase) {
+					error($error);
+				}
+			}
+			if ($isDefault) {
+				$default[] = $item;
+			} else {
+				if (!is_array($children[$count])) {
+					$children[$count] = array();
+				}
+				$children[$count][] = $item;
+			}
+			$shouldBeContent = false;
+		}
+		$child['sw'] = $switch;
+		$child['s'] = $cases;
+		$child['c'] = $children;
+		if (!empty($default)) {
+			$child['d'] = $default;
+		}
+		if (!empty($param)) {
+			$child['p'] = $param;
+			array_unshift($child['c'], '<nq><function_returns_array>');
+			array_push($child['c'], '</function_returns_array><nq>');
+		}
+	}
+
+	private static function getTemplateProperties($html, &$child) {
+		$regexp = '/\{([^\}]+)\}/';
+		$props = array();
+		$names = array();
+		$html = preg_replace('/([\'"])(\w)/', "$1 $2", $html);
+		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
+		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
+		$propNames = array_merge($matches1[1], $matches2[1]);
+		$propValues = array_merge($matches1[2], $matches2[2]);
+		$ifCondition = false;
+		$else = null;
+		for ($i = 0; $i < count($propNames); $i++) {
+			$propName = $propNames[$i];
+			$propValue = trim($propValues[$i]);
+			if ($propName == 'if') {
+				$ifCondition = $propValue;
+				continue;
+			}
+			if ($propName == 'else') {
+				$else = $propValue;
+				continue;
+			}			
+			$hasCode = hasCode($propValue);
+			if ($hasCode) {
+				if (is_string(self::$class)) {
+					error('Шаблон, содержащийся в файле <b>'.self::$class.'</b> содержит код с реактивными переменными <b>'.$propValue.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
+				}
+				if (preg_match('/\$\w+[\[]/', $propValue)) {
+					error('Шаблон класса <b>'.self::$className.'</b> содержит некорректный код <b>'.$propValue.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
+				}				
+				preg_match_all($regexp, $propValue, $matches);
+				$codes = $matches[1];
+				if (!empty($codes)) {
+					$parts = preg_split($regexp, $propValue);
+					$content = array();
+					foreach ($parts as $j => $part) {
+						if (!empty($part)) {
+							$content[] = $part;
+						}
+						if (isset($codes[$j])) {
+							$content[] = '<plus>'.self::parseCode($codes[$j], 'tmp').'</plus>';
+						}
+					}
+					$propValue = implode($content);
+				}
+			}
+			$props[$propName] = $propValue;
+		}
+		if (!empty($props)) {
+			$child['p'] = $props;
+		}
+		if (!empty($ifCondition) || !empty($else)) {
+			addIfConditionToChild(trim($ifCondition), $else, $child);
+		}
+	}
+
+	private static function getTagIndex($tagName) {
+		$tagNameIndex = array_search($tagName, self::$tagShortcuts);
+		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
+	}
+
+	private static function getTagProperties($item, &$child, $isComponentTag = false) {
+		$html = $item['content'];
+		$props = array();
+		$names = array();
+		$ifCondition = false;
+		$else = null;
+
+		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
+		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
+		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
+		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
+		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
+		$propNames = array_merge($matches1[1], $matches2[1]);
+		$propValues = array_merge($matches1[2], $matches2[2]);
+		for ($i = 0; $i < count($propNames); $i++) {		
+			$propName = $propNames[$i];
+			$propValue = trim($propValues[$i]);
+			$hasCode = self::hasCode($propValue);
+			$fullPropName = $propName;
+			$isObfClName = self::$obfuscate === true && $fullPropName == 'class';
+			$isTag = !$isComponentTag && !isset($child['tmp']);
+
+			if (is_numeric($child['t']) || $isComponentTag) {
+				if ($propName == 'scope') {
+					$props[self::$propsShortcuts[$propName]] = 1;
+					continue;
+				}
+				if ($propName == 'if') {
+					$ifCondition = $propValue;
+					continue;
+				}
+				if ($propName == 'else') {
+					$else = $propValue;
+					continue;
+				}
+				
+				if ($isTag && isset(self::$propsShortcuts[$propName])) {
+					$propName = self::$propsShortcuts[$propName];
+				} else {
+					$propName = preg_replace('/^data-/', '_', $propName);
+					if ($isComponentTag) {
+						if ($propName == 'class') {
+							$child['cmp'] = self::parseComponentClassName($propValue, $item['content']);
+							continue;
+						} elseif ($item['tagName'] == 'control' && $propName == 'name') {
+							$child['nm'] = self::parseComponentClassName($propValue, $item['content'], true);
+							continue;
+						}
+					}
+				}
+				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
+					if ($hasCode) {
+						error('Фигурные скобки внутри атрибута события <b>'.$propName.'</b>. Ожидается название функции обработчика!');
+					}
+					if (!is_array($child['e'])) {
+						$child['e']	= array();
+					}
+					$eventType = strtolower($match[1]);
+					$once = false;
+					$parts = preg_split('/once/i', $eventType);
+					if (isset($parts[1]) && empty($parts[1])) {
+						$eventType = preg_replace("/once$/i", '', $eventType);
+						$once = true;
+					}
+					$isDispatching = preg_match('/^\!/', $propValue);
+					preg_match_all('/\(([^\)]*)\)/', $propValue, $matches);
+					$args = '';
+					if (!empty($matches[1])) {
+						$propValue = str_replace($matches[0][0], '', $propValue);
+						$args = $matches[1][0];
+					}
+					$callback = preg_replace("/[^\w]/", "", $propValue);
+					if (!$isDispatching && is_array(self::$class) && !hasComponentMethod($callback)) {
+						error('Функция обработчик события <b>'.$callback.'</b> не найдена среди методов класса <b>'.self::$className.'</b>');
+					}
+					$eventTypeIndex = array_search($eventType, self::$eventTypesShortcuts);
+					if ($eventTypeIndex > -1) {
+						$eventType = $eventTypeIndex;
+					}
+					$child['e'][] = $eventType;
+					if (!$isDispatching) {
+						if (empty($args)) {
+							$child['e'][] = '<nq><this>'.$callback.'<nq>';
+						} else {
+							$child['e'][] = '<nq><this>'.$callback.'.bind($,'.$args.')<nq>';
+						}
+					} else {
+						$child['e'][] = $callback;
+					}
+					if ($once) {
+						$child['e'][] = true;
+					}
+					continue;
+				}
+			}
+			$props[$propName] = $propValue;
+			if ($hasCode) {
+				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{__#$1}", $propValue);
+				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
+				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
+				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
+
+				$regexp = '/\{([^\}]*)\}/';
+				$hasClassVar = hasClassVar($propValue);
+				preg_match_all($regexp, $propValue, $matches);
+				$codes = $matches[1];
+				$parts = preg_split($regexp, $propValue);
+				$names[$propName] = array();
+				$attrContent = '';
+				$attrParts = array();
+				foreach ($parts as $idx => $part) {
+					if ($part !== '') {
+						if ($isObfClName) {
+							$part = self::getObfuscatedClassName($part);
+						}
+						$attrContent .= $part;
+						$attrParts[] = $part;
+					}
+					if (isset($codes[$idx])) {
+						$code = $codes[$idx];
+						$code = self::checkTernary($code);
+						if ($isObfClName) {
+							$code = self::getObfuscatedClassName($code, true);
+						}
+						if (hasClassVar($code)) {
+							$code = parseAttributeClassVars($code, $names[$propName]);
+							$attrParts[] = '<nq>'.$code.'<nq>';
+						} else {
+							if ($hasClassVar) {
+								$attrParts[] = '<nq>'.$code.'<nq>';
+							} else {
+								$attrContent .= '<plus>'.$code.'</plus>';
+							}
+						}
+					}
+				}
+				
+				if ($hasClassVar) {
+					$attrContent = implode('"+"', $attrParts);
+				}
+				self::parseClassMethodCalls($attrContent);
+				if ($hasClassVar) {
+					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
+				}				
+				$attrContent = correctTagAttributeText($propName, $attrContent);
+				$props[$propName] = $attrContent;
+				$names[$propName] = array_unique($names[$propName]);
+				sort($names[$propName]);
+				if (count($names[$propName]) == 1) {
+					$names[$propName] = $names[$propName][0];
+				}
+				if (empty($names[$propName])) {
+					unset($names[$propName]);
+				}
+			} else if ($isObfClName) {
+				$props[$propName] = self::getObfuscatedClassName($propValue);
+			}
+		}
+		if ($isComponentTag) {
+			$comp = '<component class="ComponentClassName">';
+			if ($item['tagName'] == 'control') {
+				$comp = '<control class="ControlClassName" name="controlName">';
+			} elseif ($item['tagName'] == 'menu') {
+				$comp = '<menu class="MenuClassName">';
+			} elseif ($item['tagName'] == 'form') {
+				$comp = '<form class="FormClassName">';
+			}
+			if (empty($child['cmp'])) {
+				error('Неопределенный компонент в шаблоне класса <b>'.self::$className.'</b><xmp>'.$item['content'].'</xmp>Ожидается запись вида<xmp>'.$comp.'</xmp>');
+			}
+			if ($item['tagName'] == 'control' && empty($child['nm'])) {
+				error('Контрол <b>'.$child['cmp'].'</b> в шаблоне класса <b>'.self::$className.'</b> не имеет атрибута <b>name</b><xmp>'.$item['content'].'</xmp>Ожидается запись вида<xmp>'.$comp.'</xmp>');
+			}
+		}
+		if (!empty($props)) {
+			$child['p'] = $props;
+		}
+		if (!empty($names)) {
+			$child['n'] = $names;
+		}
+		if ($isComponentTag) {
+			if (is_array($child['p'])) {
+				foreach ($child['p'] as $k => $v) {
+					$v = strip_tags(trim($v));
+					preg_match('/^\^(\w+)$/', $v, $match);
+					if (!empty($match[1])) {
+						unset($child['p'][$k]);
+						if (!is_array($child['w'])) {
+							$child['w'] = array();
+						}
+						$child['w'][] = $k;
+						$child['w'][] = $match[1];
+					}
+				}
+				if (empty($child['p'])) {
+					unset($child['p']);
+				} else {
+					getProperComponentData($child);
+				}
+			}
+		}
+		if (!empty($ifCondition) || !empty($else)) {
+			addIfConditionToChild(trim($ifCondition), trim($else), $child);
+		}
+	}
+
+	private static function hasCode($text) {
+		return preg_match("/\{[^\}]+\}/", $text);
+	}
+
+
+	private static function parseComponentClassName($value, $content, $isControlName = false) {
+		if (!hasCode($value)) return !$isControlName ? '<nq>'.$value.'<nq>' : $value;
+		$hasReactive = preg_match('/\$\w/', $value);
+		if ($hasReactive) {
+			if (!$isControlName) {
+				error('Название компонента в шаблоне класса <b>'.self::$className.'</b> не может определяться реактивной переменной<xmp>'.$content.'</xmp>Допускается запись вида<xmp><component class="{~class}"></xmp>или<xmp><component class="{&class}"></xmp>');
+			} else {
+				error('Атрибут <b>name</b> контрола в шаблоне класса <b>'.self::$className.'</b> не может определяться реактивной переменной<xmp>'.$content.'</xmp>Допускается запись вида<xmp><control name="{~class}"></xmp>или<xmp><control name="{&class}"></xmp>');
+			}
+		}
+		$value = ltrim($value, '{');
+		$value = rtrim($value, '}');
+		return self::parseCode($value);
+	}
+
 	private static function parseTextNode($content, &$children, &$let) {
 		if (!empty($content)) {
 			$items = self::checkTextForContainigProps($content, $let);
@@ -414,9 +793,9 @@ class TemplateParser
 		}
 		if (preg_match('/\$\w+[\[]/', $text)) {
 			if (is_array(self::$class)) {
-				error('РЁР°Р±Р»РѕРЅ РєР»Р°СЃСЃР° <b>'.$class['name'].'</b> СЃРѕРґРµСЂР¶РёС‚ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РєРѕРґ <b>'.$text.'</b><br><br>Р РµР°РєС‚РёРІРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РєР»Р°СЃСЃР° РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РІРёРґ <b>$var</b> РёР»Рё <b>$var.name</b> РёР»Рё <b>$var.0</b>. РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ Р·Р°РїРёСЃРё РІРёРґР° <b>$var["name"]</b> РЅРµРґРѕРїСѓСЃС‚РёРјРѕ');
+				error('Шаблон класса <b>'.$class['name'].'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 			} else {
-				error('РћРґРёРЅ РёР· С€Р°Р±Р»РѕРЅРѕРІ С„Р°Р№Р»Рµ <b>'.$class.'</b> СЃРѕРґРµСЂР¶РёС‚ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РєРѕРґ <b>'.$text.'</b><br><br>Р РµР°РєС‚РёРІРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РєР»Р°СЃСЃР° РґРѕР»Р¶РЅС‹ РёРјРµС‚СЊ РІРёРґ <b>$var</b> РёР»Рё <b>$var.name</b> РёР»Рё <b>$var.0</b>. РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ Р·Р°РїРёСЃРё РІРёРґР° <b>$var["name"]</b> РЅРµРґРѕРїСѓСЃС‚РёРјРѕ');
+				error('Один из шаблонов файле <b>'.$class.'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
 			}
 		}
 		$parts = preg_split($regexp, $text);
@@ -432,12 +811,210 @@ class TemplateParser
 						$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
 						$let++;
 					} else {
-						error('РћС€РёР±РєР° РІ РєРѕРґРµ РѕРїРµСЂР°С‚РѕСЂР° <b>let</b> РІ С€Р°Р±Р»РѕРЅРµ РєР»Р°СЃСЃР° <b>'.$component['name'].'</b><xmp>{'.$codes[$i].'}</xmp><b>РћР¶РёРґР°РµС‚СЃСЏ РєРѕРґ РІРёРґР°</b><xmp>{let &var = 5}</xmp><b>РёР»Рё</b><xmp>{let &isEmpty: true}</xmp>');
+						error('Ошибка в коде оператора <b>let</b> в шаблоне класса <b>'.self::$className.'</b><xmp>{'.$codes[$i].'}</xmp><b>Ожидается код вида</b><xmp>{let &var = 5}</xmp><b>или</b><xmp>{let &isEmpty: true}</xmp>');
 					}
 				}
-				$content[] = array(parseCode($codes[$i], $component, 'prop', true));
+				$content[] = array(self::parseCode($codes[$i], 'prop', true));
 			}
 		}
 		return $content;
+	}
+
+	private static function parseCode($code, $role = null, $toPropNodes = false) {
+		$code = trim($code);
+		self::parseClassMethodCalls($code);
+		$code = self::checkTernary($code);
+		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
+		$code = preg_replace('/^\s*::(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
+		$code = preg_replace('/^\s*::(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
+		$code = preg_replace('/<noeq>=*/', '', $code);
+		if ($toPropNodes) {
+			if (preg_match('/\bcase\b/', $code)) {
+				global $isSwitchContext;
+				if (!$isSwitchContext) error('Обнаружен оператор <b>case</b> вне оператора <b>switch</b> или подобного ему <b>if</b> в шаблоне класса <b>'.self::$className.'</b><br><br><b>Используйте код вида</b>'."<xmp>{switch ~value}\n\t{case 10}\n\t\t<div class=\"ten\">10</div>}\n\n\t{default}\n\t\tdefault text\n{/switch}</xmp><b>или</b><xmp>{if}\n\t{case !isUndefined(\$var)}\n\t\tvariant 1\n\n\t{case \$var2 === true}\n\t\tvariant 2\n\n\t{default}\n\t\tdefault text\n{/if}</xmp>");
+			}
+			if (preg_match('/\#\w/', $code)) {
+				error('Обнаружено использование контстанты данных <b>'.$code.'</b> внутри текстового нода в шаблоне класса <b>'.self::$className.'</b><br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>');
+			}
+			if (preg_match('/\$\w/', $code)) {
+				$regexp = '/\$([a-z][\w+\.]*)/i';
+				preg_match_all($regexp, $code, $matches);
+				$matches = array_unique($matches[1]);
+				sort($matches);
+				$p = array();
+				$n = array();
+				foreach ($matches as $i => $match) {
+					$parts = explode('.', $match);
+					if (count($parts) > 1) {
+						$name = $parts[0];
+						$n[] = $name;
+						array_shift($parts);
+						$p[] = "\<this>g('".$name."',['".implode("','",$parts)."'])";
+					} else {
+						$n[] = $match;
+						$p[] = "\<this>g('".$match."')";
+					}
+				}
+				$parts = preg_split($regexp, $code);
+				$c = '';
+				foreach ($parts as $i => $part) {
+					$c .= $part;
+					if (isset($p[$i])) {
+						$c .= $p[$i];
+					}
+				}
+				if (count($n) > 1) {
+					$n = '<nq>'.json_encode($n).'<nq>';
+				} else {
+					$n = "'".$n[0]."'";
+				}
+				$code = "{'pr':".$n.",'p':".$c."}";
+			}
+		} else {
+			$regexp = '/\$([a-z][\w+\.\-]*)/i';
+			preg_match_all($regexp, $code, $matches);
+			$parts = preg_split($regexp, $code);
+			$matches = $matches[1];
+			$code = '';
+			foreach ($parts as $i => $part) {
+				$code .= $part;
+				if (isset($matches[$i])) {
+					$p = explode('.', $matches[$i]);
+					if (count($p) == 1) {
+						$code .= "<this>g('".$matches[$i]."')";
+					} else {
+						$name = $p[0];
+						array_shift($p);
+						$code .= "<this>g('".$name."',['".implode("','",$p)."'])";
+					}
+				}
+			}
+		}
+		$code = preg_replace('/\#([a-z]\w*)/i', "__#$1", $code);
+		$code = preg_replace('/^&([a-z])/i', "$1", $code);
+		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
+		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
+		return '<nq>'.preg_replace('/\s+([\?:\+\-><=\!]{1,3})\s+/', "$1", $code).'<nq>';
+	}
+
+	private static function parseClassMethodCalls(&$code) {
+		if (preg_match('/\bthis\./', $code)) {
+			error('Обнаружено использование ключевого слова <b>this</b> в шаблоне класса <b>'.self::$className.'</b>');
+		}
+		$hasFunctionCall = self::hasFunctionCall($code);
+		if ($hasFunctionCall) {
+			if (!is_array(self::$class['tmpCallbacks'])) {
+				self::$class['tmpCallbacks'] = array();
+			}
+			self::$class['tmpCallbacks'] = array_merge(self::$class['tmpCallbacks'], $hasFunctionCall);
+			$code = preg_replace('/\.(\w+)\(([^\)]*)\)/', "<this>$1($2)", $code);
+			$code = preg_replace('/^\s*\.(\w+)/', "<this>$1()", $code);
+			$code = preg_replace('/([^\w\]])\.(\w+)/', "$1<this>$2()", $code);					
+		}
+		return !!$hasFunctionCall;
+	}
+
+	private static function checkTernary($code) {
+		$originalCode = $code;
+		if (preg_match('/\?/', $code)) {
+			$originalCode = '('.trim(trim($originalCode, ')'), '(').')';
+			$strings = array();
+			$signs = array("'", '"');
+			for ($i = 0; $i < 2; $i++) {
+				$strings[$i] = array();
+				$parts = explode($signs[$i], $code);
+				$code = '';
+				$isString = false;
+				foreach ($parts as $part) {
+					if ($isString) {
+						$strings[$i][] = $part;
+						$code .= '__S'.$i.'__';
+					} else {
+						$code .= $part;
+					}
+					$isString = !$isString;
+				}
+			}
+			if (preg_match('/\?[^:]+$/', $code)) {
+				$strings = array_reverse($strings);
+				$code = trim($code).":''";
+				$signs = array('__S1__', '__S0__');
+				$signs2 = array('"', "'");
+				for ($i = 0; $i < 2; $i++) {
+					$parts = explode($signs[$i], $code);
+					$code = '';
+					foreach ($parts as $j => $part) {
+						$code .= $part;
+						if (isset($strings[$i][$j])) {
+							$code .= $signs2[$i].$strings[$i][$j].$signs2[$i];
+						}
+					}
+
+				}
+				$originalCode = '('.$code.')';
+			}
+		}
+		return $originalCode;
+	}
+
+	private static function hasFunctionCall($code) {
+		preg_match_all('/^\s*\.([a-z]\w*)|[^\w\]]\.([a-z]\w*)/i', $code, $matches);
+		$funcs = array();
+		foreach ($matches[1] as $i => $match) {
+			if (!empty($match)) {
+				$funcs[] = $match;
+			}
+			if (!empty($matches[2][$i])) {
+				$funcs[] = $matches[2][$i];
+			}
+			if (!empty($matches[3][$i])) {
+				$funcs[] = $matches[3][$i];
+			}
+		}
+		$funcs = array_unique($funcs);
+		if (empty($funcs)) return false;
+		return $funcs;
+	}
+
+	private static function getObfuscatedClassName($value, $isCode = false) {
+		if (!$isCode) {
+			$value = "'".$value."'";
+		}
+		$value = preg_replace('/\[\s*[\'"]([^\'"]+)[\'"]\s*\]/', "[#$1#]", $value);
+		$regexp = '/"[^"]+"|\'[^\']+\'/';
+		preg_match_all($regexp, $value, $matches);
+		$strings = $matches[0];
+		$codeParts = preg_split($regexp, $value);
+		$obfuscatedValue = '';
+		foreach ($codeParts as $i => $codePart) {
+			$obfuscatedValue .= $codePart;
+			if (isset($strings[$i])) {
+				$string = preg_replace('/["\']/', '', $strings[$i]);
+				$parts = explode(' ', $string);
+				$newClassName = array();
+				foreach ($parts as $part) {
+					if (!empty($part) && isset(self::$cssClassIndex[$part])) {
+						$newClassName[] = self::$cssClassIndex[$part];
+					} else {
+						if (!empty($part)) {
+							$part = self::addToCssClassIndex($part);
+						}
+						$newClassName[] = $part;
+					}
+				}
+				$obfuscatedValue .= "'".implode(' ', $newClassName)."'";
+			}
+		}		
+		if (!$isCode) {
+			$obfuscatedValue = trim($obfuscatedValue, "'");
+		}
+		$obfuscatedValue = preg_replace('/\[\#([^\#]+)\#\]/', "['$1']", $obfuscatedValue);
+		return preg_replace('/ {2,}/', ' ', $obfuscatedValue);
+	}
+
+	private static function addToCssClassIndex($className) {
+		$obfuscatedClassName = CSSObfuscator::generate();
+		self::$cssClassIndex[$className] = $obfuscatedClassName;
+		return $obfuscatedClassName;
 	}
 }

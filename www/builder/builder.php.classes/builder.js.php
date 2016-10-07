@@ -86,6 +86,7 @@ class JSCompiler
 	private $declCompiler;
 	private $testsCompiler;
 	private $routesCompiler;
+	private $cssCompiler;
 	private $usedComponents;
 	private $usedComponentsNames;
 
@@ -105,6 +106,7 @@ class JSCompiler
 		$this->declCompiler = $builder->getCompiler('decl');
 		$this->routesCompiler = $builder->getCompiler('routes');
 		$this->testsCompiler = $builder->getCompiler('tests');
+		$this->cssCompiler = $builder->getCompiler('css');
 
 		$this->validateEntry();
 		$this->validateJsFolder();
@@ -589,7 +591,7 @@ class JSCompiler
 			'data'             => $this->dataCompiler->get(),
 			'pathToDictionary' => $this->config['pathToDictionary'],
 			'tags'             => Tags::getList(),
-			'props'            => Props::getList(),
+			'props'            => Props::getList(true),
 			'events'           => Events::getList(),
 			'decls'            => $this->declCompiler->get(),
 			'routes'           => $this->config['router']['routes'],
@@ -644,7 +646,9 @@ class JSCompiler
 					array(
 						'classNames' => $this->usedComponentsNames,
 						'classes' => $this->classes,
-						'templates' => $templates
+						'templates' => $templates,
+						'obfuscateCss' => $this->configProvider->needCssObfuscation(),
+						'cssClassIndex' => $this->cssCompiler->getCssClassIndex()
 					)
 				);
 				$this->addTemplateFunction($className, $templates[$className], $class);
