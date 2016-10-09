@@ -2,7 +2,7 @@
 
 class TemplateParser 
 {	
-	private static $calledClasses, $classes, $templates;
+	private static $calledClasses, $classes, $templates, $sources;
 	private static $regexp = "/\{template +\.(\w+) *\}/";
 	private static $simpleTags = array('br', 'input', 'img', 'hr');
 	private static $class, $className, $tmpids, $isSwitchContext,
@@ -12,12 +12,36 @@ class TemplateParser
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
 		'noClosingTag' => 'Ошибка валидации шаблонов класса {??}. Один из {?} {??} не имеет закрывающего тега',
-		'extraClosingTag' => 'Ошибка валидации шаблонов класса {??}. Лишний закрывающийся {?} {??}'
+		'extraClosingTag' => 'Ошибка валидации шаблонов класса {??}. Лишний закрывающийся {?} {??}',
+		'unknownComponent' => 'Неопределенный компонент в шаблоне класса {??}<xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
+		'controlWithoutName' => 'Контрол {??} в шаблоне класса {??} не имеет атрибута <b>name</b><xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
+		'incorrectReactVar' => 'Элемент в шаблоне класса {??} содержит атрибут с некорректным кодом {??}<br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо',
+		'reactVarInInclude' => 'Шаблон, содержащийся в файле {??} содержит код с реактивными переменными {??}<br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>',
+		'reactComponentName' => 'Название компонента в шаблоне класса {??} не может определяться реактивной переменной<xmp>{?}</xmp>Допускается запись вида<xmp><component class="{~class}"></xmp>или<xmp><component class="{&class}"></xmp>',
+		'reactControlName' => 'Атрибут <b>name</b> контрола в шаблоне класса {??} не может определяться реактивной переменной<xmp>{?}</xmp>Допускается запись вида<xmp><control name="{~class}"></xmp>или<xmp><control name="{&class}"></xmp>',
+		'incorrectReactVar2' => 'Шаблон класса {??} содержит некорректный код {??}<br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо',
+		'letError' => 'Ошибка в коде оператора <b>let</b> в шаблоне класса {??}<xmp>{{?}}</xmp><b>Ожидается код вида</b><xmp>{let &var = 5}</xmp><b>или</b><xmp>{let &isEmpty: true}</xmp>',
+		'caseOutsideSwitch' => "Обнаружен оператор <b>case</b> вне оператора <b>switch</b> или подобного ему <b>if</b> в шаблоне класса {??}<br><br><b>Используйте код вида</b><xmp>{switch ~value}\n\t{case 10}\n\t\t<div class=\"ten\">10</div>}\n\n\t{default}\n\t\tdefault text\n{/switch}</xmp><b>или</b><xmp>{if}\n\t{case !isUndefined(\$var)}\n\t\tvariant 1\n\n\t{case \$var2 === true}\n\t\tvariant 2\n\n\t{default}\n\t\tdefault text\n{/if}</xmp>",
+		'dataInTextNode' => 'Обнаружено использование контстанты данных {??} внутри текстового нода в шаблоне класса {??}<br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>',
+		'usingThis' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне класса {??}',
+		'templateCallLoop' => 'Шаблон {??} класса {??} вызывает сам себя',
+		'incorrectForeach' => 'Невалидный код <b>foreach</b> в шаблоне класса {??}: {??}',
+		'switchError' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса {??}<xmp>{?}</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>",
+		'caseExpected' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса {??}. Ожидается оператор <b>case</b><xmp>{case 'triangle'}</xmp>или<xmp>{case 2}</xmp>",
+		'fewDefaults' => 'Обнаружено более одного условия <b>default</b> в коде оператора <b>switch</b> в шаблоне класса {??}',
+		'noSwitchContent' => 'Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса {??}. Оператор {??} не содержит контента',
+		'incorrectCaseCode' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса {??}. Некоррекнтый код в операторе <b>case</b><xmp>{{?}}</xmp>",
+		'conditionEmpty' => 'Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса {??}. Условие {??} не содержит контента',
+		'elseWithoutIf' => 'Элемент в шаблоне класса {??} содержит атрибут <b>else</b>, но не содержит атрибут <b>if</b>',
+		'incorrectIf' => 'Элемент в шаблоне класса {??} содержит некорректный атрибут <b>if = "{?}"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>',
+		'eventHandlerExpected' => 'Фигурные скобки внутри атрибута события {??} в шаблоне класса {??}. Ожидается название функции обработчика!',
+		'handlerNotFound' => 'Функция обработчик события {??} не найдена среди методов класса {??}'
 	);
 
 	public static function init($params) {
 		self::$calledClasses = $params['classNames'];
 		self::$classes = $params['classes'];
+		self::$sources = $params['sources'];
 		self::$templates = $params['templates'];
 		self::$propsShortcuts = Props::getList();
 		self::$eventTypesShortcuts = Events::getList();
@@ -42,7 +66,7 @@ class TemplateParser
 		preg_match_all(self::$regexp, $template, $matches);
 		$templateNames = $matches[1];
 		if (!empty($templateNames)) {
-			if (!empty($className) && !preg_match("/\{template +\.main *\}/", $template) && !self::hasParentMainTemplate($class) && in_array($class['name'], $calledComponents)) {
+			if (!empty($className) && !preg_match("/\{template +\.main *\}/", $template) && !self::hasParentMainTemplate($class) && in_array($className, self::$calledClasses)) {
 				new Error(self::$errors['noMainTemplate'], $className);
 			}
 			$templateContents = preg_split(self::$regexp, $template);
@@ -110,10 +134,11 @@ class TemplateParser
 		if (!is_array($class['extends']) || empty($class['extends'])) {
 			return false;
 		}
-		foreach (self::$classes as $name => $class) {
-			$template = self::$templates[$name];
-			if (!empty($template) && in_array($name, $class['extends'])) {
-				if (preg_match("/\{template +\.main *\}/", $template) || self::hasParentMainTemplate($class)) {
+		foreach ($class['extends'] as $className) {
+			$template = self::$templates[$className];
+			if (!empty($template)) {
+				preg_match_all("/\{template +\.(\w+) *\}/", $template, $matches);
+				if (empty($matches[1]) || in_array('main', $matches[1]) || self::hasParentMainTemplate(self::$classes[$className])) {
 					return true;
 				}
 			}
@@ -249,13 +274,13 @@ class TemplateParser
 					preg_match("/<template +[\"']*(\w+)[\"']*[^=]/i",  $content, $match);
 					$tmpName = $match[1];
 					if (!empty($tmpName) && $tmpName == $templateName) {
-						error('Шаблон <b>'.$templateName.'</b> класса <b>'.self::$className.'</b> вызывает сам себя');
+						new Error(self::$errors['templateCallLoop'], array($templateName, self::$className));
 					}
 					$child = array('tmp' => '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>');
 					self::getTemplateProperties($item['content'], $child);
 					if (is_array($child['p']) && !empty($child['p']['tmpid'])) {
 						if (!empty(self::$tmpids[$child['p']['tmpid']]) && self::$tmpids[$child['p']['tmpid']] == $templateName) {
-							error('Шаблон <b>'.$templateName.'</b> класса <b>'.self::$className.'</b> вызывает сам себя');
+							new Error(self::$errors['templateCallLoop'], array($templateName, self::$className));
 						}
 						$child['tmp'] = strip_tags($child['p']['tmpid']);
 						unset($child['p']['tmpid']);
@@ -332,7 +357,7 @@ class TemplateParser
 							if ($ifContentIsEmpty) {
 								getIfSwitch($item, $child);
 							} else {
-								checkIfConditionForContainigProps($match[1], $child);
+								self::checkIfConditionForContainigProps($match[1], $child);
 							}
 							if (!empty($child['e'])) {
 								if ($child['e'][0]['t'] == 'else') {
@@ -344,7 +369,7 @@ class TemplateParser
 								}
 							}
 						} elseif ($tagName == 'foreach') {
-							getForeach($item, $child);
+							self::getForeach($item, $child);
 						}	
 					}
 				}
@@ -397,17 +422,79 @@ class TemplateParser
 		}
 	}
 
+	private static function getForeach($item, &$child) {
+		$child['h'] = $child['c'];
+		unset($child['c']);
+
+		$content = preg_replace('/\s{2,}/', ' ', $item['content']);
+		$content = preg_replace('/\{foreach\s+|\}/', '', $content);
+		$parts = explode(' ', trim($content));
+		
+		if ($parts[1] != 'as' || (isset($parts[3]) && $parts[3] != '=>')) {
+			new Error(self::$errors['incorrectForeach'], array(self::$className, $item['content']));
+		}
+		$variable = $parts[0];
+		if (isset($parts[4])) {
+			$key = $parts[2];
+			$val = $parts[4];
+		} else {
+			$key = '';
+			$val = $parts[2];
+			$parts = explode('=>', $val);
+			if (isset($parts[1])) {
+				$key = $parts[0];
+				$val = $parts[1];
+			}
+		}
+		if (!preg_match_all('/^([\$&~])(\w[\w\.]*)$/', $variable, $matches)) {
+			new Error(self::$errors['incorrectForeach'], array(self::$className, $item['content']));
+		}
+		$sign = $matches[1][0];
+		$variableParts = explode('.', $matches[2][0]);
+		$variable = $variableParts[0];
+		if ($sign == '&' || $sign == '~') {
+			$variableParts[0] = '';
+			$variableParts = implode('.', $variableParts);
+			$variable .= $variableParts;
+		} else {
+			if (isset($variableParts[1])) {
+				new Error(self::$errors['incorrectForeach'], array(self::$className, $item['content']));
+			}
+		}
+
+		if (!preg_match('/^\&\w+$/', $val)) {
+			new Error(self::$errors['incorrectForeach'], array(self::$className, $item['content']));
+		}
+		if (!empty($key) && !preg_match('/^\&\w+$/', $key)) {
+			new Error(self::$errors['incorrectForeach'], array(self::$className, $item['content']));
+		}
+		if ($sign == '~') {
+			$child['p'] = "<nq>_['".$variable."']<nq>";
+		} elseif ($sign == '&') {
+			$child['p'] = '<nq>'.$variable.'<nq>';
+		} else {
+			$child['p'] = "<nq>\<this>g('".$variable."')<nq>";
+			$child['f'] = $variable;
+		}
+		if (!empty($key)) {
+			$key = ','.str_replace('&', '', $key);
+		}
+		$val = str_replace('&', '', $val);
+		array_unshift($child['h'], '<foreach '.$val.$key.'>');
+		array_push($child['h'], '</foreach>');
+		return $child;
+	}
+
 	private static function getSwitch($item, &$child) {
 		preg_match('/^\{\s*switch\s*([^\s\}]+)\s*\}$/', $item['content'], $match);
 		$switch = $match[1];
 		if (empty($switch)) {
-			error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>'."<xmp>".$item['content']."</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>");
+			new Error(self::$errors['switchError'], array(self::$className, $item['content']));
 		}
 		preg_match('/\$(\w+)/', $switch, $match);
 		$param = $match[1];
 		$switch = self::parseCode($switch, 'sw');
 
-		$error = 'Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Ожидается оператор <b>case</b>'."<xmp>{case 'triangle'}</xmp>или<xmp>{case 2}</xmp>";
 		$cases = array();
 		$children = array();
 		$default = array();
@@ -417,16 +504,16 @@ class TemplateParser
 		foreach ($child['c'] as $item) {
 			$isString = is_string($item);
 			if ($shouldBeCase && !$isString) {
-				error($error);
+				new Error(self::$errors['caseExpected'], array(self::$className));
 			}
 			if ($isString) {
 				$it = trim(strip_tags($item));
 				if ($it == 'default') {
 					if (!empty($default)) {
-						error('Обнаружено более одного условия <b>default</b> в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>');
+						new Error(self::$errors['fewDefaults'], array(self::$className));
 					}
 					if (!empty($shouldBeContent)) {
-						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Оператор <b>'.$shouldBeContent.'</b> не содержит контента');
+						new Error(self::$errors['noSwitchContent'], array(self::$className, $shouldBeContent));
 					}
 					$isDefault = true;
 					$shouldBeCase = false;
@@ -436,13 +523,13 @@ class TemplateParser
 				$pos = strpos($it, 'case');
 				if (is_int($pos)) {
 					if ($pos !== 0) {
-						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+						new Error(self::$errors['incorrectCaseCode'], array(self::$className, $it));
 					}
 					if (!empty($shouldBeContent)) {
-						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Условие <b>'.$shouldBeContent.'</b> не содержит контента');
+						new Error(self::$errors['conditionEmpty'], array(self::$className, $shouldBeContent));
 					}
 					if (!preg_match('/^\s*case\s*\'[^\']*\'\s*$/', $it) && !preg_match('/^\s*case\s*"[^"]*"\s*$/', $it) && !preg_match('/^\s*case\s+\-*\d+\s*$/', $it) && !preg_match('/^\s*case\s+(true|false|null|undefined)\s*$/', $it)) {
-						error('Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне класса <b>'.self::$className.'</b>. Некоррекнтый код в операторе <b>case</b>'."<xmp>{".$it."}</xmp>");
+						new Error(self::$errors['incorrectCaseCode'], array(self::$className, $it));
 					}
 					$it = trim(preg_replace('/\s*case\s*/', '', $it));
 					if (!is_numeric($it) && $it[0] != '"' && $it[0] != "'") {
@@ -456,7 +543,7 @@ class TemplateParser
 					$count++;
 					continue;
 				} elseif ($shouldBeCase) {
-					error($error);
+					new Error(self::$errors['caseExpected'], array(self::$className));
 				}
 			}
 			if ($isDefault) {
@@ -504,13 +591,13 @@ class TemplateParser
 				$else = $propValue;
 				continue;
 			}			
-			$hasCode = hasCode($propValue);
+			$hasCode = self::hasCode($propValue);
 			if ($hasCode) {
 				if (is_string(self::$class)) {
-					error('Шаблон, содержащийся в файле <b>'.self::$class.'</b> содержит код с реактивными переменными <b>'.$propValue.'</b><br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>');
+					new Error(self::$errors['reactVarInInclude'], array(self::$class, $propValue));
 				}
 				if (preg_match('/\$\w+[\[]/', $propValue)) {
-					error('Шаблон класса <b>'.self::$className.'</b> содержит некорректный код <b>'.$propValue.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
+					new Error(self::$errors['incorrectReactVar'], array(self::$className, $propValue));
 				}				
 				preg_match_all($regexp, $propValue, $matches);
 				$codes = $matches[1];
@@ -534,7 +621,70 @@ class TemplateParser
 			$child['p'] = $props;
 		}
 		if (!empty($ifCondition) || !empty($else)) {
-			addIfConditionToChild(trim($ifCondition), $else, $child);
+			self::addIfConditionToChild(trim($ifCondition), $else, $child);
+		}
+	}
+
+	private static function addIfConditionToChild($ifCondition, $else, &$child) {
+		if (!empty($else) && empty($ifCondition)) {
+			new Error(self::$errors['elseWithoutIf'], array(self::$className));
+		}
+		if (!preg_match('/^\{[^\}]+\}$/', $ifCondition)) {
+			new Error(self::$errors['incorrectIf'], array(self::$className, $ifCondition));
+		}
+		$ifCondition = ltrim($ifCondition, '{');
+		$ifCondition = rtrim($ifCondition, '}');
+
+		$child = array('c' => $child);
+		if (!empty($else)) {
+			$else = ltrim($else, '{');
+			$else = rtrim($else, '}');
+			if (preg_match('/\$\w+[\[]/', $else)) {
+				new Error(self::$errors['incorrectReactVar'], array(self::$className, $else));
+			}
+			$child['e'] = self::parseCode($else, 'else');
+		}
+		self::checkIfConditionForContainigProps($ifCondition, $child, true);
+	}
+
+	private static function checkIfConditionForContainigProps($ifCondition, &$child, $addingIntoChild = false) {
+		if (is_array(self::$class) && preg_match('/\$\w+[\[]/', $ifCondition)) {
+			new Error(self::$errors['incorrectReactVar'], array(self::$className, $ifCondition));
+		}
+		$hasCode = preg_match('/\$\w/', $ifCondition);
+		if (is_string(self::$class) && $hasCode) {
+			new Error(self::$errors['reactVarInInclude'], array(self::$class, $ifCondition));
+		}
+		self::parseClassMethodCalls($ifCondition);
+		$signs = '[\+\-><\!=\/\*%\?:&\|]';
+		$ifCondition = preg_replace('/\s+(?='.$signs.')/', '', $ifCondition);
+		$ifCondition = preg_replace('/('.$signs.')\s+/', "$1", $ifCondition);
+		$ifCondition = preg_replace('/\&(\w+)/', "$1", $ifCondition);
+		$ifCondition = preg_replace('/~(\w+)/', "_['$1']", $ifCondition);
+		if ($hasCode) {
+			preg_match_all('/\$(\w+)/', $ifCondition, $matches);
+			$ifCondition = preg_replace('/\$(\w+)/', "\<this>g('$1')", $ifCondition);
+			if (!empty($matches[1])) {
+				$child['p'] = $matches[1];
+			}
+			$child['i'] = '<nq>function(){return('.$ifCondition.')}<nq>';
+			if (count($child['c']) < 2) {
+				array_unshift($child['c'], '<nq><function>');
+				array_push($child['c'], '</function><nq>');
+			} else {
+				array_unshift($child['c'], '<nq><function_returns_array>');
+				array_push($child['c'], '</function_returns_array><nq>');
+			}
+			if (count($child['c']) == 2) {
+				$child['c'] = array('<nq><function>','','</function><nq>');
+			}
+		} else {
+			if (!preg_match('/'.$signs.'/', $ifCondition)) {
+				$child['i'] = '<nq>!!'.$ifCondition.'<nq>';
+			} else {
+				$child['i'] = '<nq>'.$ifCondition.'<nq>';
+			}
+			$child['aic'] = $addingIntoChild;
 		}
 	}
 
@@ -595,7 +745,7 @@ class TemplateParser
 				}
 				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
 					if ($hasCode) {
-						error('Фигурные скобки внутри атрибута события <b>'.$propName.'</b>. Ожидается название функции обработчика!');
+						new Error(self::$errors['eventHandlerExpected'], array($propName, self::$className));
 					}
 					if (!is_array($child['e'])) {
 						$child['e']	= array();
@@ -615,8 +765,8 @@ class TemplateParser
 						$args = $matches[1][0];
 					}
 					$callback = preg_replace("/[^\w]/", "", $propValue);
-					if (!$isDispatching && is_array(self::$class) && !hasComponentMethod($callback)) {
-						error('Функция обработчик события <b>'.$callback.'</b> не найдена среди методов класса <b>'.self::$className.'</b>');
+					if (!$isDispatching && is_array(self::$class) && !self::hasComponentMethod($callback, self::$class)) {
+						new Error(self::$errors['handlerNotFound'], array($callback, self::$className));
 					}
 					$eventTypeIndex = array_search($eventType, self::$eventTypesShortcuts);
 					if ($eventTypeIndex > -1) {
@@ -646,7 +796,7 @@ class TemplateParser
 				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
 
 				$regexp = '/\{([^\}]*)\}/';
-				$hasClassVar = hasClassVar($propValue);
+				$hasClassVar = self::hasClassVar($propValue);
 				preg_match_all($regexp, $propValue, $matches);
 				$codes = $matches[1];
 				$parts = preg_split($regexp, $propValue);
@@ -667,8 +817,8 @@ class TemplateParser
 						if ($isObfClName) {
 							$code = self::getObfuscatedClassName($code, true);
 						}
-						if (hasClassVar($code)) {
-							$code = parseAttributeClassVars($code, $names[$propName]);
+						if (self::hasClassVar($code)) {
+							$code = self::parseAttributeClassVars($code, $names[$propName]);
 							$attrParts[] = '<nq>'.$code.'<nq>';
 						} else {
 							if ($hasClassVar) {
@@ -687,7 +837,7 @@ class TemplateParser
 				if ($hasClassVar) {
 					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
 				}				
-				$attrContent = correctTagAttributeText($propName, $attrContent);
+				$attrContent = self::correctTagAttributeText($propName, $attrContent);
 				$props[$propName] = $attrContent;
 				$names[$propName] = array_unique($names[$propName]);
 				sort($names[$propName]);
@@ -711,10 +861,10 @@ class TemplateParser
 				$comp = '<form class="FormClassName">';
 			}
 			if (empty($child['cmp'])) {
-				error('Неопределенный компонент в шаблоне класса <b>'.self::$className.'</b><xmp>'.$item['content'].'</xmp>Ожидается запись вида<xmp>'.$comp.'</xmp>');
+				new Error(self::$errors['unknownComponent'], array(self::$className, $item['content'], $comp));
 			}
 			if ($item['tagName'] == 'control' && empty($child['nm'])) {
-				error('Контрол <b>'.$child['cmp'].'</b> в шаблоне класса <b>'.self::$className.'</b> не имеет атрибута <b>name</b><xmp>'.$item['content'].'</xmp>Ожидается запись вида<xmp>'.$comp.'</xmp>');
+				new Error(self::$errors['controlWithoutName'], array($child['cmp'], self::$className, $item['content'], $comp));
 			}
 		}
 		if (!empty($props)) {
@@ -740,13 +890,140 @@ class TemplateParser
 				if (empty($child['p'])) {
 					unset($child['p']);
 				} else {
-					getProperComponentData($child);
+					self::getProperComponentData($child);
 				}
 			}
 		}
 		if (!empty($ifCondition) || !empty($else)) {
-			addIfConditionToChild(trim($ifCondition), trim($else), $child);
+			self::addIfConditionToChild(trim($ifCondition), trim($else), $child);
 		}
+	}
+
+	private static function getProperComponentData(&$child) {
+		$props = $child['p'];
+		$properData = array();
+		if (!empty($props['props'])) {
+			$properData['ap'] = array();	
+		} else {
+			$properData['p'] = array();
+		}
+		if (!empty($props['args'])) {
+			$properData['aa'] = array();	
+		} else {
+			$properData['a'] = array();
+		}
+		foreach ($props as $k => $v) {
+			if ($k == 'opts') {
+				$properData['op'] = $v;
+			} else if ($k == 'cmpid') {
+				$properData['i'] = $v;
+			} elseif ($k == 'props' || $k == 'args') {
+				$properData[$k == 'props' ? 'p' : 'a'] = $v;
+			} else {
+				if (preg_match('/^arg-/', $k)) {
+					$k = preg_replace('/^arg-/', '', $k);
+					if (is_array($properData['aa'])) {
+						$properData['aa'][$k] = $v;
+					} else {
+						$properData['a'][$k] = $v;
+					}
+				} else {
+					if (is_array($properData['ap'])) {
+						$properData['ap'][$k] = $v;
+					} else {
+						$properData['p'][$k] = $v;
+					}
+				}
+			}
+		}
+		if (empty($properData['ap'])) {
+			unset($properData['ap']);
+		}
+		if (empty($properData['p'])) {
+			unset($properData['p']);
+		}
+		if (empty($properData['aa'])) {
+			unset($properData['aa']);
+		}
+		if (empty($properData['a'])) {
+			unset($properData['a']);
+		}
+		$child['p'] = $properData;
+		if (is_array($child['n']) && !empty($child['n'])) {
+			foreach ($child['n'] as $k => $v) {
+				if ($k == 'args' || preg_match('/^arg-/', $k)) {
+					unset($child['n'][$k]);
+					if ($k != 'args') $k = preg_replace('/^arg-/', '', $k);
+					if (!is_array($child['na'])) {
+						$child['na'] = array();
+					}
+					$child['na'][$k] = $v;
+				}
+			}
+			if (empty($child['n'])) unset($child['n']);
+		}
+		if (is_array($child['n']) && is_array($child['na'])) {
+			$properNames = array();
+			foreach ($child['n'] as $n) {
+				if (!in_array($n, $child['na'])) {
+					$properNames[] = $n;
+				}
+			}
+			$child['n'] = $properNames;
+			if (empty($child['n'])) unset($child['n']);
+		}
+		if (is_array($child['n'])) {
+			$child['n'] = array_unique($child['n']);
+		}
+		if (is_array($child['na'])) {
+			$child['na'] = array_unique($child['na']);
+		}
+	}
+
+	private static function correctTagAttributeText($propName, $text) {
+		if ($propName == 'st') {
+			$text = preg_replace('/:\s+/', ':', $text);
+		}
+		return $text;
+	}
+
+	private static function hasClassVar($code) {
+		return preg_match('/\$\w/', $code);
+	}
+
+	private static function hasComponentMethod($method, $class) {
+		if (is_array($class['functionList']) && in_array($method, $class['functionList'])) return true;
+		$parents = $class['extends'];
+		if (is_array($parents)) {
+			foreach ($parents as $parent) {
+				if (is_array(self::$sources[$parent]) && preg_match('/\b'.$parent.'.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
+					return true;
+				}
+				if (self::hasComponentMethod($method, self::$classes[$parent])) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static function parseAttributeClassVars($code, &$names) {
+		if (preg_match('/\$\w+[\[]/', $code)) {
+			if (is_array(self::$class)) {
+				new Error(self::$errors['incorrectReactVar'], array(self::$className, $code));
+			}
+		}
+		$regexp = '/\$(\w+)/';
+		preg_match_all($regexp, $code, $matches);
+		if (!empty($matches[1])) {
+			if (is_string(self::$class)) {
+				new Error(self::$errors['reactVarInInclude'], array(self::$class, $code));
+			}
+			foreach ($matches[1] as $i => $match) {
+				$names[] = $match;
+			}
+		}
+		return preg_replace($regexp, "\<this>g('$1')", $code);
 	}
 
 	private static function hasCode($text) {
@@ -755,13 +1032,13 @@ class TemplateParser
 
 
 	private static function parseComponentClassName($value, $content, $isControlName = false) {
-		if (!hasCode($value)) return !$isControlName ? '<nq>'.$value.'<nq>' : $value;
+		if (!self::hasCode($value)) return !$isControlName ? '<nq>'.$value.'<nq>' : $value;
 		$hasReactive = preg_match('/\$\w/', $value);
 		if ($hasReactive) {
 			if (!$isControlName) {
-				error('Название компонента в шаблоне класса <b>'.self::$className.'</b> не может определяться реактивной переменной<xmp>'.$content.'</xmp>Допускается запись вида<xmp><component class="{~class}"></xmp>или<xmp><component class="{&class}"></xmp>');
+				new Error(self::$errors['reactComponentName'], array(self::$className, $content));
 			} else {
-				error('Атрибут <b>name</b> контрола в шаблоне класса <b>'.self::$className.'</b> не может определяться реактивной переменной<xmp>'.$content.'</xmp>Допускается запись вида<xmp><control name="{~class}"></xmp>или<xmp><control name="{&class}"></xmp>');
+				new Error(self::$errors['reactControlName'], array(self::$className, $content));
 			}
 		}
 		$value = ltrim($value, '{');
@@ -793,9 +1070,9 @@ class TemplateParser
 		}
 		if (preg_match('/\$\w+[\[]/', $text)) {
 			if (is_array(self::$class)) {
-				error('Шаблон класса <b>'.$class['name'].'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
+				new Error(self::$errors['incorrectReactVar2'], array(self::$className, $text));
 			} else {
-				error('Один из шаблонов файле <b>'.$class.'</b> содержит некорректный код <b>'.$text.'</b><br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо');
+				new Error(self::$errors['reactVarInInclude'], array(self::$class, $text));
 			}
 		}
 		$parts = preg_split($regexp, $text);
@@ -811,7 +1088,7 @@ class TemplateParser
 						$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
 						$let++;
 					} else {
-						error('Ошибка в коде оператора <b>let</b> в шаблоне класса <b>'.self::$className.'</b><xmp>{'.$codes[$i].'}</xmp><b>Ожидается код вида</b><xmp>{let &var = 5}</xmp><b>или</b><xmp>{let &isEmpty: true}</xmp>');
+						new Error(self::$errors['letError'], array(self::$className, $codes[$i]));
 					}
 				}
 				$content[] = array(self::parseCode($codes[$i], 'prop', true));
@@ -830,11 +1107,10 @@ class TemplateParser
 		$code = preg_replace('/<noeq>=*/', '', $code);
 		if ($toPropNodes) {
 			if (preg_match('/\bcase\b/', $code)) {
-				global $isSwitchContext;
-				if (!$isSwitchContext) error('Обнаружен оператор <b>case</b> вне оператора <b>switch</b> или подобного ему <b>if</b> в шаблоне класса <b>'.self::$className.'</b><br><br><b>Используйте код вида</b>'."<xmp>{switch ~value}\n\t{case 10}\n\t\t<div class=\"ten\">10</div>}\n\n\t{default}\n\t\tdefault text\n{/switch}</xmp><b>или</b><xmp>{if}\n\t{case !isUndefined(\$var)}\n\t\tvariant 1\n\n\t{case \$var2 === true}\n\t\tvariant 2\n\n\t{default}\n\t\tdefault text\n{/if}</xmp>");
+				if (!self::$isSwitchContext) new Error(self::$errors['caseOutsideSwitch'], self::$className);
 			}
 			if (preg_match('/\#\w/', $code)) {
-				error('Обнаружено использование контстанты данных <b>'.$code.'</b> внутри текстового нода в шаблоне класса <b>'.self::$className.'</b><br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>');
+				new Error(self::$errors['dataInTextNode'], array($code, self::$className));
 			}
 			if (preg_match('/\$\w/', $code)) {
 				$regexp = '/\$([a-z][\w+\.]*)/i';
@@ -899,7 +1175,7 @@ class TemplateParser
 
 	private static function parseClassMethodCalls(&$code) {
 		if (preg_match('/\bthis\./', $code)) {
-			error('Обнаружено использование ключевого слова <b>this</b> в шаблоне класса <b>'.self::$className.'</b>');
+			new Error(self::$errors['usingThis'], self::$className);
 		}
 		$hasFunctionCall = self::hasFunctionCall($code);
 		if ($hasFunctionCall) {

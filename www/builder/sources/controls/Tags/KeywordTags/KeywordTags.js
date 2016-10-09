@@ -42,3 +42,5 @@ function tagExists(text) {
 	var items = $items.join(',').replace(/\#\d/g, '');
 	return items.split(',').has(text);
 }
+
+function resetOptions() {};

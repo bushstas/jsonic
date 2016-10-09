@@ -195,6 +195,13 @@ function Component() {
 		}
 	};
 
+	Component.prototype.addListener = function(target, eventType, handler) {
+ 		if (isElement(target)) {
+ 			this.eventHandler = this.eventHandler || new EventHandler();
+ 			this.eventHandler.listen(target, eventType, handler.bind(this));
+ 		} else target.subscribe(eventType, handler, this);
+ 	};
+
 	Component.prototype.removeValueFrom = function(propName, value) {
 		var prop = this.get(propName);
 		if (isArray(prop)) this.removeByIndexFrom(propName, prop.indexOf(value));

@@ -70,6 +70,7 @@ class JSCompiler
 
 	private $superClasses = array('component', 'dialog', 'form', 'control', 'menu');
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
+	private $componentLikeClasses = array('Dialog', 'Form', 'Control', 'Menu', 'View', 'Application');
 	private $classes = array();
 	private $classesByTypes = array();
 	private $sources = array();
@@ -170,6 +171,7 @@ class JSCompiler
 
 	private function validateSuperClasses() {
 		$this->usedComponents = $this->templateCompiler->getUsedComponents();
+		$this->usedComponentsNames = array_reverse(array_unique(array_keys($this->usedComponents)));
 		foreach ($this->classes as $class) {
 			if (is_array($class['extends'])) {
 				foreach ($class['extends'] as $superClass) {
@@ -234,7 +236,6 @@ class JSCompiler
 		foreach ($properNotUsedComponents as $className) {
 			unset($this->classes[$className]);
 		}
-		$this->usedComponentsNames = array_reverse(array_unique(array_keys($this->usedComponents)));
 	}
 
 	private function addClassesFromTemplates() {
@@ -646,13 +647,14 @@ class JSCompiler
 					array(
 						'classNames' => $this->usedComponentsNames,
 						'classes' => $this->classes,
+						'sources' => $this->sources,
 						'templates' => $templates,
 						'obfuscateCss' => $this->configProvider->needCssObfuscation(),
 						'cssClassIndex' => $this->cssCompiler->getCssClassIndex()
 					)
 				);
 				$this->addTemplateFunction($className, $templates[$className], $class);
-				if (!is_array($class['tmpCallbacks'])) {
+				if (is_array($class['tmpCallbacks'])) {
 					foreach ($class['tmpCallbacks'] as $callback) {
 						if (!$this->hasComponentMethod($callback, $class)) {
 							new Error($this->errors['noMethodFound'], array($callback, $className));
@@ -687,7 +689,9 @@ class JSCompiler
 								}
 							}
 						}
-						if ($isError) new Error($this->errors['noMethodFound'], array($callback['called'], $className));
+						if ($isError) {
+							new Error($this->errors['noMethodFound'], array($callback['called'], $className));
+						}
 					}
 				}
 			}			
@@ -712,6 +716,9 @@ class JSCompiler
 				}
 				if (is_array($this->sources[$parent]) && preg_match('/\b'.$parent.'\.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
 					return true;	
+				}
+				if (in_array($parent, $this->componentLikeClasses) && preg_match('/\bComponent.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
+					return true;
 				}
 			}
 		}
