@@ -1,7 +1,9 @@
 function Tooltiper() {
 	var target, eventHandler, event;
 	var request, tooltipElement, timer;
-	var tooltip = __TC, tooltipApi = __TA;
+	var tooltip = {{TOOLTIPCLASS}},
+		tooltipApi = {{TOOLTIPAPI}};
+		
 	var tooltipClass = '->> tooltiped';
 	var addClass, text, position, key,
 		caption, delay, corrector;

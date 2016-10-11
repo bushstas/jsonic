@@ -137,7 +137,7 @@ class JSCompiler
 			$this->addTests();
 		}
 		$this->addClasses();
-		printArr($this->jsOutput);
+		Printer::log($this->jsOutput);
 	}
 
 	private function validateApplication() {
@@ -259,15 +259,19 @@ class JSCompiler
 		if (!is_array($coreFiles) || empty($coreFiles)) {
 			new Error($this->errors['coreFilesNotFound']);
 		}
+		$usedGlobalNames = JSGlobals::getUsedNames();
 		foreach ($coreFiles as $coreFile) {
 			if (preg_match('/\bhelpers\//', $coreFile['path'])) {
 				$this->helpers[] = $coreFile['name'];
 				$coreFile['isHelper'] = true;
 			}
-			$this->sources[$coreFile['name']] = $coreFile;
 			if (preg_match('/[A-Z]\w*/', $coreFile['name'])) {
 				$this->reservedNames[] = $coreFile['name'];
 			}
+			foreach ($usedGlobalNames as $key => $value) {
+				$coreFile['content'] = str_replace('{{'.$key.'}}', $value, $coreFile['content']);
+			}
+			$this->sources[$coreFile['name']] = $coreFile;
 		}
 		$this->checkHelpersUse();
 	}

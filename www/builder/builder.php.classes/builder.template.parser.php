@@ -9,6 +9,8 @@ class TemplateParser
 				   $propsShortcuts, $eventTypesShortcuts, $obfuscate,
 				   $tagShortcuts, $cssClassIndex;
 
+				   private static $textNodes = array();
+
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
 		'noClosingTag' => 'Ошибка валидации шаблонов класса {??}. Один из {?} {??} не имеет закрывающего тега',
@@ -1053,7 +1055,7 @@ class TemplateParser
 				if (is_array($item)) {
 					$children[] = $item[0];
 				} else if (strlen($item) > 3) {
-					$children[] = '<nq>__T['.addTextNode($item).']<nq>';
+					$children[] = '<nq>__T['.self::addTextNode($item).']<nq>';
 				} else {
 					$children[] = $item;
 				}
@@ -1292,5 +1294,14 @@ class TemplateParser
 		$obfuscatedClassName = CSSObfuscator::generate();
 		self::$cssClassIndex[$className] = $obfuscatedClassName;
 		return $obfuscatedClassName;
+	}
+
+	private static function addTextNode($text) {
+		$index = array_search($text, self::$textNodes);
+		if ($index !== false) {
+			return $index;
+		}
+		self::$textNodes[] = $text;
+		return count(self::$textNodes) - 1;
 	}
 }

@@ -1,4 +1,8 @@
 function Level() {
+	var tagsList = {{TAGS}};
+	var attrNames = {{ATTRIBUTES}};
+	var eventTypes = {{EVENTTYPES}};
+
 	var self = this, parentElement, realParentElement, parentLevel,
 		nextSiblingChild, children = [], detached = false,
 		prevChild, firstChild, component, propAttrs, propNodes,
@@ -52,13 +56,13 @@ function Level() {
 	};
 
 	var createElement = function(props) {
-		var element = document.createElement(__TAGS[props['t']] || 'span');
+		var element = document.createElement(tagsList[props['t']] || 'span');
 		appendChild(element);
 		if (isObject(props['p'])) {
 			var attrName, pn, attr;		
 			for (var k in props['p']) {
 				if (isString(props['p'][k]) || isNumber(props['p'][k])) {
-					attrName = __A[k] || k;
+					attrName = attrNames[k] || k;
 					if (attrName == 'scope') component.setScope(element);
 					else if (attrName == 'eid') Core.registerElement.call(component, element, props['p'][k]);
 					else element.attr(attrName, props['p'][k]);
@@ -84,7 +88,7 @@ function Level() {
 						partValue = isFunction(attrParts[i]) ? attrParts[i]() : attrParts[i];
 						if (partValue) attrValue += partValue;
 					}
-					if (attrValue) element.attr(__A[k] || k, attrValue);
+					if (attrValue) element.attr(attrNames[k] || k, attrValue);
 				}
 			}
 		}
@@ -92,7 +96,7 @@ function Level() {
 			var eventType, callback;
 			eventHandler = eventHandler || new EventHandler();
 			for (i = 0; i < props['e'].length; i++) {
-				eventType = __EVENTTYPES[props['e'][i]] || eventType;
+				eventType = eventTypes[props['e'][i]] || eventType;
 				callback = props['e'][i + 1];
 				var isOnce = props['e'][i + 2] === true;
 				if (isString(callback)) callback = component.dispatchEvent.bind(component, callback);

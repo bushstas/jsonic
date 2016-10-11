@@ -3,7 +3,7 @@
 		$isTest = !empty($_GET['istest']);
 
 		include_once 'builder.php.classes/header.php';
-		include_once 'builder.php.classes/functions.php';
+		//include_once 'builder.php.classes/functions.php';
 		include_once 'builder.php.classes/builder.core.php';
 
 		die();

@@ -1,5 +1,5 @@
 function Decliner() {
-	var words = __DW;
+	var words = {{WORDS}};
 	this.getCount = function(key, num) {
 		if (isArray(num)) num = num.length;
 		return num + ' ' + this.get(key, num);

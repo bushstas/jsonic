@@ -1,5 +1,7 @@
 function Component() {	
 	if (this !== window) return;
+	var attrNames = {{ATTRIBUTES}};
+	var eventTypes = {{EVENTTYPES}};
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
@@ -107,7 +109,7 @@ function Component() {
 						if (!isUndefined(attrVal)) attrValue += attrVal;
 					}
 					attrValue = attrValue.trim();
-					var attrName = __A[activities[pn][i][1]] || activities[pn][i][1];
+					var attrName = attrNames[activities[pn][i][1]] || activities[pn][i][1];
 					activities[pn][i][0].attr(attrName, attrValue);
 				}
 			}
@@ -187,7 +189,7 @@ function Component() {
 	Component.prototype.dispatchEvent = function(eventType, eventParams) {
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
-				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = __EVENTTYPES[this.listeners[i]['type']];
+				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = eventTypes[this.listeners[i]['type']];
 				if (this.listeners[i]['type'] == eventType) {
 					this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams, this);
 				}

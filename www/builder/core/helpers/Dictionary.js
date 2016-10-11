@@ -1,11 +1,11 @@
 function Dictionary() {
+	var dictionaryUrl = {{DICTURL}};
 	var onLoadCallback;
 	var items = {};
 	this.load = function(callback) {
-		var url = __DICTURL;
 		if (!isNone(url)) {
 			onLoadCallback = callback;
-			var request = new AjaxRequest(url, onLoad.bind(this));
+			var request = new AjaxRequest(dictionaryUrl, onLoad.bind(this));
 			request.send('GET');
 		} else {
 			callback();
@@ -25,4 +25,4 @@ function Dictionary() {
 	};
 }
 Dictionary = new Dictionary();
-var __D = Dictionary;
+var {{DICTIONARY}} = Dictionary;

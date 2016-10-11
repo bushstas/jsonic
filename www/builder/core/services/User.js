@@ -1,10 +1,10 @@
 function User() {
+	var userOptions = {{USEROPTIONS}};
 	var app, loadedItems = 0, status = {},
 	attributes = {}, settings = {}, loaded = false, 
 	loadRequest, saveRequest;
 
 	var initOptions = function() {
-		var userOptions = __USEROPTIONS;
 		if (isObject(userOptions)) {
 			if (userOptions['login'] && isString(userOptions['login'])) {
 				loadRequest = new AjaxRequest(userOptions['login'], onLoad.bind(this));
@@ -48,12 +48,12 @@ function User() {
 		}
 	};
 	this.hasFullAccess = function() {
-		var fullAccess = Objects.get(__USEROPTIONS, 'fullAccess', null);
+		var fullAccess = Objects.get(userOptions, 'fullAccess', null);
 		var accessLevel = ~~status['accessLevel'];
 		return !isNumber(fullAccess) || accessLevel >= fullAccess;
 	};
 	this.isAdmin = function() {
-		var adminAccess = Objects.get(__USEROPTIONS, 'adminAccess', null);
+		var adminAccess = Objects.get(userOptions, 'adminAccess', null);
 		var accessLevel = ~~status['accessLevel'];
 		return !isNumber(adminAccess) || accessLevel >= adminAccess;
 	};

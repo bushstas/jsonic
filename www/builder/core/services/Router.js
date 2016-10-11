@@ -1,10 +1,10 @@
 function Router() {
-	var routes = __ROUTES;
 	var properRoutes = {};
-	var isHashRouter = !!__HASHROUTER;
-	var defaultRoute = __DEFAULTROUTE;
-	var indexRoute = __INDEXROUTE;
-	var errorRoutes = __ERRORROUTES;
+	var routes = {{ROUTES}};
+	var isHashRouter = !!{{HASHROUTER}};
+	var defaultRoute = {{DEFAULTROUTE}};
+	var indexRoute = {{INDEXROUTE}};
+	var errorRoutes = {{ERRORROUTES}};
 	var handler, bodyElement, menues, currentRoute,
 		subscribers, pathParts;
 	this.setNavigationHandler = function(handlr) {

@@ -1,4 +1,5 @@
 function AjaxRequest(url, callback, params, thisObj) {
+	var pathToApiDir = {{APIDIR}};
 	var self = this, tempUrl, active = false, 
 		withCredentials = false, headers, request, 
 		responseType;
@@ -55,9 +56,9 @@ function AjaxRequest(url, callback, params, thisObj) {
 	};
 	var correctUrl = function(u) {
 		u = u.replace(/^[\.\/]+/, '');
-		if (isString(__APIDIR)) {
-			var regExp = new RegExp('^' + __APIDIR + "\/");
-			u = __APIDIR + '/' + u.replace(regExp, '');
+		if (isString(pathToApiDir)) {
+			var regExp = new RegExp('^' + pathToApiDir + "\/");
+			u = pathToApiDir + '/' + u.replace(regExp, '');
 		}
 		return '/' + u;
 	};

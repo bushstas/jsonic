@@ -8,6 +8,7 @@ class JSGlobals
 		'apiConfig'        => 'CONFIG',
 		'dataConstants'    => '__V',
 		'pathToDictionary' => '__DICTURL',
+		'dictionary'       => '__D',
 		'tags'             => '__TAGS',
 		'props'            => '__A',
 		'decls'            => '__DW',
@@ -53,6 +54,29 @@ class JSGlobals
 		self::addUserOptions($data['user']);
 
 		return self::$output;
+	}
+
+	public static function getUsedNames() {
+		return array(
+			'ATTRIBUTES'    => self::$varNames['props'],
+			'EVENTTYPES'    => self::$varNames['events'],
+			'TAGS'          => self::$varNames['tags'],
+			'ROUTES'        => self::$varNames['routes'],
+			'ERRORROUTES'   => self::$varNames['errorRoutes'],
+			'VIEWCONTAINER' => self::$varNames['viewContainer'],
+			'PAGETITLE'     => self::$varNames['pagetitle'],
+			'DICTURL'       => self::$varNames['pathToDictionary'],
+			'DICTIONARY'    => self::$varNames['dictionary'],
+			'TOOLTIPCLASS'  => self::$varNames['tooltipClass'],
+			'TOOLTIPAPI'    => self::$varNames['tooltipApi'],
+			'APIDIR'        => self::$varNames['pathToApi'],
+			'CORRECTORS'    => self::$varNames['correctors'],
+			'INDEXROUTE'    => self::$varNames['indexRoute'],
+			'DEFAULTROUTE'  => self::$varNames['defaultRoute'],
+			'HASHROUTER'    => self::$varNames['hashRouter'],
+			'USEROPTIONS'   => self::$varNames['user'],
+			'WORDS'         => self::$varNames['decls']
+		);
 	}
 
 	public static function getVarName($key) {

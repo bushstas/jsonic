@@ -1,5 +1,10 @@
 function Application() {
 	if (this !== window) return;
+	var routes = {{ROUTES}};
+	var errorRoutes = {{ERRORROUTES}};
+	var viewContainerClass = {{VIEWCONTAINER}};
+	var defaultPagetitle = {{PAGETITLE}};
+	
 	var getViewParams = function(route, allParams) {
 		var params;
 		if (isObject(route['dinamicParams'])) {
@@ -52,13 +57,12 @@ function Application() {
 		Router.init();
 	};
 	var	defineViews = function() {
-		for (var i = 0; i < __ROUTES.length; i++) {
-			this.views[__ROUTES[i]['name']] = null;
-			if (isArray(__ROUTES[i]['children'])) {
-				this.defineViews(__ROUTES[i]['children']);
+		for (var i = 0; i < routes.length; i++) {
+			this.views[routes[i]['name']] = null;
+			if (isArray(routes[i]['children'])) {
+				this.defineViews(routes[i]['children']);
 			}
 		}
-		var errorRoutes = __ERRORROUTES;
 		if (isObject(errorRoutes)) {
 			for (var k in errorRoutes) {
 				this.views[k] = null;
@@ -67,14 +71,13 @@ function Application() {
 	};
 	var	createViewContainer = function() {
 		var viewContainer;
-		var containerClass = __VIEWCONTAINER;
-		if (containerClass) {
-			viewContainer = document.body.querySelector('.' + containerClass);
+		if (viewContainerClass) {
+			viewContainer = document.body.querySelector('.' + viewContainerClass);
 		}
 		if (!viewContainer) {
 		 	viewContainer = document.createElement('div');
-			if (containerClass) {
-				viewContainer.className = containerClass;
+			if (viewContainerClass) {
+				viewContainer.className = viewContainerClass;
 			}
 			this.element.appendChild(viewContainer);
 		}
@@ -108,7 +111,7 @@ function Application() {
 					}
 				}
 			}
-			this.setPageTitle(title ||__PAGETITLE || '');
+			this.setPageTitle(title || defaultPagetitle || '');
 		}
 	};
 	var createViewContentElement = function() {

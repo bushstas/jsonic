@@ -1,8 +1,9 @@
 function Corrector() {
+	var correctorsList = {{CORRECTORS}};
 	var corrs = {};
-	if (typeof __CRRS != 'undefined' && isArray(__CRRS)) {
-		for (var i = 0; i < __CRRS.length; i++) {
-			if (isFunction(__CRRS[i])) corrs[__CRRS[i].name.replace(/Crr$/, '')] = __CRRS[i];
+	if (typeof correctorsList != 'undefined' && isArray(correctorsList)) {
+		for (var i = 0; i < correctorsList.length; i++) {
+			if (isFunction(correctorsList[i])) corrs[correctorsList[i].name.replace(/Crr$/, '')] = correctorsList[i];
 		}
 	}
 	this.correct = function(corrName, data) {
