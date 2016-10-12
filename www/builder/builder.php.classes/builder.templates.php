@@ -9,6 +9,7 @@ class TemplateCompiler
 		'differentTypes' => 'Используются различные типы при вызове компонента {??}<br><br>В шаблоне класса {??} указан тип {??},<br><br>{?} в шаблоне класса {??} указан другой тип {??}'
 	);
 	private $templates = array();
+	private $includedTemlates = array();
 	private $usedComponents = array();
 
 	public function run($templatesFiles, $includesFiles) {
@@ -19,6 +20,11 @@ class TemplateCompiler
 				$this->initUsedComponents($templateFile['name'], $content);
 			}
 		}
+		if (is_array($includesFiles)) {
+			foreach ($includesFiles as $includesFile) {
+				$this->includedTemlates[$includesFile['filename']] = preg_replace("/<\!--.*?-->/", '', $includesFile['content']);
+			}
+		}
 	}
 
 	public function hasTemplate($className) {
@@ -27,6 +33,10 @@ class TemplateCompiler
 
 	public function getTemplates() {
 		return $this->templates;
+	}
+
+	public function getIncludes() {
+		return $this->includedTemlates;
 	}
 
 	public function getTemplateClasses() {

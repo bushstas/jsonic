@@ -137,6 +137,7 @@ class JSCompiler
 			$this->addTests();
 		}
 		$this->addClasses();
+		$this->addIncludes();
 		Printer::log($this->jsOutput);
 	}
 
@@ -626,6 +627,7 @@ class JSCompiler
 	}
 
 	private function addClasses() {
+		$templates = $this->templateCompiler->getTemplates();
 		foreach ($this->classes as $className => &$class) {
 			$type = $class['type'];
 			if (is_array($class['functions'])) {
@@ -645,7 +647,6 @@ class JSCompiler
 			if (!in_array('getInitials', $class['functionList'])) {
 				$this->addPrototypeFunction($className, 'getInitials');	
 			}
-			$templates = $this->templateCompiler->getTemplates();
 			if (!empty($templates[$className])) {
 				TemplateParser::init(
 					array(
@@ -700,6 +701,22 @@ class JSCompiler
 				}
 			}			
 		}
+	}
+
+	private function addIncludes() {
+		$includes = $this->templateCompiler->getIncludes();
+		foreach ($includes as $file => $include) {
+			$this->addIncludeFunction($include, $file);
+		}
+		
+
+
+	//function addGeneralTemplateFunction(&$js, $templateHtml, $file) {
+		//
+		// foreach ($templateFunctions as $templateFunction) {
+		// 	$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(_) {';
+		// 	$js[] = "\n\treturn".$templateFunction['content']."\n}";
+		// }
 	}
 
 	private function addLoadControllerFunction($className) {
@@ -766,6 +783,14 @@ class JSCompiler
 		}
 	}
 
+	private	function addIncludeFunction($templateContent, $file) {
+		$templateFunctions = TemplateParser::parse($templateContent, $file);
+		foreach ($templateFunctions as $templateFunction) {
+			$this->jsOutput[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(_) {';
+			$this->jsOutput[] = "\n\treturn".$templateFunction['content']."\n}";
+		}
+	}
+
 	private function addGetInitialsFunction($className, $initials) {
 		$objCode = array();
 		foreach ($initials as $name => $code) {
@@ -800,7 +825,8 @@ class JSCompiler
 
 	private function parseClasses() {
 		JSParser::setCorrectors($this->correctors);
-		foreach ($this->classes as &$class) {
+		foreach ($this->classes as $className => &$class) {
+			TextParser::decode($class['content'], $className);
 			JSParser::parse($class);
 			JSChecker::check($class);
 			$this->checkSuperClassesCallings($class);

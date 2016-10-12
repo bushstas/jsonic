@@ -117,7 +117,7 @@ class CSSCompiler
 			if ($this->configProvider->needCssObfuscation()) {
 				$this->obfuscate($css);
 			}
-			$css = preg_replace("/ *> */", ">", $css);
+			$css = preg_replace("/ *([>,]) */", "$1", $css);
 			$css = preg_replace("/\t/", " ", $css);
 			$css = preg_replace("/[\r\n]/", "", $css);
 			$css = preg_replace("/\}/", "}\n", $css);
@@ -131,12 +131,12 @@ class CSSCompiler
 
 	private function parseVariables(&$css, $filename) {
 		$keys = array();
-		preg_match_all('/([~\.\#a-z\- \*]+) *==(\w+)/i', $css, $matches);
+		preg_match_all('/([~\.\#a-z\- \*:]+) *==(\w+)/i', $css, $matches);
 		for ($i = 0; $i < count($matches[1]); $i++) {
 			if (preg_match_all('/~(\w+)/', $matches[1][$i], $ms)) {
 				foreach ($ms[1] as $m) {
 					if (isset($keys[$m])) {
-						$matches[1][$i] = str_replace('~'.$m, trim($keys[$m]), $matches[1][$i]);
+						$matches[1][$i] = preg_replace('/~'.$m.'\b/', trim($keys[$m]), $matches[1][$i]);
 					} else {
 						new Error($this->errors['variableParse'], array($filename, $matches[2][$i], $m));
 					}
@@ -145,7 +145,7 @@ class CSSCompiler
 			$keys[$matches[2][$i]] = $matches[1][$i];
 		}		
 		foreach ($keys as $k => $v) {
-			$css = str_replace('~'.$k, trim($v), $css);
+			$css = preg_replace('/~'.$k.'\b/', trim($v), $css);
 		}
 	}
 

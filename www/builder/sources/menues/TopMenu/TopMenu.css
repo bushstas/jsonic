@@ -1,39 +1,35 @@
 $imgsrc = ../images/topmenu
+
 .app-top-menu {
-	$fix $t $l $r $z2 $h42 $lh42 $bgwhite $bob#B6BFCE
-    box-shadow: 0 1px 6px #D1D8E2;
+	$(fix t l r z2 h42 lh42 bgwhite bob#B6BFCE bsh_0_1_6_#D1D8E2)
 }
 .app-top-menu-inner {
     $rel
 }
 body.main-page .app-top-menu-inner {
-    $width $ma
+    $(width ma)
 }
-.app-top-menu a {
-	$rel $block $fleft $h38 $pl35 $pr20 $norep $c#4c546b $fs14
-    background-position: 10px 54%;
-    border-bottom: 4px solid #ffffff;
+.app-top-menu a ==a {
+	$(rel block fleft h38 pl35 pr20 norep c#4c546b fs14 bp10_54% bob#ffffff_4)
 }
-.app-top-menu a.app-top-menu-logo {
-    $w148 $h42 $box $png = logo
-    background-position: 50% 64%;
+~a.app-top-menu-logo {
+    $(w148 h42 box png = logo bp50%_64%)
 }
-.app-top-menu a:nth-child(2) {
+~a:nth-child(2) {
 	$png = main
 }
-.app-top-menu a:nth-child(3) {
+~a:nth-child(3) {
 	$png = search
 }
-.app-top-menu a:nth-child(4) {
+~a:nth-child(4) {
 	$png = favorite
 }
-.app-top-menu a:nth-child(5) {
+~a:nth-child(5) {
 	$png = planzakupok
 }
-.app-top-menu a:nth-child(6) {
+~a:nth-child(6) {
 	$png = analytics
 }
-.app-top-menu a.active {
-    $c#4C546B $bold 
-    border-bottom: 4px solid #4C546B $i;
+~a.active {
+    $(c#4C546B bold bob#4C546B_4)
 }

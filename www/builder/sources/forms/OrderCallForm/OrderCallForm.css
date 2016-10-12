@@ -1,5 +1,5 @@
 .app-order-call .send-button {
-	$inb $w140 $mr12
+	$(inb w140 mr12)
 }
 .app-order-call textarea {
 	$h100

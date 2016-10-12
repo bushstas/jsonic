@@ -1,5 +1,5 @@
 .app-popup-select {
-	$(abs z900 bo#bec8da t100% l0 mt5 ml-6 bgwhite p6_10_12_10 w290 bsh_0_0_5_#bec8da br3 none)
+	$(abs z900 bo#bec8da t100% l mt5 ml-6 bgwhite p6_10_12_10 w290 bsh_0_0_5_#bec8da br3 none)
 }
 .app-popup-select.shown {
 	$block

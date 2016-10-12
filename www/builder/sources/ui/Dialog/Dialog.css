@@ -1,47 +1,43 @@
 $imgsrc = ../images/ui/
 
-.app-dialog-mask {
-	$(none fix rubber z699 bc#212D42)
-    opacity: 0.65;	
+.app-dialog-mask ==m {
+	$(none fix rubber z699 bc#212D42 opac65)
 }
-.app-dialog-mask.shown {
+~m.shown {
 	$block
 }
-.app-dialog {
+.app-dialog ==d {
 	$(fix incenter br5 bgwhite none z700)
 }
-.app-dialog.shown {
+~d.shown {
 	$block
 }
-.app-dialog.expanded {
+~d.expanded {
     $(rubber br0 nosize nomargin)
 }
-.app-dialog-title {
-    border-radius: 5px 5px 0px 0px;
-    $(rel p12 c#4a5b6f z100 bob#e5e9f3 bc#f6f7f9 lh22 fs16 bold center)
+.app-dialog-title ==t {
+    $(rel p12 c#4a5b6f z100 bob#e5e9f3 bc#f6f7f9 lh22 fs16 bold center br5_5_0_0)
 }
-.app-dialog-title:empty {
+~t:empty {
     $none
 }
-.app-dialog.expanded .app-dialog-title {
+~d.expanded ~t {
     $br0
 }
 .app-dialog-content {
-	$rel $z2
-    padding: 15px 20px;
+	$(rel z2 p15_20)
 }
-.app-dialog-close,
-.app-dialog-expand {
-    $ (abs z102 r t10 mr8 wh23 bg pointer opac7 png = close-dialog)
+.app-dialog-close ==c,
+.app-dialog-expand ==e {
+    $ (abs z102 r t10 mr8 wh23 bg pointer opac7 png=close-dialog)
 }
-.app-dialog-expand {
-    $r20 $png = expand-dialog
-    opacity: 0.65;
+~e {
+    $(r20 png=expand-dialog opac65)
 }
-.app-dialog.expanded .app-dialog-expand {
-    $png = minimize-dialog
+~d.expanded ~e {
+    $png=minimize-dialog
 }
-.app-dialog-expand:hover,
-.app-dialog-close:hover {
+~e:hover,
+~c:hover {
     $opac10
 }

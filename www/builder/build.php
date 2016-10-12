@@ -928,12 +928,11 @@
 			
 		}
 
-		// =========================================
-
-
 		foreach ($includes as $incl) {
 			addGeneralTemplateFunction($compiledJs, $incl['content'], $incl['path']);
 		}
+
+		// =========================================
 
 		$inherits = array();
 		foreach ($classesList as $name => $class) {

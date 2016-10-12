@@ -1,5 +1,5 @@
 .app-authform-logo {
-	$fs50 $center $lh50
+	$(fs50 center lh50)
 }
 .app-authform-inputs {
 	$mt20

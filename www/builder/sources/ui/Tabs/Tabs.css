@@ -3,21 +3,21 @@ $imgsrc = ../images/ui
 .app-tabs {
 	$(inb mb5 bo#5f79ab br6 lh22)
 }
-.app-tabs-item {
+.app-tabs-item ==i {
 	$(rel inb c#7a869e p3_27_5_16 pointer)
 }
-.app-tabs-item.active {
+~i.active ==ia {
 	$(bc#5f79ab br3 c#fff)
 }
-.app-tabs-remove {
+.app-tabs-remove ==r {
 	$(abs wh15 br50% bc#7f8aa6 r4 t4 bg png=tabclose)
 }
-.app-tabs-remove:hover {
+~r:hover ==rh {
 	$bc#5a6786
 }
-.app-tabs-item.active .app-tabs-remove {
+~ia ~r {
 	$bc#1a274a
 }
-.app-tabs-item.active .app-tabs-remove:hover {
+~ia ~rh {
 	$bc#99b0ef
 }
