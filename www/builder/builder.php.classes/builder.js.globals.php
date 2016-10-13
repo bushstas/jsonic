@@ -145,7 +145,7 @@ class JSGlobals
 	private function parseDataConstants(&$jsOutput, $data) {
 		if (is_array($data['index'])) {
 			$varName = self::getVarName('dataConstants');
-			$regexp = '/\b__\#\w+\b/';
+			$regexp = '/\b_DATA_\#\w+\b/';
 			preg_match_all($regexp, $jsOutput, $matches);
 			$codes = $matches[0];
 			$parts = preg_split($regexp, $jsOutput);			
@@ -153,7 +153,7 @@ class JSGlobals
 			foreach ($parts as $i => $part) {
 				$jsOutput .= $part;
 				if (isset($codes[$i])) {
-					$parts2 = explode('__#', $codes[$i]);
+					$parts2 = explode('_DATA_#', $codes[$i]);
 					$index = array_search($parts2[1], $data['index']);
 					if (is_bool($index)) {
 						new Error(self::$errors['dataConstNotFound'], array($parts2[1]));

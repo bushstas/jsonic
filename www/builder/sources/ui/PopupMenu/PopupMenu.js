@@ -28,7 +28,7 @@ function handleClick(value, button) {}
 function onBeforeShow() {}
 
 function show() {
-	var innerElement::Element = this.findElement('.->> app-popup-menu-inner-container');
+	var innerElement::Element = <.app-popup-menu-inner-container>;
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, this.options{ 'maxHeight', 400 });
 	this.setStyle({'max-height': height + 'px', 'height': height + 'px'});
@@ -42,11 +42,10 @@ function hide() {
 }
 
 function renderButtons(items) {
-	var buttons = [];
+	var $buttons = [];
 	for (var i = 0; i < items.length; i++) {	
 		buttons.push(this.getButtonData(items[i]));
 	}
-	$buttons = buttons;
 }
 
 function getButtonData(item) {

@@ -799,7 +799,7 @@ class TemplateParser
 			}
 			$props[$propName] = $propValue;
 			if ($hasCode) {
-				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{__#$1}", $propValue);
+				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{_DATA_#$1}", $propValue);
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
 				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
 				$propValue = preg_replace("/@(\w+)/", "<nq>".self::$globalNames['CONSTANTS'].".$1<nq>", $propValue);
@@ -1175,7 +1175,7 @@ class TemplateParser
 				}
 			}
 		}
-		$code = preg_replace('/\#([a-z]\w*)/i', "__#$1", $code);
+		$code = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $code);
 		$code = preg_replace('/^&([a-z])/i', "$1", $code);
 		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
 		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		

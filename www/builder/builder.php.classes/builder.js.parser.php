@@ -2,7 +2,7 @@
 
 class JSParser
 {
-	private static $correctors;
+	private static $correctors, $globals;
 
 	private static $errors = array(
 		'validationError' => 'Ошибка в валидации кода класса {??}',
@@ -10,13 +10,14 @@ class JSParser
 		'unknownCorr' => 'Неизвестный корректор {??} в методе {??} класса {??}'
 	);
 
-	public static function setCorrectors($correctors) {
+	public static function init($correctors, $globals) {
 		self::$correctors = $correctors;
+		self::$globals = $globals;
 	}
 
 	public static function parse(&$class) {
 		$code = 'function(){}'.trim($class['content']);
-		$code = preg_replace("/@(\w+)/", "__.$1", $code);
+		$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);
 		$braces = preg_replace("/[^\{\}]/", "", $code);
 		$parts = preg_split("/[\{\}]/", $code);
 					
@@ -80,7 +81,28 @@ class JSParser
 	}
 
 	private static function parseFunctionCode($code) {
+		$regexp = '/\bget\s+([\w ,]+);*\s*/';
+		preg_match_all($regexp, $code, $matches);
+		if (!empty($matches[1])) {
+			$parts = preg_split($regexp, $code);
+			$code = '';
+			foreach ($parts as $i => $part) {
+				$code .= $part;
+				if (isset($matches[1][$i])) {
+					$vars = explode(',', $matches[1][$i]);
+					foreach ($vars as $var) {
+						$code .= 'var '.$var."=this.get('".$var."');\n\t";
+					}
+				}
+			}
+		}
 		if (preg_match('/\$[a-z]/i', $code)) {
+			$regexp = '/\b(var|let|const)\s+\$(\w+)/';
+			preg_match_all($regexp, $code, $matches);
+			$varsToSet = $matches[2];
+			if (!empty($varsToSet)) {
+				$code = preg_replace($regexp, "$1 $2", $code);	
+			}
 			$code = preg_replace('/\$(\w+)\!\s*;*/', "this.toggle('$1');", $code);
 			$code = preg_replace('/\$(\w+)\s*([\+\-\*\/\%])=\s*(\w+)/', "this.plusTo('$1',$3,'$2')", $code);
 			$code = preg_replace('/\$(\w+)\s*\+\+/', "this.plusTo('$1',1)", $code);
@@ -90,6 +112,7 @@ class JSParser
 			$code = preg_replace('/\$(\w+)\.each\(/', "this.each('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.addOne\(/', "this.addOneTo('$1', ", $code);
+			$code = preg_replace('/\$(\w+)=>/', "this.set('$1', $1);", $code);
 			$code = preg_replace('/,(?=\s*\$\w)/', "```", $code);
 			$code = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n;\`]+)/', "this.set('$1',$2)", $code);
 			$code = preg_replace('/\$(\w+)/', "this.get('$1')", $code);
@@ -152,7 +175,11 @@ class JSParser
 				}
 			}
 			$code = str_replace("```", ",", $code);
-
+			if (!empty($varsToSet)) {
+				foreach ($varsToSet as $varToSet) {
+					$code .= "\n\tthis.set('".$varToSet."', ".$varToSet.");";
+				}
+			}
 		}
 		return $code;
 	}

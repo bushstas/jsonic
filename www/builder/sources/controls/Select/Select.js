@@ -1,7 +1,7 @@
 control Select
 
 function onRendered() {
-	var value = $value;
+	get value;
 	var selected;
 	if (!isUndefined(value)) {
 		selected = this.selectByValue(value, true);
@@ -17,7 +17,7 @@ function getChangeEventParams() {
 
 function selectByValue(value, forced) {
 	if (!forced && $value == value) return;
-	var options = $options;
+	get options;
 	if (isArray(options)) {
 		for (var i = 0; i < options.length; i++) {
 			if (options[i]['value'] == value) {
@@ -33,8 +33,8 @@ function selectByValue(value, forced) {
 }
 
 function selectByIndex(index) {
+	get options;
 	this.selectedIndex = index;
-	var options = $options;
 	if (isObject(options[index])) {
 		if ($value == options[index]['value']) return;
 		$value = options[index]['value'],

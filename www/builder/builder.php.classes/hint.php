@@ -256,6 +256,60 @@
 			$items[] = 'Реактивные переменные';
 			$items[] = false;
 
+			$items[] = '<b>$value = countedValue</b> - Устанавливает значение реактивной переменной
+			<xmp>this.set(\'value\', countedValue);</xmp>';
+
+			$items[] = '<b>var countedValue = $value</b> - Присваивает переменной значение реактивной переменной
+			<xmp>var countedValue = this.get(\'value\');</xmp>';
+
+			$items[] = '<b>$value=></b> - Устанавливает значение реактивной переменной из одноименной переменной
+			<xmp>this.set(\'value\', value);</xmp>';
+
+			$items[] = '<b>$isActive!</b> - Меняет значение (boolean) реактивной переменной на противоположное
+			<xmp>this.toggle(\'isActive\');</xmp>';
+
+			$items[] = '<b>get options, value</b> - Обычно используется в начале функции. Автоматически получает значения реактивных переменных и записывает их в одноименные переменные.
+			<xmp>var options = this.get(\'options\');</xmp><xmp>var value = this.get(\'value\');</xmp>';
+
+			$items[] = '<b>var $items = []</b> - Означает, что данная переменная должна установить значение одноименной реактивной переменной в конце функции
+			<xmp>var $items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp>Реальный код будет выглядеть так:
+			<xmp>var items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp><xmp>this.set(\'items\', items);</xmp>';
+
+			$items[] = '<b>$value++</b> - Изменяет значение реактивной переменной на 1
+			<xmp>this.plusTo(\'value\', 1);</xmp>';
+
+			$items[] = '<b>$value--</b> - Изменяет значение реактивной переменной на -1
+			<xmp>this.plusTo(\'value\', -1);</xmp>';
+
+			$items[] = '<b>$value *= 5</b> - Умножает значение реактивной переменной на 5
+			<xmp>this.plusTo(\'value\', 5, \'*\');</xmp>';
+
+			$items[] = '<b>$value /= 10</b> - Делит значение реактивной переменной на 10
+			<xmp>this.plusTo(\'value\', 10, \'/\');</xmp>';
+
+			$items[] = '<b>$value %= 2</b> - Присваивает реактивной переменной значение равное остатку от деления его на 2
+			<xmp>this.plusTo(\'value\', 2, \'%\');</xmp>';
+
+			$items[] = '<b>$items.add([\'apple\', \'banana\'])</b> - Добавляет элемент или несколько элементов в конец реактивной переменной и вызывает обновление компонента
+			<xmp>this.addTo(\'items\', [\'apple\', \'banana\']);</xmp>';
+
+			$items[] = '<b>$items.add(\'apple\', 0)</b> - Вставляет элемент или несколько элементов в реактивную переменную в заданную позицию и вызывает обновление компонента
+			<xmp>this.addTo(\'items\', \'apple\', 0);</xmp>';
+
+			$items[] = '<b>$items.addOne([\'apple\'])</b> - Добавляет элемент в конец реактивной переменной и вызывает обновление компонента. Даже если переданный аргумент является массивом будет добавлен только один элемент - сам массив
+			<xmp>this.addOneTo(\'items\', [\'apple\']);</xmp>';
+
+			$items[] = '<b>$items.addOne(\'apple\', 0)</b> - Вставляет элемент в реактивную переменную в заданную позицию и вызывает обновление компонента. Даже если переданный аргумент является массивом будет добавлен только один элемент - сам массив
+			<xmp>this.addOneTo(\'items\', \'apple\', 0);</xmp>';
+
+			$items[] = '<b>$items.removeAt(2)</b> - Удаляет элемент с индексом 2 из реактивной переменной и вызывает обновление компонента
+			<xmp>this.removeByIndexFrom(\'items\', 2);</xmp>';
+
+			$items[] = '<b>$items.remove(\'apple\')</b> - Удаляет элемент с заданным значением из реактивной переменной и вызывает обновление компонента
+			<xmp>this.removeValueFrom(\'items\', \'apple\');</xmp>';
+
+			$items[] = '<b>$items.each(function() {})</b> - Вызывает функцию обработчик для каждого элемента реактивной переменной
+			<xmp>this.each(\'items\', function() {});</xmp>';
 
 			$items[] = true;
 			$items[] = 'Объекты DOM';
@@ -303,7 +357,11 @@
 			$items[] = '<b>&lt;::userInfo&gt;</b> - Возвращает уже закешированный дочерний компонент, имеющий cmpid = userInfo
 			<xmp><component class="UserInfo" cmpid="userInfo"></xmp>
 			<xmp>var ui = <::userInfo>;</xmp><xmp>var ui = this.getChild(\'userInfo\');</xmp>
-			<xmp>var uie = <::userInfo>.getElement();</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>
+			<xmp>var uie = <::userInfo>.getElement();</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>';
+
+			$items[] = '<b>&lt;::userInfo&gt;&lt;&gt;</b> - Возвращает главный элемент дочернего компонента, имеющего cmpid = userInfo
+			<xmp><component class="UserInfo" cmpid="userInfo"></xmp>
+			<xmp>var uie = <::userInfo><>;</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>
 
 			<br><b>Во всех вышеуказанных записях пробелы не допускаются</b>
 			<br><b>Далее они могут иметь место</b>';
@@ -315,10 +373,10 @@
 
 			$items[] = '<b>--> change</b> - Инициирует событие change 
 			<xmp>--> change;</xmp><xmp>this.dispatchEvent(\'change\');</xmp>
-			<xmp>-->change(a, b);</xmp><xmp>this.dispatchEvent(\'change\', a, b);</xmp>';
+			<xmp>-->change(params);</xmp><xmp>this.dispatchEvent(\'change\', params);</xmp>';
 			$items[] = '<b>==> everythingReady</b> - Инициирует глобальное событие everythingReady 
 			<xmp>==> everythingReady;</xmp><xmp>Globals.dispatchEvent(\'everythingReady\');</xmp>
-			<xmp>==> everythingReady (a[0], b[0]);</xmp><xmp>Globals.dispatchEvent(\'everythingReady\', (a[0], b[0]));</xmp>';
+			<xmp>==> everythingReady (params);</xmp><xmp>Globals.dispatchEvent(\'everythingReady\', params);</xmp>';
 
 			$items[] = true;
 			$items[] = 'Диалоговые окна';

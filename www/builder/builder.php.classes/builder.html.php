@@ -27,8 +27,8 @@ class HTMLCompiler
 		$replacements = array(
 			'charset' => $this->config['charset'],
 			'title' => $this->config['title'],
-			'css' => $this->config['css'],
-			'js' => $this->config['js']
+			'css' => $this->config['css'].'.css',
+			'js' => $this->config['js'].'.js'
 		);
 		foreach ($replacements as $k => $v) {
 			$blankIndexFileContent = str_replace('{$'.$k.'}', $v, $blankIndexFileContent);

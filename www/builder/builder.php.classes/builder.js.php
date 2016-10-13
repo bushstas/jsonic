@@ -422,12 +422,13 @@ class JSCompiler
 
 	private function parseSpecialJSCode(&$content, $className) {
 		TextParser::encode($content, $className);
-		$content = preg_replace('/\#([a-z]\w*)/i', "__#$1", $content);
+		$content = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $content);
 		$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
 		$content = preg_replace('/'.$regexp.' {1,}/', "$1", $content);
 		$content = preg_replace('/ {1,}'.$regexp.'/', "$1", $content);
 
 		$content = preg_replace('/(\$*[\w\]\[\.]+) *\{ *([\w\]\[\.,]+) *\}/', "Objects.get($1,$2)", $content);
+		$content = preg_replace('/<::(\w+)> *<>/', "<::$1>.getElement()", $content);
 		$content = str_replace('<>', 'this.getElement()', $content);
 		$content = preg_replace('/\+\+> *(\w+) *(\((.*)\))* *;*/', "Dialoger.show($1,$3)", $content);
 		$content = preg_replace('/<\+\+ *(\w+) *(\((.*)\))* *;*/', "Dialoger.hide($1,$3)", $content);
@@ -640,6 +641,7 @@ class JSCompiler
 		$this->jsOutput = preg_replace("/'<nq>/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>'/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>/", '', $this->jsOutput);
+		$this->jsOutput = preg_replace("/;{2,}/", ';', $this->jsOutput);
 		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
 
 		if ($this->configProvider->needCssObfuscation()) {
@@ -925,7 +927,11 @@ class JSCompiler
 		$objCode = array();
 		foreach ($initials as $name => $code) {
 			if (!empty($code)) {
-				$code = preg_replace("/ {2,}/", ' ', preg_replace("/[\t\r\n]/", '', preg_replace('/(:\s*)@(\w+)/', "$1__.$2", $code)));
+
+				$code = preg_replace('/(:\s*)@(\w+)/', "$1__.$2", $code);
+				$code = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $code);
+				$code = preg_replace("/[\t\r\n]/", '', $code);
+				$code = preg_replace("/ {2,}/", ' ', $code);				
 				$spacelessCode = preg_replace('/\s/', '', $code);
 				if ($spacelessCode != '{}' && $spacelessCode != '[]') {
 					$objCode[] = "\n\t\t'".$name."':".$code;
@@ -954,8 +960,8 @@ class JSCompiler
 	}
 
 	private function parseClasses() {
-		JSParser::setCorrectors($this->correctors);
 		$globals = JSGlobals::getUsedNames();
+		JSParser::init($this->correctors, $globals);		
 		$classNames = array_keys($this->classes);
 		$coreClassNames = $this->reservedNames;
 		$classNames = array_merge($classNames, $coreClassNames);
