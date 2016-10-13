@@ -38,8 +38,8 @@ class Builder
 		$this->coreValidator = new CoreValidator();
 		$this->coreValidator->validate($this->config->getPathToCore());
 		
-		$this->cssCompiler = new CSSCompiler($this->config);		
 		CSSObfuscator::init();
+		$this->cssCompiler = new CSSCompiler($this->config);
 
 		$this->routesCompiler = new RoutesCompiler($this->config);
 		$this->routesCompiler->init();
@@ -73,7 +73,7 @@ class Builder
 		$this->dataCompiler     -> run ($this->files['data']);
 		$this->declCompiler     -> run ($this->files['decl']);
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
-		$this->jsCompiler       -> run ($this->files['js'], $this->files['core']);
+		$this->jsCompiler       -> run ($this->files['js'], $this->files['core'], $this->files['scripts']);
 	}
 
 	public function getCompiler($compilerName) {

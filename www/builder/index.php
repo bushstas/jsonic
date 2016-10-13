@@ -49,7 +49,7 @@
 </style>
 </head>
 <body>
-	<form class="hint-form" method="GET" target="iframe" action="engine/hint.php">
+	<form class="hint-form" method="GET" target="iframe" action="builder.php.classes/hint.php">
 		<input type="submit" value="Подсказка по" style="padding: 5px 10px;">
 		<select class="topic-select" name="topic">
 			<option value="config">конфигу приложения</option>
@@ -73,7 +73,7 @@
 			<input name="submit" type="submit" value="Скомпилировать" style="padding: 5px 10px;">
 		</div>
 		<div style="clear: both;"></div>
-		<iframe name="iframe" id="iframe" width="70%" height="1000"></iframe>
+		<iframe name="iframe" id="iframe" width="70%" height="940"></iframe>
 		<div class="options">
 			<label>
 				<input type="checkbox" vlaue="1" name="create"> 

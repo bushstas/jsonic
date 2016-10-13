@@ -295,11 +295,10 @@ class CSSCompiler
 		preg_match_all($regexp, $css, $matches);
 		$urls = $matches[0];
 		$css = preg_replace($regexp, '__URL__', $css);
-
 		preg_match_all('/\.([a-z][\w\-]{3,})/i', $css, $matches);
 		$classes = array_unique($matches[1]);
 		foreach ($classes as $class) {
-			$this->cssClassIndex[$class] = generateObfiscatedCssClassName();
+			$this->cssClassIndex[$class] = CSSObfuscator::generate();
 		}
 		foreach ($this->cssClassIndex as $k => $v) {
 			$css = preg_replace('/\.'.$k.'([\s\.\#,\{:\)])/', '.'.$v."$1", $css);

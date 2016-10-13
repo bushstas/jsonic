@@ -200,6 +200,10 @@ class Config
 		return !empty($_GET['create']);
 	}
 
+	public function isAdvancedMode() {
+		return !empty($_GET['advanced']);
+	}
+
 	public function isTest() {
 		return !empty($_GET['istest']);
 	}

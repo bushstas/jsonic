@@ -14,9 +14,9 @@ class CSSObfuscator
 	}
 
 	public static function generate() {
-		$l1 = self::$cssClassA[$cssCounters[0]];
-		$l2 = self::$cssClassB[$cssCounters[1]];
-		$l3 = self::$cssClassC[$cssCounters[2]];
+		$l1 = self::$cssClassA[self::$cssCounters[0]];
+		$l2 = self::$cssClassB[self::$cssCounters[1]];
+		$l3 = self::$cssClassC[self::$cssCounters[2]];
 		self::$cssCounters[2]++;
 		if (self::$cssCounters[2] == count(self::$cssClassC)) {
 			self::$cssCounters[2] = 0;

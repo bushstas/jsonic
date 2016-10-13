@@ -30,17 +30,10 @@ initial followers = {
 	'active': this.onChangeActive
 }
 
-function onRendered() {
-	var url = this.options{ 'url' };
-	if (isString(url)) {
-		this.request = new AjaxRequest(url, this.onLoad, null, this);
-	}
-}
-
 function onInput(value) {
 	var len = value.length;
 	var minLength = this.options{ 'minLength', 3};
-	if (isObject(this.request) && len >= minLength) {
+	if (isString(this.options{ 'url' }) && len >= minLength) {
 		this.delay(this.load, 1000, value);
 	} else if (len == 0) {
 		this.delay();
@@ -49,7 +42,7 @@ function onInput(value) {
 }
 
 function load(value) {
-	this.request.execute({'token': value});
+	Loader.get(this.options{ 'url' }, {'token': value}, this.onLoad, this);
 }
 
 function onLoad(data) {

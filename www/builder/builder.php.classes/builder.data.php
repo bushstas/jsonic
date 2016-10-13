@@ -39,7 +39,7 @@ class DataCompiler
 				if ($data === null) {
 					new Error($this->errors['parseError'], array($file, $strData));
 				}
-				$this->dataConstants[] = $strData;
+				$this->dataConstants[] = $data;
 			}
 		}
 	}

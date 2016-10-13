@@ -45,6 +45,7 @@ class JSCompiler
 		'noSuperClass' => '{?}Супер-класс {??} не найден',
 		'noThisSuperClassMethod' => '{?}Метод {??} отсутствует у супер-класса {??}',
 		'nameReserved' => 'Название класса {??} зарезервировано системой',
+		'varNameReserved' => 'Название {??} зарезервировано за системой переменной и не может использоваться в качестве имени класса',
 		'noController' => 'Контроллер {??} упомянутый в классе {??} не найден',
 		'noHelper' => 'Хелпер {??} упомянутый в классе {??} не найден',
 		'noHelperSubscribe' => 'У хелпера {??} упомянутого в классе {??} отсутствует метод <b>subscribe</b>',
@@ -57,7 +58,10 @@ class JSCompiler
 		'noRouteController' => 'Контроллер {??} упомянутый в конфигурации роутера не найден',
 		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден',
 		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
-		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}'
+		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}',
+		'globalVarUsing' => 'В классе {??} обнаружено использование зарезервированных системой имен переменных: {??}',
+		'creatingInstance' => 'В классе {??} обнаружено создание экземпляра класса {??}{?}',
+		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}'
 	);
 
 	private $coreClasses = array(
@@ -79,7 +83,7 @@ class JSCompiler
 	private $JSFileNames = array();
 	private $reservedNames = array();
 	private $jsCode = '';
-	private $jsOutput = '';
+	private $jsOutput = array();
 	private $initialsParser;
 	private $templateCompiler;
 	private $textsCompiler;
@@ -90,6 +94,7 @@ class JSCompiler
 	private $cssCompiler;
 	private $usedComponents;
 	private $usedComponentsNames;
+
 
 
 	public function __construct($configProvider) {
@@ -114,7 +119,7 @@ class JSCompiler
 		$this->validateTooltipHelper();
 	}
 
-	public function run($jsFiles, $coreFiles) {
+	public function run($jsFiles, $coreFiles, $scriptFiles) {
 		if (!is_array($jsFiles) || empty($jsFiles)) {
 			new Error($this->errors['jsFilesNotFound']);
 		}
@@ -131,13 +136,18 @@ class JSCompiler
 		$this->initialsParser->run($this->classes);
 		$this->parseClasses();
 		$this->checkClasses();
-		$this->addGlobals();
 		$this->addSources();
 		if ($this->configProvider->isTest()) {
 			$this->addTests();
 		}
 		$this->addClasses();
 		$this->addIncludes();
+		$this->addInheritance();
+		$this->addGlobals();
+		$this->decodeTexts();
+		$this->finish();
+		$this->addScripts($scriptFiles);
+		
 		Printer::log($this->jsOutput);
 	}
 
@@ -256,7 +266,6 @@ class JSCompiler
 	}
 
 	private function initCore($coreFiles) {
-		$this->reservedNames = array_values(JSGlobals::getVarNames());
 		if (!is_array($coreFiles) || empty($coreFiles)) {
 			new Error($this->errors['coreFilesNotFound']);
 		}
@@ -537,9 +546,13 @@ class JSCompiler
 		if (!empty($tooltipClass) && !isset($this->classes[$tooltipClass])) {
 			new Error($this->errors['noTooltipClass'], $tooltipClass);
 		}
+		$globals = array_values(JSGlobals::getVarNames());
 		foreach ($this->classes as $className => &$class) {
 			if (in_array($className, $this->reservedNames)) {
 				new Error($this->errors['nameReserved'], $className);
+			}
+			if (in_array($className, $globals)) {
+				new Error($this->errors['varNameReserved'], $className);
 			}
 			if (is_array($class['controllers'])) {
 				foreach ($class['controllers'] as $controller) {
@@ -591,6 +604,7 @@ class JSCompiler
 	}
 
 	private function addGlobals() {
+		$this->jsOutput = implode("\n", $this->jsOutput);
 		$data = array(
 			'texts'            => $this->textsCompiler->get(),
 			'config'           => $this->apiConfig,
@@ -613,7 +627,71 @@ class JSCompiler
 			'pagetitle'        => $this->config['pagetitle'],
 			'user'             => $this->config['user']
 		);
-		$this->jsOutput = JSGlobals::run($data);
+		JSGlobals::run($this->jsOutput, $data);
+	}
+
+	private function decodeTexts() {
+		$keys = array_keys($this->classes);		
+		TextParser::decode($this->jsOutput, $keys);
+	}
+
+	private function finish() {
+		$this->jsOutput = ';(function() {'.$this->jsOutput;
+		$this->jsOutput = preg_replace("/'<nq>/", '', $this->jsOutput);
+		$this->jsOutput = preg_replace("/<nq>'/", '', $this->jsOutput);
+		$this->jsOutput = preg_replace("/<nq>/", '', $this->jsOutput);
+		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
+
+		if ($this->configProvider->needCssObfuscation()) {
+			$cssClassIndex = &$this->cssCompiler->getCssClassIndex();
+			$this->jsOutput = preg_replace('/\.\s+->>/', '.->>', $this->jsOutput);
+			$regexp = '/->>\s*([a-z][\w\-]+)/';
+			preg_match_all($regexp, $this->jsOutput, $matches);
+			$cssClasses = $matches[1];
+			$parts = preg_split($regexp, $this->jsOutput);
+			$this->jsOutput = '';
+			foreach ($parts as $i => $part) {
+				$this->jsOutput .= $part;
+				if (isset($cssClasses[$i])) {
+					if (!isset($cssClassIndex[$cssClasses[$i]])) {
+						$cssClassIndex[$cssClasses[$i]] = CSSObfuscator::generate();
+					}
+					$this->jsOutput .= $cssClassIndex[$cssClasses[$i]];
+				}
+			}
+		}
+		$this->jsOutput = preg_replace('/->> */', '', $this->jsOutput);
+		$this->jsOutput = preg_replace('/\{\s+\}/', '{}', $this->jsOutput);
+
+		$pathToCompiledJs = DEFAULT_PATH.$this->config['path'].'.js';
+		if ($this->configProvider->isAdvancedMode()) {		
+			Gatherer::createFile('base.js', $this->jsOutput);
+			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js 2>&1', $output);	
+			if (!empty($output[0]) && preg_match('/ERROR/', $output[0])) {
+				new Error($this->errors['obfuscatorError'], array($output[0], $output[1]));
+			}
+			unlink('base.js');
+			rename('base2.js', $pathToCompiledJs);
+		} else {
+			Gatherer::createFile($pathToCompiledJs, $this->jsOutput);
+		}
+	}
+
+	private function addScripts($scriptFiles) {
+		if (is_array($scriptFiles)) {
+			$additionalContent = '';
+			foreach ($scriptFiles as $file) {
+				if ($file['ext'] == 'js') {
+					$additionalContent .= rtrim($file['content'], ';').';';
+				}
+			}
+			if (!empty($additionalContent)) {
+				$pathToCompiledJs = DEFAULT_PATH.$this->config['path'].'.js';
+				$jsCompiledContent = file_get_contents($pathToCompiledJs);
+				$jsCompiledContent = $additionalContent."\n\n".$jsCompiledContent;
+				Gatherer::createFile($pathToCompiledJs, $jsCompiledContent);
+			}
+		}
 	}
 
 	private function addSources() {
@@ -628,6 +706,16 @@ class JSCompiler
 
 	private function addClasses() {
 		$templates = $this->templateCompiler->getTemplates();
+		TemplateParser::init(
+			array(
+				'classNames' => $this->usedComponentsNames,
+				'classes' => $this->classes,
+				'sources' => $this->sources,
+				'templates' => $templates,
+				'obfuscateCss' => $this->configProvider->needCssObfuscation(),
+				'cssClassIndex' => $this->cssCompiler->getCssClassIndex()
+			)
+		);
 		foreach ($this->classes as $className => &$class) {
 			$type = $class['type'];
 			if (is_array($class['functions'])) {
@@ -648,16 +736,6 @@ class JSCompiler
 				$this->addPrototypeFunction($className, 'getInitials');	
 			}
 			if (!empty($templates[$className])) {
-				TemplateParser::init(
-					array(
-						'classNames' => $this->usedComponentsNames,
-						'classes' => $this->classes,
-						'sources' => $this->sources,
-						'templates' => $templates,
-						'obfuscateCss' => $this->configProvider->needCssObfuscation(),
-						'cssClassIndex' => $this->cssCompiler->getCssClassIndex()
-					)
-				);
 				$this->addTemplateFunction($className, $templates[$className], $class);
 				if (is_array($class['tmpCallbacks'])) {
 					foreach ($class['tmpCallbacks'] as $callback) {
@@ -708,15 +786,67 @@ class JSCompiler
 		foreach ($includes as $file => $include) {
 			$this->addIncludeFunction($include, $file);
 		}
-		
+	}
 
-
-	//function addGeneralTemplateFunction(&$js, $templateHtml, $file) {
-		//
-		// foreach ($templateFunctions as $templateFunction) {
-		// 	$js[] = 'function includeGeneralTemplate'.ucfirst($templateFunction['name']).'(_) {';
-		// 	$js[] = "\n\treturn".$templateFunction['content']."\n}";
-		// }
+	private function addInheritance() {
+		$inheritance = array();		
+		foreach ($this->classes as $className => $class) {
+			if (is_array($class['extends']) && !empty($class['extends'])) {
+				$inheritance[$className] = $class['extends'];
+			}
+		}
+		$addedClasses = array();
+		foreach ($inheritance as $usedClass => $extClasses) {
+			foreach ($extClasses as $extClass) {
+				if (is_array($inheritance[$extClass]) && !empty($inheritance[$extClass])) {
+					$inheritance[$usedClass] = array_diff($inheritance[$usedClass], $inheritance[$extClass]);
+				} else {
+					$addedClasses[] = $extClass;
+				}
+			}
+		}
+		$usedClasses = array_keys($inheritance);
+		$addedClasses = array_unique($addedClasses);
+		$usedClassesCount = count($usedClasses) + count($addedClasses);		
+		$inherited = array(
+			'Component' => array('Application', 'View', 'Form', 'Control', 'Menu'),
+			'Foreach' => array('Switch', 'IfSwitch')
+		);
+		while (count($addedClasses) < $usedClassesCount) {
+			foreach ($inheritance as $usedClass => $extClasses) {
+				if (array_search($usedClass, $addedClasses) === false) {
+					$diff = array_diff($extClasses, $addedClasses);
+					if (empty($diff)) {
+						$addedClasses[] = $usedClass;
+						foreach ($extClasses as $extClass) {
+							if (!isset($inherited[$extClass])) {
+								$inherited[$extClass] = array();
+							}
+							$inherited[$extClass][] = $usedClass;
+						}
+					}
+				}
+			}
+		}
+		$inheritance = array();
+		foreach ($inherited as $parentClass => $childClasses) {
+			$inheritance[] = $parentClass;
+			$inheritance[] = '['.implode(',',$childClasses).']';
+		}		
+		$this->jsOutput[] = "Core.inherits([".implode(',', $inheritance).']);';
+		$controllers = array('Router', 'User');
+		$controllers = array_merge($controllers, array_keys($this->classesByTypes['controller']));
+		if (!empty($controllers)) {
+			foreach ($controllers as $controller) {
+				$this->jsOutput[] = $controller." = new ".$controller."();";
+			}
+			$this->jsOutput[] = 'Core.initiateControllers(['.implode(',', array_keys($this->classesByTypes['controller'])).']);';
+		}
+		$entry = $this->config['entry'];
+		$this->jsOutput[] = $entry." = new ".$entry."();";
+		$this->jsOutput[] = "Core.initiate.call(".$entry.");";
+		$this->jsOutput[] = "User.load(".$entry.");";		
+		$this->jsOutput[] = "})();";
 	}
 
 	private function addLoadControllerFunction($className) {
@@ -825,8 +955,34 @@ class JSCompiler
 
 	private function parseClasses() {
 		JSParser::setCorrectors($this->correctors);
+		$globals = JSGlobals::getUsedNames();
+		$classNames = array_keys($this->classes);
+		$coreClassNames = $this->reservedNames;
+		$classNames = array_merge($classNames, $coreClassNames);
+		$regexp1 = '/\b'.implode('\b|\b', array_values($globals)).'\b/';
+		$regexp2 = '/\bnew\s+('.implode('\b|\b', array_values($classNames)).'\b)/';
 		foreach ($this->classes as $className => &$class) {
-			TextParser::decode($class['content'], $className);
+			if (preg_match_all($regexp1, $class['content'], $matches)) {
+				new Error($this->errors['globalVarUsing'], array($className, implode(', ', $matches[0])));
+			}
+			if (preg_match($regexp2, $class['content'], $matches)) {
+				$instance = preg_replace('/^new\s+/', '', $matches[0]);
+				$isForm = isset($this->classesByTypes['form'][$instance]);
+				$isMenu = isset($this->classesByTypes['menu'][$instance]);
+				$ending = '. Используйте шаблоны для рендеринга компонента.<xmp><'.($isForm ? 'form' : ($isMenu ? 'menu' : 'component')).' class="'.$instance.'" param1="1" param2="2"></xmp>';
+				if (in_array($instance, $coreClassNames)) {
+					$ending = '. Данный класс является системным и его нельзя использовать таким образом';
+				} elseif (isset($this->classesByTypes['application'][$instance])) {
+					$ending = '. Данный класс является приложением и синглтоном.<br>Используйте код вида:<xmp>'.$instance.'.getView("main");</xmp>';
+				} elseif (isset($this->classesByTypes['controller'][$instance])) {
+					$ending = '. Данный класс является контроллером и синглтоном.<br>Используйте код вида:<xmp>'.$instance.'.doAction("load");</xmp>';
+				} elseif (isset($this->classesByTypes['view'][$instance])) {
+					$ending = ', который имеет тип <b>view</b>.<br>Данный тип классов рендерит само приложение и их нельзя использовать';
+				} elseif (isset($this->classesByTypes['dialog'][$instance])) {
+					$ending = '. Данный класс является диалоговым окном.<br>Для его показа используйте код вида:<xmp>Dialoger.show('.$instance.');</xmp> или сокращением <xmp>++> '.$instance.'</xmp>';
+				}
+				new Error($this->errors['creatingInstance'], array($className, $matches[0], $ending));
+			}
 			JSParser::parse($class);
 			JSChecker::check($class);
 			$this->checkSuperClassesCallings($class);

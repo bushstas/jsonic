@@ -39,9 +39,12 @@ class Gatherer
 		$this->gather($this->config['pathToCore'], $this->core);
 		$this->sources = array();
 		$this->gather($this->config['pathToSrc'], $this->sources);
+		$this->scripts = array();
+		$this->gather($this->config['pathToScripts'], $this->scripts);
 		
 		$files = array(
-			'core' => $this->core
+			'core' => $this->core,
+			'scripts' => $this->scripts
 		);
 
 		foreach ($this->sources as $file) {

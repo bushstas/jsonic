@@ -932,8 +932,6 @@
 			addGeneralTemplateFunction($compiledJs, $incl['content'], $incl['path']);
 		}
 
-		// =========================================
-
 		$inherits = array();
 		foreach ($classesList as $name => $class) {
 			if (is_array($class['extends']) && !empty($class['extends'])) {
@@ -1031,11 +1029,12 @@
 				}
 			}
 		}
+
 		if (is_array($dataIndex)) {
 			$regexp = '/__\#\w+/';
 			preg_match_all($regexp, $compiledJs, $matches);
 			$codes = $matches[0];
-			$parts = preg_split($regexp, $compiledJs);			
+			$parts = preg_split($regexp, $compiledJs);
 			$compiledJs = '';
 			foreach ($parts as $i => $part) {
 				$compiledJs .= $part;
@@ -1049,6 +1048,8 @@
 				}
 			}
 		}
+
+
 		if ($obfuscate === true) {
 			$compiledJs = preg_replace('/\.\s+->>/', '.->>', $compiledJs);
 			$regexp = '/->>\s*([a-z][\w\-]+)/';
@@ -1073,13 +1074,10 @@
 			}
 		}
 		
-		$compiledJs = preg_replace('/->> */', '', $compiledJs);
-		if ($advancedMode) {
-			$compiledJs = preg_replace('/\.prototype\.initiate\b/', '.prototype["_i"]', $compiledJs);
-			$compiledJs = preg_replace('/\.prototype\.getInitials\b/', '.prototype["_gi"]', $compiledJs);
-		}
-		$jsfilename = 
+		$compiledJs = preg_replace('/->> */', '', $compiledJs);		
 		$compiledJs = preg_replace('/\{\s+\}/', '{}', $compiledJs);
+		
+
 		if ($advancedMode) {
 			createFile('base.js', $compiledJs);			
 			exec('java -jar compiler.jar --js base.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file base2.js 2>&1', $output);	
@@ -1091,6 +1089,8 @@
 		} else {
 			createFile(DEFAULT_PATH.$pathToCompiledJs, $compiledJs);
 		}
+
+		// =========================================
 
 		if (!empty($config['scripts'])) {
 			if (!is_string($config['scripts'])) {

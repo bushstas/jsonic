@@ -7,9 +7,10 @@ class TemplateParser
 	private static $simpleTags = array('br', 'input', 'img', 'hr');
 	private static $class, $className, $tmpids, $isSwitchContext,
 				   $propsShortcuts, $eventTypesShortcuts, $obfuscate,
-				   $tagShortcuts, $cssClassIndex, $templateName;
+				   $tagShortcuts, $cssClassIndex, $templateName,
+				   $globalNames;
 
-				   private static $textNodes = array();
+	private static $textNodes = array();
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
@@ -50,6 +51,11 @@ class TemplateParser
 		self::$tagShortcuts = Tags::getList();
 		self::$obfuscate = $params['obfuscateCss'];
 		self::$cssClassIndex = &$params['cssClassIndex'];
+		self::$globalNames = JSGlobals::getUsedNames();
+	}
+
+	public static function getTextNodes() {
+		return self::$textNodes;
 	}
 
 	public static function parse($template, &$class, $className = '', &$tmpids = '') {
@@ -796,7 +802,7 @@ class TemplateParser
 				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{__#$1}", $propValue);
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
 				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
-				$propValue = preg_replace("/@(\w+)/", "<nq>__.$1<nq>", $propValue);
+				$propValue = preg_replace("/@(\w+)/", "<nq>".self::$globalNames['CONSTANTS'].".$1<nq>", $propValue);
 
 				$regexp = '/\{([^\}]*)\}/';
 				$hasClassVar = self::hasClassVar($propValue);
@@ -1056,7 +1062,7 @@ class TemplateParser
 				if (is_array($item)) {
 					$children[] = $item[0];
 				} else if (strlen($item) > 3) {
-					$children[] = '<nq>__T['.self::addTextNode($item).']<nq>';
+					$children[] = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($item).']<nq>';
 				} else {
 					$children[] = $item;
 				}
@@ -1104,7 +1110,7 @@ class TemplateParser
 		$code = trim($code);
 		self::parseClassMethodCalls($code);
 		$code = self::checkTernary($code);
-		$code = preg_replace('/\s*@(\w+)\s*/', "__.$1", $code);
+		$code = preg_replace('/\s*@(\w+)\s*/', self::$globalNames['CONSTANTS'].".$1", $code);
 		$code = preg_replace('/^\s*::(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
 		$code = preg_replace('/^\s*::(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
 		$code = preg_replace('/<noeq>=*/', '', $code);

@@ -107,13 +107,24 @@ class TextParser
 	}
 
 	public static function decode(&$content, $key) {
-		if (!is_array(self::$texts[$key])) return;
-		$parts = explode(self::$mark, $content);		
+		if (is_string($key)) {
+			$texts = self::$texts[$key];
+		}
+		if (is_array($key)) {
+			$texts = array();
+			foreach ($key as $k) {
+				if (is_array(self::$texts[$k])) {
+					$texts = array_merge($texts, self::$texts[$k]);
+				}
+			}
+		}
+		if (!is_array($texts) || empty($texts)) return;
+		$parts = explode(self::$mark, $content);
 		$content = '';
 		foreach ($parts as $i => $part) {
 			$content .= $part;
-			if (isset(self::$texts[$key][$i])) {
-				$content .= self::$texts[$key][$i];
+			if (isset($texts[$i])) {
+				$content .= $texts[$i];
 			}
 		}
 		$content = str_replace('<sldq>', '\"', $content);

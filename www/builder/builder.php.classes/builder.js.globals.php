@@ -5,6 +5,7 @@ class JSGlobals
 	private static $output	= array();
 	private static $varNames = array(
 		'textConstants'    => '__',
+		'textNodes'        => '__T',
 		'apiConfig'        => 'CONFIG',
 		'dataConstants'    => '__V',
 		'pathToDictionary' => '__DICTURL',
@@ -28,12 +29,17 @@ class JSGlobals
 	);
 
 	private static $errors = array(
-		'invalidApiConfig' => "Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>"
+		'invalidApiConfig' => "Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>",
+		'textConstNotFound' => 'Текстовая константа {??} используемая в шаблоне {??} класса {??} не найдена',
+		'textConstNotFound2' => 'Текстовая константа {??} используемая в методе {??} класса {??} не найдена',
+		'dataConstNotFound' => 'Константа данных {??} не найдена',
+		'noApiConfigPath' => 'Параметр <b>CONFIG.{?}.{?}</b> не найден в файле конфигурации <b>config.js</b>'
 	);
 	
-	public static function run($data) {
+	public static function run(&$jsOutput, $data) {
+		self::addTextNodes();
 		self::addTextConstants($data['texts']);
-		self::addApiConfig($data['config']);
+		self::addApiConfig($data['config'], $jsOutput);
 		self::addDataConstants($data['data']);
 		self::addPathToDictionary($data['pathToDictionary']);
 		self::addTags($data['tags']);
@@ -53,7 +59,9 @@ class JSGlobals
 		self::addPagetitle($data['pagetitle']);
 		self::addUserOptions($data['user']);
 
-		return self::$output;
+		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
+		self::parseTextConstants($jsOutput, $data['texts']);
+		self::parseDataConstants($jsOutput, $data['data']);
 	}
 
 	public static function getUsedNames() {
@@ -75,7 +83,9 @@ class JSGlobals
 			'DEFAULTROUTE'  => self::$varNames['defaultRoute'],
 			'HASHROUTER'    => self::$varNames['hashRouter'],
 			'USEROPTIONS'   => self::$varNames['user'],
-			'WORDS'         => self::$varNames['decls']
+			'WORDS'         => self::$varNames['decls'],
+			'TEXTS'         => self::$varNames['textNodes'],
+			'CONSTANTS'     => self::$varNames['textConstants']
 		);
 	}
 
@@ -91,15 +101,80 @@ class JSGlobals
 		self::$output[] = "var ".self::$varNames[$key]." = ".$content.';';
 	}
 
+	private static function addTextNodes() {
+		$textNodes = TemplateParser::getTextNodes();
+		self::add('textNodes', preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))));
+	}
+
 	private static function addTextConstants($data) {
 		self::add('textConstants', str_replace('"', "'", json_encode($data['texts'])));
 	}
 
-	private static function addApiConfig($apiConfig) {
+	private static function parseTextConstants(&$jsOutput, $data) {
+		if (is_array($data['index'])) {
+			$varName = self::getVarName('textConstants');
+			$regexp = '/\b'.$varName.'\.\w+\b/';
+			$output = $jsOutput;
+			preg_match_all($regexp, $jsOutput, $matches);
+			$codes = $matches[0];
+			$parts = preg_split($regexp, $jsOutput);
+			$jsOutput = '';
+			foreach ($parts as $i => $part) {
+				$jsOutput .= $part;
+				if (isset($codes[$i])) {
+					$parts2 = explode('.', $codes[$i]);
+					$index = array_search($parts2[1], $data['index']);
+					if (is_bool($index)) {
+						$p = preg_split('/\b'.$varName.'\.'.$parts2[1].'\b/', $output);
+						preg_match_all('/(\w+)\.prototype\.(\w+)\s*=\s*function/', $p[0], $mtchs);
+						$cnt = count($mtchs[0]);
+						$cln = $mtchs[1][$cnt - 1];
+						$fnn = $mtchs[2][$cnt - 1];
+						preg_match('/^getTemplate([A-Z]\w*)$/', $fnn, $mtch);
+						if (isset($mtch[1])) {
+							new Error(self::$errors['textConstNotFound'], array($parts2[1], strtolower($mtch[1]), $cln));
+						}
+						new Error(self::$errors['textConstNotFound2'], array($parts2[1], $fnn, $cln));
+					}
+					$jsOutput .= $varName.'['.$index.']';
+				}
+			}
+		}
+	}
+
+	private function parseDataConstants(&$jsOutput, $data) {
+		if (is_array($data['index'])) {
+			$varName = self::getVarName('dataConstants');
+			$regexp = '/\b__\#\w+\b/';
+			preg_match_all($regexp, $jsOutput, $matches);
+			$codes = $matches[0];
+			$parts = preg_split($regexp, $jsOutput);			
+			$jsOutput = '';
+			foreach ($parts as $i => $part) {
+				$jsOutput .= $part;
+				if (isset($codes[$i])) {
+					$parts2 = explode('__#', $codes[$i]);
+					$index = array_search($parts2[1], $data['index']);
+					if (is_bool($index)) {
+						new Error(self::$errors['dataConstNotFound'], array($parts2[1]));
+					}
+					$jsOutput .= $parts2[0].$varName.'['.$index.']';
+				}
+			}
+		}
+	}
+
+	private static function addApiConfig($apiConfig, $jsOutput) {
 		TextParser::transformIntoValidJson($apiConfig);
 		$apiConfigObject = json_decode($apiConfig, true);
 		if ($apiConfigObject === null) {
 			new Error(self::$errors['invalidApiConfig']);
+		}
+		preg_match_all('/CONFIG\.(\w+)\.(\w+)/', $jsOutput, $matches);
+		foreach ($matches[1] as $i => $match) {
+			if (empty($apiConfigObject[$match][$matches[2][$i]])) {
+				new Error(self::$errors['noApiConfigPath'], array($match, $matches[2][$i]));
+			}
 		}
 		TextParser::createObjectString($apiConfig, array('/\\\/', ''));
 		self::add('apiConfig', $apiConfig);
@@ -108,10 +183,9 @@ class JSGlobals
 	private static function addDataConstants($data) {
 		$allData = array();
 		foreach ($data['data'] as $item) {
-			$item = trim(trim($item, '}'), '{');
-			$allData[] = $item;
+			$allData = array_merge($allData, $item);
 		}
-		self::add('dataConstants', '{'.str_replace('"', "'", implode(',', $allData)).'}');
+		self::add('dataConstants', str_replace('"', "'", json_encode(array_values($allData))));
 	}
 
 	private static function addPathToDictionary($url) {

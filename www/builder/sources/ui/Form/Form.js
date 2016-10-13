@@ -18,8 +18,7 @@ function sendAjaxRequest() {
 	var action = form.attr('action');
 	var method = form.attr('method');
 	if (action) {
-		this.request = this.request || new AjaxRequest(action, this.handleResponse, null, this);
-		this.request.send(method, this.getControlsData());
+		Loader.doAction(method, action, this.getControlsData(), this.handleResponse, this);
 	}
 };
 
@@ -65,8 +64,4 @@ function onSuccess(data) {
 function onFailure(data) {
 	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
 	this.log(error, 'onFailure', data);
-};
-
-function disposeInternal() {
-	this.request = null;
 };
