@@ -3,7 +3,7 @@
 class Config 
 {
 
-	private $config, $pathToApiDir, $builder, $configJson;
+	private $config, $pathToApiDir, $builder, $configJson, $isUser;
 	private $errors = array(
 		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
 		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
@@ -13,7 +13,9 @@ class Config
 		'noApiDir' => 'Директория {??}, указанная в параметре конфигурации <b>pathToApi</b>, не найдена в корневом каталоге',
 		'userLoginNotString' => "Параметр конфигурации <b>user['login']</b> должен быть строкой",
 		'userLogoutNotString' => "Параметр конфигурации <b>user['logout']</b> должен быть строкой",
-		'userSaveNotString' => "Параметр конфигурации <b>user['save']</b> должен быть строкой"
+		'userSaveNotString' => "Параметр конфигурации <b>user['save']</b> должен быть строкой",
+		'userLoginEmpty1' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['logout']</b> задан",
+		'userLoginEmpty2' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['save']</b> задан"
 	);
 
 	public function init($builder) {
@@ -95,7 +97,8 @@ class Config
 			'viewContainer' => $this->config['container'],
 			'pathToApi' => $this->config['pathToApi'],
 			'pagetitle' => $this->config['title'],
-			'user' => $this->config['user']
+			'user' => $this->config['user'],
+			'hasUser' => $this->hasUser()
 		);
 	}
 
@@ -212,8 +215,13 @@ class Config
 		return $this->configJson;
 	}
 
+	public function hasUser() {
+		return $this->isUser;
+	}
+
 	private function validateUserConfig() {
 		$user = $this->config['user'];
+		$this->isUser = false;
 		$isUser = is_array($user);
 		if ($isUser) {
 			if (isset($user['login']) && !is_string($user['login'])) {
@@ -225,6 +233,13 @@ class Config
 			if (isset($user['save']) && !is_string($user['save'])) {
 				new Error($this->errors['userSaveNotString']);
 			}
+			if (!empty($user['logout']) && empty($user['login'])) {
+				new Error($this->errors['userLoginEmpty1']);
+			}
+			if (!empty($user['save']) && empty($user['login'])) {
+				new Error($this->errors['userLoginEmpty2']);
+			}
+			$this->isUser = !empty($user['login']);
 		}
 	}
 }

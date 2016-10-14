@@ -31,8 +31,8 @@ class DataCompiler
 					$this->nameFiles[$varName] = $file;
 					$this->dataIndex[] = $varName;
 				}
-				$data = '{'.trim(preg_replace('/;*\s*'.$this->regexp.'/', ",'$1':", $data), ',').'}';
-				TextParser::transformIntoValidJson($data, true);
+				$data = '{'.trim(preg_replace('/;*\s*'.$this->regexp.'/', ",'$1':", $data), ',').'}';				
+				TextParser::transformIntoValidJson($data, true);				
 				$data = preg_replace('/@(\w+)/', "<nq>__.$1<nq>", $data);
 				$strData = preg_replace('/(CONFIG\.\w+\.\w+)/', "<nq>$1<nq>", $data);
 				$data = json_decode($strData, true);

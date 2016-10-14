@@ -1,6 +1,6 @@
 function User() {
 	var userOptions = {{USEROPTIONS}};
-	var app, loadedItems = 0, status = {},
+	var app, status = {},
 	attributes = {}, settings = {}, loaded = false, 
 	loadRequest, saveRequest;
 
@@ -11,15 +11,9 @@ function User() {
 			}
 		}
 	};
-	var loadDictionary = function() {
-		if (typeof Dictionary != 'undefined') {
-			Dictionary.load(onLoadDictionary.bind(this));
-		}
-	};
 	this.load = function(application) {
 		if (!loaded) {
 			initOptions();
-			loadDictionary();
 			app = application;
 			if (loadRequest) {
 				loadRequest.execute();
@@ -32,19 +26,9 @@ function User() {
 		status = data['status'];
 		attributes = data['attributes'];
 		settings = data['settings'];
-		loadedItems++;
-		onLoadItem();
-	};
-	var onLoadDictionary = function() {
-		loadedItems++;
-		onLoadItem();
-	};
-	var onLoadItem = function() {
-		if (loadedItems == 2) {
-			loaded = true;
-			if (isComponentLike(app)) {
-				app.run();
-			}
+		loaded = true;
+		if (isComponentLike(app)) {
+			app.run();
 		}
 	};
 	this.hasFullAccess = function() {

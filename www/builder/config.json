@@ -15,7 +15,8 @@
 	"tests"       : "./tests",
 	"blanks"      : "./blanks",
 	"scripts"     : "./scripts",
-	"views"       : "views",
+	"utils"       : "./utils",
+	"views"       : "views",	
 	"pathToApi"   : "api",
 	
 	"router"      : {

@@ -119,13 +119,14 @@ class JSCompiler
 		$this->validateTooltipHelper();
 	}
 
-	public function run($jsFiles, $coreFiles, $scriptFiles) {
+	public function run($jsFiles, $coreFiles, $scriptFiles, $dataFiles) {
 		if (!is_array($jsFiles) || empty($jsFiles)) {
 			new Error($this->errors['jsFilesNotFound']);
 		}
 		foreach ($jsFiles as $jsFile) {
 			$this->processJSFile($jsFile);
 		}
+		$this->dataCompiler->run($dataFiles);
 		$this->initCore($coreFiles);
 		$this->validateApplication();
 		$this->validateViews();
@@ -847,7 +848,11 @@ class JSCompiler
 		$entry = $this->config['entry'];
 		$this->jsOutput[] = $entry." = new ".$entry."();";
 		$this->jsOutput[] = "Core.initiate.call(".$entry.");";
-		$this->jsOutput[] = "User.load(".$entry.");";		
+		if ($this->config['hasUser']) {
+			$this->jsOutput[] = "User.load(".$entry.");";
+		} else {
+			$this->jsOutput[] = $entry.".run();";
+		}
 		$this->jsOutput[] = "})();";
 	}
 
@@ -965,8 +970,8 @@ class JSCompiler
 		$classNames = array_keys($this->classes);
 		$coreClassNames = $this->reservedNames;
 		$classNames = array_merge($classNames, $coreClassNames);
-		$regexp1 = '/\b'.implode('\b|\b', array_values($globals)).'\b/';
-		$regexp2 = '/\bnew\s+('.implode('\b|\b', array_values($classNames)).'\b)/';
+		$regexp1 = '/\b'.implode('|', array_values($globals)).'\b/';
+		$regexp2 = '/\bnew\s+('.implode('|', array_values($classNames)).')\b/';
 		foreach ($this->classes as $className => &$class) {
 			if (preg_match_all($regexp1, $class['content'], $matches)) {
 				new Error($this->errors['globalVarUsing'], array($className, implode(', ', $matches[0])));

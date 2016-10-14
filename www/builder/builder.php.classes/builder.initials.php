@@ -59,6 +59,7 @@ class InitialsParser
 
 	public function run(&$classes) {
 		foreach ($this->initials as $className => &$initials) {
+			if (!isset($classes[$className])) continue;
 			$this->defineForClass($classes[$className]);
 			foreach ($initials as $type => &$value) {
 				$this->validateInitialValue($type, $value);

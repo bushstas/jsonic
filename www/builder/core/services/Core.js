@@ -114,7 +114,7 @@ function Core() {
 				if (isFunction(superClasses[i].prototype.getInitials)) {
 					parentInitials = superClasses[i].prototype.getInitials();
 					if (isObject(parentInitials)) {
-						initials = extendInitials(initials, parentInitials);
+						initials = extendInitials(initials || null, parentInitials);
 					}
 				}
 				if (isArray(superClasses[i].prototype.inheritedSuperClasses)) {

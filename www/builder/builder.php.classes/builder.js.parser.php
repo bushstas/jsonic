@@ -46,7 +46,7 @@ class JSParser
 				$closing++;
 			}
 			if ($opening > 0 && $opening == $closing) {
-				$code = self::parseFunctionCode($temp);
+				$code = self::parseFunctionCode($temp, $functionName, $class['name']);
 				preg_match_all('/\bthis\.(\w+)\(/', $code, $ms);
 				$ms = $ms[1];
 				if (!empty($ms)) {
@@ -80,7 +80,7 @@ class JSParser
 		unset($class['content']);
 	}
 
-	private static function parseFunctionCode($code) {
+	private static function parseFunctionCode($code, $functionName, $className) {
 		$regexp = '/\bget\s+([\w ,]+);*\s*/';
 		preg_match_all($regexp, $code, $matches);
 		if (!empty($matches[1])) {
@@ -92,6 +92,30 @@ class JSParser
 					$vars = explode(',', $matches[1][$i]);
 					foreach ($vars as $var) {
 						$code .= 'var '.$var."=this.get('".$var."');\n\t";
+					}
+				}
+			}
+		}
+		$regexp = '/(\w+)::([A-Z]\w+)\s*=\s*/';
+		preg_match_all($regexp, $code, $matches);
+		if (!empty($matches[0])) {
+			$parts = preg_split($regexp, $code);
+			$code = '';
+			for ($i = 0; $i < count($parts); $i++) {
+				$code .= $parts[$i];
+				if (isset($matches[1][$i])) {
+					$code .= $matches[1][$i].'=';
+				}
+				if (isset($parts[$i + 1])) {
+					preg_match_all('/[\n;,]/', $parts[$i + 1], $ms);
+					$ps = preg_split('/[\n;,]/', $parts[$i + 1]);
+					$ps[0] = "Validator.assert(".$ps[0].",is".$matches[2][$i].",'".$matches[1][$i]." is not ".$matches[2][$i]." in ".$className.".".$functionName."')";
+					$parts[$i + 1] = '';
+					foreach ($ps as $j => $p) {
+						$parts[$i + 1] .= $p;
+						if (isset($ms[0][$j])) {
+							$parts[$i + 1] .= $ms[0][$j];
+						}
 					}
 				}
 			}

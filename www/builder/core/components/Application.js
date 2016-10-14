@@ -40,6 +40,9 @@ function Application() {
 				var viewContentElement = createViewContentElement.call(this);
 				view.render(viewContentElement);
 				view.initControllers();
+				if (typeof Dictionary != 'undefined') {
+					Dictionary.load(route['name']);
+				}
 			} else {
 				activateView.call(this, view, true, isSameView);
 			}
@@ -84,7 +87,7 @@ function Application() {
 		this.viewContainer = viewContainer;
 	};
 	var activateView = function(view, isActivated, isSameView) {
-		var parentElement = view._getParentElement();
+		var parentElement = Core.getParentElement.call(view);
 		if (!isActivated) {
 			this.viewContainer.removeChild(parentElement);
 		} else {

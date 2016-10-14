@@ -70,10 +70,9 @@ class Builder
 		$this->htmlCompiler     -> run ();
 		$this->cssCompiler      -> run ($this->files['css'], $this->files['cssconst']);
 		$this->textsCompiler    -> run ($this->files['texts']);
-		$this->dataCompiler     -> run ($this->files['data']);
 		$this->declCompiler     -> run ($this->files['decl']);
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
-		$this->jsCompiler       -> run ($this->files['js'], $this->files['core'], $this->files['scripts']);
+		$this->jsCompiler       -> run ($this->files['js'], $this->files['core'], $this->files['scripts'], $this->files['data']);
 	}
 
 	public function getCompiler($compilerName) {

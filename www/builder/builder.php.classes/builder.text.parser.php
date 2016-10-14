@@ -4,7 +4,7 @@ class TextParser
 {
 	private static $texts = array();
 	private static $dictionary = array();
-	private static $mark = '__TEXT__';
+	private static $mark = 'ENCODEDTEXT';
 	private static $regexp = '/[\'"]/';
 
 	public static function addToDictionary($keywords) {

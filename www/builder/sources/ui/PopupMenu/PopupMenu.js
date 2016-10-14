@@ -28,7 +28,7 @@ function handleClick(value, button) {}
 function onBeforeShow() {}
 
 function show() {
-	var innerElement::Element = <.app-popup-menu-inner-container>;
+	var innerElement = <.app-popup-menu-inner-container>;
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, this.options{ 'maxHeight', 400 });
 	this.setStyle({'max-height': height + 'px', 'height': height + 'px'});

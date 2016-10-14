@@ -7,7 +7,7 @@ function Decliner() {
 	this.get = function(key, num) {
 		if (isArray(num)) num = num.length;
 		if (!isNumber(num)) return '';
-		return Objects.get(Objects.get(words, key, '').split(','), getVariant(num), '');
+		return Objects.get(Objects.get(words, key, ''), getVariant(num), '');
 	};
 	var getVariant = function(num) {
 		var n, m;
