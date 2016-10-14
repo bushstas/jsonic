@@ -11,6 +11,6 @@
 		{$title}
 	</div>
 	<div class="app-dialog-content" style="{$height?'max-height:'+$height+'px;'}">
-		<template content>
+		<template templ="content">
 	</div>
 </div>

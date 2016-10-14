@@ -1,5 +1,5 @@
 <forma class="app-form-controls{~className?' '+~className}" method="{~method}" action="{~action}" data-ajax="{~ajax?1}" data-iframe="{~iframe?1}" scope>
-	<template content>
+	<template templ="content">
 	{foreach ~controls as &control}
 		<component class="FormField" args="{&control}">
 	{/foreach}

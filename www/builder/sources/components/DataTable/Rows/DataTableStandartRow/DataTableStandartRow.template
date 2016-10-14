@@ -1,12 +1,12 @@
 <a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope data-id="{~Id}">		
-	<template controls if="{!~nocontrols}">		
+	<template templ="controls" if="{!~nocontrols}">		
 	<div class="app-datatable-standart-row-top">
 		<div class="app-datatable-standart-row-top-item">
 			{getFzName(~type)}
 		</div>
 		{if ~multiregion}
 			<div class="app-datatable-standart-row-top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list" pos="left-top">
-				<template count count="{~multiregion}">
+				<template templ="count" count="{~multiregion}">
 				{~regionName}
 			</div>
 		{else}
@@ -16,7 +16,7 @@
 		{/if}
 		{if ~multicategory}
 			<div class="app-datatable-standart-row-top-item tooltiped" txt="{~subcategories}" cap="{@categories}" del="1" cor="list" pos="left-top">
-				<template count count="{~multicategory}">
+				<template templ="count" count="{~multicategory}">
 				{~subcategory}
 			</div>
 		{else}
@@ -25,7 +25,7 @@
 			</div>
 		{/if}
 		<div class="app-datatable-standart-row-top-item">
-			<include unavailable if="{~razm == 'N/A'}" else="{~razm}" tariff="{~isUnavailable}" width="66px">
+			<include templ="unavailable" if="{~razm == 'N/A'}" else="{~razm}" tariff="{~isUnavailable}" width="66px">
 		</div>
 	</div>
 	<div class="app-datatable-standart-row-price">
@@ -33,7 +33,7 @@
 	</div>
 	<div class="app-datatable-standart-row-name">
 		{if ~hot}
-			<template hotMark>										
+			<template templ="hotMark">
 		{/if}
 		{~name}	
 	</div>

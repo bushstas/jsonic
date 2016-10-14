@@ -6,7 +6,9 @@ class TemplateCompiler
 	private $regexp = '/<(component|control|form|menu)\s([^>]+)>/i';
 
 	private $errors = array(
-		'differentTypes' => 'Используются различные типы при вызове компонента {??}<br><br>В шаблоне класса {??} указан тип {??},<br><br>{?} в шаблоне класса {??} указан другой тип {??}'
+		'differentTypes' => 'Используются различные типы при вызове компонента {??}<br><br>В шаблоне класса {??} указан тип {??},<br><br>{?} в шаблоне класса {??} указан другой тип {??}',
+		'includeNoTemplateNames' => "В файле {??} нет ни одного имени шаблона. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>",
+		'includeHasTemplateKeys' => "В файле {??} один или несколько шаблонов имеют оператор <b>as</b>, что недопустимо. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>"
 	);
 	private $templates = array();
 	private $includedTemlates = array();
@@ -22,7 +24,14 @@ class TemplateCompiler
 		}
 		if (is_array($includesFiles)) {
 			foreach ($includesFiles as $includesFile) {
-				$this->includedTemlates[$includesFile['filename']] = preg_replace("/<\!--.*?-->/", '', $includesFile['content']);
+				$content = preg_replace("/<\!--.*?-->/", '', $includesFile['content']);
+				if (preg_match('/\{ *template +\.\w+ +as +\.\w+ *\}/', $content)) {
+					new Error($this->errors['includeHasTemplateKeys'], $includesFile['filename']);
+				}
+				if (!preg_match('/\{ *template +\.\w+ *\}/', $content)) {
+					new Error($this->errors['includeNoTemplateNames'], $includesFile['filename']);
+				}
+				$this->includedTemlates[$includesFile['filename']] = $content;
 			}
 		}
 	}

@@ -8,7 +8,7 @@
 		{$opt2}
 		<component class="PopupSelect" cmpid="opt2" arg-options="{#wordDistanceOptions}" title="{@wordDistance}" onChange="onChangeOption">
 	</span>
-	<template topButtons>
+	<template templ="topButtons">
 </div>
 
 {template .input}

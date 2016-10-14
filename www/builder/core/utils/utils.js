@@ -49,6 +49,9 @@ function isFunction(a) {
 function isBool(a) {
 	return typeof a == 'boolean';
 }
+function isBoolean(a) {
+	return isBool(a);
+}
 function isString(a) {
 	return typeof a == 'string';
 }

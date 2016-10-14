@@ -1,11 +1,11 @@
 {template .main}
 <div class="app-autocomplete app-input-container" scope>
 	<input type="text" placeholder="{~placeholder}" eid="input">
-	<template content>
+	<template templ="content">
 	<div class="app-autocomplete-variants{$active?' shown'}" eid="variants">
 		<div class="app-autocomplete-variants-inner">
 			{foreach $variants as &i => &variant}
-				<template variant data="{&variant}" index="{&i}">
+				<template templ="variant" data="{&variant}" index="{&i}">
 			{/foreach}
 		</div>
 	</div>

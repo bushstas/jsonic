@@ -211,8 +211,7 @@ function Controller() {
 
 	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
 		if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
-			var action = getAction.call(this, 'load');
-			setCurrentRouteOptions.call(this, routeOptions, action);
+			setCurrentRouteOptions.call(this, routeOptions, getAction.call(this, 'load'));
 			this.doAction('load');
 		}
 	};
@@ -226,7 +225,7 @@ function Controller() {
 		this.initials = null;
 		this.activeRequests = null;
 		this.requests = null;
-		this.owner = null;
+		this.currentRouteOptions = null;
 	};
 }
 Controller();

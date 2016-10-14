@@ -3,7 +3,7 @@
 class TemplateParser 
 {	
 	private static $calledClasses, $classes, $templates, $sources;
-	private static $regexp = "/\{template +\.(\w+) *\}/";
+	private static $regexp = "/\{ *template +\.(\w+) *\}/";
 	private static $simpleTags = array('br', 'input', 'img', 'hr');
 	private static $class, $className, $tmpids, $isSwitchContext,
 				   $propsShortcuts, $eventTypesShortcuts, $obfuscate,
@@ -38,7 +38,9 @@ class TemplateParser
 		'elseWithoutIf' => 'Элемент в шаблоне {??} класса {??} содержит атрибут <b>else</b>, но не содержит атрибут <b>if</b>',
 		'incorrectIf' => 'Элемент в шаблоне {??} класса {??} содержит некорректный атрибут <b>if = "{?}"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>',
 		'eventHandlerExpected' => 'Фигурные скобки внутри атрибута события {??} в шаблоне {??} класса {??}. Ожидается название функции обработчика!',
-		'handlerNotFound' => 'Функция обработчик события {??} не найдена среди методов класса {??}'
+		'handlerNotFound' => 'Функция обработчик события {??} не найдена среди методов класса {??}',
+		'noTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><template templ="table" rows="{~rows}"></xmp>',
+		'noIncludeTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><include templ="table" rows="{~rows}"></xmp>'
 	);
 
 	public static function init($params) {
@@ -280,13 +282,14 @@ class TemplateParser
 				}
 				elseif ($tagName == 'template')
 				{
-					preg_match("/<template +[\"']*(\w+)[\"']*[^=]/i",  $content, $match);
-					$tmpName = $match[1];
+					$tmpName = '';
+					self::getTemplateProperties($item['content'], $child, $tmpName);
+					if (empty($tmpName)) {
+						new Error(self::$errors['noTemplateName'], array(self::$templateName, self::$className));
+					}
 					if (!empty($tmpName) && $tmpName == self::$templateName) {
 						new Error(self::$errors['templateCallLoop'], array(self::$templateName, self::$className));
 					}
-					$child = array('tmp' => '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>');
-					self::getTemplateProperties($item['content'], $child);
 					if (is_array($child['p']) && !empty($child['p']['tmpid'])) {
 						if (!empty(self::$tmpids[$child['p']['tmpid']]) && self::$tmpids[$child['p']['tmpid']] == self::$templateName) {
 							new Error(self::$errors['templateCallLoop'], array(self::$templateName, self::$className));
@@ -300,9 +303,12 @@ class TemplateParser
 				}
 				elseif ($tagName == 'include')
 				{
-					preg_match("/<include +[\"']*(\w+)[\"']*/i",  $content, $match);
-					$child = array('tmp' => '<nq>includeGeneralTemplate'.ucfirst($match[1]).'<nq>');
-					self::getTemplateProperties($item['content'], $child);
+					$tmpName = '';
+					self::getTemplateProperties($item['content'], $child, $tmpName);
+					if (empty($tmpName)) {
+						new Error(self::$errors['noIncludeTemplateName'], array(self::$templateName, self::$className));
+					}
+					$child['tmp'] = '<nq>includeGeneralTemplate'.ucfirst($tmpName).'<nq>';
 				}
 				elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
 				{
@@ -386,6 +392,7 @@ class TemplateParser
 				if (is_array($child['c'])) {
 					$keys = array_keys($child['c']);
 				}
+
 				$isSimpleArray = isset($keys[0]) && $keys[0] === 0;
 				if (isset($child['c'])) {
 					if (!empty($child['i']) && empty($child['p'])) {
@@ -578,7 +585,7 @@ class TemplateParser
 		}
 	}
 
-	private static function getTemplateProperties($html, &$child) {
+	private static function getTemplateProperties($html, &$child, &$tmpName) {
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
 		$names = array();
@@ -592,6 +599,11 @@ class TemplateParser
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
+			if ($propName == 'templ') {
+				$tmpName = $propValue;
+				$child['tmp'] = '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>';
+				continue;
+			}
 			if ($propName == 'if') {
 				$ifCondition = $propValue;
 				continue;
@@ -645,6 +657,7 @@ class TemplateParser
 		$ifCondition = rtrim($ifCondition, '}');
 
 		$child = array('c' => $child);
+
 		if (!empty($else)) {
 			$else = ltrim($else, '{');
 			$else = rtrim($else, '}');

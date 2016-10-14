@@ -7,7 +7,7 @@
 	<control class="Checkbox" name="registryProducts" args="{#prodCheckboxOptions}">
 	<div class="app-keywords-add-request">
 		<span>{@addRequest}</span>
-		<include tooltip className="question-tooltip" key="keywordsNewReq">
+		<include templ="tooltip" className="question-tooltip" key="keywordsNewReq">
 	</div>
 	<div class="app-tooltip keywords-hint"/>
 </div>

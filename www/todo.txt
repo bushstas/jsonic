@@ -4,8 +4,6 @@
 
 проверить FOREACH
 
-файлы include ошибка если нет {template .tmpname}
-
 неверный вывод ошибок в шаблонах include (не определен класс)
 
 {from &i = 10 to 20 step 1}
@@ -13,3 +11,5 @@
 "true" => true
 
 внедрить {ifempty} внутрь FOREACH
+
+косяк с let, когда он находится вне тегов

@@ -1,17 +1,17 @@
 {template .main}
 <div class="app-tags" scope>
 	<div class="app-tags-container">
-		<template topContent>
-		<template input>
+		<template templ="topContent">
+		<template templ="input">
 		<div class="app-tags-content">
 			<div class="app-tags-placeholder">
 				{foreach $items as &item}
-					<template tag text="{&item}">
+					<template templ="tag" text="{&item}">
 				{/foreach}
 			</div>
 		</div>
 	</div>
-	<template bottomContent>
+	<template templ="bottomContent">
 </div>
 
 {template .input}

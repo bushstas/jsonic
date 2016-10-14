@@ -1,17 +1,13 @@
 <div class="app-select{~className?' '+~className}{$active?' active'}" scope>
 	<div class="app-select-value" onClick="onClick">
 		{$title}
-		{if ~tooltip}
-			<include tooltip className="question-tooltip" key="{$tooltip}">
-		{/if}
+		<include templ="tooltip" if="{~tooltip}" className="question-tooltip" key="{$tooltip}">
 	</div>
 	<div class="app-select-options" onClick="onOptionsClick">
 		{foreach $options as &option}
 			<div class="app-select-option" data-value="{&option.value}">
 				{&option.title}
-				{if &option.tooltip}
-					<include tooltip className="question-tooltip" key="{&option.tooltip}">
-				{/if}
+				<include templ="tooltip" if="{&option.tooltip}" className="question-tooltip" key="{&option.tooltip}">
 			</div>
 		{/foreach}
 	</div>

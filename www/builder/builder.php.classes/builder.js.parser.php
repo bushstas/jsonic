@@ -5,9 +5,9 @@ class JSParser
 	private static $correctors, $globals;
 
 	private static $errors = array(
-		'validationError' => 'ÐžÑˆÐ¸Ð±ÐºÐ° Ð² Ð²Ð°Ð»Ð¸Ð´Ð°Ñ†Ð¸Ð¸ ÐºÐ¾Ð´Ð° ÐºÐ»Ð°ÑÑÐ° {??}',
-		'incorrectCorrName' => 'ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÐ½Ñ‚Ð¾Ðµ Ð¸Ð¼Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð¾Ñ€Ð° {??} Ð² Ð¼ÐµÑ‚Ð¾Ð´Ðµ {??} ÐºÐ»Ð°ÑÑÐ° {??}',
-		'unknownCorr' => 'ÐÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð¾Ñ€ {??} Ð² Ð¼ÐµÑ‚Ð¾Ð´Ðµ {??} ÐºÐ»Ð°ÑÑÐ° {??}'
+		'validationError' => 'Îøèáêà â âàëèäàöèè êîäà êëàññà {??}',
+		'incorrectCorrName' => 'Íåêîððåêíòîå èìÿ êîððåêòîðà {??} â ìåòîäå {??} êëàññà {??}',
+		'unknownCorr' => 'Íåèçâåñòíûé êîððåêòîð {??} â ìåòîäå {??} êëàññà {??}'
 	);
 
 	public static function init($correctors, $globals) {
@@ -213,11 +213,16 @@ class JSParser
 		$args = array();
 		$corrs = array();
 		foreach ($parts as $part) {
+			$dv = '';
 			$part = trim($part);
 			$p = explode(':', $part);
 			$arg = $p[0];
-			$args[] = $arg;
-			if (isset($p[1])) {				
+			if (isset($p[1])) {
+				$ps = explode('=', $p[1]);
+				if (isset($ps[1])) {
+					$p[1] = $ps[0];
+					$dv = $ps[1];
+				}
 				foreach ($p as $i => $v) {
 					if ($i > 0) {
 						if (!is_array($corrs[$arg])) {
@@ -227,6 +232,10 @@ class JSParser
 					}
 				}
 			}
+			if (!empty($dv)) {
+				$arg .= '='.$dv;
+			}
+			$args[] = $arg;
 		}
 		$args = implode(',', $args);
 		foreach ($corrs as $k => $v) {

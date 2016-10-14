@@ -3,7 +3,7 @@
 		{foreach $buttons as &idx => &button}
 			<div class="app-popup-menu-button" data-value="{&button['value']}" data-index="{&idx}">
 				{&button['name']}
-				<template content item="{&button}">
+				<template templ="content" item="{&button}">
 			</div>
 		{/foreach}
 	</div>

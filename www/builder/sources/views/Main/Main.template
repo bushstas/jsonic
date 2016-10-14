@@ -9,7 +9,7 @@
 					<component class="UserInfo">
 					<div class="mainpage-leftcolumn-title bold">
 						{@calendar}
-						<include tooltip args="{#calendarTooltip}">
+						<include templ="tooltip" args="{#calendarTooltip}">
 					</div>
 					<component class="FavoritesCalendar">
 				</div>
