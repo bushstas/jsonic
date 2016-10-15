@@ -1,7 +1,7 @@
 control KeywordsControl
 
-function onFocus(isSwitched) {
-	$switched = isSwitched;
+function onFocus(switched) {
+	$switched=>
 }
 
 function onRecommendationsChange(count) {

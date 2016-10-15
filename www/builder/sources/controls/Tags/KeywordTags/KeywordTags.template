@@ -11,7 +11,7 @@
 </div>
 
 {template .tag}
-<div class="app-tags-item{.hasOption(~text)?' optioned'}">
+<div class="app-tags-item {.hasOption(~text)?'optioned'}">
 	<span class="app-tags-item-text" data-text="{~text}">
 		{.getProperTagText(~text)}
 	</span>

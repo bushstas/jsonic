@@ -16,8 +16,7 @@ function onEnter(value) {
 }
 
 function onOptionClick(target) {
-	var index = target.getData('index');
-	var select = this.getChild('opt' + index);
+	var select = this.getChild('opt' + target->index);
 	if (select) {
 		select.show();
 	}

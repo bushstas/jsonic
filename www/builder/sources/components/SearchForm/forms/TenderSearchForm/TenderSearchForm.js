@@ -13,12 +13,11 @@ function onRendered() {
 	});
 }
 
-function onResetButtonClick(e) {
-	var button = e.target.getAncestor('.->> app-search-form-reset');
-	button.addClass('->> active');
-	this.delay(function() {
-		button.removeClass('->> active');
-	}, 2500);
+function onResetButtonClick() {
+	$reset = true;
+	delay(2500) {
+		$reset = false;
+	}
 }
 
 function onResetConfirmed() {

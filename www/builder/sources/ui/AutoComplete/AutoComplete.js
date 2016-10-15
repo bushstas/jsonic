@@ -69,10 +69,10 @@ function onBlur() {
 }
 
 function onEnter(value) {
-	var currentVariant = $currentVariant;
+	get currentVariant;
 	if (isNumber(currentVariant)) {
 		var e = <.app-autocomplete-variant.active>;
-		--> enter (e.getData('value'))
+		--> enter (e->value)
 		this.onEscape();
 		return false;
 	} else {
@@ -83,7 +83,6 @@ function onEnter(value) {
 function setValue(value) {
 	<input>.value = value;
 }
-
 
 function onEscape() {
 	this.clear();
@@ -109,23 +108,27 @@ function onDown() {
 }
 
 function highlightVariant(step) {
-	var current = $currentVariant;
-	var variants = $variants;
+	get variants, currentVariant;
 	if (isArray(variants) && variants.length > 0) {
 		var total = variants.length;
-		if (!isNumber(current)) current = -1;
-		current += step;
-		if (current < 0) current = total - 1;
-		else if (current == total) current = 0;
-		$currentVariant = current;
+		if (!isNumber(currentVariant)) {
+			currentVariant = -1;
+		}
+		currentVariant += step;
+		if (currentVariant < 0) {
+			currentVariant = total - 1;
+		} else if (currentVariant == total) {
+			currentVariant = 0;
+		}
+		$currentVariant=>
 	}
 }
 
 function onChangeCurrentVariant(index) {
 	var e = <.app-autocomplete-variant.active>;
-	if (e) e.removeClass('active');
+	@(e).removeClass('active');
 	e = <.app-autocomplete-variant[index]>;
-	if (e) e.addClass('active');
+	@(e).addClass('active');
 }
 
 function onChangeActive(isActive) {

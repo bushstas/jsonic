@@ -27,8 +27,7 @@ function addRequest() {
 }
 
 function removeRequest(index, isExact) {
-	var total = $keywordsCount;
-	$keywords.removeAt(isExact ? index : total - index - 1);
+	$keywords.removeAt(isExact ? index : $keywordsCount - index - 1);
 }
 
 function onKeywordsChange(kw) {
@@ -47,7 +46,7 @@ function onKeywordsChange(kw) {
 
 function onSelectTab(index) {
 	index = $keywordsCount - index - 1;
-	<:area>.scrollToElement(<.app-keywords-block[index]>, 300);
+	<:area>.scrollTo(<.app-keywords-block[index]>, 300);
 }
 
 function onTagEdit(tag) {

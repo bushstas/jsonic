@@ -36,15 +36,13 @@ $imgsrc = ../images/ui
     $(inb vmid p5_0)
 }
 .app-select-options {
-    $ (abs none t100% l-1 r-1 mt2 mah300 bgwhite bo#bec8da br4 p6 regular)
-    overflow: auto;
-    box-shadow: 2px 2px 5px #e4e4e4;
+    $(abs none t100% l-1 r-1 mt2 mah300 bgwhite bo#bec8da br4 p6 regular ova bsh_2_2_5_#e4e4e4)
 }
 .app-select.active .app-select-options {
     $block 
 }
 .app-select-option {
-    $( lh13 fs13 p7 tovh pointer c#444C61)
+    $(lh13 fs13 p7 tovh pointer c#444C61)
 }
 .app-select-option:hover {
     $ (c#5f6b7f bc#e7ecf4)

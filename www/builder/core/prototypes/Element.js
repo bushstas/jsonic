@@ -164,10 +164,14 @@ Element.prototype.hide = function() {
 Element.prototype.find = function(selector) {
 	return this.querySelector(selector);
 };
+Element.prototype.finds = function(selector) {
+	return this.querySelectorAll(selector);
+};
 Element.prototype.getParent = function() {
 	return this.parentNode;
 };
 Element.prototype.scrollTo = function(pxy, duration) {
+	if (isElement(pxy)) pxy = pxy.getRelativePosition(this).y
 	if (!duration || !isNumber(duration)) this.scrollTop = pxy;
 	else {
 		var px = pxy - this.scrollTop, ratio = 15,
@@ -182,9 +186,6 @@ Element.prototype.scrollTo = function(pxy, duration) {
 		if (px != 0) cb();
 	}
 };
-Element.prototype.scrollToElement = function(element, duration) {
-	this.scrollTo(element.getRelativePosition(this).y, duration);
-};
 Element.prototype.getRelativePosition = function(element) {
 	var a = this.getRect();
 	var b = element.getRect();
@@ -194,9 +195,9 @@ Element.prototype.clear = function() {
 	if (isString(this.value)) this.value = '';
 	else this.innerHTML = '';
 };
-Element.prototype.getPrev = function() {
+Element.prototype.prev = function() {
 	return this.previousSibling;
 };
-Element.prototype.getNext = function() {
+Element.prototype.next = function() {
 	return this.nextSibling;
 };

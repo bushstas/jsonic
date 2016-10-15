@@ -186,12 +186,15 @@ function Component() {
 		this.addClass('->> disabled', !isDisabled);
 	};
 
-	Component.prototype.dispatchEvent = function(eventType, eventParams) {
+	Component.prototype.dispatchEvent = function(eventType) {
+		var args = Array.prototype.slice.call(arguments);
+		args.splice(0, 1);
+		args.push(this);
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = eventTypes[this.listeners[i]['type']];
 				if (this.listeners[i]['type'] == eventType) {
-					this.listeners[i]['handler'].call(this.listeners[i]['subscriber'] || null, eventParams, this);
+					this.listeners[i]['handler'].apply(this.listeners[i]['subscriber'] || null, args);
 				}
 			}
 		}
@@ -420,10 +423,6 @@ function Component() {
 		return data;
 	};
 
-	Component.prototype.getParent = function() {
-		return this.parentalComponent;
-	};
-
 	Component.prototype.getChildAt = function(index) {
 		return Objects.getByIndex(this.children, index);
 	};
@@ -469,14 +468,6 @@ function Component() {
 
 	Component.prototype.findElements = function(selector, scopeElement) {
 		return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
-	};
-
-	Component.prototype.findElementWithinParent = function(selector) {
-		return this.getParent().findElement(selector);
-	};
-
-	Component.prototype.findElementsWithinParent = function(selector) {
-		return this.getParent().findElements(selector);
 	};
 
 	Component.prototype.fill = function(element, data) {
@@ -538,7 +529,6 @@ function Component() {
 		this.followers = null;
 		this.correctors = null;
 		this.controls = null;
-		this.parentalComponent = null;
 	};
 
 	var f = function() {

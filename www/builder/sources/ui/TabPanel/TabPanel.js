@@ -10,14 +10,16 @@ initial helpers = [
 	}
 ]
 
-function initiate() {
-	this.margin = 4;
+function onRendered() {
+	this.tabWidth = this.args['tabWidth'] || 200;
+	this.tabMargin = this.args['tabMargin'] || 4;
 }
 
 function onParentRendered() {
-	if (isArray(this.args['tabs'])) {
-		for (var i = 0; i < this.args['tabs'].length; i++) {
-			this.activateTab(i, !!this.args['tabs'][i]['active']);
+	var tabs = this.args['tabs'];
+	if (isArray(tabs)) {
+		each (tabs as tab) {
+			this.activateTab(idx, !!tab['active']);
 		}
 	}
 	this.redraw();
@@ -25,19 +27,18 @@ function onParentRendered() {
 
 function redraw() {
 	this.hiddenTabs = [];
-	var tabPanelWidth = this.getElement().getWidth();
+	var tabPanelWidth = <>.getWidth();
 	var controlWidth = this.getControlsWidth();
-	var tabs = this.findElements('.->> app-tab');
-	var totalWidth = 0, buttonWidth;
-	for (var i = 0; i < tabs.length; i++) {
-		tabs[i].toggleClass('->> first', i == 0);
-		buttonWidth = tabs[i].getWidth();
-		if (totalWidth + controlWidth + buttonWidth + this.margin > tabPanelWidth) {
-			tabs[i].show(false);
-			this.hiddenTabs.push(i);
+	var tabs = <.app-tab[]>;
+	var totalWidth = 0;
+	each (tabs as tab) {
+		tab.toggleClass('->> first', idx == 0);
+		if (totalWidth + controlWidth + this.tabWidth + this.tabMargin > tabPanelWidth) {
+			tab.hide();
+			this.hiddenTabs[] = idx;
 		} else {
-			tabs[i].style.left = totalWidth + 'px';
-			totalWidth += buttonWidth + this.margin;
+			tab.style.left = totalWidth + 'px';
+			totalWidth += this.tabWidth + this.tabMargin;
 		}
 	}
 	$count = this.hiddenTabs.length;
@@ -45,11 +46,11 @@ function redraw() {
 
 function getControlsWidth() {
 	var width = 0;
-	var restButton = this.findElement('.->> app-tab-rest');
-	if (restButton) width += restButton.getWidth() + this.margin;
+	var restButton = <.app-tab-rest>;
+	width += @(restButton).getWidth() + this.tabMargin;
 
-	var plusButton = this.findElement('.->> app-tab-plus');
-	if (plusButton) width += plusButton.getWidth() + this.margin;
+	var plusButton = <.app-tab-plus>;
+	width += @(plusButton).getWidth() + this.tabMargin;
 	return width;
 }
 
@@ -58,26 +59,18 @@ function onRestTabClick() {
 }
 
 function onTabClick(target) {
-	if (isNumeric(this.activeTab)) this.activateTab(this.activeTab, false);
-	this.activateTab(target.getData('index'), true);
+	if (isNumeric(this.activeTab)) {
+		this.activateTab(this.activeTab, false);
+	}	
+	this.activateTab(target->index, true);
 }
 
 function activateTab(tabIndex, isShown) {
-	var container = this.findElement('.' + Objects.get(this.getTabParamsByIndex(tabIndex), 'container'), this.getScopeElement());
-	if (container) container.show(isShown);
-	if (isShown) this.activeTab = tabIndex;
-	this.getTab(tabIndex).toggleClass('->> active', isShown);
+	var contents = <>.next().finds('.->>app-tab-content');
+	@(contents[tabIndex]).show(isShown);
+	if (isShown) {
+		-->select (tabIndex)
+		this.activeTab = tabIndex;		
+	}
+	<.app-content-tab[tabIndex]>.toggleClass('->> active', isShown);
 }
-
-function getTab(tabIndex) {
-	return this.findElements('.->> app-content-tab')[tabIndex];
-}
-
-function getScopeElement() {
-	if (!this.scopeElement && isString(this.args['scope'])) this.scopeElement = this.findElementWithinParent('.' + this.args['scope']) || document.body;
-	return this.scopeElement;
-}
-
-function getTabParamsByIndex(tabIndex) {
-	return this.args['tabs'][tabIndex];
-};

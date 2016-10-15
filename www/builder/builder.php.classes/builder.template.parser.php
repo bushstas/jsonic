@@ -38,7 +38,7 @@ class TemplateParser
 		'elseWithoutIf' => 'Элемент в шаблоне {??} класса {??} содержит атрибут <b>else</b>, но не содержит атрибут <b>if</b>',
 		'incorrectIf' => 'Элемент в шаблоне {??} класса {??} содержит некорректный атрибут <b>if = "{?}"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>',
 		'eventHandlerExpected' => 'Фигурные скобки внутри атрибута события {??} в шаблоне {??} класса {??}. Ожидается название функции обработчика!',
-		'handlerNotFound' => 'Функция обработчик события {??} не найдена среди методов класса {??}',
+		'handlerNotFound' => 'Функция {??}, указанная в шаблоне {??} класса {??} в качестве обработчика события {??}, не найдена среди методов данного класса',
 		'noTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><template templ="table" rows="{~rows}"></xmp>',
 		'noIncludeTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><include templ="table" rows="{~rows}"></xmp>'
 	);
@@ -788,7 +788,7 @@ class TemplateParser
 					}
 					$callback = preg_replace("/[^\w]/", "", $propValue);
 					if (!$isDispatching && is_array(self::$class) && !self::hasComponentMethod($callback, self::$class)) {
-						new Error(self::$errors['handlerNotFound'], array($callback, self::$className));
+						new Error(self::$errors['handlerNotFound'], array($callback, self::$templateName, self::$className, 'on'.$match[1]));
 					}
 					$eventTypeIndex = array_search($eventType, self::$eventTypesShortcuts);
 					if ($eventTypeIndex > -1) {

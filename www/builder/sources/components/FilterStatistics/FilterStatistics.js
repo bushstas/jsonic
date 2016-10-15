@@ -46,7 +46,7 @@ function refresh() {
 }
 
 function onLoaded(filters) {
-	$filters = filters;
+	$filters=>
 }
 
 function updateFilterCount(data) {

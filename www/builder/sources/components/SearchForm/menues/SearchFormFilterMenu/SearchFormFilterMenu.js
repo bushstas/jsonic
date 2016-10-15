@@ -41,5 +41,5 @@ function getButtonData(item) {
 };
 
 function handleClick(value, button) {
-	Globals.getView('search').openFilter(value);
+	App.getView('search').openFilter(value);
 };

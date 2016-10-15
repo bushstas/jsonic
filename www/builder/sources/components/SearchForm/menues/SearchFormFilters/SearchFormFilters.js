@@ -14,9 +14,9 @@ initial props = {
 };
 
 function onLoadFilters(filters) {
-	this.set('quantity', filters.length);
+	$quantity = filters.length;
 }
 
 function onSaveFilterClick() {
-	Dialoger.show(FilterEdit, {'filterId': Globals.get('filterId')});
+	++>FilterEdit ({'filterId': Globals.get('filterId')});
 }

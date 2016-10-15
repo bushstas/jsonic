@@ -1,6 +1,6 @@
 {template .main}
-<div class="app-dialog-mask{$shown?' shown'}" onClick="close"></div>
-<div class="app-dialog{$expanded?' expanded'}{$shown?' shown'}" scope style="width:{$width}px;margin-left:{$marginLeft};margin-top:{$marginTop};">
+<div class="app-dialog-mask {$shown?'shown'}" onClick="close"></div>
+<div class="app-dialog {$expanded?'expanded'} {$shown?'shown'}" scope style="width:{$width}px;margin-left:{$marginLeft};margin-top:{$marginTop};">
 	{if ~closable}
 		<div class="app-dialog-close" onClick="close"></div>
 	{/if}

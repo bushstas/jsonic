@@ -252,8 +252,5 @@ function Core() {
 	this.getParentElement = function() {
 		return this.parentElement;
 	};
-	this.setParent = function(parentalComponent) {
-		this.parentalComponent = parentalComponent;
-	};
 }
 Core = new Core();

@@ -1,2 +1,2 @@
 {template .content}
-<div class="app-ui-checkbox{~item['isAutoOpen']?' checked'}" data-value="{~item['value']}"></div>
+<div class="app-ui-checkbox {~item['isAutoOpen']?'checked'}" data-value="{~item['value']}"/>

@@ -1,6 +1,6 @@
 <component class="KeywordsPanel" cmpid="keywordsPanel">
 
-<div class="app-search-form-reset">
+<div class="app-search-form-reset {$reset?'active'}">
 	<div class="hover-label" onClick="onResetButtonClick">
 		{@clearFilter}
 	</div>

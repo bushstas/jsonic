@@ -275,7 +275,6 @@ function Level() {
 				}
 			}
 			Core.initiate.call(cmp, props, args, opts);
-			Core.setParent.call(cmp, component);
 			cmp.render(pe);
 			registerChild(cmp, true);			
 			var events = item['e'];

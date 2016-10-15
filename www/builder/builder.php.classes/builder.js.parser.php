@@ -7,7 +7,11 @@ class JSParser
 	private static $errors = array(
 		'validationError' => 'Ошибка в валидации кода класса {??}',
 		'incorrectCorrName' => 'Некоррекнтое имя корректора {??} в методе {??} класса {??}',
-		'unknownCorr' => 'Неизвестный корректор {??} в методе {??} класса {??}'
+		'unknownCorr' => 'Неизвестный корректор {??} в методе {??} класса {??}',
+		'symbolsBetweenFuncs' => 'Обнаружен код после функции {??} класса {??}. Вне методов класса не должно быть никакого кода',
+		'symbolsAfterFuncs' => 'Обнаружен код в конце класса {??}. Вне методов класса не должно быть никакого кода',
+		'symbolsBeforeFuncs' => 'Обнаружен код в начале класса {??}. Вне методов класса не должно быть никакого кода',
+		'innerFunc' => "Обнаружена вложенная функция {??} в методе {??} класса {??}.<br>Для создания замыканий используйте код вида:<xmp>function func() {\n\tvar innerFunc = function() {\n\n\t};\n}</xmp>"
 	);
 
 	public static function init($correctors, $globals) {
@@ -16,65 +20,56 @@ class JSParser
 	}
 
 	public static function parse(&$class) {
-		$code = 'function(){}'.trim($class['content']);
-		$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);
-		$braces = preg_replace("/[^\{\}]/", "", $code);
-		$parts = preg_split("/[\{\}]/", $code);
-					
-		$properParts = array();
-		for ($i = 0; $i < count($parts); $i++) {
-			$properParts[] = $parts[$i];
-			if (!empty($braces[$i])) {
-				$properParts[] = $braces[$i];
-			}
-		}
-		$temp = '';
-		$opening = 0;
-		$closing = 0;
+		$code = 'function __constructor(){}'.trim($class['content']);
+		$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);	
+
+		$data = Splitter::split('/\bfunction +(\w+) *\(([^\)]*)\) *\{/', $code, 'all');		
 		$functions = array();
 		$functionList = array();
-		$functionName = "__constructor";
 		$class['calledMethods'] = array();
-		for ($i = 1; $i < count($properParts); $i++) {				
-			$part = $properParts[$i];
-			if ($part == '{') {
-				$opening++;
-				if ($opening == 1) {
-					$part = "";
-				}
-			} elseif ($part == '}') {
-				$closing++;
-			}
-			if ($opening > 0 && $opening == $closing) {
-				$code = self::parseFunctionCode($temp, $functionName, $class['name']);
-				preg_match_all('/\bthis\.(\w+)\(/', $code, $ms);
-				$ms = $ms[1];
-				if (!empty($ms)) {
-					foreach ($ms as $msi) {
-						$class['calledMethods'][] = array('method' => $functionName, 'called' => $msi);
-					}						
-				}
-				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
-				$functions[] = array('name' => $functionName, 'args' => $arguments, 'code' => $code);
-				$functionList[] = $functionName;
-				$nextPart = $properParts[$i + 1];
-				if (preg_replace("/[\s;]/", "", $nextPart) != "") {
-					preg_match_all("/[\s;]*function {1,}(\w{1,}) *\(([^\)]*)\) *$/", $nextPart, $matches);
-					$functionName = $matches[1][0];
-					$arguments = $matches[2][0];
-					$i++;
-					
-					if ($properParts[$i + 2] == '{' || empty($functionName)) {
-						new Error(self::$errors['validationError'], array($class['name']));
+		foreach ($data['items'] as $i => $part) {
+			$content .= $part;
+			if (isset($data['delimiters'][1][$i])) {
+				$functionName = $data['delimiters'][1][$i];
+				$arguments = $data['delimiters'][2][$i];
+
+				$d = Splitter::getInner($data['items'][$i + 1]);
+				if (!$d['closed']) {
+					if (isset($data['items'][$i + 2])) {
+						new Error(self::$errors['innerFunc'], array($data['delimiters'][1][$i + 1], $functionName, $class['name']));
+					} else {
+						die('not closed');
 					}
 				}
-				$opening = 0;
-				$closing = 0;
-				$temp = '';
-			} else {
-				$temp .= $part;
+				$d['outer'] = preg_replace('/[\s]/', '', $d['outer']);
+				if ($d['outer'] == ';') $d['outer'] = '';
+				if ($d['outer'] != '') {
+					if ($functionName == '__constructor') {
+						new Error(self::$errors['symbolsBeforeFuncs'], array($class['name']));
+					} elseif (isset($data['items'][$i + 2])) {
+						new Error(self::$errors['symbolsBetweenFuncs'], array($functionName, $class['name']));
+					} else {
+						new Error(self::$errors['symbolsAfterFuncs'], array($class['name']));
+					}
+				}
+				$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
+				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
+				$functions[] = array(
+					'name' => $functionName, 
+					'args' => $arguments,
+					'code' => $code
+				);
+				preg_match_all('/\bthis\.(\w+)\(/', $code, $matches);
+				$matches = $matches[1];
+				if (!empty($matches)) {
+					foreach ($matches as $match) {
+						$class['calledMethods'][] = array('method' => $functionName, 'called' => $match);
+					}						
+				}
+				$functionList[] = $functionName;
 			}
 		}
+
 		$class['functions'] = $functions;
 		$class['functionList'] = $functionList;		
 		unset($class['content']);
@@ -91,7 +86,7 @@ class JSParser
 				if (isset($matches[1][$i])) {
 					$vars = explode(',', $matches[1][$i]);
 					foreach ($vars as $var) {
-						$code .= 'var '.$var."=this.get('".$var."');\n\t";
+						$code .= 'var '.$var."=this.get('".$var."');\n";
 					}
 				}
 			}
@@ -201,7 +196,7 @@ class JSParser
 			$code = str_replace("```", ",", $code);
 			if (!empty($varsToSet)) {
 				foreach ($varsToSet as $varToSet) {
-					$code .= "\n\tthis.set('".$varToSet."', ".$varToSet.");";
+					$code .= "\nthis.set('".$varToSet."', ".$varToSet.");";
 				}
 			}
 		}
@@ -246,7 +241,7 @@ class JSParser
 				if (!in_array($crr.'Crr', self::$correctors)) {
 					new Error(self::$errors['unknownCorr'], array($crr, $name, $class));
 				}
-				$code = "\t".$k."=Corrector.correct('".$crr."',".$k.");\n".$code;
+				$code = $k."=Corrector.correct('".$crr."',".$k.");\n".$code;
 			}
 		}
 	}

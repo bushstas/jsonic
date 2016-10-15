@@ -17,15 +17,15 @@
 			<td class="app-mainpage-content-column">
 				<component class="TabPanel" args="{#mainPageTabs}">
 				<div class="app-mainpage-content">
-					<div class="app-mainpage-tab1-content">
+					<div class="app-tab-content">
 						<component class="FilterStatistics" args="{#mainPageFilterStat}">
 					</div>
-					<div class="app-mainpage-tab2-content">
+					<div class="app-tab-content">
 						<component class="FilterSubscriptionOptions">
 						<component class="FilterSubscription">
 					</div>
-					<div class="app-mainpage-tab3-content">
-						
+					<div class="app-tab-content">
+						11111111
 					</div>
 				</div>
 			</td>

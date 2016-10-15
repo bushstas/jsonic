@@ -5,9 +5,9 @@ function onRendered() {
 }
 
 function getCorrectedText(text) {
-	var opt1 = $opt1value;
-	if (opt1 > 1) {
-		return text + '#' + opt1;
+	get opt1value;
+	if (opt1value > 1) {
+		return text + '#' + opt1value;
 	}
 	return text;
 }

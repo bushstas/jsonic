@@ -44,7 +44,7 @@ function Tooltiper() {
 	};
 	var createPopup = function() {
 		tooltip = new tooltip();
-		Initialization.initiate.call(tooltip);
+		Core.initiate.call(tooltip);
 		tooltip.render(document.body);
 		tooltipElement = tooltip.getElement();
 	};

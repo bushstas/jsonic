@@ -1,4 +1,4 @@
-<div class="app-select{~className?' '+~className}{$active?' active'}" scope>
+<div class="app-select {~className?~className} {$active?'active'}" scope>
 	<div class="app-select-value" onClick="onClick">
 		{$title}
 		<include templ="tooltip" if="{~tooltip}" className="question-tooltip" key="{$tooltip}">

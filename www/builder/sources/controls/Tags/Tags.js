@@ -20,9 +20,10 @@ initial followers = {
 }
 
 function onEnter(value) {
-	var v = value.split(','), a = [], tv;
-	for (var i = 0; i < v.length; i++) {
-		tv = v[i].trim().toLowerCase();
+	value = value.split(',');
+	var a = [], tv;
+	each (value as v) {
+		tv = v.trim().toLowerCase();
 		if (!tv.isEmpty() && !this.tagExists(tv)) {
 			a.push(this.getCorrectedText(tv));
 		}
@@ -46,8 +47,7 @@ function onPickVariant(value) {
 }
 
 function onRemoveButtonClick(target) {
-	var text = target.getPrev().getData('text');
-	$items.remove(text);
+	$items.remove(target.prev()->text);
 	this.dispatchChange();
 }
 

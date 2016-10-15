@@ -1,2 +1,2 @@
 {template .checkbox}
-<div class="app-ui-checkbox{~checked?' checked'}" data-name="{~name}" data-value="{~value}"></div>
+<div class="app-ui-checkbox {~checked?'checked'}" data-name="{~name}" data-value="{~value}"></div>

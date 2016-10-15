@@ -6,7 +6,7 @@ initial props = {
 
 function onSupportButtonClick() {
 	this.hide();
-	Dialoger.show(Support);
+	++> Support
 }
 
 function onShow() {

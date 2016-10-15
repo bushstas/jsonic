@@ -58,8 +58,10 @@ function enableOption(index, isEnabled) {
 function onOptionsClick(e) {
 	var target = e.getTarget('.->> app-select-option');
 	if (target && !target.hasClass('->> disabled')) {
-		var value = target.getData('value');
-		if (this.selectByValue(value)) this.dispatchChange();
+		var value = target->value;
+		if (this.selectByValue(value)) {
+			this.dispatchChange();
+		}
 		this.hide();
 	}
 }
@@ -83,4 +85,4 @@ function onClick() {
 
 function hide() {
 	$active = false;
-};
+}

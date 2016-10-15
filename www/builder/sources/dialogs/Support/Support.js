@@ -6,5 +6,5 @@ initial props = {
 
 function onOrderCallButtonClick() {
 	this.hide();
-	Dialoger.show(OrderCall);
+	++> OrderCall
 }

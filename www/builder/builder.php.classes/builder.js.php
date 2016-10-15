@@ -125,7 +125,7 @@ class JSCompiler
 		}
 		foreach ($jsFiles as $jsFile) {
 			$this->processJSFile($jsFile);
-		}
+		}		
 		$this->dataCompiler->run($dataFiles);
 		$this->initCore($coreFiles);
 		$this->validateApplication();
@@ -148,8 +148,6 @@ class JSCompiler
 		$this->decodeTexts();
 		$this->finish();
 		$this->addScripts($scriptFiles);
-		
-		Printer::log($this->jsOutput);
 	}
 
 	private function validateApplication() {
@@ -423,64 +421,7 @@ class JSCompiler
 
 	private function parseSpecialJSCode(&$content, $className) {
 		TextParser::encode($content, $className);
-		$content = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $content);
-		$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
-		$content = preg_replace('/'.$regexp.' {1,}/', "$1", $content);
-		$content = preg_replace('/ {1,}'.$regexp.'/', "$1", $content);
-
-		$content = preg_replace('/(\$*[\w\]\[\.]+) *\{ *([\w\]\[\.,]+) *\}/', "Objects.get($1,$2)", $content);
-		$content = preg_replace('/<::(\w+)> *<>/', "<::$1>.getElement()", $content);
-		$content = str_replace('<>', 'this.getElement()', $content);
-		$content = preg_replace('/\+\+> *(\w+) *(\((.*)\))* *;*/', "Dialoger.show($1,$3)", $content);
-		$content = preg_replace('/<\+\+ *(\w+) *(\((.*)\))* *;*/', "Dialoger.hide($1,$3)", $content);
-		$content = preg_replace('/\+> *(\w+) *(\((.*)\))*/', "Dialoger.get($1,$3)", $content);
-		$content = preg_replace('/--> *(\w+) *(\((.*)\))* *;*/', "this.dispatchEvent('$1',$3);", $content);
-		$content = preg_replace('/==> *(\w+) *(\((.*)\))* *;*/', "Globals.dispatchEvent('$1',$3);", $content);
-		$content = str_replace(",)", ")", $content);
-		
-		$regexp = '/[\w\]\[\.]*<[\.\#:]*[a-z][\w\-\.\#\]\[]*>/i';
-		$parts = preg_split($regexp, $content);
-		preg_match_all($regexp, $content, $matches);
-		$matches = $matches[0];
-		$content = '';
-		foreach ($parts as $i => $part) {
-			$content .= $part;
-			if (isset($matches[$i])) {
-				$p = preg_split('/[<>]/', $matches[$i]);
-				$tag = $p[1];
-				$scope = '';
-				$index = null;
-				if ($p[0] == 'return') {
-					$content .= 'return ';
-				} elseif (!empty($p[0])) {
-					$scope = ','.$p[0];
-				}
-				$p = explode('[', $tag);
-				if (isset($p[1])) {
-					$tag = $p[0];
-					$p = explode(']', $p[1]);
-					if (isset($p[1])) {
-						$index = $p[0];
-					}
-				}
-				$tag = preg_replace('/[^\.\#:\-\w]/', '', $tag);
-				preg_match_all('/([\.\#:]*)([\w\-\.\#]+)/', $tag, $ms);
-				if ($ms[1][0] == ':') {
-					$content .= "this.getElement('".$ms[2][0]."')";
-				} elseif ($ms[1][0] == '::') {
-					$content .= "this.getChild('".$ms[2][0]."')";
-				} else {
-					$selector = !empty($ms[1][0]) ? $ms[1][0].'->>' : '';
-					if ($index === null) {
-						$content .= "this.findElement('".$selector.$ms[2][0].$scope."')";
-					} elseif(empty($index)) {
-						$content .= "this.findElements('".$selector.$ms[2][0].$scope."')";
-					} else {
-						$content .= "this.findElements('".$selector.$ms[2][0].$scope."')[".$index."]";
-					}
-				}				
-			}
-		}
+		JSInterpreter::parse($content, $className);
 	}
 	
 	private function validateEntry() {
@@ -643,6 +584,7 @@ class JSCompiler
 		$this->jsOutput = preg_replace("/<nq>'/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/;{2,}/", ';', $this->jsOutput);
+		$this->jsOutput = preg_replace("/ {2,}/", ' ', $this->jsOutput);
 		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
 
 		if ($this->configProvider->needCssObfuscation()) {
@@ -972,7 +914,7 @@ class JSCompiler
 		$classNames = array_merge($classNames, $coreClassNames);
 		$regexp1 = '/\b'.implode('|', array_values($globals)).'\b/';
 		$regexp2 = '/\bnew\s+('.implode('|', array_values($classNames)).')\b/';
-		foreach ($this->classes as $className => &$class) {
+		foreach ($this->classes as $className => &$class) {		
 			if (preg_match_all($regexp1, $class['content'], $matches)) {
 				new Error($this->errors['globalVarUsing'], array($className, implode(', ', $matches[0])));
 			}
