@@ -73,6 +73,10 @@ function Core() {
 	var subscribeToHelper = function(options) {
 		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
 	};
+	var isProperMethod = function(child, parent, method) {
+		if (!!child.prototype[method]) return false;
+		return parent.prototype[method] != parent.prototype.initiate && parent.prototype[method] != parent.prototype.getInitials;
+	}
 	this.inherits = function(list) {
 		var children, parent, child, initials, sc;
 		for (var k = 0; k < list.length; k++) {
@@ -93,7 +97,7 @@ function Core() {
 				};
 				cb(parent);
 				for (var method in parent.prototype) {
-					if (!child.prototype[method]) {
+					if (isProperMethod(child, parent, method)) {
 						child.prototype[method] = parent.prototype[method];
 					}
 				}
@@ -102,23 +106,25 @@ function Core() {
 	};
 	this.initiate = function(props, args, opts) {
 		var initials = null;
-		if (isFunction(this.constructor.prototype.getInitials)) {
-			initials = this.constructor.prototype.getInitials();
+		var proto = this.constructor.prototype;
+		if (isFunction(proto.getInitials)) {
+			initials = proto.getInitials();
 		}
 		var initiateParental = function(superClasses, object) {
-			var parentInitials;
+			var parentInitials, pproto;
 			for (var i = 0; i < superClasses.length; i++) {
-				if (isFunction(superClasses[i].prototype.initiate)) {
-					superClasses[i].prototype.initiate.call(object);
+				pproto = superClasses[i].prototype;
+				if (isFunction(pproto.initiate)) {
+					pproto.initiate.call(object);
 				}
-				if (isFunction(superClasses[i].prototype.getInitials)) {
-					parentInitials = superClasses[i].prototype.getInitials();
+				if (isFunction(pproto.getInitials)) {
+					parentInitials = pproto.getInitials();
 					if (isObject(parentInitials)) {
 						initials = extendInitials(initials || null, parentInitials);
 					}
 				}
-				if (isArray(superClasses[i].prototype.inheritedSuperClasses)) {
-					initiateParental(superClasses[i].prototype.inheritedSuperClasses, object);
+				if (isArray(pproto.inheritedSuperClasses)) {
+					initiateParental(pproto.inheritedSuperClasses, object);
 				}
 			}
 		};
@@ -127,8 +133,8 @@ function Core() {
 		}
 		if (isObject(this.props)) Objects.merge(this.props, props);
 		else this.props = props || {};
-		if (isFunction(this.constructor.prototype.initiate)) {
-			this.constructor.prototype.initiate.call(this);
+		if (isFunction(proto.initiate)) {
+			proto.initiate.call(this);
 		}
 		this.initials = initials;
 		this.args = args;

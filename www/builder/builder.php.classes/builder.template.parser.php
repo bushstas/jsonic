@@ -89,6 +89,7 @@ class TemplateParser
 		$templates = array();
 		for ($i = 0; $i < count($templateNames); $i++) {
 			self::$templateName = $templateNames[$i];
+			TemplateCodeParser::init(self::$templateName, $className);
 			$templates[] = self::getParsedTemplate($templateContents[$i]);
 		}
 
@@ -1120,7 +1121,7 @@ class TemplateParser
 	}
 
 	private static function parseCode($code, $role = null, $toPropNodes = false) {
-		$code = trim($code);
+		TemplateCodeParser::parse($code);
 		self::parseClassMethodCalls($code);
 		$code = self::checkTernary($code);
 		$code = preg_replace('/\s*@(\w+)\s*/', self::$globalNames['CONSTANTS'].".$1", $code);

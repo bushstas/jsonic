@@ -3,6 +3,7 @@
 class JSParser
 {
 	private static $correctors, $globals;
+	private static $usedCorrectors = array();
 
 	private static $errors = array(
 		'validationError' => 'Ошибка в валидации кода класса {??}',
@@ -66,13 +67,19 @@ class JSParser
 						$class['calledMethods'][] = array('method' => $functionName, 'called' => $match);
 					}						
 				}
-				$functionList[] = $functionName;
+				if ($functionName != '__constructor') {
+					$functionList[] = $functionName;
+				}
 			}
 		}
 
 		$class['functions'] = $functions;
 		$class['functionList'] = $functionList;		
 		unset($class['content']);
+	}
+
+	public static function getUsedCorrectors() {
+		return self::$usedCorrectors;
 	}
 
 	private static function parseFunctionCode($code, $functionName, $className) {
@@ -238,10 +245,14 @@ class JSParser
 				if (!preg_match('/^[a-z]\w*/i', $crr)) {
 					new Error(self::$errors['incorrectCorrName'], array($crr, $name, $class));
 				}
-				if (!in_array($crr.'Crr', self::$correctors)) {
+				$crrName = $crr.'Crr';
+				if (!in_array($crrName, self::$correctors)) {
 					new Error(self::$errors['unknownCorr'], array($crr, $name, $class));
 				}
-				$code = $k."=Corrector.correct('".$crr."',".$k.");\n".$code;
+				$code = $k."=".$crr."Crr.correct(".$k.");\n".$code;
+				if (!in_array($crrName, self::$usedCorrectors)) {
+					self::$usedCorrectors[] = $crrName;
+				}
 			}
 		}
 	}

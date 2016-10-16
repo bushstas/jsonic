@@ -22,7 +22,6 @@ class JSGlobals
 		'viewContainer'    => '__VIEWCONTAINER',
 		'tooltipClass'     => '__TC',
 		'tooltipApi'       => '__TA',
-		'correctors'       => '__CRRS',
 		'pathToApi'        => '__APIDIR',
 		'pagetitle'        => '__PAGETITLE',
 		'user'             => '__USEROPTIONS'
@@ -54,7 +53,6 @@ class JSGlobals
 		self::addViewContainer($data['viewContainer']);
 		self::addTooltipClass($data['tooltipClass']);
 		self::addTooltipApi($data['tooltipApi']);
-		self::addCorrectors($data['correctors']);
 		self::addPathToApi($data['pathToApi']);
 		self::addPagetitle($data['pagetitle']);
 		self::addUserOptions($data['user']);
@@ -78,7 +76,6 @@ class JSGlobals
 			'TOOLTIPCLASS'  => self::$varNames['tooltipClass'],
 			'TOOLTIPAPI'    => self::$varNames['tooltipApi'],
 			'APIDIR'        => self::$varNames['pathToApi'],
-			'CORRECTORS'    => self::$varNames['correctors'],
 			'INDEXROUTE'    => self::$varNames['indexRoute'],
 			'DEFAULTROUTE'  => self::$varNames['defaultRoute'],
 			'HASHROUTER'    => self::$varNames['hashRouter'],
@@ -240,10 +237,6 @@ class JSGlobals
 
 	private static function addTooltipApi($tooltipApi) {
 		self::add('tooltipApi', "'".$tooltipApi."'");
-	}
-
-	private static function addCorrectors($correctors) {
-		self::add('correctors', str_replace('"', '', json_encode($correctors)));
 	}
 
 	private static function addPathToApi($pathToApi) {

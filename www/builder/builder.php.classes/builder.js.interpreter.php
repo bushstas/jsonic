@@ -23,7 +23,15 @@ class JSInterpreter
 	}
 
 	private static function parseEachOperators(&$content) {
-		$content = preg_replace('/\beach\s*\(([\w\.\[\]]+) +as +(\w+)\)\s*\{/', "var _a=$1,idx;for(idx=0;idx<_a.length;idx++){var $2=_a[idx];", $content);
+		$itemsName = '_items';
+		$names = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','_');		
+		foreach ($names as $name) {
+			if (!preg_match('/\b'.$name.'\b/', $content)) {
+				$itemsName = $name;
+				break;
+			}
+		}
+		$content = preg_replace('/\beach\s*\(([\w\.\[\]]+) +as +(\w+)\)\s*\{/', "var ".$itemsName."=$1,idx;for(idx=0;idx<".$itemsName.".length;idx++){var $2=".$itemsName."[idx];", $content);
 	}
 
 	private static function parseArrayPushOperators(&$content) {

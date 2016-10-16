@@ -61,7 +61,8 @@ class JSCompiler
 		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}',
 		'globalVarUsing' => 'В классе {??} обнаружено использование зарезервированных системой имен переменных: {??}',
 		'creatingInstance' => 'В классе {??} обнаружено создание экземпляра класса {??}{?}',
-		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}'
+		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}',
+		'noCorrectMethod' => 'В классе-корректоре {??} отсутсвует метод <b>correct</b>'
 	);
 
 	private $coreClasses = array(
@@ -136,6 +137,7 @@ class JSCompiler
 		$this->validateUsedClasses();
 		$this->initialsParser->run($this->classes);
 		$this->parseClasses();
+		$this->unsetNotUsedCorrectors();
 		$this->checkClasses();
 		$this->addSources();
 		if ($this->configProvider->isTest()) {
@@ -245,6 +247,17 @@ class JSCompiler
 		}
 		foreach ($properNotUsedComponents as $className) {
 			unset($this->classes[$className]);
+		}
+	}
+
+	private function unsetNotUsedCorrectors() {
+		$usedCorrectors = JSParser::getUsedCorrectors();
+		if (is_array($this->classesByTypes['corrector'])) {
+			foreach ($this->classesByTypes['corrector'] as $className => $class) {
+				if (!in_array($className, $usedCorrectors)) {
+					unset($this->classes[$className]);
+				}
+			}
 		}
 	}
 
@@ -536,6 +549,9 @@ class JSCompiler
 					}
 				}
 			}
+			if ($class['type'] == 'corrector' && !in_array('correct', $class['functionList'])) {
+				new Error($this->errors['noCorrectMethod'], array($class['name']));
+			}
 			if (isset($this->usedComponents[$className]) && isset($this->usedComponents[$className]['type']) && $class['type'] != $this->usedComponents[$className]['type']) {
 				if ($class['type'] == 'dialog') {
 					new Error($this->errors['dialogCalling'], $this->usedComponents[$className]['classNames'][0]);
@@ -565,7 +581,6 @@ class JSCompiler
 			'viewContainer'    => $this->config['viewContainer'],
 			'tooltipClass'     => $this->config['tooltipClass'],
 			'tooltipApi'       => $this->config['tooltipApi'],
-			'correctors'       => $this->correctors,
 			'pathToApi'        => $this->config['pathToApi'],
 			'pagetitle'        => $this->config['pagetitle'],
 			'user'             => $this->config['user']
@@ -667,18 +682,12 @@ class JSCompiler
 				foreach ($class['functions'] as $func) {
 					$constructorCode = '';
 					$args = !empty($func['args']) ? $func['args'] : '';
-					if ($func['name'] != '__constructor') {						
+					if ($func['name'] != '__constructor') {
 						$this->addPrototypeFunction($className, $func['name'], $args, $func['code']);
 					} else {
 						$this->addConstructorFunction($className, in_array($type, $this->componentLikeClassTypes));
 					}						
 				}
-			}
-			if (!in_array('initiate', $class['functionList'])) {
-				$this->addPrototypeFunction($className, 'initiate');
-			}
-			if (!in_array('getInitials', $class['functionList'])) {
-				$this->addPrototypeFunction($className, 'getInitials');	
 			}
 			if (!empty($templates[$className])) {
 				$this->addTemplateFunction($className, $templates[$className], $class);
@@ -722,7 +731,10 @@ class JSCompiler
 						}
 					}
 				}
-			}			
+			}
+			if ($class['type'] == 'corrector') {
+				$this->jsOutput[] = $className.'=new '.$className.'();';
+			}
 		}
 	}
 
@@ -836,16 +848,16 @@ class JSCompiler
 
 	private function addConstructorFunction($className, $isComponent) {
 		$routerMenuClasses = $this->config['routerMenu'];
-		$this->jsOutput[] = 'function '.$className.'() {';
+		$this->jsOutput[] = 'function '.$className.'(){';
 		if ($isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses)) {
 			$this->jsOutput[] = "\tRouter.addMenu(this);";
-			$this->jsOutput[] = "\tthis.isRouteMenu = true;";
+			$this->jsOutput[] = "\tthis.isRouteMenu=true;";
 		}		
 		$this->jsOutput[] = '};';
 	}
 
 	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
-		$this->jsOutput[] = $className.'.prototype.'.$method.' = function('.$args.') {';
+		$this->jsOutput[] = $className.'.prototype.'.$method.'=function('.$args.'){';
 		$this->jsOutput[] = $code;
 		$this->jsOutput[] = '};';
 	}
@@ -858,7 +870,7 @@ class JSCompiler
 		}
 		if (!empty($tmpids)) {
 			foreach ($tmpids as $k => &$v) $v = '<nq>'.$className.'.prototype.getTemplate'.ucfirst($v).'<nq>';
-			$this->jsOutput[] = $className.'.prototype.templatesById = '.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
+			$this->jsOutput[] = $className.'.prototype.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
 		}
 	}
 
@@ -886,7 +898,7 @@ class JSCompiler
 			}
 		}		
 		if (!empty($objCode)) {
-			$this->jsOutput[] = $className.".prototype.getInitials = function() {";
+			$this->jsOutput[] = $className.".prototype.getInitials=function(){";
 			$this->jsOutput[] = "\n\treturn {\n";
 			$this->jsOutput[] = implode(",\n", $objCode);
 			$this->jsOutput[] = "\t};\n};";
