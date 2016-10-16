@@ -1091,6 +1091,9 @@ class TemplateParser
 		if (empty($codes)) {
 			return array($text);
 		}
+		foreach ($codes as &$code) {
+			TemplateCodeParser::parse($code, 'textNode');
+		}
 		if (preg_match('/\$\w+[\[]/', $text)) {
 			if (is_array(self::$class)) {
 				new Error(self::$errors['incorrectReactVar2'], array(self::$templateName, self::$className, $text));
@@ -1121,7 +1124,7 @@ class TemplateParser
 	}
 
 	private static function parseCode($code, $role = null, $toPropNodes = false) {
-		TemplateCodeParser::parse($code);
+		$code = trim($code);
 		self::parseClassMethodCalls($code);
 		$code = self::checkTernary($code);
 		$code = preg_replace('/\s*@(\w+)\s*/', self::$globalNames['CONSTANTS'].".$1", $code);
