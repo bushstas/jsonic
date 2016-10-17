@@ -9,7 +9,6 @@
 {template .hotMark as .name}
 <div data-title="fuck" class="tooltiped datatable-tooltiped datatable-hot-tender" data-timeout="true"></div>
 
-
 {template .count}
 <span class="app-datatable-standart-row-count">
 	{~count}

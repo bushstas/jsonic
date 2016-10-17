@@ -109,7 +109,7 @@ function Application() {
 				if (isObject(titleParams)) {
 					var regExp;
 					for (var k in titleParams) {
-						regExp = new RegExp("\\$" + k)
+						regExp = new RegExp("\\$" + k);
 						title = title.replace(regExp, titleParams[k]);
 					}
 				}
@@ -154,7 +154,7 @@ function Application() {
 			this.views[viewName] = null;
 		}
 	};
-	Application.prototype.onNoErrors = function() {};
-	Application.prototype.onError = function(errorCode) {};
+	Application.prototype.onNoErrors=function(){};
+	Application.prototype.onError=function(){};
 }
 Application();

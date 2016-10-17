@@ -2,7 +2,7 @@
 
 class TemplateCodeParser
 {	
-	private static $code, $templateName, $className;
+	private static $code, $templateName, $className, $globalNames;
 	private static $expected = array();
 	private static $space = '¦';
 	private static $signs = array(
@@ -49,16 +49,20 @@ class TemplateCodeParser
 	);
 
 	private static $lists = array(
-		'|' => array('.', 'a', '0', '~', '$', '@', '#', '&', '-'),
-		'+' => array('a', '0', '~', '&', '$', '@', '.'),
-		'-' => array('a', '0', '.', '~', '&', '$'),
-		'*' => array('a', '0', '.', '~', '&', '$', '-'),
+		'|' => array('.', 'a', '0', '~', '@', '#', '&', '-'),
+		'+' => array('a', '0', '~', '&', '@', '.'),
+		'-' => array('a', '0', '.', '~', '&'),
+		'*' => array('a', '0', '.', '~', '&', '-'),
 		'/' => array('a', '0', '.', '~', '&', '$', '-')
 	);
 
 	private static $operators = array(
 		'case', 'switch', 'if', 'foreach', 'let', 'default'
 	);
+
+	public static function setGlobalNames($names) {
+		self::$globalNames = $names;
+	}
 
 	public static function init($templateName, $className) {
 		self::$templateName = $templateName;
@@ -73,6 +77,9 @@ class TemplateCodeParser
 		$code = preg_replace('/\s+/', self::$space, $code);
 		$parts = preg_split('/\b/', $code);
 		//Printer::log($parts);
+		$data = array(
+			'react' => array()
+		);
 				
 		$isStart = true;
 		$isOpenFunction = 0;
@@ -93,6 +100,13 @@ class TemplateCodeParser
 					}
 					$quoted = self::$expected == '*';
 					switch ($sign) {
+
+						case self::$space:
+							if (!$quoted) {
+								$varType = '';
+								$isReactive = false;
+							}
+						break;
 
 						case '|':
 							if (!$quoted) {
@@ -134,7 +148,9 @@ class TemplateCodeParser
 
 						case '$':
 							if (!$quoted) {
+								$isReactive = false;
 								$isReactiveOpen = true;
+								$reactName = '';
 								self::$expected = array('a');
 								$varType = 'r';
 							}
@@ -148,12 +164,13 @@ class TemplateCodeParser
 
 						case '.':
 							if (!$quoted) {
-								if ($prevSign != 'a') {
+								if ($prevSign != 'a' && !$isReactive) {
 									$isOpenMethod++;
+									$varType = '';
 								} else {
 									switch ($varType) {
 										case 'r':
-											$isReactiveOpen = true;
+											$isReactive = true;
 										break;
 										case 'a':
 										case 'l':
@@ -168,14 +185,43 @@ class TemplateCodeParser
 							}
 						break;
 
+						case "[":
+							if (!$quoted) {
+								$isOpenBracket++;
+								self::$expected = array('"', "'", 'a', '0', '&', '$', '~', '@', self::$space);
+								if (($prevSign == 'a' || $prevSign == ']') && $varType == 'r') {
+									$isReactive = true;
+								}
+							}
+						break;
+
+						case "]":
+							if (!$quoted) {
+								if ($isOpenBracket > 0) {
+									$isOpenBracket--;
+								}
+								self::$expected = array('&&', '||', '-', '+', '?', '/', '*', '%', '[', '.', self::$space);
+								if (!empty($isOpenTernary)) {
+									self::$expected[] = ':';
+								}
+								if ($varType == 'r') {
+									$isReactive = true;
+								}
+							}
+						break;
+
 						case '+':
 						case '-':
 						case '*':
 						case '/':
 							if (!$quoted) {
 								self::$expected = self::$lists[$sign];
+								if (!$isPlaceholderOpen) {
+									self::$expected[] = '$';
+								}
 								self::$expected[] = self::$space;
 								$isMathOpen = $sign;
+								$varType = '';
 							}
 						break;
 						
@@ -227,6 +273,7 @@ class TemplateCodeParser
 							if (!$quoted) {
 								self::$expected = array('a');
 								$isTextOpen = true;
+								$varType = 't';
 							}
 						break;
 
@@ -257,25 +304,6 @@ class TemplateCodeParser
 							}
 						break;
 
-						case "[":
-							if (!$quoted) {
-								$isOpenBracket++;
-								self::$expected = array('"', "'", 'a', '0', '&', '$', '~', '@', self::$space);
-							}
-						break;
-
-						case "]":
-							if (!$quoted) {
-								if ($isOpenBracket > 0) {
-									$isOpenBracket--;
-								}
-								self::$expected = array('&&', '||', '-', '+', '?', '/', '*', '%', '[', self::$space);
-								if (!empty($isOpenTernary)) {
-									self::$expected[] = ':';
-								}
-							}
-						break;
-
 						case ")":
 							if (!$quoted) {
 								if ($isOpenFunction > 0) {
@@ -289,15 +317,18 @@ class TemplateCodeParser
 						break;
 					}
 					$prevSign = $sign;
-					$code .= $sign == self::$space ? ' ' : $sign;
+					if ($sign == self::$space) {
+						$code .= ' ';
+					} else if ($isReactive) {
+
+					} else {
+						$code .= $sign;
+					}
 				}
 			} 
 
 
 			else 
-
-
-
 
 
 			{
@@ -316,7 +347,25 @@ class TemplateCodeParser
 
 					$prevSign = !$isNum ? 'a' : '0';
 					$prevCode = $code;
-					$code .= $part;
+					
+					if ($isOpenMethod) {
+						$code = rtrim($code, '.')."$.".$part;
+					} elseif ($isReactive) {
+						$code = rtrim($code, ')').",'".$part."')";
+					} elseif ($isReactiveOpen) {
+						$code = $code.".g('".$part."')";
+					} elseif ($isVarOpen) {
+						$sign = $code[strlen($code) - 1];
+						if ($sign == '~') {
+							$code = rtrim($code, '~').'_.'.$part;
+						} else {
+							$code = rtrim($code, '&').$part;
+						}
+					} elseif($isTextOpen) {
+						$code = rtrim($code, '@').self::$globalNames['CONSTANTS'].'.'.$part;
+					} else {
+						$code .= $part;
+					}
 					
 					if ($isStart) {
 						switch ($part) {
@@ -360,7 +409,7 @@ class TemplateCodeParser
 							self::$expected[] = ',';
 						} else {
 							self::$expected[] = self::$space;
-							if (!$isVarOpen && !$isTextOpen && !$isDataOpen && !$isReactiveOpen && !$isNum) {
+							if (!$isVarOpen && !$isTextOpen && !$isDataOpen && !$isReactiveOpen && !$isReactive && !$isNum) {
 								$isFuncExpected = true;
 								self::$expected = array('(');
 							}
@@ -370,10 +419,21 @@ class TemplateCodeParser
 							self::$expected[] = ']';
 						}
 						
-						if (!$isNum && ($isVarOpen || $isReactiveOpen)) {
+						if (!$isNum && ($isVarOpen || $isReactiveOpen || $isReactive)) {
 							self::$expected[] = '.';
 						}
 					}
+					if ($isReactiveOpen || $isReactive) {
+						if (empty($reactName)) {
+							$data['react'][$part] = array();
+							$reactName = $part;
+						} else {
+							$data['react'][$reactName][] = $part;
+						}
+					} else {
+						$reactName = '';
+					}
+
 					$isReactiveOpen = false;
 					$isVarOpen = false;
 					$isTextOpen = false;
@@ -397,14 +457,6 @@ class TemplateCodeParser
 			}
 			$isStart = false;
 		}
-
-
-
-
-
-
-
-
 
 
 
@@ -445,11 +497,37 @@ class TemplateCodeParser
 		if (!empty($isOpenMethod)) {
 			self::$expected = array('(');
 		}
-
 		if (is_array(self::$expected)) {
 			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);
 		}
+		
+
+		if (!empty($isPlaceholderOpen)) {
+			preg_match_all('/::(\w+)(.+)*/', $code, $matches);
+			$name = $matches[1][0];
+			$def = $matches[2][0];
+			if (empty($def)) {
+				$code = "{'pl':'".$name."'}";	
+			} else {
+				$code = "{'pl':'".$name."','p':".ltrim($def, '=')."}";
+			}			
+		
+		} elseif (!empty($data['react'])) {
+			$names = array_keys($data['react']);
+			if (count($names) == 1) {
+				$names = "'".$names[0]."'";
+			} else {
+				$names = json_encode($names);
+				$code = 'function(){return'.$code.'}';
+			}
+			$code = "{'pr':".$names.",'p':".$code."}";
+			//Printer::log($code);
+		}
+		$data['code'] = '<nq>'.$code.'<nq>';
+		return $data;
+
 	}
+
 
 	private static function defineExpected($place) {
 		switch ($place) {

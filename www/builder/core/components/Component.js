@@ -94,7 +94,13 @@ function Component() {
 			activities = this.propActivities['nod'];
 			if (activities && isArray(activities[pn])) {
 				var node;
-				for (i = 0; i < activities[pn].length; i++) activities[pn][i].textContent = pv;
+				for (i = 0; i < activities[pn].length; i++) {
+					if (isUndefined(activities[pn][i][1])) {
+						activities[pn][i][0].textContent = pv;
+					} else {
+						activities[pn][i][0].textContent = activities[pn][i][1]();
+					}
+				}
 			}
 			activities = this.propActivities['atr'];
 			if (activities && isArray(activities[pn])) {
@@ -261,14 +267,14 @@ function Component() {
 		}
 	};
 
-	Component.prototype.get = function(propName, keys) {
+	Component.prototype.get = function(propName) {
 		var prop = this.propsToSet[propName] || this.props[propName];
-		if (!keys || !isArrayLike(prop) || !isArray(keys)) return prop;
+		if (isUndefined(arguments[1]) || !isArrayLike(prop)) return prop;
 		var end;
-		for (var i = 0; i < keys.length; i++) {
-			prop = prop[keys[i]];
+		for (var i = 1; i < arguments.length; i++) {
+			prop = prop[arguments[i]];
 			if (isUndefined(prop)) return '';
-			end = keys.length == i + 1;
+			end = arguments.length == i + 1;
 			if (end || !isArrayLike(prop)) break;
 		}
 		return end ? prop || '' : '';
@@ -280,7 +286,7 @@ function Component() {
 	};
 
 	Component.prototype.setStyle = function(styles) {
-		if (this.isRendered()) this.getElement().setStyle(styles);
+		if (this.isRendered()) this.getElement().css(styles);
 	};
 
 	Component.prototype.setPosition = function(x, y) {
@@ -359,7 +365,10 @@ function Component() {
 		if (isString(child)) child = this.getChild(child);
 		else childId = Objects.getKey(this.children, child);
 		if (isComponentLike(child)) child.dispose();
-		if ((isString(childId) || isNumber(childId)) && isObject(this.children)) delete this.children[childId];	
+		if ((isString(childId) || isNumber(childId)) && isObject(this.children)) {
+			this.children[childId] = null;
+			delete this.children[childId];
+		}
 	 };
 
 	Component.prototype.forEachChild = function(callback) {
@@ -530,17 +539,14 @@ function Component() {
 		this.correctors = null;
 		this.controls = null;
 	};
-
-	var f = function() {
-		return null;
-	};
-	Component.prototype.initOptions = f;
-	Component.prototype.onRendered = f;
-	Component.prototype.onRenderComplete = f;
-	Component.prototype.onLoaded = f;
-	Component.prototype.getTemplateMain = f;
-	Component.prototype.disposeInternal = f;
-	Component.prototype.getArgs = f;	
-	Component.prototype.g = Component.prototype.get;
+	var f = function(){return};
+	Component.prototype.initOptions=f;
+	Component.prototype.onRendered=f;
+	Component.prototype.onRenderComplete=f;
+	Component.prototype.onLoaded=f;
+	Component.prototype.getTemplateMain=f;
+	Component.prototype.disposeInternal=f;
+	Component.prototype.getArgs=f;	
+	Component.prototype.g=Component.prototype.get;
 }
 Component();

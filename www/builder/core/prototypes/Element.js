@@ -114,7 +114,7 @@ Element.prototype.getTop = function() {
 Element.prototype.getLeft = function() {
 	return this.getRect().left;
 };
-Element.prototype.setStyle = function(style) {
+Element.prototype.css = function(style) {
 	var element = this;
 	var set = function(value, style) {
 		var propertyName = getVendorJsStyleName(style);	

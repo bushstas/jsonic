@@ -19,10 +19,9 @@ class TemplateParser
 		'unknownComponent' => 'Неопределенный компонент в шаблоне {??} класса {??}<xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'controlWithoutName' => 'Контрол {??} в шаблоне {??} класса {??} не имеет атрибута <b>name</b><xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'incorrectReactVar' => 'Элемент в шаблоне {??} класса {??} содержит атрибут с некорректным кодом {??}<br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо',
-		'reactVarInInclude' => 'Шаблон {??}, содержащийся в файле {??} содержит код с реактивными переменными {??}<br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов (локальных переменных) <b>&var</b>',
+		'reactVarInInclude' => 'Шаблон {??}, содержащийся в файле {??} содержит код с реактивными переменными {??}<br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>~arg</b> и локальных переменных <b>&var</b>',
 		'reactComponentName' => 'Название компонента в шаблоне {??} класса {??} не может определяться реактивной переменной<xmp>{?}</xmp>Допускается запись вида<xmp><component class="{~class}"></xmp>или<xmp><component class="{&class}"></xmp>',
 		'reactControlName' => 'Атрибут <b>name</b> контрола в шаблоне {??} класса {??} не может определяться реактивной переменной<xmp>{?}</xmp>Допускается запись вида<xmp><control name="{~class}"></xmp>или<xmp><control name="{&class}"></xmp>',
-		'incorrectReactVar2' => 'Шаблон {??} класса {??} содержит некорректный код {??}<br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо',
 		'letError' => 'Ошибка в коде оператора <b>let</b> в шаблоне {??} класса {??}<xmp>{{?}}</xmp><b>Ожидается код вида</b><xmp>{let &var = 5}</xmp><b>или</b><xmp>{let &isEmpty: true}</xmp>',
 		'caseOutsideSwitch' => "Обнаружен оператор <b>case</b> вне оператора <b>switch</b> или подобного ему <b>if</b> в шаблоне {??} класса {??}<br><br><b>Используйте код вида</b><xmp>{switch ~value}\n\t{case 10}\n\t\t<div class=\"ten\">10</div>}\n\n\t{default}\n\t\tdefault text\n{/switch}</xmp><b>или</b><xmp>{if}\n\t{case !isUndefined(\$var)}\n\t\tvariant 1\n\n\t{case \$var2 === true}\n\t\tvariant 2\n\n\t{default}\n\t\tdefault text\n{/if}</xmp>",
 		'dataInTextNode' => 'Обнаружено использование контстанты данных {??} внутри текстового нода в шаблоне {??} класса {??}<br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>',
@@ -87,6 +86,7 @@ class TemplateParser
 		}
 		
 		$templates = array();
+		TemplateCodeParser::setGlobalNames(self::$globalNames);
 		for ($i = 0; $i < count($templateNames); $i++) {
 			self::$templateName = $templateNames[$i];
 			TemplateCodeParser::init(self::$templateName, $className);
@@ -1071,56 +1071,57 @@ class TemplateParser
 
 	private static function parseTextNode($content, &$children, &$let) {
 		if (!empty($content)) {
-			$items = self::checkTextForContainigProps($content, $let);
-			foreach ($items as $item) {
-				if (is_array($item)) {
-					$children[] = $item[0];
-				} else if (strlen($item) > 3) {
-					$children[] = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($item).']<nq>';
+			
+			$regexp = '/\{([^\}]+)\}/';
+			preg_match_all($regexp, $content, $matches);
+			$codes = $matches[1];
+			$count = count($codes);
+			if (empty($codes)) {
+				if (strlen($content) > 3) {
+					$children[] = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($content).']<nq>';
 				} else {
-					$children[] = $item;
+					$children[] = $content;
 				}
+				return;
 			}
-		}
-	}
-
-	private static function checkTextForContainigProps($text, &$let) {
-		$regexp = '/\{([^\}]+)\}/';
-		preg_match_all($regexp, $text, $matches);
-		$codes = $matches[1];
-		if (empty($codes)) {
-			return array($text);
-		}
-		foreach ($codes as &$code) {
-			TemplateCodeParser::parse($code, 'textNode');
-		}
-		if (preg_match('/\$\w+[\[]/', $text)) {
-			if (is_array(self::$class)) {
-				new Error(self::$errors['incorrectReactVar2'], array(self::$templateName, self::$className, $text));
-			} else {
-				new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $text));
-			}
-		}
-		$parts = preg_split($regexp, $text);
-		$content = array();
-		foreach ($parts as $i => $part) {
-			if (!empty($part)) {
-				$content[] = $part;
-			}
-			if (isset($codes[$i])) {
-				if (preg_match('/^\s*let\s/', $codes[$i])) {
-					if (preg_match('/^\s*let &[a-z][\w\.\'"\[\]]*\s*[=:]\s*[^\s]+\s*$/i', $codes[$i])) {
-						$codes[$i] = preg_replace('/^\s*let &(\w+)\s*[:=]\s*(.+)/', "<let>var $1=$2<=let>", $codes[$i]);
-						$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
-						$let++;
-					} else {
-						new Error(self::$errors['letError'], array(self::$templateName, self::$className, $codes[$i]));
+			foreach ($codes as &$code) {
+				$data = TemplateCodeParser::parse($code, 'textNode');
+				$code = $data['code'];
+				//Printer::log($data['code']);
+				if (!empty($data['react'])) {
+					if (!is_array(self::$class)) {
+						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
 					}
+					//$code = ''
+				}			
+			}
+
+			$parts = preg_split($regexp, $content);
+			$items = array();
+			foreach ($parts as $i => $part) {
+				if (!empty($part)) {
+					$items[] = $part;
 				}
-				$content[] = array(self::parseCode($codes[$i], 'prop', true));
+				if (isset($codes[$i])) {
+					if (preg_match('/^\s*let\s/', $codes[$i])) {
+						if (preg_match('/^\s*let &[a-z][\w\.\'"\[\]]*\s*[=:]\s*[^\s]+\s*$/i', $codes[$i])) {
+							$codes[$i] = preg_replace('/^\s*let &(\w+)\s*[:=]\s*(.+)/', "<let>var $1=$2<=let>", $codes[$i]);
+							$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
+							$let++;
+						} else {
+							new Error(self::$errors['letError'], array(self::$templateName, self::$className, $codes[$i]));
+						}
+					}
+					//$items[] = array(self::parseCode($codes[$i], 'prop', true));
+					$items[] = $codes[$i];
+				}
+			}
+			Printer::log($items);
+
+			foreach ($items as $item) {
+				$children[] = $item;
 			}
 		}
-		return $content;
 	}
 
 	private static function parseCode($code, $role = null, $toPropNodes = false) {

@@ -24,7 +24,8 @@ class JSGlobals
 		'tooltipApi'       => '__TA',
 		'pathToApi'        => '__APIDIR',
 		'pagetitle'        => '__PAGETITLE',
-		'user'             => '__USEROPTIONS'
+		'user'             => '__USEROPTIONS',
+		'nullFunction'     => '__FNC'
 	);
 
 	private static $errors = array(
@@ -56,6 +57,7 @@ class JSGlobals
 		self::addPathToApi($data['pathToApi']);
 		self::addPagetitle($data['pagetitle']);
 		self::addUserOptions($data['user']);
+		self::addNullFunction();
 
 		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
 		self::parseTextConstants($jsOutput, $data['texts']);
@@ -250,5 +252,9 @@ class JSGlobals
 	private static function addUserOptions($userOptions) {
 		TextParser::createObjectString($userOptions, array('/\\\/', ''));
 		self::add('user', $userOptions);
-	}	
+	}
+
+	private static function addNullFunction() {
+		self::add('nullFunction', 'function(){return}');
+	}
 }

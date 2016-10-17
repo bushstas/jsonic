@@ -26,6 +26,6 @@ View.prototype.initControllers = function() {
 		}
 	}
 };
-View.prototype.getTitleParams = function() {};
-View.prototype.onReady = function() {};
-View.prototype.getControllersToLoad = function() {};
+View.prototype.getTitleParams=function(){};
+View.prototype.onReady=function(){};
+View.prototype.getControllersToLoad=function(){};

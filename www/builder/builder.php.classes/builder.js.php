@@ -594,13 +594,14 @@ class JSCompiler
 	}
 
 	private function finish() {
-		$this->jsOutput = ';(function() {'.$this->jsOutput;
+		$this->jsOutput = ";(function() {\n".$this->jsOutput;
 		$this->jsOutput = preg_replace("/'<nq>/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>'/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/;{2,}/", ';', $this->jsOutput);
 		$this->jsOutput = preg_replace("/ {2,}/", ' ', $this->jsOutput);
 		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
+		$this->jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", JSGlobals::getVarName('nullFunction'), $this->jsOutput);
 
 		if ($this->configProvider->needCssObfuscation()) {
 			$cssClassIndex = &$this->cssCompiler->getCssClassIndex();

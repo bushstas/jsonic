@@ -15,22 +15,22 @@ function Level() {
 		} else renderItem(items);
 	};
 
-	var renderItem = function(item) {
-		if (!item && item !== 0) return;
-		if (isFunction(item)) {
-			renderItems(item());
+	var renderItem = function(i) {
+		if (!i && i !== 0) return;
+		if (isFunction(i)) {
+			renderItems(i());
 			return;
 		}
-		if (!isObject(item)) createTextNode(item);
-		else if (item.hasOwnProperty('t')) createElement(item);
-		else if (item.hasOwnProperty('pr')) createPropertyNode(item);
-		else if (item.hasOwnProperty('i')) createCondition(item);
-		else if (isFunction(item['h'])) createForeach(item);	
-		else if (item.hasOwnProperty('tmp')) includeTemplate(item);
-		else if (item.hasOwnProperty('cmp')) renderComponent(item);
-		else if (item.hasOwnProperty('is')) createIfSwitch(item);
-		else if (item.hasOwnProperty('sw')) createSwitch(item);
-		else if (item.hasOwnProperty('pl')) createPlaceholder(item);
+		if (!isObject(i)) createTextNode(i);
+		else if (i.hasOwnProperty('t'))   createElement(i);
+		else if (i.hasOwnProperty('pr'))  createPropertyNode(i);
+		else if (i.hasOwnProperty('i'))   createCondition(i);
+		else if (isFunction(i['h']))      createForeach(i);	
+		else if (i.hasOwnProperty('tmp')) includeTemplate(i);
+		else if (i.hasOwnProperty('cmp')) renderComponent(i);
+		else if (i.hasOwnProperty('is'))  createIfSwitch(i);
+		else if (i.hasOwnProperty('sw'))  createSwitch(i);
+		else if (i.hasOwnProperty('pl'))  createPlaceholder(i);
 	};
 
 	var createLevel = function(items, pe) {
@@ -46,13 +46,20 @@ function Level() {
 	};
 
 	var createPropertyNode = function(props) {
-		var name = props['pr'];
-		if (isUndefined(props['p'])) props['p'] = '';
-		var node = document.createTextNode(props['p']);
+		var p = '', isFunc, node, names, data;
+		if (!isUndefined(props['p'])) {
+			p = isFunction(props['p']) ? props['p']() : props['p'];
+		}
+		node = document.createTextNode(p);
+		names = isArray(props['pr']) ? props['pr'] : [props['pr']];
 		appendChild(node);
-		propNodes = propNodes || {};
-		propNodes[name] = propNodes[name] || [];
-		propNodes[name].push(Core.registerPropActivity.call(component, 'nod', name, node));
+		propNodes = propNodes || {};		
+		for (var i = 0; i < names.length; i++) {
+			propNodes[names[i]] = propNodes[names[i]] || [];
+			data = [node];
+			if (isFunc) data.push(props['p']);
+			propNodes[names[i]].push(Core.registerPropActivity.call(component, 'nod', names[i], data));
+		}
 	};
 
 	var createElement = function(props) {
@@ -93,12 +100,12 @@ function Level() {
 			}
 		}
 		if (isArray(props['e'])) {
-			var eventType, callback;
+			var eventType, callback, isOnce;
 			eventHandler = eventHandler || new EventHandler();
 			for (i = 0; i < props['e'].length; i++) {
 				eventType = eventTypes[props['e'][i]] || eventType;
 				callback = props['e'][i + 1];
-				var isOnce = props['e'][i + 2] === true;
+				isOnce = props['e'][i + 2] === true;
 				if (isString(callback)) callback = component.dispatchEvent.bind(component, callback);
 				if (isString(eventType) && isFunction(callback)) {					
 					if (isOnce) {
@@ -315,12 +322,6 @@ function Level() {
 		propComps[pn].push(Core.registerPropActivity.call(component, 'cmp', pn, data));
 	};
 
-	var disposeDom = function() {
-		var elementsToDispose = getElements();
-		for (var i = 0; i < elementsToDispose.length; i++) parentElement.removeChild(elementsToDispose[i]);
-		elementsToDispose = null;
-	};
-
 	var getElements = function() {
 		var elements = [];
 		if (firstNodeChild && lastNodeChild) {
@@ -332,6 +333,12 @@ function Level() {
 			}
 		}
 		return elements;
+	};
+
+	var disposeDom = function() {
+		var elementsToDispose = getElements();
+		for (var i = 0; i < elementsToDispose.length; i++) parentElement.removeChild(elementsToDispose[i]);
+		elementsToDispose = null;
 	};
 
 	this.render = function(items, pe, pl, nsc) {
