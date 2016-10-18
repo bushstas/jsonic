@@ -737,7 +737,9 @@ class TemplateParser
 			$fullPropName = $propName;
 			$isObfClName = self::$obfuscate === true && $fullPropName == 'class';
 			$isTag = !$isComponentTag && !isset($child['tmp']);
-
+			if (!$isTag && in_array($propValue, array('true', 'false', 'null', 'undefined'))) {
+				$propValue = '<nq>'.$propValue.'<nq>';
+			}
 			if (is_numeric($child['t']) || $isComponentTag) {
 				if ($propName == 'scope') {
 					$props[self::$propsShortcuts[$propName]] = 1;
@@ -1087,6 +1089,7 @@ class TemplateParser
 			foreach ($codes as &$code) {
 				$data = TemplateCodeParser::parse($code, 'textNode');
 				$code = $data['code'];
+				
 				//Printer::log($data['code']);
 				if (!empty($data['react'])) {
 					if (!is_array(self::$class)) {

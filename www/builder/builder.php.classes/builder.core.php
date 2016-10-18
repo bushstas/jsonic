@@ -64,6 +64,7 @@ class Builder
 		$this->gatherer->init();
 		
 		$this->files = $this->gatherer->gatherFiles();
+		$this->coreValidator->validateUtilsFunction($this->files['core']);
 		$this->runCompilers();
 	}
 
@@ -96,6 +97,8 @@ class Builder
 				return $this->dataCompiler;
 			case 'decl':
 				return $this->declCompiler;
+			case 'validator':
+				return $this->coreValidator;
 		}
 	}
 }

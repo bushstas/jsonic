@@ -12,7 +12,8 @@ class JSParser
 		'symbolsBetweenFuncs' => 'Обнаружен код после функции {??} класса {??}. Вне методов класса не должно быть никакого кода',
 		'symbolsAfterFuncs' => 'Обнаружен код в конце класса {??}. Вне методов класса не должно быть никакого кода',
 		'symbolsBeforeFuncs' => 'Обнаружен код в начале класса {??}. Вне методов класса не должно быть никакого кода',
-		'innerFunc' => "Обнаружена вложенная функция {??} в методе {??} класса {??}.<br>Для создания замыканий используйте код вида:<xmp>function func() {\n\tvar innerFunc = function() {\n\n\t};\n}</xmp>"
+		'innerFunc' => "Обнаружена вложенная функция {??} в методе {??} класса {??}.<br>Для создания замыканий используйте код вида:<xmp>function func() {\n\tvar innerFunc = function() {\n\n\t};\n}</xmp>",
+		'doubleDollarSign' => 'Ошибка парсинга метода {??} класса {??}. Обнаружены два или более символа <b>$</b> подряд'
 	);
 
 	public static function init($correctors, $globals) {
@@ -23,6 +24,7 @@ class JSParser
 	public static function parse(&$class) {
 		$code = 'function __constructor(){}'.trim($class['content']);
 		$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);	
+
 
 		$data = Splitter::split('/\bfunction +(\w+) *\(([^\)]*)\) *\{/', $code, 'all');		
 		$functions = array();
@@ -83,6 +85,9 @@ class JSParser
 	}
 
 	private static function parseFunctionCode($code, $functionName, $className) {
+		if (preg_match('/\${2,}/', $code)) {
+			new Error(self::$errors['doubleDollarSign'], array($functionName, $className));
+		}
 		$regexp = '/\bget\s+([\w ,]+);*\s*/';
 		preg_match_all($regexp, $code, $matches);
 		if (!empty($matches[1])) {

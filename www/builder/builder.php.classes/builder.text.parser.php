@@ -19,7 +19,8 @@ class TextParser
 		return self::$dictionary;
 	}
 
-	public static function encode(&$content, $key = null) {
+	public static function encode(&$content, $key = null, $mark = null) {
+		if (empty($mark)) $mark = self::$mark;
 		self::initTexts($key);
 		$content = preg_replace('/\\\"/', '<sldq>', $content);
 		$content = preg_replace("/\\\'/", '<slq>', $content);
@@ -45,7 +46,7 @@ class TextParser
 						$currentText .= $currentQuote;
 						if (is_array(self::$texts[$key])) {
 							self::$texts[$key][] = $currentText;
-							$content .= self::$mark;
+							$content .= $mark;
 						} else {
 							$content .= self::replaceArrayLikeSymbols($currentText);
 						}
@@ -106,7 +107,8 @@ class TextParser
 		return in_array($keyword, self::$dictionary);
 	}
 
-	public static function decode(&$content, $key) {
+	public static function decode(&$content, $key, $mark = null) {
+		if (empty($mark)) $mark = self::$mark;
 		if (is_string($key)) {
 			$texts = self::$texts[$key];
 		}
@@ -119,7 +121,7 @@ class TextParser
 			}
 		}
 		if (!is_array($texts) || empty($texts)) return;
-		$parts = explode(self::$mark, $content);
+		$parts = preg_split('/\b'.$mark.'\b/', $content);
 		$content = '';
 		foreach ($parts as $i => $part) {
 			$content .= $part;

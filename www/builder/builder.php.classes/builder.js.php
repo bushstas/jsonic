@@ -62,7 +62,10 @@ class JSCompiler
 		'globalVarUsing' => 'В классе {??} обнаружено использование зарезервированных системой имен переменных: {??}',
 		'creatingInstance' => 'В классе {??} обнаружено создание экземпляра класса {??}{?}',
 		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}',
-		'noCorrectMethod' => 'В классе-корректоре {??} отсутсвует метод <b>correct</b>'
+		'noCorrectMethod' => 'В классе-корректоре {??} отсутсвует метод <b>correct</b>',
+		'overrideController' => 'Обнаружено переопределение существующего класса {??} в одном из методов класса {??}',
+		'overrideGlobal' => 'Обнаружено переопределение системной переменной {??} в одном из методов класса {??}',
+		'overrideUtilsFunc' => 'Обнаружено переопределение системной функции {??} в одном из методов класса {??}'
 	);
 
 	private $coreClasses = array(
@@ -89,6 +92,7 @@ class JSCompiler
 	private $templateCompiler;
 	private $textsCompiler;
 	private $dataCompiler;
+	private $validator;
 	private $declCompiler;
 	private $testsCompiler;
 	private $routesCompiler;
@@ -114,6 +118,7 @@ class JSCompiler
 		$this->routesCompiler = $builder->getCompiler('routes');
 		$this->testsCompiler = $builder->getCompiler('tests');
 		$this->cssCompiler = $builder->getCompiler('css');
+		$this->validator = $builder->getCompiler('validator');
 
 		$this->validateEntry();
 		$this->validateJsFolder();
@@ -147,7 +152,6 @@ class JSCompiler
 		$this->addIncludes();
 		$this->addInheritance();
 		$this->addGlobals();
-		$this->decodeTexts();
 		$this->finish();
 		$this->addScripts($scriptFiles);
 	}
@@ -595,6 +599,9 @@ class JSCompiler
 	}
 
 	private function finish() {
+		$this->encodeControllerCallings();
+		$this->decodeTexts();
+
 		$this->jsOutput = ";(function() {\n".$this->jsOutput;
 		$this->jsOutput = preg_replace("/'<nq>/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>'/", '', $this->jsOutput);
@@ -625,7 +632,6 @@ class JSCompiler
 		$this->jsOutput = preg_replace('/->> */', '', $this->jsOutput);
 		$this->jsOutput = preg_replace('/\{\s+\}/', '{}', $this->jsOutput);
 
-		$this->encodeControllerCallings();
 		$this->jsOutput .= "\n".implode("\n", $this->bottomOutput);
 
 		$pathToCompiledJs = DEFAULT_PATH.$this->config['path'].'.js';
@@ -644,16 +650,17 @@ class JSCompiler
 
 	private function encodeControllerCallings() {
 		$globals = JSGlobals::getUsedNames();
-		$ctrs = array_keys($this->classesByTypes['controller']);
+		$ctrs = array_keys($this->classesByTypes['controller']);		
+		TextParser::encode($this->jsOutput, 'rest', 'REST_ENC_TEXT');
 		foreach ($ctrs as $i => $ctr) {
 			$this->jsOutput = preg_replace('/\bfunction\s+'.$ctr.'\b/', 'function_'.$ctr, $this->jsOutput);
 			$this->jsOutput = preg_replace('/\b'.$ctr.'\.prototype\b/', $ctr.'_prototype', $this->jsOutput);
-			$regexp = '/\b'.$ctr.'\b/';
-			$this->jsOutput = preg_replace($regexp, $globals['CONTROLLER'].'.get('.$i.')', $this->jsOutput);
+			$this->jsOutput = preg_replace('/\b'.$ctr.'\b/', $globals['CONTROLLER'].'.get('.$i.')', $this->jsOutput);
 			$this->jsOutput = str_replace('function_'.$ctr, 'function '.$ctr, $this->jsOutput);
 			$this->jsOutput = str_replace($ctr.'_prototype', $ctr.'.prototype', $this->jsOutput);
 			$this->jsOutput = str_replace('_#_'.$ctr.'_#_', $ctr, $this->jsOutput);
-		}		
+		}
+		TextParser::decode($this->jsOutput, 'rest', 'REST_ENC_TEXT');
 	}
 
 	private function addScripts($scriptFiles) {
@@ -927,14 +934,24 @@ class JSCompiler
 	}
 
 	private function parseClasses() {
-		$globals = JSGlobals::getUsedNames();
-		JSParser::init($this->correctors, $globals);		
+		$globals = JSGlobals::getVarNames();
 		$classNames = array_keys($this->classes);
 		$coreClassNames = $this->reservedNames;
 		$classNames = array_merge($classNames, $coreClassNames);
-		$regexp1 = '/\b'.implode('|', array_values($globals)).'\b/';
-		$regexp2 = '/\bnew\s+('.implode('|', array_values($classNames)).')\b/';
+		$utilsFuncs = $this->validator->getUtilsFunctionNames();
+
+		$implodedClasses = implode('|', array_values($classNames));
+		$implodedGlobals = implode('|', array_values($globals));
+		$regexp1 = '/[^\w\$]('.$implodedGlobals.')\b/';
+		$regexp2 = '/[^\w\$]new\s+('.$implodedClasses.')\b/';
+		$regexp3 = '/[^\w\$]('.$implodedClasses.')\s*=(?!=)/';
+		$regexp4 = '/[^\w\$]('.$implodedGlobals.')\s*=(?!=)/';
+		$regexp5 = '/[^\w\$]('.implode('|', $utilsFuncs).')\s*=(?!=)/';
 		foreach ($this->classes as $className => &$class) {		
+			preg_match_all($regexp4, $class['content'], $matches);
+			if (!empty($matches[1])) {
+				new Error($this->errors['overrideGlobal'], array($matches[1][0], $className));
+			}
 			if (preg_match_all($regexp1, $class['content'], $matches)) {
 				new Error($this->errors['globalVarUsing'], array($className, implode(', ', $matches[0])));
 			}
@@ -956,6 +973,15 @@ class JSCompiler
 				}
 				new Error($this->errors['creatingInstance'], array($className, $matches[0], $ending));
 			}
+			preg_match_all($regexp3, $class['content'], $matches);
+			if (!empty($matches[1])) {
+				new Error($this->errors['overrideController'], array($matches[1][0], $className));
+			}
+			preg_match_all($regexp5, $class['content'], $matches);
+			if (!empty($matches[1])) {
+				new Error($this->errors['overrideUtilsFunc'], array($matches[1][0], $className));
+			}
+			JSParser::init($this->correctors, JSGlobals::getUsedNames());
 			JSParser::parse($class);
 			JSChecker::check($class);
 			$this->checkSuperClassesCallings($class);

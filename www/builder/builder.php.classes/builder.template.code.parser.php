@@ -415,7 +415,7 @@ class TemplateCodeParser
 					} elseif ($isReactive) {
 						$parsedCode = rtrim($parsedCode, ')').",'".$part."')";
 					} elseif ($isReactiveOpen) {
-						$parsedCode = $parsedCode.".g('".$parsedCode."')";
+						$parsedCode = $parsedCode.".g('".$part."')";
 					} elseif ($isVarOpen) {
 						$sign = $parsedCode[strlen($parsedCode) - 1];
 						if ($sign == '~') {

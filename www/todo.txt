@@ -2,15 +2,11 @@
 
 {from &i = 10 to 20 step 1}
 
-"true" => true
-
 внедрить {ifempty} внутрь FOREACH
 
 косяк с let, когда он находится вне тегов
 
 запилить геттеры и сеттеры
-
-Controllers.get()
 
 **~var = (!!~var?~var:'')
 
@@ -23,3 +19,20 @@ Dictionary.aaa()
 5*#data['aaa'] -> not error
 
 $func(), ~func()
+
+реализовать кастомные валидаторы
+
+<component childClass="{class:Favorites}">
+
+<component class="DataTableTabPanel" userName="{user:name}">
+<component class="DataTableTabPanel" userName="{user:isAutorized()}">
+
+<component class="DataTableTabPanel" city="{dict:cities[22]}">
+
+валидация функций вызываемых в швблонах: только utils и myutils
+
+<component class="DataTableTabPanel" cityTempl="{template:city}">
+<component class="DataTableTabPanel" cityTempl="{template:#city}"> by key
+<div>
+	{~cityTempl->}
+</div>
