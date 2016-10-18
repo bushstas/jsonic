@@ -25,7 +25,9 @@ class JSGlobals
 		'pathToApi'        => '__APIDIR',
 		'pagetitle'        => '__PAGETITLE',
 		'user'             => '__USEROPTIONS',
-		'nullFunction'     => '__FNC'
+		'nullFunction'     => '__FNC',
+		'controllers'      => '__CTR',
+		'controller'       => '__C'
 	);
 
 	private static $errors = array(
@@ -46,7 +48,7 @@ class JSGlobals
 		self::addProps($data['props']);
 		self::addDecls($data['decls']);
 		self::addEvents($data['events']);
-		self::addRoutes($data['routes']);
+		self::addRoutes($data['routes'], $data['controllers']);
 		self::addErrorRoutes($data['errorRoutes']);
 		self::addHashRouter($data['hashRouter']);
 		self::addIndexRoute($data['indexRoute']);
@@ -57,6 +59,7 @@ class JSGlobals
 		self::addPathToApi($data['pathToApi']);
 		self::addPagetitle($data['pagetitle']);
 		self::addUserOptions($data['user']);
+		self::addControllers($data['controllers']);
 		self::addNullFunction();
 
 		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
@@ -84,7 +87,9 @@ class JSGlobals
 			'USEROPTIONS'   => self::$varNames['user'],
 			'WORDS'         => self::$varNames['decls'],
 			'TEXTS'         => self::$varNames['textNodes'],
-			'CONSTANTS'     => self::$varNames['textConstants']
+			'CONSTANTS'     => self::$varNames['textConstants'],
+			'CONTROLLERS'   => self::$varNames['controllers'],
+			'CONTROLLER'    => self::$varNames['controller']
 		);
 	}
 
@@ -207,8 +212,11 @@ class JSGlobals
 		self::add('events', str_replace('"', "'", json_encode($events)));
 	}
 
-	private static function addRoutes($routes) {
+	private static function addRoutes($routes, $controllers) {
 		TextParser::createObjectString($routes, array('/view":"([^"]+)"/', "view':$1"));
+		foreach ($controllers as $i => $ctr) {
+			$routes = preg_replace('/\''.$ctr.'\'/', $i, $routes);
+		}
 		self::add('routes', $routes);
 	}
 
@@ -256,5 +264,9 @@ class JSGlobals
 
 	private static function addNullFunction() {
 		self::add('nullFunction', 'function(){return}');
+	}
+
+	private static function addControllers($controllers) {
+		self::add('controllers', str_replace('"', '_#_', json_encode($controllers)));
 	}
 }

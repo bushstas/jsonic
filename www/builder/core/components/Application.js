@@ -22,6 +22,11 @@ function Application() {
 		}
 		return params;
 	};
+	var loadControllers = function(route) {
+		if (isArray(route['load']) || isNumber(route['load'])) {
+			Controllers.load(route['load']);
+		}
+	};
 	var handleNavigation = function(route, changeTitle) {
 		this.isChangeTitle = changeTitle;
 		this.currentRoute = route;
@@ -39,7 +44,7 @@ function Application() {
 				view.setOnReadyHandler(onViewReady.bind(this));
 				var viewContentElement = createViewContentElement.call(this);
 				view.render(viewContentElement);
-				view.initControllers();
+				loadControllers(route);
 				if (typeof Dictionary != 'undefined') {
 					Dictionary.load(route['name']);
 				}

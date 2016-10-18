@@ -141,9 +141,6 @@ function Core() {
 		if (opts) this.options = opts;
 		Core.processInitials.call(this);
 	};
-	this.initiateControllers = function(controllers) {
-		for (var i = 0; i < controllers.length; i++) Core.initiate.call(controllers[i]);
-	};
 	this.getNextSiblingChild = function() {
 		if (!this.nextSiblingChild) return null;
 		if (this.nextSiblingChild instanceof Node) return this.nextSiblingChild;

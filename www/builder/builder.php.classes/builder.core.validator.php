@@ -16,7 +16,7 @@ class CoreValidator
 			'Array', 'Element', 'MouseEvent', 'String'
 		),
 		'services' => array(
-			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator'
+			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator', 'Controllers'
 		),
 		'utils' => array(
 			'utils', 'Objects'

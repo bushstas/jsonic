@@ -1116,7 +1116,7 @@ class TemplateParser
 					$items[] = $codes[$i];
 				}
 			}
-			Printer::log($items);
+			//Printer::log($items);
 
 			foreach ($items as $item) {
 				$children[] = $item;

@@ -375,6 +375,7 @@ class TemplateCodeParser
 					}
 					if ($sign == self::$space) {
 						$code .= ' ';
+						$parsedCode .= ' ';
 						continue;
 					} 
 					$prevSign = $sign;
@@ -382,6 +383,7 @@ class TemplateCodeParser
 
 					} else {
 						//Printer::log($code);
+						$parsedCode .= $sign;
 						$code .= $sign;
 					}
 				}
@@ -448,6 +450,7 @@ class TemplateCodeParser
 							break;
 							case 'default':
 								$isDefault = true;
+								$thereWasWord = true;
 								self::$expected = array('end', self::$space);
 							break;
 						}

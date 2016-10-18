@@ -22,6 +22,9 @@ function isComponentLike(a) {
 function isComponent(a) {
 	return isComponentLike(a) && a.instanceOf(Component);
 }
+function isController(a) {
+	return isComponentLike(a) && a.instanceOf(Controller);
+}
 function isControl(a) {
 	return isComponentLike(a) && a.instanceOf(Control);
 }

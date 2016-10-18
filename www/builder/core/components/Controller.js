@@ -158,6 +158,10 @@ function Controller() {
 		}
 	};
 
+	Controller.prototype.instanceOf = function(classFunc) {
+		return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
+	};
+
 	Controller.prototype.getData = function(actionName) {
 		return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
 	};

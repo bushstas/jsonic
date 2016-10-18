@@ -16,16 +16,5 @@ View.prototype.activate = function(isActivated) {
 		this.dispatchReadyEvent();
 	}
 };
-View.prototype.initControllers = function() {
-	var controllersToLoad = this.getControllersToLoad();
-	if (isArray(controllersToLoad)) {
-		for (var i = 0; i < controllersToLoad.length; i++) {
-			if (isObject(controllersToLoad[i])) {
-				controllersToLoad[i].load();
-			}
-		}
-	}
-};
 View.prototype.getTitleParams=function(){};
 View.prototype.onReady=function(){};
-View.prototype.getControllersToLoad=function(){};

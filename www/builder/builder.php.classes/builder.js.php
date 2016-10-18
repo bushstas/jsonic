@@ -583,7 +583,8 @@ class JSCompiler
 			'tooltipApi'       => $this->config['tooltipApi'],
 			'pathToApi'        => $this->config['pathToApi'],
 			'pagetitle'        => $this->config['pagetitle'],
-			'user'             => $this->config['user']
+			'user'             => $this->config['user'],
+			'controllers'      => array_keys($this->classesByTypes['controller'])
 		);
 		JSGlobals::run($this->jsOutput, $data);
 	}
@@ -624,6 +625,9 @@ class JSCompiler
 		$this->jsOutput = preg_replace('/->> */', '', $this->jsOutput);
 		$this->jsOutput = preg_replace('/\{\s+\}/', '{}', $this->jsOutput);
 
+		$this->encodeControllerCallings();
+		$this->jsOutput .= "\n".implode("\n", $this->bottomOutput);
+
 		$pathToCompiledJs = DEFAULT_PATH.$this->config['path'].'.js';
 		if ($this->configProvider->isAdvancedMode()) {		
 			Gatherer::createFile('base.js', $this->jsOutput);
@@ -636,6 +640,20 @@ class JSCompiler
 		} else {
 			Gatherer::createFile($pathToCompiledJs, $this->jsOutput);
 		}
+	}
+
+	private function encodeControllerCallings() {
+		$globals = JSGlobals::getUsedNames();
+		$ctrs = array_keys($this->classesByTypes['controller']);
+		foreach ($ctrs as $i => $ctr) {
+			$this->jsOutput = preg_replace('/\bfunction\s+'.$ctr.'\b/', 'function_'.$ctr, $this->jsOutput);
+			$this->jsOutput = preg_replace('/\b'.$ctr.'\.prototype\b/', $ctr.'_prototype', $this->jsOutput);
+			$regexp = '/\b'.$ctr.'\b/';
+			$this->jsOutput = preg_replace($regexp, $globals['CONTROLLER'].'.get('.$i.')', $this->jsOutput);
+			$this->jsOutput = str_replace('function_'.$ctr, 'function '.$ctr, $this->jsOutput);
+			$this->jsOutput = str_replace($ctr.'_prototype', $ctr.'.prototype', $this->jsOutput);
+			$this->jsOutput = str_replace('_#_'.$ctr.'_#_', $ctr, $this->jsOutput);
+		}		
 	}
 
 	private function addScripts($scriptFiles) {
@@ -703,9 +721,6 @@ class JSCompiler
 			if (!empty($class['initials'])) {
 				$this->addGetInitialsFunction($className, $class['initials']);
 			}
-			if ($type == 'view') {
-				$this->addLoadControllerFunction($className);
-			}
 			if (is_array($class['callbacks'])) {
 				foreach ($class['callbacks'] as $callback) {
 					if (!$this->hasComponentMethod($callback, $class)) {
@@ -747,6 +762,7 @@ class JSCompiler
 	}
 
 	private function addInheritance() {
+		$this->bottomOutput = array();
 		$inheritance = array();		
 		foreach ($this->classes as $className => $class) {
 			if (is_array($class['extends']) && !empty($class['extends'])) {
@@ -791,32 +807,23 @@ class JSCompiler
 			$inheritance[] = $parentClass;
 			$inheritance[] = '['.implode(',',$childClasses).']';
 		}		
-		$this->jsOutput[] = "Core.inherits([".implode(',', $inheritance).']);';
+		$this->bottomOutput[] = "Core.inherits([".implode(',', $inheritance).']);';
 		$controllers = array('Router', 'User');
-		$controllers = array_merge($controllers, array_keys($this->classesByTypes['controller']));
 		if (!empty($controllers)) {
 			foreach ($controllers as $controller) {
-				$this->jsOutput[] = $controller." = new ".$controller."();";
+				$this->bottomOutput[] = $controller." = new ".$controller."();";
 			}
-			$this->jsOutput[] = 'Core.initiateControllers(['.implode(',', array_keys($this->classesByTypes['controller'])).']);';
+			
 		}
 		$entry = $this->config['entry'];
-		$this->jsOutput[] = $entry." = new ".$entry."();";
-		$this->jsOutput[] = "Core.initiate.call(".$entry.");";
+		$this->bottomOutput[] = $entry." = new ".$entry."();";
+		$this->bottomOutput[] = "Core.initiate.call(".$entry.");";
 		if ($this->config['hasUser']) {
-			$this->jsOutput[] = "User.load(".$entry.");";
+			$this->bottomOutput[] = "User.load(".$entry.");";
 		} else {
-			$this->jsOutput[] = $entry.".run();";
+			$this->bottomOutput[] = $entry.".run();";
 		}
-		$this->jsOutput[] = "})();";
-	}
-
-	private function addLoadControllerFunction($className) {
-		$routeControllersByViews = $this->routesCompiler->getControllersByView();
-		if (is_array($routeControllersByViews[$className]) && !empty($routeControllersByViews[$className])) {
-			$this->jsOutput[] = $className.'.prototype.getControllersToLoad = function() {';
-			$this->jsOutput[] = "\n\treturn [".implode(',', $routeControllersByViews[$className])."];\n};";
-		}
+		$this->bottomOutput[] = "})();";
 	}
 
 	private function hasComponentMethod($method, $class) {

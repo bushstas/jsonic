@@ -1,7 +1,3 @@
 <div class="app-datatable-outer-container">
-	{!~a && $b()}
-	{		let &aaa = 3 + aaa(!~a &&1= #c ? ~a[!&a ? 2 : 3] + ~b / ~c : null)  ,
-			  &b  =  5
-	}
 	<component class="DataTableTabPanel">
 </div>
