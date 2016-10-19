@@ -976,7 +976,7 @@ label {
 
 /* MAP */
 .map-area {
-	margin-top: 40px;
+	margin-top: 50px;
 }
 .map-area .map {
 	height: 400px;
@@ -1179,4 +1179,120 @@ label {
 }
 .dialog.order-dialog .order-form {
 	width: 100%;
+}
+
+.contacts-area { 
+	padding-top: 50px;
+}
+.contacts-area:after {
+	content: '';
+	display: block;
+	clear: both;
+}
+.contacts-area .contacts-left-side {
+	width: 570px;
+	float: left;
+}
+.contacts-area .contacts-right-side {
+	width: 470px;
+	float: right;	
+}
+.contacts-area h2 {
+	font-size: 30px;
+	color: #2a2d32;
+}
+.contacts-area h3 {
+	font-size: 18px;
+	color: #2a2d32;
+	margin-top: 40px;
+}
+.contacts-area .contacts-content {
+	margin-top: 40px;
+}
+.contacts-area .contacts-right-side .contacts-content {
+	margin-top: 31px;
+}
+.contacts-area .contacts-input {
+	position: relative;
+	margin-bottom: 30px;
+}
+.contacts-area .contacts-input.half {
+	display: inline-block;
+	width: 270px;
+}
+.contacts-area .contacts-inputs-pair {
+	white-space: nowrap;
+}
+.contacts-area .contacts-inputs-pair .contacts-input:nth-child(2) {
+	margin-left: 26px;
+}
+.contacts-area .contacts-form textarea,
+.contacts-area .contacts-form input[type="text"] {
+	background-color: #f2f3f6;
+	padding: 16px;
+	border-radius: 4px;
+	border-top: 1px solid #e7e8ec;
+	width: 100%;
+}
+.contacts-area .contacts-form textarea {
+	height: 140px;
+	resize: none;
+}
+.contacts-area .contacts-form input[type="submit"] {
+	color: #fff;
+	background-color: #8cc642;
+	background-image: url(../images/green.png);
+	border-radius: 4px;
+	line-height: 50px;
+	height: 50px;
+	width: 170px;
+	font-family: 'open_sansbold';
+	font-size: 14px;
+}
+.contacts-area .contacts-form input[type="submit"]:hover {
+	background-image: url(../images/blue.png);
+	background-color: #53afbd;
+}
+.contacts-area .contacts-line:after {
+	content: '';
+	display: block;
+	clear: both;
+}
+.contacts-area .contacts-line {
+	padding: 10px 0;
+}
+.contacts-area .contacts-line span:first-child {
+	float: left;
+	color: #2a2d32;
+	font-family: 'open_sansbold';
+}
+.contacts-area .contacts-line span:last-child {
+	float: right;
+	color: #7e848e;
+}
+.contacts-area .contacts-text {
+	color: #7e848e;
+	line-height: 24px;
+}
+.contacts-area i.fa {
+	color: #8cc642;
+	margin-right: 20px;
+	width: 15px;
+}
+.contacts-area .social {
+	color: #7e848e;
+	font-size: 18px;
+	margin-right: 15px;
+}
+.contacts-area .social:hover {
+	color: #000;
+}
+.contacts-area .a {
+	
+}
+.contacts-area .a {
+	
+}
+.contacts-area .a {
+	
 }
