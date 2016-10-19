@@ -1,8 +1,8 @@
 $(document).ready(function() {
 	
 	// Модальное окно
-	var dialog = $('.dialog.send-form');
-	var mask = $('.dialog-mask.send-form-mask');
+	var dialog = $('.dialog.order-dialog');
+	var mask = $('.dialog-mask.order-dialog-mask');
 	$('.show-form-dialog').click(function() {
 		dialog.show();
 		mask.show();
