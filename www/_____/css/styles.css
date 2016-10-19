@@ -1792,7 +1792,7 @@ label {
 	position: relative;
 	padding-top: 18px;
 }
-.subscr-form :before {
+.subscr-form:before {
 	content: '';
 	position: absolute;
 	top: 0;
