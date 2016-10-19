@@ -1,3 +1,7 @@
 <div class="app-datatable-outer-container">
+	{let 
+		 &a = 2.3,
+	     &f = (~a?~a + 2:2,&
+	}
 	<component class="DataTableTabPanel">
 </div>

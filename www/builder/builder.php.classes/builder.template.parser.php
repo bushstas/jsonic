@@ -1089,13 +1089,12 @@ class TemplateParser
 			foreach ($codes as &$code) {
 				$data = TemplateCodeParser::parse($code, 'textNode');
 				$code = $data['code'];
+				Printer::log($code);
 				
-				//Printer::log($data['code']);
 				if (!empty($data['react'])) {
 					if (!is_array(self::$class)) {
 						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
 					}
-					//$code = ''
 				}			
 			}
 
@@ -1106,15 +1105,6 @@ class TemplateParser
 					$items[] = $part;
 				}
 				if (isset($codes[$i])) {
-					if (preg_match('/^\s*let\s/', $codes[$i])) {
-						if (preg_match('/^\s*let &[a-z][\w\.\'"\[\]]*\s*[=:]\s*[^\s]+\s*$/i', $codes[$i])) {
-							$codes[$i] = preg_replace('/^\s*let &(\w+)\s*[:=]\s*(.+)/', "<let>var $1=$2<=let>", $codes[$i]);
-							$codes[$i] = preg_replace('/^\s*let &(\w[^\s:=]*)\s*[:=]\s*(.+)/', "<let>$1=$2<=let>", $codes[$i]);
-							$let++;
-						} else {
-							new Error(self::$errors['letError'], array(self::$templateName, self::$className, $codes[$i]));
-						}
-					}
 					//$items[] = array(self::parseCode($codes[$i], 'prop', true));
 					$items[] = $codes[$i];
 				}
