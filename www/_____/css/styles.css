@@ -1293,22 +1293,7 @@ label {
 
 /* DOCTOR */
 .doctor-area { 
-	padding: 50px 0 80px 0;
-}
-.doctor-area .main-table {
-	width: 100%;
-}
-.doctor-area .main-table td {
-	vertical-align: top;
-}
-.doctor-area .main-table td:first-child {
-	width: 290px;
-}
-.doctor-area .main-table td:nth-child(2) {
-	width: 134px;
-}
-.doctor-area .main-table td:last-child {
-	width: auto;
+	padding: 50px 0 70px 0;
 }
 .doctor-area h1 {
 	color: #000000;
@@ -1370,18 +1355,6 @@ label {
 .doctor-area .bottom-info {
 	margin-top: 40px
 }
-.doctor-area .bottom-info h3 {
-	color: #7e848e;
-	font-size: 20px;
-	font-family: 'open_sansbold';
-	margin-bottom: 17px;
-	margin-top: 10px;
-}
-.doctor-area .bottom-info p {
-	font-size: 16px;
-	color: #7e848e;
-	line-height: 20px;
-}
 .doctor-area .social-links {
 	font-size: 12px;
 	color: #5b5b5b;
@@ -1417,12 +1390,65 @@ label {
 .doctor-area .pictutre:nth-child(3n) {
 	margin-right: 0;
 }
-.doctor-area .a {
+
+
+
+/* DOCUMENT */
+.document-area { 
+	padding: 50px 0 70px 0;
+}
+.document-area h1 {
+	color: #000000;
+	font-size: 30px;
+	margin-bottom: 10px;
+	line-height: 30px;
+}
+.document-area .documents-content {
+	margin-top: 22px;
+}
+.document-area .items {
+	margin-top: 22px;
+	line-height: 0;
+	font-size: 0;
+	letter-spacing: -1px;
 
 }
-.doctor-area .a {
+.document-area .item {
+	width: 230px;
+	height: 300px;
+	display: inline-block;
+	margin-right: 29px;
+	margin-bottom: 29px;
+	line-height: 18px;
+	font-size: 14px;
+	letter-spacing: 0;
+	background-color: #e7e7e7;
+	vertical-align: top;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+}
+.document-area .item:nth-child(3n) {
+	margin-right: 0;
+}
+.document-area .a {
 
 }
+.document-area .a {
+
+}
+.document-area .a {
+
+}
+.document-area .a {
+
+}
+.document-area .a {
+
+}
+.document-area .a {
+
+}
+
 
 
 /* SIDE NAV */
@@ -1508,4 +1534,34 @@ label {
 }
 .breadcrumbs a:hover {
 	color: #000;
+}
+
+.main-table {
+	width: 100%;
+}
+.main-table td {
+	vertical-align: top;
+}
+.main-table td:first-child {
+	width: 290px;
+	padding-bottom: 50px;
+}
+.main-table td:nth-child(2) {
+	width: 134px;
+}
+.main-table td:last-child {
+	width: auto;
+}
+
+.standart-content h3 {
+	color: #7e848e;
+	font-size: 20px;
+	font-family: 'open_sansbold';
+	margin-bottom: 17px;
+	margin-top: 10px;
+}
+.standart-content p {
+	font-size: 16px;
+	color: #7e848e;
+	line-height: 20px;
 }
