@@ -12,7 +12,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
 @font-face {
   font-family: 'OpenSans-Light';
   src: url('../fonts/OpenSans-Light.woff') format('woff');
@@ -55,6 +54,9 @@ body {
 	color: #000000;
 	font-size: 14px;
 	background-color: #ffffff;
+}
+body.fixed-header {
+	padding-top: 197px;
 }
 textarea, input[type="text"], input[type="password"], select {
 	font-family: open_sansregular;
@@ -113,18 +115,6 @@ h1, h2, h3 {
 	position: relative;
 	font-weight: normal;
 }
-h2.large {
-	font-size: 48px;
-}
-h1 {
-	font-size: 28px;
-}
-h3 {
-	font-size: 24px;
-}
-.black {
-	color: #000 !important;
-}
 p {
 	margin: 0px;
 	padding: 0px 0px 20px 0px;
@@ -154,21 +144,8 @@ label {
 	width: 1170px;
 	z-index: 2;
 }
-.cover {
-	background-position: 50% 50%;
-	background-repeat: no-repeat;
-	background-size: cover;
-}
-.rubber {
-	position: absolute;
-	z-index: 1;
-	left: 0px;
-	right: 0px;
-	top: 0px;
-	bottom: 0px;
-}
 
-
+/* ORDER-FORM */
 .order-form.form {
 	width: 290px;
 	padding-top: 15px;
@@ -303,9 +280,7 @@ label {
 	color: #8cc642;
 }
 
-body.fixed-header {
-	padding-top: 197px;
-}
+
 
 /* иряър */
 .header {
