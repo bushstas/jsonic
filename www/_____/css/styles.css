@@ -1693,6 +1693,71 @@ label {
 	margin-bottom: 20px;
 }
 
+/* ARTICLES */
+.articles-area { 
+	padding: 50px 0 70px 0;
+}
+.articles-area h1 {
+	color: #000000;
+	font-size: 30px;
+	margin-bottom: 10px;
+	line-height: 30px;
+}
+.articles-area .articles-content {
+	margin-top: 22px;
+}
+.articles-area .items {
+	margin-top: 20px;
+	line-height: 0;
+	font-size: 0;
+	letter-spacing: -1px;
+}
+.articles-area .item {
+	width: 370px;
+	color: #000000;
+	display: inline-block;
+	margin-right: 31px;
+	margin-bottom: 45px;
+	line-height: 16px;
+	font-size: 14px;
+	letter-spacing: 0;
+	vertical-align: top;
+	cursor: pointer;
+}
+.articles-area .item:nth-child(2n) {
+	margin-right: 0;
+}
+.articles-area .item .image {
+	height: 230px;
+	background-color: #e7e7e7;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	border-radius: 2px 2px 0 0;
+}
+.articles-area .item .content {
+	border: 1px solid #e7e8ec;
+	border-top: 0;
+	padding: 20px 26px;
+	border-radius: 0 0 2px 2px;
+	min-height: 175px;
+}
+.articles-area .item .title {
+	font-family: 'open_sansbold';
+	font-size: 18px;
+	color: #2a2d32;
+}
+.articles-area .item .text {
+	color: #7e848e;
+	margin-top: 6px;
+	line-height: 24px;
+}
+.articles-area .item .date {
+	color: #c5c7cb;
+	line-height: 15px;
+	font-size: 13px;
+	margin-bottom: 20px;
+}
+
 
 
 /* SIDE NAV */
