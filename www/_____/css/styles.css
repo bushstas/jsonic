@@ -1477,12 +1477,49 @@ label {
 }
 
 
-/* SIDE NAV */
-.side-nav {
-	padding-bottom: 18px;
+/* FAQ */
+.faq-area { 
+	padding: 50px 0 70px 0;
+}
+.faq-area h1 {
+	color: #000000;
+	font-size: 30px;
+	margin-bottom: 10px;
+	line-height: 30px;
+}
+.faq-area .questions {
+	margin-top: 40px;
+}
+.faq-area .question {
+	position: relative;
+	padding-left: 72px;
+	margin-bottom: 50px;
+}
+.faq-area .question-image {
+	position: absolute;
+	left: 0;
+	top: 0;
+	border-radius: 50%;
+	background-color: #5b5b5b;
+	width: 49px;
+	height: 49px;
+	background-image: url(../images/question.png);
+}
+.faq-area .question-image.answer-image {
+	background-image: url(../images/answer.png);
+	background-color: #99d117;
+}
+.faq-area .question-answer {
+	padding-left: 72px;
+	position: relative;
+	margin-top: 45px;
+}
+.faq-area .question-head {
+	line-height: 39px;
+	height: 49px;
 	position: relative;
 }
-.side-nav:after {
+.faq-area .question-head:after {
 	content: '';
 	position: absolute;
 	top: 100%;
@@ -1490,6 +1527,34 @@ label {
 	right: 0;
 	height: 1px;
 	background-image: url(../images/dotted.png);
+}
+.faq-area .question-name {
+	font-size: 14px;
+	color: #2a2d32;
+	font-family: 'open_sansbold';
+	float: left;
+}
+.faq-area .question-date {
+	font-size: 13px;
+	color: #c5c7cb;
+	float: right;
+}
+.faq-area .question-date .fa {
+	margin-right: 3px;
+}
+.faq-area .question-text {
+	margin-top: 18px;
+	color: #7e848e;
+	line-height: 30px;
+}
+
+
+
+
+/* SIDE NAV */
+.side-nav {
+	position: relative;
+	margin-bottom: 25px;
 }
 .side-nav .section-title {
 	color: #2a2d32;
@@ -1515,8 +1580,17 @@ label {
 	font-family: 'open_sansbold';
 }
 .subscr-form {
-	margin-top: 25px;
 	position: relative;
+	padding-top: 18px;
+}
+.subscr-form :before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background-image: url(../images/dotted.png);
 }
 .subscr-form .subscr-title {
 	font-family: 'open_sansbold';	
@@ -1590,4 +1664,37 @@ label {
 	font-size: 16px;
 	color: #7e848e;
 	line-height: 20px;
+}
+
+.pagination {
+	margin-top: 20px;
+	line-height: 0;
+	font-size: 0;
+	letter-spacing: -1px;
+}
+.pagination span,
+.pagination a {
+	display: inline-block;
+	width: 26px;
+	height: 26px;
+	box-sizing: border-box;
+	border: 1px solid #c5c7cb;
+	border-right: 0;
+	line-height: 24px;
+	font-size: 14px;
+	letter-spacing: 0;
+	color: #7e848e;
+	text-align: center;
+	vertical-align: top;
+}
+.pagination a:first-child {
+	border-radius: 2px 0 0 2px;
+}
+.pagination a:last-child {
+	border-radius: 0 2px 2px 0;
+	border-right: 1px solid #c5c7cb;
+}
+.pagination a:hover {
+	color: #000;
+	background-color: #f1f1f1;
 }
