@@ -1586,14 +1586,70 @@ label {
 	font-weight: normal;
 	font-family: 'open_sansbold';
 }
-.download-area .items {
 
+
+/* SPECIALISTS */
+.specialists-area { 
+	padding: 50px 0 70px 0;
 }
-.download-area .items {
-
+.specialists-area h1 {
+	color: #000000;
+	font-size: 30px;
+	margin-bottom: 10px;
+	line-height: 30px;
 }
-.download-area .items {
-
+.specialists-area .specialists-content {
+	margin-top: 22px;
+}
+.specialists-area .items {
+	margin-top: 20px;
+	line-height: 0;
+	font-size: 0;
+	letter-spacing: -1px;
+}
+.specialists-area .item {
+	width: 230px;
+	color: #000000;
+	display: inline-block;
+	margin-right: 29px;
+	margin-bottom: 55px;
+	line-height: 16px;
+	font-size: 14px;
+	letter-spacing: 0;
+	vertical-align: top;
+}
+.specialists-area .item:nth-child(3n) {
+	margin-right: 0;
+}
+.specialists-area .item .image {
+	height: 280px;
+	background-color: #e7e7e7;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+}
+.specialists-area .item .button {
+	display: block;
+	height: 42px;
+	line-height: 42px;
+	font-family: 'open_sansbold';
+	color: #fff;
+	text-align: center;
+	background-color: #8cc642;
+	background-image: url(../images/green.png);
+	font-size: 16px;
+}
+.specialists-area .item .button:hover {
+	background-image: url(../images/blue.png);
+	background-color: #53afbd;
+}
+.specialists-area .item .name {
+	font-family: 'open_sansbold';
+	margin-top: 13px;
+	margin-bottom: 2px;
+}
+.specialists-area .item .text {
+	color: #7e848e;
+	line-height: 15px;
 }
 
 
