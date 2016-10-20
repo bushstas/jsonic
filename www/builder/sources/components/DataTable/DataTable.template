@@ -1,4 +1,4 @@
 <div class="app-datatable-outer-container">
-	{::a     = 4/a( ~b[] }
+	{let &a}
 	<component class="DataTableTabPanel">
 </div>

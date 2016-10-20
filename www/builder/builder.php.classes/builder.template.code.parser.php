@@ -7,7 +7,8 @@ class TemplateCodeParser
 	private static $space = '¦';
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
-				   $prevSign, $isCase, $couldBeMathSign, $isStart, $quoted;
+				   $prevSign, $isCase, $couldBeMathSign, $isStart, $quoted,
+				   $thereWasWord;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -42,7 +43,8 @@ class TemplateCodeParser
 		'}' => 'закрывающаяся фигурная скобка',
 		';' => 'точка с запятой',
 		'end' => 'конец выражения',
-		'0' => 'число'
+		'0' => 'число',
+		'1' => 'цифра'
 	);
 
 	private static $names = array(
@@ -60,12 +62,12 @@ class TemplateCodeParser
 	);
 
 	private static $keywords = array(
-		'false', 'true', 'null', 'undefined'
+		'false', 'true', 'null', 'undefined', 'NaN', 'Infinity'
 	);
 
 	private static $lists = array(
-		'|' => array('.', 'a', '0', '~', '@', '#', '&', '-'),
-		'+' => array('a', '0', '~', '&', '@', '.', '-', '('),
+		'|' => array('.', 'a', '0', '~', '@', '#', '&', '-', '"', "'", '+'),
+		'+' => array('a', '0', '~', '&', '@', '.', '-', '(', '"', "'"),
 		'-' => array('a', '0', '.', '~', '&', '-', '(', '+'),
 		'*' => array('a', '0', '.', '~', '&', '-', '(', '+'),
 		'/' => array('a', '0', '.', '~', '&', '$', '-', '(', '+')
@@ -100,8 +102,6 @@ class TemplateCodeParser
 		self::$open = array();
 
 		self::$isStart = true;
-		$isOpened = 0;
-		$isClosingTernary = 0;
 
 		$code = '';
 		$parsedCode = '';
@@ -138,112 +138,13 @@ class TemplateCodeParser
 						case '/'           : self::handleMathSign($sign); break;
 						case "'"           : self::handleQuote();         break;
 						case '"'           : self::handleDoubleQuote();   break;
-							
-						
-						case '"':
-								if (!$isOpenQuote) {
-									$isOpenQuote2 = !$isOpenQuote2;
-									if (self::$open['placeholderShouldHaveDefaultValue']) {
-										self::on('placeholderHasDefaultValue');
-									}
-								}
-								if ($isOpenQuote2 || $isOpenQuote) {
-									self::$expected = '*';
-								} else {
-									self::$expected = array(':', '?', '+', '&&', '||', self::$space);
-									if (!empty(self::$open['bracket'])) {
-										self::$expected[] = ']';
-									}
-								}
-								if (self::$isCase && !$isOpenQuote2) {
-									self::$isCase = false;
-									self::off('case');
-									self::$expected = array('end', self::$space);
-								}
-						break;
+						case '~'           : self::handleTilde();         break;
+						case '@'           : self::handleAtSign();        break;
+						case '#'           : self::handleNumberSign();    break;
+						case '&'           : self::handleAmpersand();     break;
+						case '('           : self::handleLeftParens();    break;
+						case ')'           : self::handleRightParens();   break;
 
-						case "~":
-							if (!self::$quoted) {
-								self::$expected = array('a');
-								self::on('var');
-								self::$varType = 'a';
-								if (self::$isLet && !self::isOpen('letvarname')) {
-									self::$expected = array('a');
-									self::on('letvarname');
-								}
-							}
-						break;
-
-						case "@":
-							if (!self::$quoted) {
-								self::$expected = array('a');
-								$isTextOpen = true;
-								self::on('text');
-								self::$varType = 't';
-							}
-						break;
-
-						case "#":
-							if (!self::$quoted) {
-								self::$expected = array('a');
-								self::on('data');
-								self::$varType = 'd';
-							}
-						break;
-
-						case "&":
-							if (!self::$quoted) {								
-								self::$expected = array('a');
-								self::on('var');
-								if (self::$prevSign == '&') {
-									self::set('or', 2);
-									self::off('var');
-									array_push(self::$expected, '0', '~', '#', '-', '!',self::$space);
-									if (!self::$isLet && !self::$isCase) {
-										self::$expected[] = '$';
-									}
-								} else if ($thereWasWord) {
-									self::$expected[] = '&';
-								}
-								if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue']) {
-									self::on('letvarname');
-								}
-								self::$varType = 'l';
-							}
-						break;
-
-						case "(":
-							if (!self::$quoted) {
-								if (self::$prevSign == 'a') {
-									$isFuncExpected = false;
-									self::off('fn');
-									self::add('func');
-									self::minus('method');
-								} else {
-									$isOpened++;
-									self::add('parenthesis');
-								}
-								self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', ')', self::$space);
-								if (!self::$isLet && !self::$isCase) {
-									self::$expected[] = '$';
-								}
-							}
-						break;
-
-						case ")":
-							if (!self::$quoted) {
-								if ($isOpened > 0) {
-									$isOpened--;
-									self::minus('parenthesis');
-								} else {
-									self::minus('func');
-								}
-								self::$expected = array('&&', '||', '-', '+', '?', '/', '*', '%', '[', ',', self::$space);
-								if (!empty(self::$open['ternary'])) {
-									self::$expected[] = ':';
-								}
-							}
-						break;
 					}
 					if ($sign == self::$space) {
 						$sign = ' ';
@@ -266,7 +167,7 @@ class TemplateCodeParser
 			}
 			else
 			{
-				self::$quoted = $isOpenQuote || $isOpenQuote2;
+				self::$quoted = self::$open['quote'] || self::$open['doubleQuote'];
 				$withoutCyr = preg_replace('/[^\w]/usi', '', $part);
 				$isLatin = $part == $withoutCyr;
 				
@@ -294,7 +195,7 @@ class TemplateCodeParser
 						} else {
 							$parsedCode = rtrim($parsedCode, '&').$part;
 						}
-					} elseif($isTextOpen) {
+					} elseif (self::$open['open']) {
 						$parsedCode = rtrim($parsedCode, '@').self::$globalNames['CONSTANTS'].'.'.$part;
 					} else {
 						$parsedCode .= $part;
@@ -314,7 +215,7 @@ class TemplateCodeParser
 							break;
 							case 'default':
 								$isDefault = true;
-								$thereWasWord = true;
+								self::$thereWasWord = true;
 								self::$expected = array('end', self::$space);
 							break;
 						}
@@ -401,54 +302,75 @@ class TemplateCodeParser
 					self::$prevSign = 'a';
 					$code .= $part;
 				}
-				$thereWasWord = true;
+				self::$thereWasWord = true;
 			}
 			self::$isStart = false;
 		}
 
 
 		$expecteds = self::$expected;
-		if (!self::$isCase && $thereWasWord) {
+		if (!self::$isCase && self::$thereWasWord) {
 			self::$expected = null;
 		}		
-		if (self::$open['placeholder'] && !$thereWasWord) {
+		
+		if (self::$open['ternary'] > self::$open['ternary2'] && !self::$open['functionResult'] && !self::$open['number'] && !self::isAnyVarOpen())
+		{
+			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
+			self::maybeAddDollar();
+		} 
+		elseif (self::$open['decimal'])
+		{
+			self::$expected = array("1");
+		}
+		elseif (self::$open['placeholder'] && !self::$thereWasWord)
+		{
 			self::$expected = array("a");
-		}
-		if (self::$open['fn']) {
+		} elseif (self::$open['fn'])
+		{
 			self::$expected = array("(");
-		}
-		if (!empty(self::$open['math'])) {
+		} elseif (!empty(self::$open['math']))
+		{
 			self::$expected = self::$lists[self::$open['math']];
 		}
-		if ($isOpenQuote) {
+		elseif (self::$open['quote'])
+		{
 			self::$expected = array("'");
 		}
-		if ($isOpenQuote2) {
+		elseif (self::$open['doubleQuote'])
+		{
 			self::$expected = array('"');
 		}
-		if (!empty(self::$open['or'])) {
+		elseif (!empty(self::$open['or']))
+		{
 			if (self::$open['or'] == 1) {
 				self::$expected = array('|');
 			} else {
 				self::$expected = self::$lists['|'];
 			}
 		}
-		if (self::$open['placeholderShouldHaveDefaultValue'] && !self::$open['placeholderHasDefaultValue']) {
+		elseif (self::$open['placeholderShouldHaveDefaultValue'] && !self::$open['placeholderHasDefaultValue'])
+		{
 			self::$expected = $expecteds;
 		}
-		if (self::isAnyVarOpen() && !self::$open['placeholderHasName']) {
+		elseif (self::isAnyVarOpen() && !self::$open['placeholderHasName'])
+		{
 			self::$expected = array('a');
 		}
-		if (!empty(self::$open['bracket'])) {
+		elseif (!empty(self::$open['bracket']))
+		{
 			self::$expected = array(']');
 		}
-		if (!empty(self::$open['func']) || !empty($isOpened)) {
+		elseif (!empty(self::$open['func']) || !empty(self::$open['parenthesis']))
+		{
 			self::$expected = array(')');
 		}
-		if (!empty(self::$open['method'])) {
+		elseif (!empty(self::$open['method']))
+		{
 			self::$expected = array('(');
 		}
-		if (is_array(self::$expected)) {
+		
+		if (is_array(self::$expected))
+		{
 			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);
 		}
 		
@@ -538,7 +460,7 @@ class TemplateCodeParser
 			else if (self::$open['ternary'])
 			{
 				self::add('ternary2');
-				array_push(self::$expected, '~', '&', '@', '#', '-', '+', '!', '(');
+				array_push(self::$expected, 'a', '0', '.', '~', '&', '@', '#', '-', '+', '!', '(', '"', "'", self::$space);
 				self::maybeAddDollar();
 			}
 		}
@@ -572,7 +494,7 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			if (self::$open['number']) {
 				self::$expected = array('0');
-				self::open('decimal');
+				self::on('decimal');
 			} else {
 				if (self::$prevSign != 'a' && !self::$open['react2']) {
 					self::add('method');
@@ -625,7 +547,7 @@ class TemplateCodeParser
 	private static function handleRightBracket() {
 		if (!self::$quoted) {
 			self::minus('bracket');
-			self::$expected = array('&&', '||', '-', '+', '?', '/', '*', '%', '[', '.', self::$space);
+			self::$expected = array('&&', '||', '?', '[', '.', '-', '+', '/', '*', '%', self::$space);
 			if (!empty(self::$open['ternary'])) {
 				self::$expected[] = ':';
 			}
@@ -647,8 +569,10 @@ class TemplateCodeParser
 					return;
 				}
 			}
-
-			self::$expected = array('a', '0', '~', '&', '.', '@', '#', '-', '!', '+', '(', self::$space);
+			self::$expected = array('a', '0', '~', '&', '.', '@', '#', '-', '!', '+', '(', "'", '"', self::$space);
+			if (!self::$open['placeholderHasName']) {
+				self::$expected[] = '=';	
+			}
 			self::maybeAddDollar();
 			if (self::$isLet) {
 				self::$expected[] = self::$space;
@@ -675,20 +599,29 @@ class TemplateCodeParser
 
 	private static function handleQuote() {
 		if (!self::$open['doubleQuote']) {
-			$isOpenQuote = !$isOpenQuote;
+			self::$open['quote'] = !self::$open['quote'];
 			if (self::$open['placeholderShouldHaveDefaultValue']) {
 				self::on('placeholderHasDefaultValue');
 			}
 		}
-		if ($isOpenQuote || $isOpenQuote2) {
+		if (self::$open['doubleQuote'] || self::$open['quote']) {
 			self::$expected = '*';
 		} else {
-			self::$expected = array(':', '?', '+', '&&', '||', self::$space);
+			self::on('recentQuote');
+			self::$expected = array( '?', '+', '&&', '||', self::$space);
+			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
+				self::$expected[] = ':';
+			}
 			if (!empty(self::$open['bracket'])) {
 				self::$expected[] = ']';
 			}
+			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
+				self::$expected[] = ')';
+			}
+			self::set('math', '');
+			self::set('or', 0);
 		}
-		if (self::$isCase && !$isOpenQuote) {
+		if (self::$isCase && !self::$open['quote']) {
 			self::$isCase = false;
 			self::off('case');
 			self::$expected = array('end', self::$space);
@@ -696,7 +629,121 @@ class TemplateCodeParser
 	}
 
 	private static function handleDoubleQuote() {
-		
+		if (!self::$open['quote']) {
+			self::$open['doubleQuote'] = !self::$open['doubleQuote'];
+			if (self::$open['placeholderShouldHaveDefaultValue']) {
+				self::on('placeholderHasDefaultValue');
+			}
+		}
+		if (self::$open['doubleQuote'] || self::$open['quote']) {
+			self::$expected = '*';
+		} else {
+			self::on('recentQuote');
+			self::$expected = array('?', '+', '&&', '||', self::$space);
+			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
+				self::$expected[] = ':';
+			}
+			if (!empty(self::$open['bracket'])) {
+				self::$expected[] = ']';
+			}
+			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
+				self::$expected[] = ')';
+			}
+			self::set('math', '');
+			self::set('or', 0);
+		}
+		if (self::$isCase && !self::$open['doubleQuote']) {
+			self::$isCase = false;
+			self::off('case');
+			self::$expected = array('end', self::$space);
+		}
+	}
+
+	private static function handleTilde() {
+		if (!self::$quoted) {
+			self::$expected = array('a');
+			self::on('var');
+			self::$varType = 'a';
+			if (self::$isLet && !self::$open['letvarname']) {
+				self::$expected = array('a');
+				self::on('letvarname');
+			}
+		}
+	}
+
+	private static function handleAtSign() {
+		if (!self::$quoted) {
+			self::$expected = array('a');
+			self::on('text');
+			self::$varType = 't';
+		}
+	}
+
+	private static function handleNumberSign() {
+		if (!self::$quoted) {
+			self::$expected = array('a');
+			self::on('data');
+			self::$varType = 'd';
+		}
+	}
+
+	private static function handleAmpersand() {
+		if (!self::$quoted) {
+			self::$expected = array('a');
+			self::on('var');
+			if (self::$prevSign == '&') {
+				self::set('or', 2);
+				self::off('var');
+				array_push(self::$expected, '0', '~', '#', '-', '!',self::$space);
+				self::maybeAddDollar();
+			} else if (self::$thereWasWord) {
+				self::$expected[] = '&';
+			}
+			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue']) {
+				self::on('letvarname');
+			}
+			self::$varType = 'l';
+		}
+	}
+
+
+	private static function handleLeftParens() {
+		if (!self::$quoted) {
+			if (self::$prevSign == 'a') {
+				self::off('fn');
+				self::add('func');
+				self::minus('method');
+			} else {
+				self::add('parenthesis');
+			}
+			self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', '(', self::$space);
+			self::maybeAddDollar();
+			if (self::$prevSign != '(' || empty(self::$open['parenthesis'])) {
+				self::$expected[] = ')';
+			}
+		}
+	}
+
+	private static function handleRightParens() {
+		if (!self::$quoted) {
+			self::$expected = array('&&', '||', '+', ',', '?', self::$space);
+			if (!empty(self::$open['parenthesis'])) {
+				self::minus('parenthesis');
+				if (empty(self::$open['recentQuote'])) {
+					array_push(self::$expected, '-', '/', '*', '%', '[', '=');
+				}
+			} else {
+				self::minus('func');
+				self::on('functionResult');
+				array_push(self::$expected, '-', '/', '*', '%', '[', '=');
+			}
+			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
+				self::$expected[] = ':';
+			}
+			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
+				self::$expected[] = ')';
+			}
+		}
 	}
 
 	private static function maybeAddDollar() {
@@ -830,7 +877,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeEqual() {
-		return self::$isKey || self::$open['letvarname'];
+		return self::$open['var'] || self::$isKey || self::$open['letvarname'];
 	}
 
 	private static function couldBeSpace() {
@@ -854,6 +901,7 @@ class TemplateCodeParser
 	}
 
 	private static function finish() {
+		self::off('recentQuote');
 		if (self::$open['placeholder']) {
 			if (!self::$open['placeholderShouldHaveDefaultValue']) {
 				self::on('placeholderHasName');
@@ -883,7 +931,7 @@ class TemplateCodeParser
 					self::$data['let'][$idx]['value'] = '';
 				}
 				self::$data['let'][$idx]['value'] .= self::$currentPart;
-				if (empty($isClosingTernary) && empty($isOpened)) {
+				if (empty(self::$open['parenthesis'])) {
 					self::$expected[] = ',';
 				}
 			}
