@@ -7,7 +7,7 @@ class TemplateCodeParser
 	private static $space = '¦';
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
-				   $prevSign, $isCase, $couldBeMathSign, $isStart, $quoted,
+				   $prevSign, $isCase, $notLetValue, $isStart, $quoted,
 				   $thereWasWord;
 
 	private static $signs = array(
@@ -86,26 +86,31 @@ class TemplateCodeParser
 		self::$className = $className;
 	}
 
-	public static function parse($code, $place) {
-		self::defineExpected($place);		
+	private static function initiate(&$code, $place) {
+		self::defineExpected($place);
+		$code = str_replace('_#_MORE_#_', '>', $code);
 		$code = trim($code);
-		//Printer::log($code);
 		self::$code = $code;
 		$code = preg_replace('/\s+/', self::$space, $code);
-		$parts = preg_split('/\b/', $code);
-		//Printer::log($parts);
-		$data = array(
+		self::$data = array(
 			'react' => array(),
 			'let' => array()
 		);
-		self::$data = $data;
 		self::$open = array();
-
 		self::$isStart = true;
+		self::$prevSign = '';		
+
+		self::$isLet = false;
+		self::$isCase = false;
+		self::$quoted = false;
+	}
+
+	public static function parse($code, $place) {
+		self::initiate($code, $place);
+		$parts = preg_split('/\b/', $code);		
 
 		$code = '';
-		$parsedCode = '';
-		self::$prevSign = '';
+		$parsedCode = '';		
 		for ($i = 0; $i < count($parts); $i++) {
 			$part = $parts[$i];
 			if ($part === '') continue;
@@ -144,6 +149,8 @@ class TemplateCodeParser
 						case '&'           : self::handleAmpersand();     break;
 						case '('           : self::handleLeftParens();    break;
 						case ')'           : self::handleRightParens();   break;
+						case '>'           : self::handleGreaterSign();   break;
+						case '<'           : self::handleGreaterSign();   break;
 
 					}
 					if ($sign == self::$space) {
@@ -160,7 +167,7 @@ class TemplateCodeParser
 					}
 
 					if (self::$isLet && self::isOpen('letvalue')) {
-						$data['let'][count($data['let']) - 1]['value'] .= $signToAdd;						
+						self::$data['let'][count(self::$data['let']) - 1]['value'] .= $signToAdd;						
 					}
 					self::$isStart = false;
 				}
@@ -262,6 +269,12 @@ class TemplateCodeParser
 							if (self::couldBeEqual()) {
 								self::$expected[] = '=';
 							}
+							if (self::couldBeGreater()) {
+								self::$expected[] = '>';
+							}
+							if (self::couldBeLess()) {
+								self::$expected[] = '<';
+							}
 							if (self::couldBeAnd()) {
 								self::$expected[] = '&&';
 							}
@@ -307,72 +320,7 @@ class TemplateCodeParser
 			self::$isStart = false;
 		}
 
-
-		$expecteds = self::$expected;
-		if (!self::$isCase && self::$thereWasWord) {
-			self::$expected = null;
-		}		
-		
-		if (self::$open['ternary'] > self::$open['ternary2'] && !self::$open['functionResult'] && !self::$open['number'] && !self::isAnyVarOpen())
-		{
-			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
-			self::maybeAddDollar();
-		} 
-		elseif (self::$open['decimal'])
-		{
-			self::$expected = array("1");
-		}
-		elseif (self::$open['placeholder'] && !self::$thereWasWord)
-		{
-			self::$expected = array("a");
-		} elseif (self::$open['fn'])
-		{
-			self::$expected = array("(");
-		} elseif (!empty(self::$open['math']))
-		{
-			self::$expected = self::$lists[self::$open['math']];
-		}
-		elseif (self::$open['quote'])
-		{
-			self::$expected = array("'");
-		}
-		elseif (self::$open['doubleQuote'])
-		{
-			self::$expected = array('"');
-		}
-		elseif (!empty(self::$open['or']))
-		{
-			if (self::$open['or'] == 1) {
-				self::$expected = array('|');
-			} else {
-				self::$expected = self::$lists['|'];
-			}
-		}
-		elseif (self::$open['placeholderShouldHaveDefaultValue'] && !self::$open['placeholderHasDefaultValue'])
-		{
-			self::$expected = $expecteds;
-		}
-		elseif (self::isAnyVarOpen() && !self::$open['placeholderHasName'])
-		{
-			self::$expected = array('a');
-		}
-		elseif (!empty(self::$open['bracket']))
-		{
-			self::$expected = array(']');
-		}
-		elseif (!empty(self::$open['func']) || !empty(self::$open['parenthesis']))
-		{
-			self::$expected = array(')');
-		}
-		elseif (!empty(self::$open['method']))
-		{
-			self::$expected = array('(');
-		}
-		
-		if (is_array(self::$expected))
-		{
-			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);
-		}
+		self::check($code);
 		
 		$code = $parsedCode;
 		if (self::$open['placeholder']) {
@@ -385,8 +333,8 @@ class TemplateCodeParser
 				$code = "{'pl':'".$name."','p':".ltrim($def, '=')."}";
 			}			
 		
-		} elseif (!empty($data['react'])) {
-			$names = array_keys($data['react']);
+		} elseif (!empty(self::$data['react'])) {
+			$names = array_keys(self::$data['react']);
 			if (count($names) == 1) {
 				$names = "'".$names[0]."'";
 			} else {
@@ -395,21 +343,21 @@ class TemplateCodeParser
 			}
 			$code = "{'pr':".$names.",'p':".$code."}";
 			//Printer::log($code);
-		} elseif (!empty($data['let'])) {
+		} elseif (!empty(self::$data['let'])) {
 			$lets = array();
-			foreach ($data['let'] as $let) {
+			foreach (self::$data['let'] as $let) {
 				$lets[] = $let['name'].'='.$let['value'];
 			}
 			$code = '<let>var '.implode(',', $lets).'<=let>';
 		}
-		$data['code'] = '<nq>'.$code.'<nq>';
+		self::$data['code'] = '<nq>'.$code.'<nq>';
 		
 
 
 		self::$expected = $expecteds;
 		self::log();
 
-		return $data;
+		return self::$data;
 
 	}
 
@@ -417,7 +365,9 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			self::$varType = '';
 			self::off('react2');
-			self::removeExpected('[');
+			if (!self::$open['letvalue'] && !self::$open['array']) {
+				self::removeExpected('[');
+			}
 			
 			$mathSign = self::$open['math'];
 			if ($mathSign == '+' || $mathSign == '-') {
@@ -478,15 +428,20 @@ class TemplateCodeParser
 
 	private static function handleComma() {
 		if (!self::$quoted) {
-			if (!self::$isLet || !empty(self::$open['func'])) {
+			self::$expected = array();
+			if (!self::$isLet || !empty(self::$open['func']) || self::$open['array']) {
 				self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', self::$space);
 				self::maybeAddDollar();
 			} else {
 				self::$expected = array('&', self::$space);
 			}
-			if (self::$isLet && empty(self::$open['func'])) {
+			if (self::$isLet && empty(self::$open['func']) && !self::$open['array']) {
 				self::off('letvalue');
+				self::on('letvarname');
+			} else {
+				self::$expected[] = '(';
 			}
+			self::off('functionResult');
 		}
 	}
 
@@ -496,10 +451,11 @@ class TemplateCodeParser
 				self::$expected = array('0');
 				self::on('decimal');
 			} else {
-				if (self::$prevSign != 'a' && !self::$open['react2']) {
+				if (self::$prevSign != 'a' && self::$prevSign != ']' && !self::$open['react2']) {
 					self::add('method');
 					self::$varType = '';
 				} else {
+
 					switch (self::$varType) {
 						case 'r':
 							self::on('react2');
@@ -536,10 +492,14 @@ class TemplateCodeParser
 	private static function handleLeftBracket() {
 		if (!self::$quoted) {
 			self::add('bracket');
-			self::$expected = array('"', "'", 'a', '0', '&', '~', '!', '@', self::$space);
+			self::$expected = array('"', "'", 'a', '0', '&', '~', '!', '@', '+', '-', '(', self::$space);
 			self::maybeAddDollar();
 			if ((self::$prevSign == 'a' || self::$prevSign == ']') && self::$varType == 'r') {
 				self::on('react2');
+			}			
+			if (self::$open['letvalue']) {
+				self::on('array');
+				self::$expected[] = ']';
 			}
 		}
 	}
@@ -548,11 +508,22 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			self::minus('bracket');
 			self::$expected = array('&&', '||', '?', '[', '.', '-', '+', '/', '*', '%', self::$space);
-			if (!empty(self::$open['ternary'])) {
+			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
 				self::$expected[] = ':';
 			}
 			if (self::$varType == 'r') {
 				self::on('react2');
+			}
+			if (self::$open['array']) {
+				self::off('array');
+				self::off('letvalue');
+				self::off('number');
+			}
+			if (self::$isLet) {
+				if (self::$open['letvarname']) self::$expected[] = '=';
+				if (!self::$open['letvalue']) {
+					array_push(self::$expected, ',', 'end');
+				}
 			}
 		}
 	}
@@ -569,13 +540,27 @@ class TemplateCodeParser
 					return;
 				}
 			}
-			self::$expected = array('a', '0', '~', '&', '.', '@', '#', '-', '!', '+', '(', "'", '"', self::$space);
-			if (!self::$open['placeholderHasName']) {
-				self::$expected[] = '=';	
+			self::$expected = array('a', '0', '~', '&', '.', '@', '#', '+', '-', '!', '(', "'", '"', self::$space);
+			if (!self::$open['doubleEqual']) {
+				if (!self::$open['placeholderHasName']) {
+					self::$expected[] = '=';	
+				}
+				if (self::$prevSign == '=') {
+					if (!self::$open['doubleEqual']) {
+						self::on('doubleEqual');
+					}
+				}
+			} else {
+				self::off('doubleEqual');
+				self::on('tripleEqual');
 			}
 			self::maybeAddDollar();
 			if (self::$isLet) {
 				self::$expected[] = self::$space;
+				self::$expected[] = '[';
+				if (!self::$open['parenthesis'] && !self::$open['func'] && !self::$open['bracket'] && !self::$open['array']) {
+					self::removeExpected('=');
+				}
 				self::on('letvalue');
 				self::off('letvarname');
 				$signToAdd = '';
@@ -593,6 +578,7 @@ class TemplateCodeParser
 			self::maybeAddDollar();
 			self::$expected[] = self::$space;
 			self::set('math', $sign);
+			self::off('functionResult');
 			self::$varType = '';
 		}
 	}
@@ -615,8 +601,15 @@ class TemplateCodeParser
 			if (!empty(self::$open['bracket'])) {
 				self::$expected[] = ']';
 			}
+			if (!empty(self::$open['func'])) {
+				self::$expected[] = ',';
+			}
 			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
 				self::$expected[] = ')';
+			}
+			if (self::$isLet && !self::$open['letvarname']) {
+				self::off('letvalue');
+				self::$expected[] = ',';
 			}
 			self::set('math', '');
 			self::set('or', 0);
@@ -646,8 +639,15 @@ class TemplateCodeParser
 			if (!empty(self::$open['bracket'])) {
 				self::$expected[] = ']';
 			}
+			if (!empty(self::$open['func'])) {
+				self::$expected[] = ',';
+			}
 			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
 				self::$expected[] = ')';
+			}
+			if (self::$isLet && !self::$open['letvarname']) {
+				self::off('letvalue');
+				self::$expected[] = ',';
 			}
 			self::set('math', '');
 			self::set('or', 0);
@@ -664,7 +664,7 @@ class TemplateCodeParser
 			self::$expected = array('a');
 			self::on('var');
 			self::$varType = 'a';
-			if (self::$isLet && !self::$open['letvarname']) {
+			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis'])) {				
 				self::$expected = array('a');
 				self::on('letvarname');
 			}
@@ -696,10 +696,10 @@ class TemplateCodeParser
 				self::off('var');
 				array_push(self::$expected, '0', '~', '#', '-', '!',self::$space);
 				self::maybeAddDollar();
-			} else if (self::$thereWasWord) {
+			} else if (self::$thereWasWord && !self::$open['letvarname']) {
 				self::$expected[] = '&';
 			}
-			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue']) {
+			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis'])) {				
 				self::on('letvarname');
 			}
 			self::$varType = 'l';
@@ -718,7 +718,7 @@ class TemplateCodeParser
 			}
 			self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', '(', self::$space);
 			self::maybeAddDollar();
-			if (self::$prevSign != '(' || empty(self::$open['parenthesis'])) {
+			if ((self::$prevSign != '(' && empty(self::$open['parenthesis'])) || self::$open['func']) {
 				self::$expected[] = ')';
 			}
 		}
@@ -730,7 +730,7 @@ class TemplateCodeParser
 			if (!empty(self::$open['parenthesis'])) {
 				self::minus('parenthesis');
 				if (empty(self::$open['recentQuote'])) {
-					array_push(self::$expected, '-', '/', '*', '%', '[', '=');
+					array_push(self::$expected, '-', '/', '*', '%', '[', '=', '>', '<');
 				}
 			} else {
 				self::minus('func');
@@ -743,6 +743,16 @@ class TemplateCodeParser
 			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
 				self::$expected[] = ')';
 			}
+			if (!empty(self::$open['bracket'])) {
+				self::$expected[] = ']';
+			}
+		}
+	}
+
+	private static function handleGreaterSign() {
+		if (!self::$quoted) {
+			self::$expected = array('=', '+', '-', 'a', '0', '~', '&', '#', self::$space);
+			self::maybeAddDollar();
 		}
 	}
 
@@ -762,7 +772,7 @@ class TemplateCodeParser
 		self::$anyVar = self::isAnyVarOpen();
 		self::$objVar = self::$anyVar && self::$notTextOrComp;
 		self::$decOpen = self::isOpen('decimal');
-		self::$couldBeMathSign = !self::isOpen('letvarname');
+		self::$notLetValue = !self::$open['letvarname'];
 
 		if (self::$isNum) {
 			if (self::$decOpen) {
@@ -772,7 +782,6 @@ class TemplateCodeParser
 		} else {
 			self::off('number');
 		}
-
 
 		if (!self::$isNum && !self::$anyVar && !self::$isKey && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
 			self::on('fn');
@@ -857,27 +866,35 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeMinus() {
-		return self::$notTextOrComp && self::$couldBeMathSign;
+		return self::$notTextOrComp && self::$notLetValue;
 	}
 
 	private static function couldBePlus() {
-		return !self::isOpen('comp') && self::$couldBeMathSign;
+		return !self::isOpen('comp') && self::$notLetValue;
 	}
 
 	private static function couldBeSlash() {
-		return self::$notTextOrComp && self::$couldBeMathSign;
+		return self::$notTextOrComp && self::$notLetValue;
 	}
 
 	private static function couldBePercent() {
-		return self::$notTextOrComp && self::$couldBeMathSign;
+		return self::$notTextOrComp && self::$notLetValue;
 	}
 
 	private static function couldBeStar() {
-		return self::$notTextOrComp && self::$couldBeMathSign;
+		return self::$notTextOrComp && self::$notLetValue;
 	}
 
 	private static function couldBeEqual() {
 		return self::$open['var'] || self::$isKey || self::$open['letvarname'];
+	}
+
+	private static function couldBeGreater() {
+		return self::$open['var'];
+	}
+
+	private static function couldBeLess() {
+		return self::$open['var'];
 	}
 
 	private static function couldBeSpace() {
@@ -885,7 +902,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeLeftParenthesis() {
-		return false;
+		return !self::$isNum && self::$notLetValue;
 	}
 
 	private static function couldBeRightParenthesis() {
@@ -893,11 +910,11 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeComma() {
-		return self::isOpen('func');
+		return self::$open['func'] || (self::$isLet && empty(self::$open['letvalue'])) || self::$open['array'] || self::$open['object'];
 	}
 
 	private static function couldBeDot() {
-		return self::$objVar || (self::$isNum && !self::$decOpen);
+		return (self::$objVar || (self::$isNum && !self::$decOpen)) && self::$notLetValue;
 	}
 
 	private static function finish() {
@@ -938,6 +955,8 @@ class TemplateCodeParser
 			
 		}
 		self::offVars();
+		self::off('letvalue');
+		self::off('space');
 	}
 
 	private static function offVars() {
@@ -1062,6 +1081,79 @@ class TemplateCodeParser
 	private static function log() {
 		self::printOpen();
 		Printer::log(self::$expected);
+	}
+
+	private static function check($code) {
+		$expecteds = self::$expected;
+		if (!self::$isCase && self::$thereWasWord) {
+			self::$expected = null;
+		}		
+		
+		if (self::$open['ternary'] > self::$open['ternary2'] && !self::$open['functionResult'] && !self::$open['number'] && !self::isAnyVarOpen())
+		{
+			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
+			self::maybeAddDollar();
+		} 
+		elseif (self::$open['decimal'])
+		{
+			self::$expected = array("1");
+		}
+		elseif (self::$open['placeholder'] && !self::$thereWasWord)
+		{
+			self::$expected = array("a");
+		} elseif (self::$open['fn'])
+		{
+			self::$expected = array("(");
+		} elseif (!empty(self::$open['math']))
+		{
+			self::$expected = self::$lists[self::$open['math']];
+		}
+		elseif (self::$open['quote'])
+		{
+			self::$expected = array("'");
+		}
+		elseif (self::$open['doubleQuote'])
+		{
+			self::$expected = array('"');
+		}
+		elseif (!empty(self::$open['or']))
+		{
+			if (self::$open['or'] == 1) {
+				self::$expected = array('|');
+			} else {
+				self::$expected = self::$lists['|'];
+			}
+		}
+		elseif (self::$open['placeholderShouldHaveDefaultValue'] && !self::$open['placeholderHasDefaultValue'])
+		{
+			self::$expected = $expecteds;
+		}
+		elseif (self::isAnyVarOpen() && !self::$open['placeholderHasName'])
+		{
+			self::$expected = array('a');
+		}
+		elseif (!empty(self::$open['bracket']))
+		{
+			self::$expected = array(']');
+		}
+		elseif (!empty(self::$open['func']) || !empty(self::$open['parenthesis']))
+		{
+			self::$expected = array(')');
+		}
+		elseif (!empty(self::$open['method']))
+		{
+			self::$expected = array('(');
+		}
+		elseif (self::$isLet)
+		{
+			if (self::$open['letvalue']) self::$expected = $expecteds;
+			else if (self::$open['letvarname']) self::$expected = $expecteds;
+		}
+		
+		if (is_array(self::$expected))
+		{
+			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);
+		}
 	}
 
 }

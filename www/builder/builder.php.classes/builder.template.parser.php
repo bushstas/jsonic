@@ -169,7 +169,7 @@ class TemplateParser
 		preg_match_all($regexp, $html, $matches);
 		$matches = $matches[0];
 		foreach ($matches as &$match) {
-			$match = str_replace('>', '__MORE__', $match);
+			$match = str_replace('>', '_#_MORE_#_', $match);
 		}
 		$parts = preg_split($regexp, $html);
 		$html = '';
@@ -181,8 +181,8 @@ class TemplateParser
 		}
 		$regexp = "/(<\/*[a-z]+[^>]*>|\{\s*\/*foreach[^\}]*\}|\{\s*\/*if[^\}]*\}|\{\s*else\}|\{\s*\/*switch[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
-		$tags = implode('__TMPDELIMITER__', $matches[1]);
-		$tags = explode('__TMPDELIMITER__', str_replace('__MORE__', '>', $tags));
+		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
+		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
 		$parts = preg_split($regexp, $html);
 		
 		$list = array();
