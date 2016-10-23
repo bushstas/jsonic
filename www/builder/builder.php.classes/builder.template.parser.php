@@ -18,7 +18,6 @@ class TemplateParser
 		'extraClosingTag' => 'Ошибка валидации шаблонов класса {??}. Лишний закрывающийся {?} {??}',
 		'unknownComponent' => 'Неопределенный компонент в шаблоне {??} класса {??}<xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'controlWithoutName' => 'Контрол {??} в шаблоне {??} класса {??} не имеет атрибута <b>name</b><xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
-		'incorrectReactVar' => 'Элемент в шаблоне {??} класса {??} содержит атрибут с некорректным кодом {??}<br><br>Реактивные переменные класса должны иметь вид <b>$var</b> или <b>$var.name</b> или <b>$var.0</b>. Использование записи вида <b>$var["name"]</b> недопустимо',
 		'reactVarInInclude' => 'Шаблон {??}, содержащийся в файле {??} содержит код с реактивными переменными {??}<br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>~arg</b> и локальных переменных <b>&var</b>',
 		'reactComponentName' => 'Название компонента в шаблоне {??} класса {??} не может определяться реактивной переменной<xmp>{?}</xmp>Допускается запись вида<xmp><component class="{~class}"></xmp>или<xmp><component class="{&class}"></xmp>',
 		'reactControlName' => 'Атрибут <b>name</b> контрола в шаблоне {??} класса {??} не может определяться реактивной переменной<xmp>{?}</xmp>Допускается запись вида<xmp><control name="{~class}"></xmp>или<xmp><control name="{&class}"></xmp>',
@@ -131,6 +130,7 @@ class TemplateParser
 				$data = str_replace("<let>", "function(){", $data);
 				$data = preg_replace("/<=let>,*/", ";return[", $data);
 				$data = preg_replace("/,'<\/let>'/", "]}", $data);
+				$data = str_replace("<quote>", "'", $data);
 
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				
@@ -620,7 +620,7 @@ class TemplateParser
 					new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $propValue));
 				}
 				if (preg_match('/\$\w+[\[]/', $propValue)) {
-					new Error(self::$errors['incorrectReactVar'], array(self::$templateName, self::$className, $propValue));
+					//
 				}				
 				preg_match_all($regexp, $propValue, $matches);
 				$codes = $matches[1];
@@ -664,7 +664,7 @@ class TemplateParser
 			$else = ltrim($else, '{');
 			$else = rtrim($else, '}');
 			if (preg_match('/\$\w+[\[]/', $else)) {
-				new Error(self::$errors['incorrectReactVar'], array(self::$templateName, self::$className, $else));
+				///
 			}
 			$child['e'] = self::parseCode($else, 'else');
 		}
@@ -673,7 +673,7 @@ class TemplateParser
 
 	private static function checkIfConditionForContainigProps($ifCondition, &$child, $addingIntoChild = false) {
 		if (is_array(self::$class) && preg_match('/\$\w+[\[]/', $ifCondition)) {
-			new Error(self::$errors['incorrectReactVar'], array(self::$templateName, self::$className, $ifCondition));
+			///
 		}
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string(self::$class) && $hasCode) {
@@ -816,7 +816,6 @@ class TemplateParser
 			}
 			$props[$propName] = $propValue;
 			if ($hasCode) {
-				$attrContent = '';
 				$attrParts = array();
 				$names[$propName] = array();
 				
@@ -829,35 +828,44 @@ class TemplateParser
 						break;
 					}
 				}
+				$parts = array();
+				$inFunc = false;
 				foreach ($items as $idx => $item) {
 					if ($item !== '') {
 						if ($isObfClName) {
 							self::getObfuscatedClassName($item);
 						}
-						$attrContent += $item;
-						$attrParts[] = $item;
+						$attrParts[] = "<quote>".str_replace("'", "\\'", $item)."<quote>";
 					}
 					if (isset($attrData['delimiters'][$idx])) {
 						$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
 						$data = TemplateCodeParser::parse($code, $isComponentTag ? 'componentAttribute' : 'elementAttribute');
 						$code = $data['code'];
-						if ($data['ternary'] && $hasText) {
-							if ($data['ternaryIncomplete']) {
-								TextParser::encode($code, '_tmpcode');
-								$parts = explode('?', $code);
-								$code = $parts[0];
-								for ($pidx = 1; $pidx < count($parts); $pidx++) {
-
-								}
-								$code = preg_replace('/\?([\s])/', "?$2:''", $code);
-								TextParser::decode($code, '_tmpcode');
-								Printer::log($code);
-							}
-							$code = '('.$code = $data['code'].')';
+						if ($data['inFunc']) {
+							$inFunc = true;
 						}
-						Printer::log($code);
+						if (is_array($data['reactNames'])) {
+							$names[$propName] = array_merge($names[$propName], $data['reactNames']);
+						}
+						if ($data['ternary'] && $hasText) {
+							$code = '('.$code.')';
+						}
+						if ($isObfClName) {
+							self::getObfuscatedClassName($code);
+						}
+						$attrParts[] = $code;
 					}
 				}
+				if (!$inFunc) {
+					$inFunc = count($names[$propName]) > 1;
+				}
+				$attrContent = implode('+', $attrParts);
+				if ($inFunc) {
+					$attrContent = '<nq><function>'.$attrContent.'</function><nq>';
+				} else {
+					$attrContent = '<nq>'.$attrContent.'<nq>';
+				}
+				Printer::log($attrContent);
 
 
 				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{<data>$1}", $propValue);
@@ -872,41 +880,11 @@ class TemplateParser
 				
 
 
-				
+				//new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
 				
 
-				$parts = preg_split($regexp, $propValue);
 				
-				
-				foreach ($parts as $idx => $part) {
-					if ($part !== '') {
-						if ($isObfClName) {
-							self::getObfuscatedClassName($part);
-						}
-						$attrContent .= $part;
-						$attrParts[] = $part;
-					}
-					if (isset($codes[$idx])) {
-						$code = $codes[$idx];
-						if ($isObfClName) {
-							self::getObfuscatedClassName($code, true);
-						}
-						if (self::hasClassVar($code)) {
-							$code = self::parseAttributeClassVars($code, $names[$propName]);
-							$attrParts[] = '<nq>'.$code.'<nq>';
-						} else {
-							if ($hasClassVar) {
-								$attrParts[] = '<nq>'.$code.'<nq>';
-							} else {
-								$attrContent .= '<plus>'.$code.'</plus>';
-							}
-						}
-					}
-				}
-				
-				if ($hasClassVar) {
-					$attrContent = implode('"+"', $attrParts);
-				}
+
 				self::parseClassMethodCalls($attrContent);
 				if ($hasClassVar) {
 					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
@@ -1080,25 +1058,6 @@ class TemplateParser
 			}
 		}
 		return false;
-	}
-
-	private static function parseAttributeClassVars($code, &$names) {
-		if (preg_match('/\$\w+[\[]/', $code)) {
-			if (is_array(self::$class)) {
-				new Error(self::$errors['incorrectReactVar'], array(self::$templateName, self::$className, $code));
-			}
-		}
-		$regexp = '/\$(\w+)/';
-		preg_match_all($regexp, $code, $matches);
-		if (!empty($matches[1])) {
-			if (is_string(self::$class)) {
-				new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
-			}
-			foreach ($matches[1] as $i => $match) {
-				$names[] = $match;
-			}
-		}
-		return preg_replace($regexp, "\<this>g('$1')", $code);
 	}
 
 	private static function hasCode($text) {

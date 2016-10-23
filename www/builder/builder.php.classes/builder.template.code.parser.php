@@ -66,7 +66,8 @@ class TemplateCodeParser
 		'capitalFirstLetter' => 'Использование вызова функции начинающейся с заглавной буквы в шаблоне {??} класса {??}<br><br>Имена функций утилит должны начинаться с маленькой буквы<br><br>Код в котором произошла ошибка: {{??}}',
 		'usingGlobalName' => 'Использование зарезервированного глобально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: {{??}}',
-		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}'
+		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}',
+		'incompleteTernary' => 'Обнаружена одна или несколько неполных тернерных операций в шаблоне {??} класса {??}<br><br>Неполные тернерные операции могут использоваться только, если такая операция одна<br><br>Код в котором произошла ошибка: {{??}}'
 	);
 
 	private static $keywords = array(
@@ -85,6 +86,7 @@ class TemplateCodeParser
 		'case', 'switch', 'if', 'foreach', 'let', 'default'
 	);
 
+	//logging
 	private static $logging = false;
 	//private static $logging = true;
 
@@ -176,7 +178,13 @@ class TemplateCodeParser
 						self::$prevSign = $sign;
 						self::off('space');
 					}
-					$parsedCode .= $sign;
+					if (self::$open['reactAdded']) {
+						if ($sign != '.') {
+							$parsedCode .= $sign;	
+						}
+					} else {
+						$parsedCode .= $sign;
+					}
 					$code .= $sign;
 					if (self::$isLet && self::isOpen('letvalue')) {
 						self::$data['let'][count(self::$data['let']) - 1]['value'] .= $signToAdd;						
@@ -202,13 +210,16 @@ class TemplateCodeParser
 					$prevCode = $code;
 					
 					//adding
-					if (!empty(self::$open['method'])) {
+					if (!empty(self::$open['method']))
+					{
 						$parsedCode = rtrim($parsedCode, '.')."$.".$part;
-					} elseif (self::$open['react2']) {
-						$parsedCode = rtrim($parsedCode, ')').",'".$part."')";
-					} elseif (self::$open['react']) {
+					}
+					elseif (self::$open['react'])
+					{
 						$parsedCode = $parsedCode.".g('".$part."')";
-					} elseif (self::$open['var']) {
+					}
+					elseif (self::$open['var'])
+					{
 						$sign = $parsedCode[strlen($parsedCode) - 1];
 						if ($sign == '~') {
 							$parsedCode = rtrim($parsedCode, '~').'_.'.$part;
@@ -345,7 +356,7 @@ class TemplateCodeParser
 		self::$data['code'] = self::getParsedData($parsedCode);
 		
 		// logging
-		if (self::$logging) Printer::log($data['code']);
+		if (self::$logging) Printer::log(self::$data['code']);
 		return self::$data;
 
 	}
@@ -388,6 +399,7 @@ class TemplateCodeParser
 				self::$expected = array('|');
 			}
 			self::off('name');
+			self::off('recentVar');
 		}
 	}
 
@@ -412,6 +424,7 @@ class TemplateCodeParser
 				self::maybeAddDollar();
 			}
 			self::off('name');
+			self::off('recentVar');
 			self::off('number');
 		}
 	}
@@ -443,6 +456,7 @@ class TemplateCodeParser
 			}
 			self::off('functionResult');
 			self::off('name');
+			self::off('recentVar');
 		}
 	}
 
@@ -487,6 +501,7 @@ class TemplateCodeParser
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', '"', "'", self::$space);
 			self::maybeAddDollar();
 			self::off('name');
+			self::off('recentVar');
 			self::off('number');
 			self::off('greater');
 			self::off('doubleEqual');
@@ -551,6 +566,8 @@ class TemplateCodeParser
 				self::off('array');
 				self::off('letvalue');
 				self::off('number');
+			} else {
+				self::on('recentVar');
 			}
 			if (self::$isLet) {
 				if (self::$open['letvarname']) {
@@ -569,6 +586,7 @@ class TemplateCodeParser
 		{			
 			self::$expected = array();
 			self::off('name');
+			self::off('recentVar');
 			if (self::$open['placeholder'])
 			{
 				self::on('placeholderShouldHaveDefaultValue');
@@ -625,6 +643,7 @@ class TemplateCodeParser
 			self::off('functionResult');
 			self::$varType = '';
 			self::off('name');
+			self::off('recentVar');
 			self::off('number');
 		}
 	}
@@ -748,6 +767,7 @@ class TemplateCodeParser
 				self::set('or', 2);
 				self::off('var');
 				self::off('name');
+				self::off('recentVar');
 				array_push(self::$expected, '0', '~', '#', '+', '-', '!', '(', self::$space);
 				self::maybeAddDollar();
 			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math'])) || self::$open['bracket']) {
@@ -810,6 +830,7 @@ class TemplateCodeParser
 			self::on('greater');
 			self::off('functionResult');
 			self::off('name');
+			self::off('recentVar');
 			self::$varType = '';
 		}
 	}
@@ -1170,7 +1191,7 @@ class TemplateCodeParser
 			self::$expected = null;
 		}		
 		
-		if (!empty(self::$open['ternary']) && !self::$open['functionResult'] && !self::$open['number'] && !self::$open['name'] && !self::$open['recentQuote'] && !self::isAnyVarOpen())
+		if (!empty(self::$open['ternary']) && !self::$open['functionResult'] && !self::$open['number'] && !self::$open['name'] && !self::$open['recentQuote'] && !self::isAnyVarOpen() && !self::$open['recentVar'])
 		{
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
 			self::maybeAddDollar();
@@ -1241,15 +1262,32 @@ class TemplateCodeParser
 		if (!empty(self::$open['ternary'])) {
 			self::$data['ternary'] = true;
 			if (self::$open['ternary'] > self::$open['ternary2']) {
-				self::$data['ternaryIncomplete'] = true;
+				if (self::$open['ternary'] > 1) {
+					new Error(self::$errors['incompleteTernary'], array(self::$className, self::$templateName, self::$code));
+				}
+				TextParser::encode($code, '_tmpcode');
+				$parts = explode('?', $code);
+				$code = $parts[0];
+				$data = Splitter::split('/[\)\],\}]/', $parts[1]);
+				if (count($data['items']) > 1) {
+					$code .= '?'.$data['items'][0].":''".$data['delimiters'][0];
+					for ($i = 1; $i < count($data['items']); $i++) {
+						$code .= $data['items'][$i];
+						if (isset($data['delimiters'][$i])) {
+							$code .= $data['delimiters'][$i];
+						}
+					}
+				} else {
+					$code .= '?'.$parts[1].":''";
+				}
+				TextParser::decode($code, '_tmpcode');
 			}
 		}
 		if (self::$open['placeholder']) {
 			return self::getPlaceholderCode($code);		
 		} 
-		if (self::$place == 'textNode' && !empty(self::$data['react'])) {
-			return self::getReactTextNode($code);
-			
+		if (!empty(self::$data['react'])) {
+			$code = self::getReactCode($code);
 		} elseif (!empty(self::$data['let'])) {
 			$lets = array();
 			foreach (self::$data['let'] as $let) {
@@ -1257,7 +1295,6 @@ class TemplateCodeParser
 			}
 			$code = '<let>var '.implode(',', $lets).'<=let>';
 		}
-		self::$data['code'] = '<nq>'.$code.'<nq>';
 		return $code;
 	}
 
@@ -1273,15 +1310,22 @@ class TemplateCodeParser
 		return $code;
 	}
 
-	private static function getReactTextNode($code) {
-		$names = array_keys(self::$data['react']);
+	private static function getReactCode($code) {
+		self::$data['reactNames'] = array_keys(self::$data['react']);
+		$names = self::$data['reactNames'];
 		if (count($names) == 1) {
 			$names = "'".$names[0]."'";
 		} else {
 			$names = json_encode($names);
-			$code = 'function(){return'.$code.'}';
 		}
-		return "{'pr':".$names.",'p':".$code."}";
+		if (!preg_match('/^\$\.g\(\'\w+\'\)$/', $code)) {
+			self::$data['inFunc'] = true;
+		}
+		if (self::$place == 'textNode') {
+			return "{'pr':".$names.",'p':".$code."}";
+		} else {
+			return $code;
+		}
 	}
 
 }
