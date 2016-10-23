@@ -27,6 +27,7 @@ class JSCompiler
 		'extendsEmpty' => 'Супер-классы не указаны после ключевого слова <b>extends</b> в первой строке файла {??}. Ожидается имя класса или имена классов через запятую',
 		'incorrectFirstLine' => 'Недопустимое определение класса {??} в файле {??}',
 		'differentNames' => 'Файл {??} должен содержать класс {??}, тогда как содержит класс с именем {??}',
+		'differentNames2' => 'Файл {??} должен иметь название {??} как класс, который в нем содержится',
 		'incorrectSuper' => 'Название супер-класса {??} для {??} недопустимо. Используйте запись вида <b>ClassName</b>',
 		'classExists' => 'Найдено несколько классов с одинаковым именем {??}',
 		'appNotFound' => 'Класс с типом <b>application</b> не найден',
@@ -207,9 +208,13 @@ class JSCompiler
 		}
 	}
 
+	private function isValidClassName($name) {
+		return preg_match("/^[A-Z][a-zA-Z\d]+$/", $name);
+	}
+
 	private function validateUsedClasses() {
 		foreach ($this->usedComponents as $usedComponent => $data) {
-			if (!preg_match("/^[A-Z][a-zA-Z\d]+$/", $usedComponent)) {
+			if (!$this->isValidClassName($usedComponent)) {
 				new Error($this->errors['incorrectClassName'], array($usedComponent));
 			}
 			$inClasses = '';
@@ -366,9 +371,8 @@ class JSCompiler
 			}
 			new Error($this->errors['unknownClassType'], array($classType, $jsFile['path'], $this->getAvailableClassTypes()));
 		}
-		$classNameRegExp = "/^[A-Z][a-zA-Z\d]+$/";
 		$className = $lineParts[1];
-		if (!preg_match($classNameRegExp, $className)) {
+		if (!$this->isValidClassName($className)) {
 			new Error($this->errors['incorrectClassName'], array($className));
 		}
 		if (isset($lineParts[2]) && $lineParts[2] != 'extends') {
@@ -398,11 +402,15 @@ class JSCompiler
 		unset($parts[0]);
 		$content = implode("\n", $parts);
 		if ($className != $jsFile['name']) {
-			new Error($this->errors['differentNames'], array($jsFile['path'], $jsFile['name'], $className));
+			if ($this->isValidClassName($jsFile['name'])) {
+				new Error($this->errors['differentNames'], array($jsFile['path'], $jsFile['name'], $className));
+			} else {
+				new Error($this->errors['differentNames2'], array($jsFile['path'], $className.'.js'));
+			}
 		}
 		$properExtends = array();
 		foreach ($extends as $superClassName) {
-			if (!preg_match($classNameRegExp, $superClassName)) {
+			if (!$this->isValidClassName($superClassName)) {
 				new Error($this->errors['incorrectSuper'], array($superClassName, $className));
 			}
 			$properExtends[] = $superClassName;
@@ -699,7 +707,8 @@ class JSCompiler
 				'sources' => $this->sources,
 				'templates' => $templates,
 				'obfuscateCss' => $this->configProvider->needCssObfuscation(),
-				'cssClassIndex' => $this->cssCompiler->getCssClassIndex()
+				'cssClassIndex' => $this->cssCompiler->getCssClassIndex(),
+				'utilsFuncs' => $this->validator->getUtilsFunctionNames()
 			)
 		);
 		foreach ($this->classes as $className => &$class) {

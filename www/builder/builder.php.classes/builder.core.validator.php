@@ -17,7 +17,7 @@ class CoreValidator
 			'Array', 'Element', 'MouseEvent', 'String'
 		),
 		'services' => array(
-			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator', 'Controllers'
+			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator', 'Controllers', 'Logger'
 		),
 		'utils' => array(
 			'utils', 'Objects'
@@ -27,7 +27,7 @@ class CoreValidator
 	private $allUtilsFunctionNames = array();
 
 	private $utilsFunctions = array(
-		'log', 'Error', 'generateRandomKey', 'toCamelCase', 'isComponentLike', 'isComponent', 'isController', 'isControl', 'isObject',
+		'generateRandomKey', 'toCamelCase', 'isComponentLike', 'isComponent', 'isController', 'isControl', 'isObject',
 		'isArray', 'isArrayLike', 'isElement', 'isNode', 'isText', 'isFunction', 'isBool', 'isBoolean', 'isString', 'isNumber', 'isNumeric',
 		'isUndefined', 'isNull', 'isNone', 'isZero', 'isNotEmptyString', 'stringToNumber', 'getCount'
 	);

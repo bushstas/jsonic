@@ -53,6 +53,8 @@ class TemplateParser
 		self::$obfuscate = $params['obfuscateCss'];
 		self::$cssClassIndex = &$params['cssClassIndex'];
 		self::$globalNames = JSGlobals::getUsedNames();
+		$varNames = array_values(JSGlobals::getVarNames());
+		TemplateCodeParser::setGlobalNames(self::$globalNames, $varNames, $params['utilsFuncs']);
 	}
 
 	public static function getTextNodes() {
@@ -86,7 +88,6 @@ class TemplateParser
 		}
 		
 		$templates = array();
-		TemplateCodeParser::setGlobalNames(self::$globalNames);
 		for ($i = 0; $i < count($templateNames); $i++) {
 			self::$templateName = $templateNames[$i];
 			TemplateCodeParser::init(self::$templateName, $className);

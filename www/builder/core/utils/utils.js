@@ -1,12 +1,3 @@
-function log(message, method, object, opts) {
-	window.console.log(method === undefined ? message : new Error(message, method, object, opts));
-}
-function Error(message, method, object, opts) {
-	this.object = object;
-	this.method = method;
-	this.message = message;
-	this.opts = opts;
-}
 function generateRandomKey() {
 	var x = 2147483648, now = +new Date();
 	return Math.floor(Math.random() * x).toString(36) + Math.abs(Math.floor(Math.random() * x) ^ now).toString(36);

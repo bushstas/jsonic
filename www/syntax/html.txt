@@ -359,7 +359,7 @@ contexts:
           captures:         
             1: comment.block.actionscript.2 
 
-        - match: -*\d+
+        - match: -*\d+\.*
           captures:         
             0: constant.language.actionscript.2
 
@@ -371,7 +371,7 @@ contexts:
           captures:         
             1: constant.language.actionscript.2
 
-        - match: ([\^\$&~\.@\#:]\w+)
+        - match: ([\$&@\#~\^\.](?=[a-zA-Z])\w+)
           captures:
             0: support.class.actionscript.2
 

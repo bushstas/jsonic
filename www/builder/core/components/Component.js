@@ -517,7 +517,7 @@ function Component() {
 	};
 
 	Component.prototype.log = function(message, method, opts) {
-		log(message, method, this, opts);
+		Logger.log(message, method, this, opts);
 	};
 
 	Component.prototype.getUniqueId = function() {
