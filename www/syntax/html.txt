@@ -351,11 +351,11 @@ contexts:
           captures:
             0: comment2.block.actionscript.2     
 
-        - match: ' \w+ *:'
+        - match: ([\$&@\#~\^\.](?=[a-zA-Z])\w+)
           captures:
-            0: comment.block.actionscript.2          
+            0: support.class.actionscript.2
 
-        - match: '(=|\!=|>=*|=>|<=*|\-|\/|\+|\%|\?|:|\!)'
+        - match: '[=\!><\-\/\+%\?:\*&\|\#~\$@\^\\]'
           captures:         
             1: comment.block.actionscript.2 
 
@@ -363,17 +363,13 @@ contexts:
           captures:         
             0: constant.language.actionscript.2
 
-        - match: (null|false|true|Number|String|Boolean|Function|Null|undefined|Object|Array)
+        - match: (null|false|true|Number|String|Infinity|NaN|Boolean|Function|Null|undefined|Object|Array)
           captures:         
             1: constant.language.actionscript.2        
 
         - match: (\d+ *)(?=[\/\]])
           captures:         
             1: constant.language.actionscript.2
-
-        - match: ([\$&@\#~\^\.](?=[a-zA-Z])\w+)
-          captures:
-            0: support.class.actionscript.2
 
         - match: '([\?:&])'
           captures:

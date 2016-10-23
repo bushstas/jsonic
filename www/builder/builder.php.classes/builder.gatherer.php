@@ -4,7 +4,7 @@ class Gatherer
 {
 	private $configProvider, $config;
 	private $extensions = array(
-		'js', 'css', 'template', 'texts', 'data', 'cssconst', 'include', 'decl'
+		'js', 'css', 'template', 'texts', 'data', 'cssconst', 'include', 'decl', 'utils'
 	);
 	private $errors = array(
 		'noPathToSrc' => 'Директория указанная в параметре <b>scope</b> не найдена',

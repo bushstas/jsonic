@@ -54,7 +54,7 @@ class TemplateParser
 		self::$cssClassIndex = &$params['cssClassIndex'];
 		self::$globalNames = JSGlobals::getUsedNames();
 		$varNames = array_values(JSGlobals::getVarNames());
-		TemplateCodeParser::setGlobalNames(self::$globalNames, $varNames, $params['utilsFuncs']);
+		TemplateCodeParser::setGlobalNames(self::$globalNames, $varNames, $params['utilsFuncs'], $params['userUtilsFuncs']);
 	}
 
 	public static function getTextNodes() {
@@ -816,7 +816,51 @@ class TemplateParser
 			}
 			$props[$propName] = $propValue;
 			if ($hasCode) {
-				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{_DATA_#$1}", $propValue);
+				$attrContent = '';
+				$attrParts = array();
+				$names[$propName] = array();
+				
+				$attrData = Splitter::split('/\{([^\}]*)\}/', $propValue);
+				$items = $attrData['items'];
+				$hasText = false;
+				foreach ($items as $item) {
+					if (!empty($item)) {
+						$hasText = true;
+						break;
+					}
+				}
+				foreach ($items as $idx => $item) {
+					if ($item !== '') {
+						if ($isObfClName) {
+							self::getObfuscatedClassName($item);
+						}
+						$attrContent += $item;
+						$attrParts[] = $item;
+					}
+					if (isset($attrData['delimiters'][$idx])) {
+						$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
+						$data = TemplateCodeParser::parse($code, $isComponentTag ? 'componentAttribute' : 'elementAttribute');
+						$code = $data['code'];
+						if ($data['ternary'] && $hasText) {
+							if ($data['ternaryIncomplete']) {
+								TextParser::encode($code, '_tmpcode');
+								$parts = explode('?', $code);
+								$code = $parts[0];
+								for ($pidx = 1; $pidx < count($parts); $pidx++) {
+
+								}
+								$code = preg_replace('/\?([\s])/', "?$2:''", $code);
+								TextParser::decode($code, '_tmpcode');
+								Printer::log($code);
+							}
+							$code = '('.$code = $data['code'].')';
+						}
+						Printer::log($code);
+					}
+				}
+
+
+				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{<data>$1}", $propValue);
 				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
 				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
 				$propValue = preg_replace("/@(\w+)/", "<nq>".self::$globalNames['CONSTANTS'].".$1<nq>", $propValue);
@@ -825,23 +869,27 @@ class TemplateParser
 				$hasClassVar = self::hasClassVar($propValue);
 				preg_match_all($regexp, $propValue, $matches);
 				$codes = $matches[1];
+				
+
+
+				
+				
+
 				$parts = preg_split($regexp, $propValue);
-				$names[$propName] = array();
-				$attrContent = '';
-				$attrParts = array();
+				
+				
 				foreach ($parts as $idx => $part) {
 					if ($part !== '') {
 						if ($isObfClName) {
-							$part = self::getObfuscatedClassName($part);
+							self::getObfuscatedClassName($part);
 						}
 						$attrContent .= $part;
 						$attrParts[] = $part;
 					}
 					if (isset($codes[$idx])) {
 						$code = $codes[$idx];
-						$code = self::checkTernary($code);
 						if ($isObfClName) {
-							$code = self::getObfuscatedClassName($code, true);
+							self::getObfuscatedClassName($code, true);
 						}
 						if (self::hasClassVar($code)) {
 							$code = self::parseAttributeClassVars($code, $names[$propName]);
@@ -874,7 +922,8 @@ class TemplateParser
 					unset($names[$propName]);
 				}
 			} else if ($isObfClName) {
-				$props[$propName] = self::getObfuscatedClassName($propValue);
+				self::getObfuscatedClassName($propValue);
+				$props[$propName] = $propValue;
 			}
 		}
 		if ($isComponentTag) {
@@ -1090,8 +1139,7 @@ class TemplateParser
 			foreach ($codes as &$code) {
 				$data = TemplateCodeParser::parse($code, 'textNode');
 				$code = $data['code'];
-				Printer::log($code);
-				
+			
 				if (!empty($data['react'])) {
 					if (!is_array(self::$class)) {
 						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
@@ -1121,7 +1169,6 @@ class TemplateParser
 	private static function parseCode($code, $role = null, $toPropNodes = false) {
 		$code = trim($code);
 		self::parseClassMethodCalls($code);
-		$code = self::checkTernary($code);
 		$code = preg_replace('/\s*@(\w+)\s*/', self::$globalNames['CONSTANTS'].".$1", $code);
 		$code = preg_replace('/^\s*::(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
 		$code = preg_replace('/^\s*::(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
@@ -1187,7 +1234,7 @@ class TemplateParser
 				}
 			}
 		}
-		$code = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $code);
+		$code = preg_replace('/\#([a-z]\w*)/i', "<data>$1", $code);
 		$code = preg_replace('/^&([a-z])/i', "$1", $code);
 		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
 		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
@@ -1211,49 +1258,6 @@ class TemplateParser
 		return !!$hasFunctionCall;
 	}
 
-	private static function checkTernary($code) {
-		$originalCode = $code;
-		if (preg_match('/\?/', $code)) {
-			$originalCode = '('.trim(trim($originalCode, ')'), '(').')';
-			$strings = array();
-			$signs = array("'", '"');
-			for ($i = 0; $i < 2; $i++) {
-				$strings[$i] = array();
-				$parts = explode($signs[$i], $code);
-				$code = '';
-				$isString = false;
-				foreach ($parts as $part) {
-					if ($isString) {
-						$strings[$i][] = $part;
-						$code .= '__S'.$i.'__';
-					} else {
-						$code .= $part;
-					}
-					$isString = !$isString;
-				}
-			}
-			if (preg_match('/\?[^:]+$/', $code)) {
-				$strings = array_reverse($strings);
-				$code = trim($code).":''";
-				$signs = array('__S1__', '__S0__');
-				$signs2 = array('"', "'");
-				for ($i = 0; $i < 2; $i++) {
-					$parts = explode($signs[$i], $code);
-					$code = '';
-					foreach ($parts as $j => $part) {
-						$code .= $part;
-						if (isset($strings[$i][$j])) {
-							$code .= $signs2[$i].$strings[$i][$j].$signs2[$i];
-						}
-					}
-
-				}
-				$originalCode = '('.$code.')';
-			}
-		}
-		return $originalCode;
-	}
-
 	private static function hasFunctionCall($code) {
 		preg_match_all('/^\s*\.([a-z]\w*)|[^\w\]]\.([a-z]\w*)/i', $code, $matches);
 		$funcs = array();
@@ -1273,7 +1277,7 @@ class TemplateParser
 		return $funcs;
 	}
 
-	private static function getObfuscatedClassName($value, $isCode = false) {
+	private static function getObfuscatedClassName(&$value, $isCode = false) {
 		if (!$isCode) {
 			$value = "'".$value."'";
 		}
@@ -1306,7 +1310,7 @@ class TemplateParser
 			$obfuscatedValue = trim($obfuscatedValue, "'");
 		}
 		$obfuscatedValue = preg_replace('/\[\#([^\#]+)\#\]/', "['$1']", $obfuscatedValue);
-		return preg_replace('/ {2,}/', ' ', $obfuscatedValue);
+		$value = preg_replace('/ {2,}/', ' ', $obfuscatedValue);
 	}
 
 	private static function addToCssClassIndex($className) {

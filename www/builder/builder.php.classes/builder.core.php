@@ -18,7 +18,7 @@ $includes = array(
 	'error', 'core.validator', 'config', 'gatherer', 'css', 'js', 'templates', 'html', 'routes',
 	'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser', 'js.checker', 'js.globals',
 	'data', 'tags', 'props', 'events', 'template.parser', 'css.obfuscator', 'printer', 'js.interpreter',
-	'splitter', 'template.code.parser'
+	'splitter', 'template.code.parser', 'utils'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
@@ -28,7 +28,7 @@ class Builder
 {
 	private $config, $gatherer, $testsCompiler,
 			$cssCompiler, $jsCompiler, $htmlCompiler,
-			$templateCompiler, $dataCompiler;
+			$templateCompiler, $dataCompiler, $utilsCompiler;
 
 	private $files;
 	
@@ -41,6 +41,7 @@ class Builder
 		
 		CSSObfuscator::init();
 		$this->cssCompiler = new CSSCompiler($this->config);
+		$this->utilsCompiler = new UtilsCompiler($this->config);
 
 		$this->routesCompiler = new RoutesCompiler($this->config);
 		$this->routesCompiler->init();
@@ -71,6 +72,7 @@ class Builder
 	private function runCompilers() {
 		$this->htmlCompiler     -> run ();
 		$this->cssCompiler      -> run ($this->files['css'], $this->files['cssconst']);
+		$this->utilsCompiler    -> run ($this->files['utils'], $this->coreValidator->getUtilsFunctionNames());
 		$this->textsCompiler    -> run ($this->files['texts']);
 		$this->declCompiler     -> run ($this->files['decl']);
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
@@ -99,6 +101,8 @@ class Builder
 				return $this->declCompiler;
 			case 'validator':
 				return $this->coreValidator;
+			case 'utils':
+				return $this->utilsCompiler;
 		}
 	}
 }

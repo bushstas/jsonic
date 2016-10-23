@@ -1,6 +1,4 @@
 <div class="app-datatable-outer-container">
-	{
-		.a()
-	}
+	{~a ? 4 + $a[~b ? 5] }
 	<component class="DataTableTabPanel">
 </div>

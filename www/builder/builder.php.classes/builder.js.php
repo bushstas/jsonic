@@ -96,6 +96,7 @@ class JSCompiler
 	private $validator;
 	private $declCompiler;
 	private $testsCompiler;
+	private $utilsCompiler;
 	private $routesCompiler;
 	private $cssCompiler;
 	private $usedComponents;
@@ -120,6 +121,7 @@ class JSCompiler
 		$this->testsCompiler = $builder->getCompiler('tests');
 		$this->cssCompiler = $builder->getCompiler('css');
 		$this->validator = $builder->getCompiler('validator');
+		$this->utilsCompiler = $builder->getCompiler('utils');
 
 		$this->validateEntry();
 		$this->validateJsFolder();
@@ -708,7 +710,8 @@ class JSCompiler
 				'templates' => $templates,
 				'obfuscateCss' => $this->configProvider->needCssObfuscation(),
 				'cssClassIndex' => $this->cssCompiler->getCssClassIndex(),
-				'utilsFuncs' => $this->validator->getUtilsFunctionNames()
+				'utilsFuncs' => $this->validator->getUtilsFunctionNames(),
+				'userUtilsFuncs' => $this->utilsCompiler->getFunctionsList()
 			)
 		);
 		foreach ($this->classes as $className => &$class) {
@@ -912,7 +915,7 @@ class JSCompiler
 			if (!empty($code)) {
 
 				$code = preg_replace('/(:\s*)@(\w+)/', "$1__.$2", $code);
-				$code = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $code);
+				$code = preg_replace('/\#([a-z]\w*)/i', "<data>$1", $code);
 				$code = preg_replace("/[\t\r\n]/", '', $code);
 				$code = preg_replace("/ {2,}/", ' ', $code);				
 				$spacelessCode = preg_replace('/\s/', '', $code);

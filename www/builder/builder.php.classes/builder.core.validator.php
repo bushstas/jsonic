@@ -5,7 +5,8 @@ class CoreValidator
 	private $errors = array(
 		'noCoreFolder' => 'Директория скриптов ядра {??} не обнаружена. Путь к диретории: {??}',
 		'noCoreFile' => 'Файл {??} в директории {??} не обнаружен. Путь к файлу: {??}',
-		'noUtilsFunc' => 'Системная функция {??} не найдена в файле утилит {??}'
+		'noUtilsFunc' => 'Системная функция {??} не найдена в файле утилит {??}',
+		'invalidFuncName' => 'Некорректное имя функции {??} в файле {??}. Имя функции утилиты должно начинаться с маленькой буквы'
 	);
 
 	private $content = array(
@@ -53,15 +54,22 @@ class CoreValidator
 	public function validateUtilsFunction($coreFiles) {
 		foreach ($coreFiles as $coreFile) {
 			if ($coreFile['name'] == 'utils') {
-				$utilsContent = $coreFile['content'];
-				preg_match_all('/\bfunction\s+(\w+)\s*\(/', $utilsContent, $matches);
+				preg_match_all('/\bfunction\s+(\w+)\s*\(/', $coreFile['content'], $matches);
 				$funcs = $this->allUtilsFunctionNames = $matches[1];
-				foreach ($this->utilsFunctions as $funcName) {
+				foreach ($funcs as $funcName) {
+					if (!$this->isValidFuncName($funcName)) {
+						new Error($this->errors['invalidFuncName'], array($funcName, $coreFile['path']));
+					}
 					if (!in_array($funcName, $funcs)) {
 						new Error($this->errors['noUtilsFunc'], array($funcName, $coreFile['path']));
 					}
 				}
+				break;
 			}
 		}
+	}
+
+	private function isValidFuncName($name) {
+		return preg_match("/^[a-z]\w*$/", $name);
 	}
 }

@@ -9,7 +9,7 @@ class TemplateCodeParser
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted,
-				   $thereWasWord;
+				   $thereWasWord, $place;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -64,7 +64,9 @@ class TemplateCodeParser
 		'unexpectedEnd' => 'Неожиданное окончание выражения: {{?}{?}<br><br>Ожидается:<xmp>{?}</xmp>',
 		'usingReservedName' => 'Использование зарезервированного локально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'capitalFirstLetter' => 'Использование вызова функции начинающейся с заглавной буквы в шаблоне {??} класса {??}<br><br>Имена функций утилит должны начинаться с маленькой буквы<br><br>Код в котором произошла ошибка: {{??}}',
-		'usingGlobalName' => 'Использование зарезервированного глобально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}'
+		'usingGlobalName' => 'Использование зарезервированного глобально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
+		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: {{??}}',
+		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}'
 	);
 
 	private static $keywords = array(
@@ -83,11 +85,13 @@ class TemplateCodeParser
 		'case', 'switch', 'if', 'foreach', 'let', 'default'
 	);
 
-	public static function setGlobalNames($names, $reserved, $utilsFuncs) {
+	private static $logging = false;
+	//private static $logging = true;
+
+	public static function setGlobalNames($names, $reserved, $utilsFuncs, $userUtilsFuncs) {
 		self::$globalNames = $names;
 		self::$reservedNames = $reserved;
-		self::$utilsFuncs = $utilsFuncs;
-		Printer::log(self::$utilsFuncs);
+		self::$utilsFuncs = array_merge($utilsFuncs, $userUtilsFuncs);
 	}
 
 	public static function init($templateName, $className) {
@@ -100,6 +104,7 @@ class TemplateCodeParser
 		$code = str_replace('_#_MORE_#_', '>', $code);
 		$code = trim($code);
 		self::$code = $code;
+		self::$place = $place;
 		$code = preg_replace('/\s+/', self::$space, $code);
 		self::$data = array(
 			'react' => array(),
@@ -136,6 +141,7 @@ class TemplateCodeParser
 					switch ($sign) {
 
 						case self::$space  : self::handleSpace();         break;
+						case '^'           : self::handleCaret();         break;
 						case '|'           : self::handleVerticalBar();   break;
 						case ':'           : self::handleColon();         break;
 						case '='           : self::handleEqual();         break;
@@ -170,11 +176,8 @@ class TemplateCodeParser
 						self::$prevSign = $sign;
 						self::off('space');
 					}
-					if (!self::$open['react2']) {
-						$parsedCode .= $sign;
-						$code .= $sign;
-					}
-
+					$parsedCode .= $sign;
+					$code .= $sign;
 					if (self::$isLet && self::isOpen('letvalue')) {
 						self::$data['let'][count(self::$data['let']) - 1]['value'] .= $signToAdd;						
 					}
@@ -198,6 +201,7 @@ class TemplateCodeParser
 					self::$prevSign = !$isNum ? 'a' : '0';
 					$prevCode = $code;
 					
+					//adding
 					if (!empty(self::$open['method'])) {
 						$parsedCode = rtrim($parsedCode, '.')."$.".$part;
 					} elseif (self::$open['react2']) {
@@ -211,8 +215,10 @@ class TemplateCodeParser
 						} else {
 							$parsedCode = rtrim($parsedCode, '&').$part;
 						}
-					} elseif (self::$open['open']) {
+					} elseif (self::$open['text']) {
 						$parsedCode = rtrim($parsedCode, '@').self::$globalNames['CONSTANTS'].'.'.$part;
+					} elseif (self::$open['data']) {
+						$parsedCode = rtrim($parsedCode, '#').'<data>'.$part;
 					} else {
 						$parsedCode .= $part;
 					}
@@ -331,42 +337,15 @@ class TemplateCodeParser
 		}
 
 		self::check($code);
-		
-		$code = $parsedCode;
-		if (self::$open['placeholder']) {
-			preg_match_all('/::(\w+)(.+)*/', $code, $matches);
-			$name = $matches[1][0];
-			$def = $matches[2][0];
-			if (empty($def)) {
-				$code = "{'pl':'".$name."'}";	
-			} else {
-				$code = "{'pl':'".$name."','p':".ltrim($def, '=')."}";
-			}			
-		
-		} elseif (!empty(self::$data['react'])) {
-			$names = array_keys(self::$data['react']);
-			if (count($names) == 1) {
-				$names = "'".$names[0]."'";
-			} else {
-				$names = json_encode($names);
-				$code = 'function(){return'.$code.'}';
-			}
-			$code = "{'pr':".$names.",'p':".$code."}";
-			//Printer::log($code);
-		} elseif (!empty(self::$data['let'])) {
-			$lets = array();
-			foreach (self::$data['let'] as $let) {
-				$lets[] = $let['name'].'='.$let['value'];
-			}
-			$code = '<let>var '.implode(',', $lets).'<=let>';
-		}
-		self::$data['code'] = '<nq>'.$code.'<nq>';
-		
-
-
 		self::$expected = $expecteds;
-		self::log();
+		
+		// logging
+		if (self::$logging) self::log();
 
+		self::$data['code'] = self::getParsedData($parsedCode);
+		
+		// logging
+		if (self::$logging) Printer::log($data['code']);
 		return self::$data;
 
 	}
@@ -375,6 +354,7 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			self::$varType = '';
 			self::off('react2');
+			self::off('var2');
 			if (!self::$open['letvalue'] && !self::$open['array']) {
 				self::removeExpected('[');
 			}
@@ -386,6 +366,13 @@ class TemplateCodeParser
 			if (self::$open['number'] || self::$open['name']) {
 				self::removeExpected('.');
 			}
+		}
+	}
+
+	private static function handleCaret() {
+		if (!self::$quoted) {
+			self::$expected = array('a');
+			self::on('comp');
 		}
 	}
 
@@ -425,6 +412,7 @@ class TemplateCodeParser
 				self::maybeAddDollar();
 			}
 			self::off('name');
+			self::off('number');
 		}
 	}
 
@@ -490,9 +478,20 @@ class TemplateCodeParser
 	private static function handleQuestion() {
 		if (!self::$quoted) {
 			self::add('ternary');
-			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
+			if (!self::$open['bracket'] && !self::$open['parenthesis'] && !self::$open['func']) {
+				if (self::$open['outerTernary']) {
+					new Error(self::$errors['fewOuterTernaries'], array(self::$className, self::$templateName, self::$code));
+				}
+				self::on('outerTernary');
+			}
+			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', '"', "'", self::$space);
 			self::maybeAddDollar();
 			self::off('name');
+			self::off('number');
+			self::off('greater');
+			self::off('doubleEqual');
+			self::off('tripleEqual');
+			self::off('notEqual');
 		}
 	}
 
@@ -512,9 +511,13 @@ class TemplateCodeParser
 			self::add('bracket');
 			self::$expected = array('"', "'", 'a', '0', '&', '~', '!', '@', '+', '-', '(', self::$space);
 			self::maybeAddDollar();
-			if ((self::$prevSign == 'a' || self::$prevSign == ']') && self::$varType == 'r') {
-				self::on('react2');
-			}			
+			if ((self::$prevSign == 'a' || self::$prevSign == ']')) {
+				if (self::$varType == 'r') {
+					self::on('react2');
+				} elseif (!empty(self::$varType)) {
+					self::on('var2');
+				}
+			}
 			if (self::$open['letvalue']) {
 				self::on('array');
 				self::$expected[] = ']';
@@ -528,13 +531,21 @@ class TemplateCodeParser
 			self::$expected = array('[', '.', self::$space);
 			self::off('number');
 			if (!self::$open['letvarname']) {
-				array_push(self::$expected, '&&', '||', '?', '-', '+', '/', '*', '%', '>', '<', '!');
+				array_push(self::$expected, '&&', '||', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');
+			}
+			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
+				self::$expected[] = ')';
+			}
+			if (!empty(self::$open['func'])) {
+				self::$expected[] = ',';
 			}
 			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
 				self::$expected[] = ':';
 			}
 			if (self::$varType == 'r') {
 				self::on('react2');
+			} elseif (!empty(self::$varType)) {
+				self::on('var2');
 			}
 			if (self::$open['array']) {
 				self::off('array');
@@ -547,6 +558,8 @@ class TemplateCodeParser
 				} elseif (!self::$open['letvalue']) {
 					array_push(self::$expected, ',', 'end');
 				}
+			} else {
+				self::$expected[] = 'end';
 			}
 		}
 	}
@@ -564,24 +577,22 @@ class TemplateCodeParser
 					return;
 				}
 			}
-			if (self::$open['functionResult'] || (self::$isLet && !self::$open['letvarname'] && self::$prevSign != '=' && self::$prevSign != '!' && !self::$open['greater'])) {
+			if (self::$open['recentQuote'] || self::$open['functionResult'] || (self::$isLet && !self::$open['letvarname'] && self::$prevSign != '=' && self::$prevSign != '!' && !self::$open['greater'])) {
 				self::$expected = array('=');
 				self::off('functionResult');
+				self::off('recentQuote');
 			} else {
-				self::$expected = array('a', '0', '~', '&', '.', '@', '#', '+', '-', '!', '(', "'", '"', self::$space);
-				if (!self::$open['doubleEqual'] && !self::$open['greater']) {
-					if (!self::$open['placeholderHasName']) {
-						self::$expected[] = '=';
-					}
+				self::$expected = array('a', '0', '~', '&', '.', '@', '#', '+', '-', '!', '(', "'", '"', '=', self::$space);
+				if (!self::$open['doubleEqual'] && !self::$open['greater'] && !self::$open['notEqual']) {
 					if (self::$prevSign == '!') {
 						self::on('notEqual');
-						self::$expected[] = '=';
 					} elseif (self::$prevSign == '=') {
 						if (!self::$open['doubleEqual']) {
 							self::on('doubleEqual');
 						}
 					}
 				} else {
+					self::removeExpected('=');
 					self::off('doubleEqual');
 					self::on('tripleEqual');
 				}
@@ -614,6 +625,7 @@ class TemplateCodeParser
 			self::off('functionResult');
 			self::$varType = '';
 			self::off('name');
+			self::off('number');
 		}
 	}
 
@@ -628,7 +640,7 @@ class TemplateCodeParser
 			self::$expected = '*';
 		} else {
 			self::on('recentQuote');
-			self::$expected = array( '?', '+', '&&', '||', self::$space);
+			self::$expected = array( '?', '+', '&&', '||', '=', '!', self::$space);
 			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
 				self::$expected[] = ':';
 			}
@@ -666,7 +678,7 @@ class TemplateCodeParser
 			self::$expected = '*';
 		} else {
 			self::on('recentQuote');
-			self::$expected = array('?', '+', '&&', '||', self::$space);
+			self::$expected = array('?', '+', '&&', '||', '=', '!', self::$space);
 			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
 				self::$expected[] = ':';
 			}
@@ -697,6 +709,7 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			self::$expected = array('a');
 			self::on('var');
+			self::off('var2');
 			self::$varType = 'a';
 			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis'])) {				
 				self::$expected = array('a');
@@ -728,6 +741,7 @@ class TemplateCodeParser
 				self::$expected[] = 'a';
 			}
 			self::on('var');
+			self::off('var2');
 			self::off('functionResult');
 			if (self::$prevSign == '&') {
 				self::off('letvarname');
@@ -736,7 +750,7 @@ class TemplateCodeParser
 				self::off('name');
 				array_push(self::$expected, '0', '~', '#', '+', '-', '!', '(', self::$space);
 				self::maybeAddDollar();
-			} else if ((self::$thereWasWord && !self::$open['letvarname']) || self::$open['bracket']) {
+			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math'])) || self::$open['bracket']) {
 				self::$expected[] = '&';
 			}
 			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis']) && self::$prevSign != '&') {
@@ -827,8 +841,14 @@ class TemplateCodeParser
 			self::off('number');
 		}
 
-		if (!self::$isNum && !self::$anyVar && !self::$isKey && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
-			self::validateFunction($part);
+		if (self::$open['comp']) {
+			self::$expected = array('end');
+			return false;
+		}
+		if (!self::$isNum && !self::$anyVar && !self::$isKey && !self::$open['comp'] && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
+			if (!self::$open['method']) {
+				self::validateFunction($part);
+			}
 			self::on('fn');
 			self::$expected = array('(');
 			return false;
@@ -847,10 +867,15 @@ class TemplateCodeParser
 	private static function validateFunction($funcName) {
 		if ($funcName == '_') {
 			new Error(self::$errors['usingReservedName'], array('_', self::$className, self::$templateName, self::$code));
-		} elseif (preg_match('/^[A-Z]/', $funcName)) {
+		}
+		if (preg_match('/^[A-Z]/', $funcName)) {
 			new Error(self::$errors['capitalFirstLetter'], array(self::$className, self::$templateName, self::$code));
-		} elseif (in_array($funcName, self::$reservedNames)) {
+		}
+		if (in_array($funcName, self::$reservedNames)) {
 			new Error(self::$errors['usingGlobalName'], array($funcName, self::$className, self::$templateName, self::$code));
+		}
+		if (!in_array($funcName, self::$utilsFuncs)) {
+			new Error(self::$errors['usingUnknownFunc'], array($funcName, self::$className, self::$templateName, self::$code));
 		}
 	}
 
@@ -893,7 +918,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeQuestion() {
-		return (self::$notTextOrComp && !self::$open['letvarname']) || self::$open['bracket'];
+		return (!self::$open['comp'] && !self::$open['text'] && !self::$open['letvarname']) || self::$open['bracket'] || self::$isKey;
 	}
 
 	private static function couldBeExclamation() {
@@ -901,7 +926,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeLeftBracket() {
-		return !self::$isNum && !self::$isKey;
+		return !self::$isNum && !self::$isKey && !self::$open['text'];
 	}
 
 	private static function couldBeRightBracket() {
@@ -929,7 +954,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBePlus() {
-		return (!self::isOpen('comp') && self::$notLetValue) || self::$open['bracket'];
+		return (!self::$open['comp'] && self::$notLetValue) || self::$open['bracket'];
 	}
 
 	private static function couldBeSlash() {
@@ -945,19 +970,19 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeEqual() {
-		return self::$open['var'] || self::$isKey || self::$open['letvarname'] || self::$isNum;
+		return self::$open['var'] || self::$open['react'] || self::$open['react2'] || self::$isKey || self::$open['letvarname'] || self::$isNum;
 	}
 
 	private static function couldBeGreater() {
-		return self::$open['var'] && !self::$open['letvarname'];
+		return (self::$open['var'] && !self::$open['letvarname']) || self::$isNum || self::$open['react'] || self::$open['react2'];
 	}
 
 	private static function couldBeSpace() {
-		return self::$isNum || self::$anyVar;
+		return self::$isNum || self::$anyVar || self::$isKey;
 	}
 
 	private static function couldBeLeftParenthesis() {
-		return !self::$isNum && self::$notLetValue;
+		return !self::$isNum && self::$notLetValue && !self::$open['text'];
 	}
 
 	private static function couldBeRightParenthesis() {
@@ -1029,7 +1054,7 @@ class TemplateCodeParser
 
 	
 	private static function isAnyVarOpen() {
-		return self::isOpen('react', 'react2', 'text', 'comp', 'var', 'data');
+		return self::isOpen('react', 'react2', 'text', 'comp', 'var', 'var2', 'data');
 	}
 
 	private static function isOpen() {
@@ -1056,16 +1081,13 @@ class TemplateCodeParser
 	private static function defineExpected($place) {
 		switch ($place) {
 			case 'elementAttribute':
-				self::$expected = array('+', '-', '!', 'a', '.', '&', '$', '~', '@');
-			break;
-			case 'templateAttribute':
-				self::$expected = array('+', '-', '!', 'a', '.', '&', '$', '~', '@');
+				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#');
 			break;
 			case 'componentAttribute':
-				self::$expected = array('+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '@');
+				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^');
 			break;
 			case 'textNode':
-				self::$expected = array('+', '-', '!', 'a', '.', ':', '&', '$', '~', '@');
+				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@');
 			break;
 			default:
 				self::$expected = array();
@@ -1141,13 +1163,14 @@ class TemplateCodeParser
 		Printer::log(self::$expected);
 	}
 
+	//checking
 	private static function check($code) {
 		$expecteds = self::$expected;
 		if (!self::$isCase && self::$thereWasWord) {
 			self::$expected = null;
 		}		
 		
-		if (self::$open['ternary'] > self::$open['ternary2'] && !self::$open['functionResult'] && !self::$open['number'] && !self::isAnyVarOpen())
+		if (!empty(self::$open['ternary']) && !self::$open['functionResult'] && !self::$open['number'] && !self::$open['name'] && !self::$open['recentQuote'] && !self::isAnyVarOpen())
 		{
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
 			self::maybeAddDollar();
@@ -1186,7 +1209,7 @@ class TemplateCodeParser
 		{
 			self::$expected = $expecteds;
 		}
-		elseif (self::isAnyVarOpen() && !self::$open['placeholderHasName'])
+		elseif (self::isOpen('react', 'text', 'comp', 'var', 'data') && !self::$open['placeholderHasName'])
 		{
 			self::$expected = array('a');
 		}
@@ -1212,6 +1235,53 @@ class TemplateCodeParser
 		{
 			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);
 		}
+	}
+
+	private static function getParsedData($code) {
+		if (!empty(self::$open['ternary'])) {
+			self::$data['ternary'] = true;
+			if (self::$open['ternary'] > self::$open['ternary2']) {
+				self::$data['ternaryIncomplete'] = true;
+			}
+		}
+		if (self::$open['placeholder']) {
+			return self::getPlaceholderCode($code);		
+		} 
+		if (self::$place == 'textNode' && !empty(self::$data['react'])) {
+			return self::getReactTextNode($code);
+			
+		} elseif (!empty(self::$data['let'])) {
+			$lets = array();
+			foreach (self::$data['let'] as $let) {
+				$lets[] = $let['name'].'='.$let['value'];
+			}
+			$code = '<let>var '.implode(',', $lets).'<=let>';
+		}
+		self::$data['code'] = '<nq>'.$code.'<nq>';
+		return $code;
+	}
+
+	private static function getPlaceholderCode($code) {
+		preg_match_all('/::(\w+)(.+)*/', $code, $matches);
+		$name = $matches[1][0];
+		$def = preg_replace('/^[\s=]+/', '', $matches[2][0]);
+		if (empty($def)) {
+			$code = "{'pl':'".$name."'}";	
+		} else {
+			$code = "{'pl':'".$name."','p':".$def."}";
+		}
+		return $code;
+	}
+
+	private static function getReactTextNode($code) {
+		$names = array_keys(self::$data['react']);
+		if (count($names) == 1) {
+			$names = "'".$names[0]."'";
+		} else {
+			$names = json_encode($names);
+			$code = 'function(){return'.$code.'}';
+		}
+		return "{'pr':".$names.",'p':".$code."}";
 	}
 
 }

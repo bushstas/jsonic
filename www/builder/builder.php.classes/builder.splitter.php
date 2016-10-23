@@ -2,7 +2,7 @@
 
 class Splitter
 {
-	public function split($regexp, $text, $matchesIndex = 0) {
+	public static function split($regexp, $text, $matchesIndex = 0) {
 		preg_match_all($regexp, $text, $matches);
 		if (empty($matches[0])) return;
 		$regexp = '/'.trim(trim($regexp, '#'), '/').'/';
@@ -13,7 +13,7 @@ class Splitter
 		);
 	}
 
-	public function join($items, $delimiters) {
+	public static function join($items, $delimiters) {
 		$text = '';
 		for ($i = 0; $i < count($items); $i++) {
 			$text .= $items[$i];
@@ -24,7 +24,7 @@ class Splitter
 		return $text;
 	}
 
-	public function getInner($text, $opening = '}', $closing = '{') {
+	public static function getInner($text, $opening = '}', $closing = '{') {
 		$inner = '';
 		$outer = '';
 		$closed = true;
