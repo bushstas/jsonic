@@ -38,7 +38,8 @@ class TemplateParser
 		'eventHandlerExpected' => 'Фигурные скобки внутри атрибута события {??} в шаблоне {??} класса {??}. Ожидается название функции обработчика!',
 		'handlerNotFound' => 'Функция {??}, указанная в шаблоне {??} класса {??} в качестве обработчика события {??}, не найдена среди методов данного класса',
 		'noTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><template templ="table" rows="{~rows}"></xmp>',
-		'noIncludeTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><include templ="table" rows="{~rows}"></xmp>'
+		'noIncludeTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><include templ="table" rows="{~rows}"></xmp>',
+		'codeOutsideAttribute' => 'Обнаружен код вне атрибута тега в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
 	public static function init($params) {
@@ -727,8 +728,19 @@ class TemplateParser
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
 		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
-		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
-		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
+		$regexp = "/ ([a-z][\w\-]*)=\"([^\"]+)\"/";
+		preg_match_all($regexp, $html, $matches1);
+		$regexp2 = "/ ([a-z][\w\-]*)='([^']+)'/";
+		preg_match_all($regexp2, $html, $matches2);
+		
+		if ($html[0] == '<') {
+			$tagContent = preg_replace($regexp, '', $html);
+			$tagContent = preg_replace($regexp, '', $tagContent);
+			if (preg_match('/\{[^\}]+\}/', $tagContent)) {
+				new Error(self::$errors['codeOutsideAttribute'], array(self::$templateName, self::$className, $html));
+			}
+		}
+
 		$propNames = array_merge($matches1[1], $matches2[1]);
 		$propValues = array_merge($matches1[2], $matches2[2]);
 		for ($i = 0; $i < count($propNames); $i++) {		
@@ -818,7 +830,9 @@ class TemplateParser
 			if ($hasCode) {
 				$attrParts = array();
 				$names[$propName] = array();
-				
+				if (is_array(self::$class) && !is_array(self::$class['tmpCallbacks'])) {
+					self::$class['tmpCallbacks'] = array();
+				}
 				$attrData = Splitter::split('/\{([^\}]*)\}/', $propValue);
 				$items = $attrData['items'];
 				$hasText = false;
@@ -841,10 +855,17 @@ class TemplateParser
 						$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
 						$data = TemplateCodeParser::parse($code, $isComponentTag ? 'componentAttribute' : 'elementAttribute');
 						$code = $data['code'];
+						//Printer::log($code);
 						if ($data['inFunc']) {
 							$inFunc = true;
 						}
+						if (is_array(self::$class) && !empty($data['callbacks'])) {
+							self::$class['tmpCallbacks'] = array_merge(self::$class['tmpCallbacks'], $data['callbacks']);
+						}
 						if (is_array($data['reactNames'])) {
+							if (is_string(self::$class)) {
+								new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
+							}
 							$names[$propName] = array_merge($names[$propName], $data['reactNames']);
 						}
 						if ($data['ternary'] && $hasText) {
@@ -865,30 +886,9 @@ class TemplateParser
 				} else {
 					$attrContent = '<nq>'.$attrContent.'<nq>';
 				}
-				Printer::log($attrContent);
-
-
-				$propValue = preg_replace("/\{\s*\#([a-z]\w*)\s*\}/", "{<data>$1}", $propValue);
-				$propValue = preg_replace("/&(\w+)/", "$1", $propValue);
-				$propValue = preg_replace("/~(\w+)/", "_['$1']", $propValue);
-				$propValue = preg_replace("/@(\w+)/", "<nq>".self::$globalNames['CONSTANTS'].".$1<nq>", $propValue);
-
-				$regexp = '/\{([^\}]*)\}/';
-				$hasClassVar = self::hasClassVar($propValue);
-				preg_match_all($regexp, $propValue, $matches);
-				$codes = $matches[1];
+				//Printer::log($attrContent);
+		
 				
-
-
-				//new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
-				
-
-				
-
-				self::parseClassMethodCalls($attrContent);
-				if ($hasClassVar) {
-					$attrContent = '<nq><function>"'.$attrContent.'"</function><nq>';
-				}				
 				$attrContent = self::correctTagAttributeText($propName, $attrContent);
 				$props[$propName] = $attrContent;
 				$names[$propName] = array_unique($names[$propName]);
@@ -1097,7 +1097,7 @@ class TemplateParser
 			}
 			foreach ($codes as &$code) {
 				$data = TemplateCodeParser::parse($code, 'textNode');
-				$code = $data['code'];
+				$code = '<nq>'.$data['code'].'<nq>';
 			
 				if (!empty($data['react'])) {
 					if (!is_array(self::$class)) {
@@ -1201,9 +1201,7 @@ class TemplateParser
 	}
 
 	private static function parseClassMethodCalls(&$code) {
-		if (preg_match('/\bthis\./', $code)) {
-			new Error(self::$errors['usingThis'], array(self::$templateName, self::$className));
-		}
+
 		$hasFunctionCall = self::hasFunctionCall($code);
 		if ($hasFunctionCall) {
 			if (!is_array(self::$class['tmpCallbacks'])) {
