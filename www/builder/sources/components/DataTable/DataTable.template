@@ -1,3 +1,3 @@
-<div class="app-datatable-outer-container" id="{~a?1 + (~b?4)}">
-	<component class="DataTableTabPanel">
+<div class="app-datatable-outer-container">
+	<component class="DataTableTabPanel" if="{!!true}" else="{.df()}">
 </div>

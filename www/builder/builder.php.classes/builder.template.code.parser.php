@@ -11,7 +11,7 @@ class TemplateCodeParser
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted,
-				   $thereWasWord, $place, $parsedCode;
+				   $thereWasWord, $place, $parsedCode, $element;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -89,8 +89,8 @@ class TemplateCodeParser
 	);
 
 	//logging
-	//private static $logging = false;
-	private static $logging = true;
+	private static $logging = false;
+	//private static $logging = true;
 
 	public static function setGlobalNames($names, $reserved, $utilsFuncs, $userUtilsFuncs) {
 		self::$globalNames = $names;
@@ -103,12 +103,13 @@ class TemplateCodeParser
 		self::$className = $className;
 	}
 
-	private static function initiate(&$code, $place) {
+	private static function initiate(&$code, $place, $element) {
 		self::defineExpected($place);
 		$code = str_replace('_#_MORE_#_', '>', $code);
 		$code = trim($code);
 		self::$code = $code;
 		self::$place = $place;
+		self::$element = $element;
 		$code = preg_replace('/\s+/', self::$space, $code);
 		self::$data = array(
 			'react' => array(),
@@ -124,8 +125,8 @@ class TemplateCodeParser
 		self::$quoted = false;
 	}
 
-	public static function parse($code, $place) {
-		self::initiate($code, $place);
+	public static function parse($code, $place, $element = null) {
+		self::initiate($code, $place, $element);
 		$parts = preg_split('/\b/', $code);		
 
 		$code = '';
@@ -894,12 +895,12 @@ class TemplateCodeParser
 			return false;
 		}
 		if (!self::$isNum && !self::$anyVar && !self::$isKey && !self::$open['comp'] && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
-			if (!self::$open['method']) {
-				self::validateFunction($part);
-			}
 			self::on('fn');
 			self::$expected = array('(');
-			return false;
+			if (!self::$open['method']) {
+				self::validateFunction($part);
+				return false;
+			}
 		}
 		if (self::isOpen('placeholder') && !self::isOpen('placeholderShouldHaveDefaultValue')) {
 			self::$expected = array('=', 'end', self::$space);
@@ -1132,9 +1133,35 @@ class TemplateCodeParser
 		return self::isOpen(array_keys(self::$open));
 	}
 
+	private static function getPlaceCaption() {
+		switch (self::$place) {
+			case 'componentClass':
+				return 'имени класса компонента';
+			
+			case 'templateAttribute':
+				return 'атрибута шаблона';
+
+			case 'elementAttribute':
+				return 'атрибута элемента';
+			
+			case 'componentAttribute':
+				return 'атрибута компонента';
+			
+			case 'textNode':
+				return 'текстового элемента';
+			
+			default:
+				return '';
+		}
+	}
 
 	private static function defineExpected($place) {
 		switch ($place) {
+			case 'componentClass':
+				self::$expected = array('a', '.', '&', '~', '#');
+			break;
+			case 'elseAttribute':
+			case 'templateAttribute':
 			case 'elementAttribute':
 				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#');
 			break;
@@ -1186,7 +1213,13 @@ class TemplateCodeParser
 
 	private static function error($name, $vars) {
 		self::log();
-		$err = 'Ошибка в парсинге кода в шаблоне <b>'.self::$templateName.'</b> класса <b>'.self::$className.'</b><br><br>Код в котором произошла ошибка: {'.self::$code.'}<br><br>';
+		$elementCode = '';
+		if (!empty(self::$element)) {
+			$elementCode = 'Элeмент в котором произошла ошибка: <xmp>'.self::$element.'</xmp><br>';
+		}
+		$err = 'Ошибка в парсинге кода '.self::getPlaceCaption().' в шаблоне <b>'.self::$templateName.'</b> класса <b>'.self::$className.'</b><br><br>
+				'.$elementCode.'
+		        Код в котором произошла ошибка: {'.self::$code.'}<br><br>';
 		new Error($err.self::$errors[$name], $vars);
 	}
 
@@ -1293,8 +1326,11 @@ class TemplateCodeParser
 	}
 
 	private static function getParsedData($code) {
-		if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
-			$code .= ":''";
+		if (!empty(self::$open['ternary'])) {
+			if (self::$open['ternary'] > self::$open['ternary2']) {
+				$code .= ":''";
+			}
+			self::$data['ternary'] = true;
 		}
 		if (self::$open['placeholder']) {
 			return self::getPlaceholderCode($code);		

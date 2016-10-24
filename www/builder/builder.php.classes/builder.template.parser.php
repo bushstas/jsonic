@@ -8,7 +8,7 @@ class TemplateParser
 	private static $class, $className, $tmpids, $isSwitchContext,
 				   $propsShortcuts, $eventTypesShortcuts, $obfuscate,
 				   $tagShortcuts, $cssClassIndex, $templateName,
-				   $globalNames;
+				   $globalNames, $parsedItem;
 
 	private static $textNodes = array();
 
@@ -505,7 +505,7 @@ class TemplateParser
 	}
 
 	private static function getSwitch($item, &$child) {
-		preg_match('/^\{\s*switch\s*([^\s\}]+)\s*\}$/', $item['content'], $match);
+		preg_match('/^\{\s*switch\s*([^\}]+)\}$/', $item['content'], $match);
 		$switch = $match[1];
 		if (empty($switch)) {
 			new Error(self::$errors['switchError'], array(self::$templateName, self::$className, $item['content']));
@@ -589,16 +589,14 @@ class TemplateParser
 	}
 
 	private static function getTemplateProperties($html, &$child, &$tmpName) {
+		self::$parsedItem = $html;
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
 		$names = array();
-		$html = preg_replace('/([\'"])(\w)/', "$1 $2", $html);
-		preg_match_all("/ ([a-z][\w\-]*)=\"([^\"]+)\"/", $html, $matches1);
-		preg_match_all("/ ([a-z][\w\-]*)='([^']+)'/", $html, $matches2);
-		$propNames = array_merge($matches1[1], $matches2[1]);
-		$propValues = array_merge($matches1[2], $matches2[2]);
 		$ifCondition = false;
 		$else = null;
+		list($propNames, $propValues) = self::getTagAttrs($html);	
+		
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
@@ -617,27 +615,7 @@ class TemplateParser
 			}			
 			$hasCode = self::hasCode($propValue);
 			if ($hasCode) {
-				if (is_string(self::$class)) {
-					new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $propValue));
-				}
-				if (preg_match('/\$\w+[\[]/', $propValue)) {
-					//
-				}				
-				preg_match_all($regexp, $propValue, $matches);
-				$codes = $matches[1];
-				if (!empty($codes)) {
-					$parts = preg_split($regexp, $propValue);
-					$content = array();
-					foreach ($parts as $j => $part) {
-						if (!empty($part)) {
-							$content[] = $part;
-						}
-						if (isset($codes[$j])) {
-							$content[] = '<plus>'.self::parseCode($codes[$j], 'tmp').'</plus>';
-						}
-					}
-					$propValue = implode($content);
-				}
+				$propValue = self::processCode($propValue, 'templateAttribute');
 			}
 			$props[$propName] = $propValue;
 		}
@@ -662,20 +640,12 @@ class TemplateParser
 		$child = array('c' => $child);
 
 		if (!empty($else)) {
-			$else = ltrim($else, '{');
-			$else = rtrim($else, '}');
-			if (preg_match('/\$\w+[\[]/', $else)) {
-				///
-			}
-			$child['e'] = self::parseCode($else, 'else');
+			$child['e'] = self::processCode($else, 'elseAttribute');
 		}
 		self::checkIfConditionForContainigProps($ifCondition, $child, true);
 	}
 
 	private static function checkIfConditionForContainigProps($ifCondition, &$child, $addingIntoChild = false) {
-		if (is_array(self::$class) && preg_match('/\$\w+[\[]/', $ifCondition)) {
-			///
-		}
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string(self::$class) && $hasCode) {
 			new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $ifCondition));
@@ -718,13 +688,7 @@ class TemplateParser
 		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
 	}
 
-	private static function getTagProperties($item, &$child, $isComponentTag = false) {
-		$html = $item['content'];
-		$props = array();
-		$names = array();
-		$ifCondition = false;
-		$else = null;
-
+	private static function getTagAttrs($html) {
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
 		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
@@ -740,9 +704,87 @@ class TemplateParser
 				new Error(self::$errors['codeOutsideAttribute'], array(self::$templateName, self::$className, $html));
 			}
 		}
+		return array(
+			array_merge($matches1[1], $matches2[1]),
+			array_merge($matches1[2], $matches2[2])
+		);
+	}
 
-		$propNames = array_merge($matches1[1], $matches2[1]);
-		$propValues = array_merge($matches1[2], $matches2[2]);
+	private static function processCode($code, $parsedPlace = 'elementAttribute', &$names = null) {
+		$attrParts = array();
+		if (is_array(self::$class) && !is_array(self::$class['tmpCallbacks'])) {
+			self::$class['tmpCallbacks'] = array();
+		}
+		$attrData = Splitter::split('/\{([^\}]*)\}/', $code);
+		$items = $attrData['items'];
+		$hasText = false;
+		foreach ($items as $item) {
+			if (!empty($item)) {
+				$hasText = true;
+				break;
+			}
+		}
+		$parts = array();
+		$inFunc = false;
+		foreach ($items as $idx => $item) {
+			if ($item !== '') {
+				if ($isObfClName) {
+					self::getObfuscatedClassName($item);
+				}
+				$attrParts[] = "<quote>".str_replace("'", "\\'", $item)."<quote>";
+			}
+			if (isset($attrData['delimiters'][$idx])) {
+				$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
+				$data = TemplateCodeParser::parse($code, $parsedPlace, self::$parsedItem);
+				$code = $data['code'];
+				//Printer::log($data);
+				if ($data['inFunc']) {
+					$inFunc = true;
+				}
+				if (!empty($data['callbacks'])) {
+					if (is_array(self::$class)) {
+						self::$class['tmpCallbacks'] = array_merge(self::$class['tmpCallbacks'], $data['callbacks']);
+					} else {
+						/////// ошибка
+					}
+				}
+				if (is_array($data['reactNames'])) {
+					if (is_string(self::$class)) {
+						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
+					}
+					if (is_array($names)) {
+						$names = array_merge($names, $data['reactNames']);
+					}
+				}
+				if ($data['ternary'] && $hasText) {
+					$code = '('.$code.')';
+				}
+				if ($isObfClName) {
+					self::getObfuscatedClassName($code);
+				}
+				$attrParts[] = $code;
+			}
+		}
+		if (!$inFunc && is_array($names)) {
+			$inFunc = count($names) > 1;
+		}
+		$attrContent = implode('+', $attrParts);
+		if ($inFunc) {
+			$attrContent = '<nq><function>'.$attrContent.'</function><nq>';
+		} else {
+			$attrContent = '<nq>'.$attrContent.'<nq>';
+		}
+		return $attrContent;
+	}
+
+	private static function getTagProperties($item, &$child, $isComponentTag = false) {
+		self::$parsedItem = $item['content'];
+		$props = array();
+		$names = array();
+		$ifCondition = false;
+		$else = null;
+		list($propNames, $propValues) = self::getTagAttrs($item['content']);
+
 		for ($i = 0; $i < count($propNames); $i++) {		
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
@@ -828,69 +870,13 @@ class TemplateParser
 			}
 			$props[$propName] = $propValue;
 			if ($hasCode) {
-				$attrParts = array();
 				$names[$propName] = array();
-				if (is_array(self::$class) && !is_array(self::$class['tmpCallbacks'])) {
-					self::$class['tmpCallbacks'] = array();
-				}
-				$attrData = Splitter::split('/\{([^\}]*)\}/', $propValue);
-				$items = $attrData['items'];
-				$hasText = false;
-				foreach ($items as $item) {
-					if (!empty($item)) {
-						$hasText = true;
-						break;
-					}
-				}
-				$parts = array();
-				$inFunc = false;
-				foreach ($items as $idx => $item) {
-					if ($item !== '') {
-						if ($isObfClName) {
-							self::getObfuscatedClassName($item);
-						}
-						$attrParts[] = "<quote>".str_replace("'", "\\'", $item)."<quote>";
-					}
-					if (isset($attrData['delimiters'][$idx])) {
-						$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
-						$data = TemplateCodeParser::parse($code, $isComponentTag ? 'componentAttribute' : 'elementAttribute');
-						$code = $data['code'];
-						//Printer::log($code);
-						if ($data['inFunc']) {
-							$inFunc = true;
-						}
-						if (is_array(self::$class) && !empty($data['callbacks'])) {
-							self::$class['tmpCallbacks'] = array_merge(self::$class['tmpCallbacks'], $data['callbacks']);
-						}
-						if (is_array($data['reactNames'])) {
-							if (is_string(self::$class)) {
-								new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
-							}
-							$names[$propName] = array_merge($names[$propName], $data['reactNames']);
-						}
-						if ($data['ternary'] && $hasText) {
-							$code = '('.$code.')';
-						}
-						if ($isObfClName) {
-							self::getObfuscatedClassName($code);
-						}
-						$attrParts[] = $code;
-					}
-				}
-				if (!$inFunc) {
-					$inFunc = count($names[$propName]) > 1;
-				}
-				$attrContent = implode('+', $attrParts);
-				if ($inFunc) {
-					$attrContent = '<nq><function>'.$attrContent.'</function><nq>';
-				} else {
-					$attrContent = '<nq>'.$attrContent.'<nq>';
-				}
-				//Printer::log($attrContent);
-		
-				
-				$attrContent = self::correctTagAttributeText($propName, $attrContent);
-				$props[$propName] = $attrContent;
+				$parsedPlace = $isComponentTag ? 'componentAttribute' : 'elementAttribute';
+				$code = self::processCode($propValue, $parsedPlace, $names[$propName]);
+				$code = self::correctTagAttributeText($propName, $code);
+				//Printer::log($code);
+
+				$props[$propName] = $code;
 				$names[$propName] = array_unique($names[$propName]);
 				sort($names[$propName]);
 				if (count($names[$propName]) == 1) {
@@ -1075,9 +1061,8 @@ class TemplateParser
 				new Error(self::$errors['reactControlName'], array(self::$templateName, self::$className, $content));
 			}
 		}
-		$value = ltrim($value, '{');
-		$value = rtrim($value, '}');
-		return self::parseCode($value);
+		self::$parsedItem = $content;
+		return self::processCode($value, 'componentClass');
 	}
 
 	private static function parseTextNode($content, &$children, &$let) {
@@ -1113,12 +1098,9 @@ class TemplateParser
 					$items[] = $part;
 				}
 				if (isset($codes[$i])) {
-					//$items[] = array(self::parseCode($codes[$i], 'prop', true));
 					$items[] = $codes[$i];
 				}
 			}
-			//Printer::log($items);
-
 			foreach ($items as $item) {
 				$children[] = $item;
 			}
