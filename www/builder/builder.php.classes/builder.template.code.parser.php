@@ -209,9 +209,6 @@ class TemplateCodeParser
 					if (!self::isLatinTextExpected($part, $code)) {
 						self::error('unexpectedLat', array($code, $part, ' ...}', self::getExpected()));
 					}
-
-					self::$prevSign = !$isNum ? 'a' : '0';
-					$prevCode = $code;
 					
 					//adding
 					if (!empty(self::$open['method']))
@@ -244,7 +241,7 @@ class TemplateCodeParser
 						switch ($part) {
 							case 'let':
 								self::$isLet = true;
-								self::$expected = array('&', '~', self::$space);
+								self::$expected = array('&', self::$space);
 							break;
 							case 'case':
 								self::$isCase = true;
@@ -261,6 +258,10 @@ class TemplateCodeParser
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
+						if (self::isOpen('letvalue')) {
+							$idx = count(self::$data['let']) - 1;
+							self::$data['let'][$idx]['value'] .= $part;
+						}
 					} else {
 
 						if (self::$isCase) {
@@ -337,7 +338,8 @@ class TemplateCodeParser
 								self::$expected[] = '.';
 							}
 						}					
-					
+						self::$prevSign = !$isNum ? 'a' : '0';
+						$prevCode = $code;
 						self::finish();					
 					}
 				} elseif (self::$expected != '*') {
@@ -448,7 +450,7 @@ class TemplateCodeParser
 		$env = self::$queue[count(self::$queue) - 1];
 		$cnt = self::$open[$env];
 		$ternary = self::$ternaries[count(self::$ternaries) - 1];
-		if ($ternary[$env] == $cnt) {
+		if (!empty($ternary) && $ternary[$env] == $cnt) {
 			array_pop(self::$ternaries);
 			self::$parsedCode .= ":''";
 		}
@@ -457,7 +459,6 @@ class TemplateCodeParser
 	private static function handleComma() {
 		if (!self::$quoted) {
 			self::tryToCloseTernary();
-
 			self::$expected = array();
 			if (!self::$isLet || !empty(self::$open['func']) || self::$open['array']) {
 				self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', self::$space);
@@ -474,6 +475,7 @@ class TemplateCodeParser
 			self::off('functionResult');
 			self::off('name');
 			self::off('recentVar');
+			self::off('number');
 		}
 	}
 
@@ -881,6 +883,7 @@ class TemplateCodeParser
 		self::$decOpen = self::isOpen('decimal');
 		self::$notLetValue = !self::$open['letvarname'];
 
+		
 		if (self::$isNum) {
 			if (self::$decOpen) {
 				self::off('decimal');
@@ -888,6 +891,9 @@ class TemplateCodeParser
 			self::on('number');
 		} else {
 			self::off('number');
+			if (self::$prevSign == '&' && self::$currentPart == '_') {
+				new Error(self::$errors['usingReservedName'], array('_', self::$className, self::$templateName, self::$code));
+			}
 		}
 
 		if (self::$open['comp']) {
@@ -982,7 +988,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeLeftBracket() {
-		return !self::$isNum && !self::$isKey && !self::$open['text'];
+		return !self::$isNum && !self::$isKey && !self::$open['text'] && !self::$open['letvarname'];
 	}
 
 	private static function couldBeRightBracket() {
@@ -1087,8 +1093,7 @@ class TemplateCodeParser
 				if (empty(self::$open['parenthesis'])) {
 					self::$expected[] = ',';
 				}
-			}
-			
+			}			
 		}
 		self::offVars();
 		self::off('letvalue');
@@ -1160,7 +1165,8 @@ class TemplateCodeParser
 			case 'componentClass':
 				self::$expected = array('a', '.', '&', '~', '#');
 			break;
-			case 'elseAttribute':
+			case 'if':
+			case 'else':
 			case 'templateAttribute':
 			case 'elementAttribute':
 				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#');
@@ -1338,11 +1344,12 @@ class TemplateCodeParser
 		if (!empty(self::$data['react'])) {
 			$code = self::getReactCode($code);
 		} elseif (!empty(self::$data['let'])) {
+			self::$data['isLet'] = true;
 			$lets = array();
 			foreach (self::$data['let'] as $let) {
-				$lets[] = $let['name'].'='.$let['value'];
+				$lets[] = $let['name'].$let['value'];
 			}
-			$code = '<let>var '.implode(',', $lets).'<=let>';
+			$code = implode(',', $lets);
 		}
 		return $code;
 	}

@@ -4,8 +4,6 @@
 
 внедрить {ifempty} внутрь FOREACH
 
-косяк с let, когда он находится вне тегов
-
 запилить геттеры и сеттеры
 
 ?~var = (!!~var?~var:'')
@@ -31,8 +29,6 @@ $func(), ~func()
 
 <component class="DataTableTabPanel" city="{dict:cities[22]}">
 
-валидация функций вызываемых в швблонах: только utils и myutils
-
 <component class="DataTableTabPanel" cityTempl="{template:city}">
 <component class="DataTableTabPanel" cityTempl="{template:#city}"> by key
 <div>
@@ -43,8 +39,8 @@ $func(), ~func()
 
 запилить JS константы
 
-ternary => (a?b:c)
-
 запретить вызвать например .render() из шаблона 
 
 Ошибка вызова метода df класса DataTable из его шаблона. Метод не найден -> выводить код элемента
+
+запилить реактивный let

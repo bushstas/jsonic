@@ -14,8 +14,8 @@ class TemplateParser
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
-		'noClosingTag' => 'Ошибка валидации шаблонов класса {??}. Один из {?} {??} не имеет закрывающего тега',
-		'extraClosingTag' => 'Ошибка валидации шаблонов класса {??}. Лишний закрывающийся {?} {??}',
+		'noClosingTag' => 'Ошибка валидации шаблона {??} класса {??}. Один из {?} {??} не имеет закрывающего тега',
+		'extraClosingTag' => 'Ошибка валидации шаблона {??}  класса {??}. Обнаружен лишний закрывающийся {?} {??}',
 		'unknownComponent' => 'Неопределенный компонент в шаблоне {??} класса {??}<xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'controlWithoutName' => 'Контрол {??} в шаблоне {??} класса {??} не имеет атрибута <b>name</b><xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'reactVarInInclude' => 'Шаблон {??}, содержащийся в файле {??} содержит код с реактивными переменными {??}<br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>~arg</b> и локальных переменных <b>&var</b>',
@@ -101,10 +101,12 @@ class TemplateParser
 			if ($data == '[]') {
 				$data = ' null';
 			} else {
+
 				$data = str_replace('"', "'", $data);
 		
 				$data = str_replace("\'", "'", $data);
-
+				//replacing
+				//Printer::log($data);
 				$data = str_replace('<this>', '$.', $data);
 				$data = preg_replace("/'<nq>/", '', $data);
 				$data = preg_replace("/<nq>'/", '', $data);
@@ -127,7 +129,6 @@ class TemplateParser
 
 				
 				$data = str_replace("<=let>,<let>", ";", $data);
-				$data = preg_replace("/(,'<\/let>'){2,}/", ",'</let>'", $data);
 				$data = str_replace("<let>", "function(){", $data);
 				$data = preg_replace("/<=let>,*/", ";return[", $data);
 				$data = preg_replace("/,'<\/let>'/", "]}", $data);
@@ -204,6 +205,9 @@ class TemplateParser
 		$isLet = 0;
 		self::checkTagsPairing($list);
 		$children = self::getHtmlChildren($list, $isLet, false);
+		if ($isLet > 0) {
+			$children[] = '</let>';
+		}
 		return array('name' => self::$templateName, 'children' => $children);
 	}
 
@@ -240,10 +244,13 @@ class TemplateParser
 		foreach ($opened as $tn => $count) {
 			if ($count > $closed[$tn]) {
 				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'операторов' : 'тегов';
-				new Error(self::$errors['noClosingTag'], array(self::$class['name'], $object, $tn));
-			} elseif ($count < $closed[$tn]) {
+				new Error(self::$errors['noClosingTag'], array(self::$templateName, self::$class['name'], $object, strtoupper($tn)));
+			}
+		}
+		foreach ($closed as $tn => $count) {
+			if ($count > $opened[$tn]) {
 				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'оператор' : 'тег';
-				new Error(self::$errors['extraClosingTag'], array(self::$class['name'], $object, $tn));
+				new Error(self::$errors['extraClosingTag'], array(self::$templateName, self::$class['name'], $object, strtoupper($tn)));
 			}
 		}
 	}
@@ -283,35 +290,9 @@ class TemplateParser
 					$child = array('t' => self::getTagIndex($tagName));
 					self::getTagProperties($item, $child);
 				}
-				elseif ($tagName == 'template')
+				elseif ($tagName == 'template' || $tagName == 'include')
 				{
-					$tmpName = '';
-					self::getTemplateProperties($item['content'], $child, $tmpName);
-					if (empty($tmpName)) {
-						new Error(self::$errors['noTemplateName'], array(self::$templateName, self::$className));
-					}
-					if (!empty($tmpName) && $tmpName == self::$templateName) {
-						new Error(self::$errors['templateCallLoop'], array(self::$templateName, self::$className));
-					}
-					if (is_array($child['p']) && !empty($child['p']['tmpid'])) {
-						if (!empty(self::$tmpids[$child['p']['tmpid']]) && self::$tmpids[$child['p']['tmpid']] == self::$templateName) {
-							new Error(self::$errors['templateCallLoop'], array(self::$templateName, self::$className));
-						}
-						$child['tmp'] = strip_tags($child['p']['tmpid']);
-						unset($child['p']['tmpid']);
-						if (count(array_keys($child['p'])) == 0) {
-							unset($child['p']);
-						}
-					}
-				}
-				elseif ($tagName == 'include')
-				{
-					$tmpName = '';
-					self::getTemplateProperties($item['content'], $child, $tmpName);
-					if (empty($tmpName)) {
-						new Error(self::$errors['noIncludeTemplateName'], array(self::$templateName, self::$className));
-					}
-					$child['tmp'] = '<nq>includeGeneralTemplate'.ucfirst($tmpName).'<nq>';
+					self::getTemplateProperties($item['content'], $child, $tagName == 'include');
 				}
 				elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
 				{
@@ -377,7 +358,7 @@ class TemplateParser
 							} else {
 								self::checkIfConditionForContainigProps($match[1], $child);
 							}
-							if (!empty($child['e'])) {
+							if (is_array($child) && !empty($child['e'])) {
 								if ($child['e'][0]['t'] == 'else') {
 									$child['e'] = array($child['e'][0]);
 								}
@@ -390,35 +371,6 @@ class TemplateParser
 							self::getForeach($item, $child);
 						}	
 					}
-				}
-				$keys = array();
-				if (is_array($child['c'])) {
-					$keys = array_keys($child['c']);
-				}
-
-				$isSimpleArray = isset($keys[0]) && $keys[0] === 0;
-				if (isset($child['c'])) {
-					if (!empty($child['i']) && empty($child['p'])) {
-						if (empty($child['aic'])) {
-							array_unshift($child['c'], '<nq><nb>'.preg_replace('/<nq>$/', '?[<nc><nq>', $child['i']));
-							if (empty($child['e'])) {
-								array_push($child['c'], '<nq><nc>]:""<nb><nq>');
-							} else {
-								array_push($child['c'], '<nq><nc>]:'.str_replace('\\', '', json_encode($child['e'][0])).'<nb><nq>');
-							}
-							$child['i'] = true;
-							unset( $child['aic'], $child['e']);
-						} else {
-							$ch = '<nq>'.str_replace('<nq>', '', $child['i']).'?'.str_replace('\\', '', json_encode($child['c'])).':'.(empty($child['e']) ? '""' : $child['e']).'<nq>';
-							$child = $ch;
-						}
-					}
-				}
-
-				if (!isset($keys[0])) {
-					unset($child['c']);
-				} elseif ($isSimpleArray && count($child['c']) == 1) {
-					$child['c'] = $child['c'][0];
 				}
 				if (!$isElse) {
 					$children[] = $child;
@@ -512,7 +464,6 @@ class TemplateParser
 		}
 		preg_match('/\$(\w+)/', $switch, $match);
 		$param = $match[1];
-		$switch = self::parseCode($switch, 'sw');
 
 		$cases = array();
 		$children = array();
@@ -588,7 +539,8 @@ class TemplateParser
 		}
 	}
 
-	private static function getTemplateProperties($html, &$child, &$tmpName) {
+	private static function getTemplateProperties($html, &$child, $isInclude = false) {
+		$tmpName = '';
 		self::$parsedItem = $html;
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
@@ -622,6 +574,29 @@ class TemplateParser
 		if (!empty($props)) {
 			$child['p'] = $props;
 		}
+		if (!$isInclude) {
+			if (empty($tmpName)) {
+				new Error(self::$errors['noTemplateName'], array(self::$templateName, self::$className));
+			}
+			if (!empty($tmpName) && $tmpName == self::$templateName) {
+				new Error(self::$errors['templateCallLoop'], array(self::$templateName, self::$className));
+			}
+			if (is_array($child['p']) && !empty($child['p']['tmpid'])) {
+				if (!empty(self::$tmpids[$child['p']['tmpid']]) && self::$tmpids[$child['p']['tmpid']] == self::$templateName) {
+					new Error(self::$errors['templateCallLoop'], array(self::$templateName, self::$className));
+				}
+				$child['tmp'] = strip_tags($child['p']['tmpid']);
+				unset($child['p']['tmpid']);
+				if (count(array_keys($child['p'])) == 0) {
+					unset($child['p']);
+				}
+			}
+		} else {
+			if (empty($tmpName)) {
+				new Error(self::$errors['noIncludeTemplateName'], array(self::$templateName, self::$className));
+			}
+			$child['tmp'] = '<nq>includeGeneralTemplate'.ucfirst($tmpName).'<nq>';
+		}
 		if (!empty($ifCondition) || !empty($else)) {
 			self::addIfConditionToChild(trim($ifCondition), $else, $child);
 		}
@@ -634,53 +609,54 @@ class TemplateParser
 		if (!preg_match('/^\{[^\}]+\}$/', $ifCondition)) {
 			new Error(self::$errors['incorrectIf'], array(self::$templateName, self::$className, $ifCondition));
 		}
-		$ifCondition = ltrim($ifCondition, '{');
-		$ifCondition = rtrim($ifCondition, '}');
-
-		$child = array('c' => $child);
-
+		$child = array('c' => array($child));
 		if (!empty($else)) {
-			$child['e'] = self::processCode($else, 'elseAttribute');
+			$child['e'] = self::processCode($else, 'else');
 		}
-		self::checkIfConditionForContainigProps($ifCondition, $child, true);
+		self::checkIfConditionForContainigProps($ifCondition, $child);
 	}
 
-	private static function checkIfConditionForContainigProps($ifCondition, &$child, $addingIntoChild = false) {
+	private static function checkIfConditionForContainigProps($ifCondition, &$child) {
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string(self::$class) && $hasCode) {
 			new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $ifCondition));
 		}
-		self::parseClassMethodCalls($ifCondition);
-		$signs = '[\+\-><\!=\/\*%\?:&\|]';
-		$ifCondition = preg_replace('/\s+(?='.$signs.')/', '', $ifCondition);
-		$ifCondition = preg_replace('/('.$signs.')\s+/', "$1", $ifCondition);
-		$ifCondition = preg_replace('/\&(\w+)/', "$1", $ifCondition);
-		$ifCondition = preg_replace('/~(\w+)/', "_['$1']", $ifCondition);
-		if ($hasCode) {
-			preg_match_all('/\$(\w+)/', $ifCondition, $matches);
-			$ifCondition = preg_replace('/\$(\w+)/', "\<this>g('$1')", $ifCondition);
-			if (!empty($matches[1])) {
-				$child['p'] = $matches[1];
-			}
-			$child['i'] = '<nq>function(){return('.$ifCondition.')}<nq>';
-			if (count($child['c']) < 2) {
-				array_unshift($child['c'], '<nq><function>');
-				array_push($child['c'], '</function><nq>');
+		$names = array();
+		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
+		$ifCondition = self::processCode($ifCondition, 'if', $names);
+		
+		//Printer::log($child, true);
+		
+		$child['i'] = $ifCondition;
+		if (!empty($names)) {
+			$child['p'] = $names;
+			if (empty($child['c'])) {
+				$child['c'] = "<nq>function(){return''}</nq>";
+			} elseif (count($child['c']) < 2) {
+				$child['c'] = '<nq><function>'.json_encode($child['c']).'</function><nq>';
 			} else {
-				array_unshift($child['c'], '<nq><function_returns_array>');
-				array_push($child['c'], '</function_returns_array><nq>');
-			}
-			if (count($child['c']) == 2) {
-				$child['c'] = array('<nq><function>','','</function><nq>');
+				//Printer::log($child['c']);
+				$child['c'] = '<nq><function_returns_array>'.json_encode($child['c']).'</function_returns_array><nq>';
 			}
 		} else {
-			if (!preg_match('/'.$signs.'/', $ifCondition)) {
-				$child['i'] = '<nq>!!'.$ifCondition.'<nq>';
-			} else {
-				$child['i'] = '<nq>'.$ifCondition.'<nq>';
+			//Printer::log($child['i']);
+			$then = '""';
+			$else = '""';
+			if (!empty($child['c'])) {
+				Printer::log($child['c']);
+				$then = is_array($child['c']) ? (count($child['c']) > 1 || is_array($child['c'][0]) ? str_replace('\\', '', json_encode($child['c'])) : $child['c'][0]) :  $child['c'];
 			}
-			$child['aic'] = $addingIntoChild;
+			if (is_array($child['e'][0]) && isset($child['e'][0][0])) {
+				$child['e'] = $child['e'][0];
+			}
+			if (!empty($child['e'])) {
+				$else = is_array($child['e']) ? (count($child['e']) > 1 || is_array($child['e'][0]) ? str_replace('\\', '', json_encode($child['e'])) : $child['e'][0]) :  $child['e'];
+				//Printer::log($else);
+			}
+			$child = '<nq>'.str_replace('<nq>', '', $child['i']).'?'.$then.':'.$else.'<nq>';
+			//unset($child['i'], $child['e']);
 		}
+		//Printer::log($child);
 	}
 
 	private static function getTagIndex($tagName) {
@@ -766,7 +742,11 @@ class TemplateParser
 			}
 		}
 		if (!$inFunc && is_array($names)) {
-			$inFunc = count($names) > 1;
+			if (in_array($parsedPlace, array('if', 'else'))) {
+				$inFunc = count($names) > 0;	
+			} else {
+				$inFunc = count($names) > 1;
+			}
 		}
 		$attrContent = implode('+', $attrParts);
 		if ($inFunc) {
@@ -1080,17 +1060,31 @@ class TemplateParser
 				}
 				return;
 			}
+			$isLet = false;
+			$lets = array();
 			foreach ($codes as &$code) {
 				$data = TemplateCodeParser::parse($code, 'textNode');
-				$code = '<nq>'.$data['code'].'<nq>';
-			
+				if ($data['isLet']) {
+					if (!$isLet) {
+						$let++;
+					}
+					$isLet = true;
+					$code = '';
+					$lets[] = $data['code'];
+				} else {
+					$code = '<nq>'.$data['code'].'<nq>';
+					$isLet = false;
+				}			
 				if (!empty($data['react'])) {
 					if (!is_array(self::$class)) {
 						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
 					}
 				}			
 			}
-
+			
+			if (!empty($lets)) {
+				$letCode = '<nq><let>var '.implode(',', $lets).'<=let><nq>';
+			}
 			$parts = preg_split($regexp, $content);
 			$items = array();
 			foreach ($parts as $i => $part) {
@@ -1101,100 +1095,16 @@ class TemplateParser
 					$items[] = $codes[$i];
 				}
 			}
+			if (!empty($letCode)) {
+				array_unshift($items, $letCode);
+			}
+			//Printer::log($items);
 			foreach ($items as $item) {
-				$children[] = $item;
-			}
-		}
-	}
-
-	private static function parseCode($code, $role = null, $toPropNodes = false) {
-		$code = trim($code);
-		self::parseClassMethodCalls($code);
-		$code = preg_replace('/\s*@(\w+)\s*/', self::$globalNames['CONSTANTS'].".$1", $code);
-		$code = preg_replace('/^\s*::(\d+)\s*(=.+)*$/', "{'pl':$1,'d':'<noeq>$2'}", $code);
-		$code = preg_replace('/^\s*::(\w+)\s*(=.+)*$/', "{'pl':'$1','d':'<noeq>$2'}", $code);
-		$code = preg_replace('/<noeq>=*/', '', $code);
-		if ($toPropNodes) {
-			if (preg_match('/\bcase\b/', $code)) {
-				if (!self::$isSwitchContext) new Error(self::$errors['caseOutsideSwitch'], array(self::$templateName, self::$className));
-			}
-			if (preg_match('/\#\w/', $code)) {
-				new Error(self::$errors['dataInTextNode'], array($code, self::$templateName, self::$className));
-			}
-			if (preg_match('/\$\w/', $code)) {
-				$regexp = '/\$([a-z][\w+\.]*)/i';
-				preg_match_all($regexp, $code, $matches);
-				$matches = array_unique($matches[1]);
-				sort($matches);
-				$p = array();
-				$n = array();
-				foreach ($matches as $i => $match) {
-					$parts = explode('.', $match);
-					if (count($parts) > 1) {
-						$name = $parts[0];
-						$n[] = $name;
-						array_shift($parts);
-						$p[] = "\<this>g('".$name."',['".implode("','",$parts)."'])";
-					} else {
-						$n[] = $match;
-						$p[] = "\<this>g('".$match."')";
-					}
-				}
-				$parts = preg_split($regexp, $code);
-				$c = '';
-				foreach ($parts as $i => $part) {
-					$c .= $part;
-					if (isset($p[$i])) {
-						$c .= $p[$i];
-					}
-				}
-				if (count($n) > 1) {
-					$n = '<nq>'.json_encode($n).'<nq>';
-				} else {
-					$n = "'".$n[0]."'";
-				}
-				$code = "{'pr':".$n.",'p':".$c."}";
-			}
-		} else {
-			$regexp = '/\$([a-z][\w+\.\-]*)/i';
-			preg_match_all($regexp, $code, $matches);
-			$parts = preg_split($regexp, $code);
-			$matches = $matches[1];
-			$code = '';
-			foreach ($parts as $i => $part) {
-				$code .= $part;
-				if (isset($matches[$i])) {
-					$p = explode('.', $matches[$i]);
-					if (count($p) == 1) {
-						$code .= "<this>g('".$matches[$i]."')";
-					} else {
-						$name = $p[0];
-						array_shift($p);
-						$code .= "<this>g('".$name."',['".implode("','",$p)."'])";
-					}
+				if (!empty($item)) {
+					$children[] = $item;
 				}
 			}
 		}
-		$code = preg_replace('/\#([a-z]\w*)/i', "<data>$1", $code);
-		$code = preg_replace('/^&([a-z])/i', "$1", $code);
-		$code = preg_replace('/([^&])&([a-z])/i', "$1$2", $code);
-		$code = preg_replace('/~([a-z]\w*)/i', "_['$1']", $code);		
-		return '<nq>'.preg_replace('/\s+([\?:\+\-><=\!]{1,3})\s+/', "$1", $code).'<nq>';
-	}
-
-	private static function parseClassMethodCalls(&$code) {
-
-		$hasFunctionCall = self::hasFunctionCall($code);
-		if ($hasFunctionCall) {
-			if (!is_array(self::$class['tmpCallbacks'])) {
-				self::$class['tmpCallbacks'] = array();
-			}
-			self::$class['tmpCallbacks'] = array_merge(self::$class['tmpCallbacks'], $hasFunctionCall);
-			$code = preg_replace('/\.(\w+)\(([^\)]*)\)/', "<this>$1($2)", $code);
-			$code = preg_replace('/^\s*\.(\w+)/', "<this>$1()", $code);
-			$code = preg_replace('/([^\w\]])\.(\w+)/', "$1<this>$2()", $code);					
-		}
-		return !!$hasFunctionCall;
 	}
 
 	private static function hasFunctionCall($code) {

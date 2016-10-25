@@ -11,7 +11,10 @@ function Level() {
 
 	var renderItems = function(items) {
 		if (isArray(items)) {
-			for (var i = 0; i < items.length; i++) renderItem(items[i]);
+			for (var i = 0; i < items.length; i++) {
+				if (!isArray(items[i])) renderItem(items[i]);
+				else renderItems(items[i]);
+			}
 		} else renderItem(items);
 	};
 
