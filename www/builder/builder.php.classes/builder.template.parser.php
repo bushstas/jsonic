@@ -106,7 +106,7 @@ class TemplateParser
 		
 				$data = str_replace("\'", "'", $data);
 				//replacing
-				//Printer::log($data);
+				Printer::log($data);
 				$data = str_replace('<this>', '$.', $data);
 				$data = preg_replace("/'<nq>/", '', $data);
 				$data = preg_replace("/<nq>'/", '', $data);
@@ -118,11 +118,6 @@ class TemplateParser
 				$data = str_replace('<\/plus>', "+'", $data);
 				$data = str_replace('\\', '', $data);
 				
-				$data = preg_replace("/\[*<function>\[*(',)*/", 'function(){return ', $data);
-				$data = preg_replace("/(,')*\]*<\/function>\]*/", '}', $data);
-
-				$data = preg_replace("/\[*<function_returns_array>\[*(',)*/", 'function(){return[', $data);
-				$data = preg_replace("/(,')*\]*<\/function_returns_array>\]*/", ']}', $data);
 
 				$data = preg_replace("/\['<foreach ([^>]+)>',/", "function($1){return[", $data);
 				$data = preg_replace("/,*'<\/foreach>'\]/", ']}', $data);
@@ -359,12 +354,8 @@ class TemplateParser
 								self::checkIfConditionForContainigProps($match[1], $child);
 							}
 							if (is_array($child) && !empty($child['e'])) {
-								if ($child['e'][0]['t'] == 'else') {
-									$child['e'] = array($child['e'][0]);
-								}
 								if (!empty($child['p']) && !empty($child['e'])) {
-									array_unshift($child['e'], '<nq><function_returns_array>');
-									array_push($child['e'], '</function_returns_array><nq>');				
+									$child['e'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['e'])).'}<nq>';
 								}
 							}
 						} elseif ($tagName == 'foreach') {
@@ -534,8 +525,8 @@ class TemplateParser
 		}
 		if (!empty($param)) {
 			$child['p'] = $param;
-			array_unshift($child['c'], '<nq><function_returns_array>');
-			array_push($child['c'], '</function_returns_array><nq>');
+			array_unshift($child['c'], '<nq>function(){return[');
+			array_push($child['c'], ']}<nq>');
 		}
 	}
 
@@ -633,17 +624,17 @@ class TemplateParser
 			if (empty($child['c'])) {
 				$child['c'] = "<nq>function(){return''}</nq>";
 			} elseif (count($child['c']) < 2) {
-				$child['c'] = '<nq><function>'.json_encode($child['c']).'</function><nq>';
+				//Printer::log($child['c']);
+				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
 			} else {
 				//Printer::log($child['c']);
-				$child['c'] = '<nq><function_returns_array>'.json_encode($child['c']).'</function_returns_array><nq>';
+				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
 			}
 		} else {
 			//Printer::log($child['i']);
 			$then = '""';
 			$else = '""';
 			if (!empty($child['c'])) {
-				Printer::log($child['c']);
 				$then = is_array($child['c']) ? (count($child['c']) > 1 || is_array($child['c'][0]) ? str_replace('\\', '', json_encode($child['c'])) : $child['c'][0]) :  $child['c'];
 			}
 			if (is_array($child['e'][0]) && isset($child['e'][0][0])) {
@@ -750,7 +741,7 @@ class TemplateParser
 		}
 		$attrContent = implode('+', $attrParts);
 		if ($inFunc) {
-			$attrContent = '<nq><function>'.$attrContent.'</function><nq>';
+			$attrContent = '<nq>function(){return '.$attrContent.'}<nq>';
 		} else {
 			$attrContent = '<nq>'.$attrContent.'<nq>';
 		}
