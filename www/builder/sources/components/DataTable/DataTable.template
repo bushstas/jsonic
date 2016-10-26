@@ -1,17 +1,16 @@
-{if !!$aaa && !!~a}
 <div class="app-datatable-outer-container">
-	<div></div>
-	{let &c = 43, &d = 434}
-	{let &a = 3, &b = 4}
-	<component class="DataTableTabPanel">
-	{if &c == 42}
-		Да, равняется 43
+	{if !!$aaa && !!~a}
+		<div></div>
+		{let &c = 43, &d = 434}
+		{let &a = 3, &b = 4}
+		<component class="DataTableTabPanel">
+		{if &c == 42}
+			Да, равняется 43
+		{else}
+			Нет, не равняется 43
+			<br><div>12321321</div>
+		{/if}
 	{else}
-		Нет, не равняется 43
-		<br><div>12321321</div>
+		<span id="bushstas">{$bbb}</span>
 	{/if}
 </div>
-<div class="fuck"></div>
-{else}
-111
-{/if}

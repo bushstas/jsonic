@@ -26,7 +26,8 @@ Condition.prototype.update = function() {
 };
 
 Condition.prototype.getChildren = function() {
-	return this.isTrue ? this.params['c']() : (isFunction(this.params['e']) ? this.params['e']() : null);
+	if (this.isTrue) return isFunction(this.params['c']) ? this.params['c']() : this.params['c'];
+	return isFunction(this.params['e']) ? this.params['e']() : this.params['e'];
 };
 
 Condition.prototype.disposeLevel = function() {

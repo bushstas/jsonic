@@ -660,7 +660,7 @@ class JSCompiler
 
 	private function encodeControllerCallings() {
 		$globals = JSGlobals::getUsedNames();
-		$ctrs = array_keys($this->classesByTypes['controller']);		
+		$ctrs = array_keys($this->classesByTypes['controller']);	
 		TextParser::encode($this->jsOutput, 'rest', 'REST_ENC_TEXT');
 		foreach ($ctrs as $i => $ctr) {
 			$this->jsOutput = preg_replace('/\bfunction\s+'.$ctr.'\b/', 'function_'.$ctr, $this->jsOutput);

@@ -121,7 +121,7 @@ class TextParser
 			}
 		}
 		if (!is_array($texts) || empty($texts)) return;
-		$parts = preg_split('/\b'.$mark.'\b/', $content);
+		$parts = preg_split('/'.$mark.'/', $content);
 		$content = '';
 		foreach ($parts as $i => $part) {
 			$content .= $part;

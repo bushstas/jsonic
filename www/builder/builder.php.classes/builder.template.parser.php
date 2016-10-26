@@ -106,7 +106,8 @@ class TemplateParser
 		
 				$data = str_replace("\'", "'", $data);
 				//replacing
-				Printer::log($data);
+				//Printer::log($data);
+				
 				$data = str_replace('<this>', '$.', $data);
 				$data = preg_replace("/'<nq>/", '', $data);
 				$data = preg_replace("/<nq>'/", '', $data);
@@ -326,7 +327,11 @@ class TemplateParser
 					$data = self::getHtmlChildren($childrenList, $isLet, self::$isSwitchContext);
 					if ($isLet > 0) {
 						for ($ii = 0; $ii < $isLet; $ii++) {
-							$data[] = '</let>';
+							if (!isset($data['c'])) {
+								$data[] = '</let>';
+							} else {
+								$data['c'][] = '</let>';
+							}
 						}
 					}
 					if (!empty($data)) {
@@ -354,8 +359,11 @@ class TemplateParser
 								self::checkIfConditionForContainigProps($match[1], $child);
 							}
 							if (is_array($child) && !empty($child['e'])) {
-								if (!empty($child['p']) && !empty($child['e'])) {
-									$child['e'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['e'])).'}<nq>';
+								$json = json_encode($child['e']);
+								if (preg_match('/\$\.g\(/', $json)) {
+									self::wrapInFunction($child['e']); 
+								} else {
+									$child['e'] = self::getProperChildren($child['e']);
 								}
 							}
 						} elseif ($tagName == 'foreach') {
@@ -376,12 +384,20 @@ class TemplateParser
 		}
 		if (!empty($elseChildren)) {
 			if (is_array($elseChildren[0]['c'])) {
-				$elseChildren = array($elseChildren[0]['c']);
+				$elseChildren = $elseChildren[0]['c'];
 			}
 			return array('c' => $children, 'e' => $elseChildren);
 		} else {
 			return $children;
 		}
+	}
+
+	private static function getProperChildren($children) {
+		return '<nq>'.(is_array($children) ? (count($children) > 1 || is_array($children[0]) ? str_replace('\\', '', json_encode($children)) : $children[0]) :  $children).'<nq>';
+	}
+
+	private static function wrapInFunction(&$children) {		
+		$children = '<nq>function(){return '.self::getProperChildren($children).'}<nq>';
 	}
 
 	private static function getForeach($item, &$child) {
@@ -525,8 +541,7 @@ class TemplateParser
 		}
 		if (!empty($param)) {
 			$child['p'] = $param;
-			array_unshift($child['c'], '<nq>function(){return[');
-			array_push($child['c'], ']}<nq>');
+			$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
 		}
 	}
 
@@ -622,12 +637,8 @@ class TemplateParser
 		if (!empty($names)) {
 			$child['p'] = $names;
 			if (empty($child['c'])) {
-				$child['c'] = "<nq>function(){return''}</nq>";
-			} elseif (count($child['c']) < 2) {
-				//Printer::log($child['c']);
-				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
+				$child['c'] = "<nq>function(){return''}</nq>";			 
 			} else {
-				//Printer::log($child['c']);
 				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
 			}
 		} else {
