@@ -99,7 +99,7 @@ class TemplateParser
 		foreach ($templates as $template) {
 			$data = json_encode($template['children']);
 			if ($data == '[]') {
-				$data = ' null';
+				$data = '';
 			} else {
 
 				$data = str_replace('"', "'", $data);
@@ -136,7 +136,7 @@ class TemplateParser
 
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
-			$templateFunctions[] = array('content' => $data, 'name' => $template['name']);
+			$templateFunctions[] = array('content' => $data, 'name' => $template['name'], 'let' => $template['let']);
 		}
 		return $templateFunctions;
 	}
@@ -189,7 +189,7 @@ class TemplateParser
 			if (!empty($part)) {
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
-			if (isset($tags[$j]) && !empty($match[1]) && !empty($tags[$j])) {
+			if (isset($tags[$j]) && !empty($tags[$j])) {
 				preg_match('/^[<\{]\s*\/*([a-z]\w*) */i', $tags[$j], $match);
 				$tagName = strtolower($match[1]);
 				$tagContent = $tags[$j];
@@ -200,24 +200,37 @@ class TemplateParser
 		$isLet = 0;
 		self::checkTagsPairing($list);
 		$children = self::getHtmlChildren($list, $isLet, false);
-		
+
+		$let = '';
 		if (isset($children[0]) && count($children) == 1) {
 			$children = $children[0];
-			if ($isLet > 0 && isset($children['c'])) {
-				if (is_array($children)) {
-					if (is_array($children['c'])) {
-						$children['c'][] = '</let>';
-					} elseif (is_string($children['c'])) {
-						$children['c'] .= '</let>';
-					}
-				} else {
-					$children .= '</let>';
-				}
+			if ($isLet > 0) {				
+				$let = self::getLet($children);
+				$children = '';
 			}
 		} elseif ($isLet > 0) {
-			$children[] = '</let>';
+			$letItem = '';
+			$items = array();
+			foreach ($children as $item) {
+				if (is_string($item) && preg_match('/^<nq><let>/', $item)) {
+					$letItem = $item;
+				} else {
+					$items[] = $item;
+				}
+			}
+			$let = self::getLet($letItem);
+			$children = $items;
+			if (count($children) == 1) {
+				$children = $children[0];
+			}
 		}
-		return array('name' => self::$templateName, 'children' => $children);
+		return array('name' => self::$templateName, 'children' => $children, 'let' => $let);
+	}
+
+	private static function getLet($content) {
+		$parts = explode('<let>', $content);
+		$parts = explode('<=let>', $parts[1]);
+		return $parts[0];
 	}
 
 	private static function isTagClosing($tagName, $tagContent) {

@@ -921,7 +921,16 @@ class JSCompiler
 		$tmpids = array();
 		$templateFunctions = TemplateParser::parse($templateContent, $class, $className, $tmpids);
 		foreach ($templateFunctions as $templateFunction) {
-			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', "\n\treturn".$templateFunction['content']);
+			$let = '';
+			if (!empty($templateFunction['let'])) {
+				$let = "\t".$templateFunction['let'].";";
+			}
+			if (!empty($templateFunction['content'])) {
+				$content = $let."\n\treturn".$templateFunction['content'];
+			} else {
+				$content = $let."\n";
+			}
+			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content);
 		}
 		if (!empty($tmpids)) {
 			foreach ($tmpids as $k => &$v) $v = '<nq>'.$className.'.prototype.getTemplate'.ucfirst($v).'<nq>';
