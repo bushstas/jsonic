@@ -44,7 +44,7 @@ function Component() {
 		this.level = new Level();
 		this.args = getCombinedArgs.call(this);
 		var content = this.getTemplateMain(this.args, this);
-		if (isArray(content)) {
+		if (content) {
 			this.level.setComponent(this);
 			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 		}

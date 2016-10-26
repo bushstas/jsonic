@@ -128,11 +128,11 @@ class TemplateParser
 				$data = str_replace("<let>", "function(){", $data);
 				$data = preg_replace("/<=let>,*/", ";return[", $data);
 				$data = preg_replace("/,'<\/let>'/", "]}", $data);
+				$data = preg_replace("/<\/let>'/", "']}", $data);
 				$data = str_replace("<quote>", "'", $data);
 
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				
-				$data = preg_replace("/([^\d])\.(\d+)/", "$1[$2]", $data);
 
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
@@ -183,14 +183,13 @@ class TemplateParser
 		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
 		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
 		$parts = preg_split($regexp, $html);
-		
 		$list = array();
 		for ($j = 0; $j < count($parts); $j++) {
 			$part = $parts[$j];
 			if (!empty($part)) {
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
-			if (isset($tags[$j])) {
+			if (isset($tags[$j]) && !empty($match[1]) && !empty($tags[$j])) {
 				preg_match('/^[<\{]\s*\/*([a-z]\w*) */i', $tags[$j], $match);
 				$tagName = strtolower($match[1]);
 				$tagContent = $tags[$j];
@@ -201,7 +200,21 @@ class TemplateParser
 		$isLet = 0;
 		self::checkTagsPairing($list);
 		$children = self::getHtmlChildren($list, $isLet, false);
-		if ($isLet > 0) {
+		
+		if (isset($children[0]) && count($children) == 1) {
+			$children = $children[0];
+			if ($isLet > 0 && isset($children['c'])) {
+				if (is_array($children)) {
+					if (is_array($children['c'])) {
+						$children['c'][] = '</let>';
+					} elseif (is_string($children['c'])) {
+						$children['c'] .= '</let>';
+					}
+				} else {
+					$children .= '</let>';
+				}
+			}
+		} elseif ($isLet > 0) {
 			$children[] = '</let>';
 		}
 		return array('name' => self::$templateName, 'children' => $children);
@@ -327,23 +340,24 @@ class TemplateParser
 					$data = self::getHtmlChildren($childrenList, $isLet, self::$isSwitchContext);
 					if ($isLet > 0) {
 						for ($ii = 0; $ii < $isLet; $ii++) {
-							if (!isset($data['c'])) {
-								$data[] = '</let>';
+							if (is_array($data)) {
+								if (!isset($data['c'])) {
+									$data[] = '</let>';
+								} else {
+									$data['c'][] = '</let>';
+								}
 							} else {
-								$data['c'][] = '</let>';
+								$data .= '</let>';
 							}
 						}
 					}
 					if (!empty($data)) {
-						if (!isset($data['c'])) {
+						if (!is_array($data) || !isset($data['c'])) {
 							$child['c'] = $data;
 						} else {
 							$child['c'] = $data['c'];
 							$child['e'] = $data['e'];
 						}
-					}
-					if (!is_array($child['c'])) {
-						$child['c'] = array();
 					}
 					if ($tagName == 'switch') {
 						self::getSwitch($item, $child);
@@ -393,7 +407,16 @@ class TemplateParser
 	}
 
 	private static function getProperChildren($children) {
-		return '<nq>'.(is_array($children) ? (count($children) > 1 || is_array($children[0]) ? str_replace('\\', '', json_encode($children)) : $children[0]) :  $children).'<nq>';
+		if (is_array($children)) {
+			while (is_array($children) && isset($children[0])) {
+				if (count($children) == 1) {
+					$children = $children[0];
+				} else {
+					break;
+				}
+			}
+		}
+		return '<nq>'.(is_array($children) ? str_replace('\\', '', json_encode($children)) :  $children).'<nq>';
 	}
 
 	private static function wrapInFunction(&$children) {		
@@ -1048,6 +1071,7 @@ class TemplateParser
 	}
 
 	private static function parseTextNode($content, &$children, &$let) {
+		
 		if (!empty($content)) {
 			
 			$regexp = '/\{([^\}]+)\}/';

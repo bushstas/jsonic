@@ -11,6 +11,6 @@
 			<br><div>12321321</div>
 		{/if}
 	{else}
-		<span id="bushstas">{$bbb}</span>
+		<span id="bushstas">111</span>
 	{/if}
 </div>

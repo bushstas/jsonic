@@ -89,6 +89,7 @@ class JSCompiler
 	private $reservedNames = array();
 	private $jsCode = '';
 	private $jsOutput = array();
+	private $extendsCount = array();
 	private $initialsParser;
 	private $templateCompiler;
 	private $textsCompiler;
@@ -140,8 +141,8 @@ class JSCompiler
 		$this->validateApplication();
 		$this->validateViews();
 		$this->validateSuperClasses();
-		$this->unsetNotUsedClasses();
 		$this->addClassesFromTemplates();
+		$this->unsetNotUsedClasses();
 		$this->validateUsedClasses();
 		$this->initialsParser->run($this->classes);
 		$this->parseClasses();
@@ -194,6 +195,10 @@ class JSCompiler
 		foreach ($this->classes as $class) {
 			if (is_array($class['extends'])) {
 				foreach ($class['extends'] as $superClass) {
+					if (!isset($this->extendsCount[$superClass])) {
+						$this->extendsCount[$superClass] = 0;
+					}
+					$this->extendsCount[$superClass]++;
 					if (array_search($superClass, $this->coreClasses) === false) {
 						if (!isset($this->classes[$superClass])) {
 							new Error($this->errors['superClassNotFound'], array($class['name'], $superClass));
@@ -235,7 +240,6 @@ class JSCompiler
 	}
 
 	private function unsetNotUsedClasses() {
-		$configJson = $this->configProvider->getConfigJson();
 		$used = array_keys($this->usedComponents);
 		$notUsedClasses = array();
 		$parentalClasses = array();
@@ -250,14 +254,38 @@ class JSCompiler
 		$parentalClasses = array_unique($parentalClasses);
 		$properNotUsedComponents = array();
 		foreach ($notUsedClasses as $className) {
-			$regexp = '/\b'.$className.'\b/';
-			$modifiedJs = preg_replace('/(component|control|menu|form|dialog)\s+'.$className.'\b/', '', $this->jsCode);
-			if (!in_array($className, $parentalClasses) && !preg_match($regexp, $modifiedJs) && !preg_match($regexp, $configJson)) {
+			if (!in_array($className, $parentalClasses) && !$this->isClassNameInCode($className)) {
 				$properNotUsedComponents[] = $className;
 			}
 		}
 		foreach ($properNotUsedComponents as $className) {
-			unset($this->classes[$className]);
+			$this->unsetNotUsedClass($className);
+		}
+	}
+
+	private function isClassNameInCode($className) {
+		$configJson = $this->configProvider->getConfigJson();
+		$modifiedJs = preg_replace('/(component|control|menu|form|dialog)\s+'.$className.'\b/', '', $this->jsCode);
+		$regexp = '/\b'.$className.'\b/';
+		return preg_match($regexp, $modifiedJs) || preg_match($regexp, $configJson);
+	}
+
+	private function unsetNotUsedClass($className) {
+		$used = $this->templateCompiler->getUsedComponents();
+		$classType = $this->classes[$className]['type'];
+		$extends = $this->classes[$className]['extends'];
+		unset($this->usedComponents[$className]);
+		unset($this->classes[$className]);
+		unset($this->classesByTypes[$classType][$className]);
+		if (is_array($extends)) {
+			foreach ($extends as $superClassName) {
+				if ($this->extendsCount[$superClassName] > 0) {
+					$this->extendsCount[$superClassName]--;
+					if ($this->extendsCount[$superClassName] == 0 && !$this->isClassNameInCode($superClassName) && !isset($used[$superClassName])) {
+						$this->unsetNotUsedClass($superClassName);
+					}
+				}
+			}
 		}
 	}
 
