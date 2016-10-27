@@ -1,6 +1,8 @@
-
+{let 
+	&b=3,
+	&a='sdsdd',
+	&d= -5 + 'df'
+}
 <div class="app-datatable-outer-container">
-	{let &b=3}
-{let &a=1}
 	<component class="DataTableTabPanel">
 </div>

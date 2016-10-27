@@ -213,7 +213,13 @@ class TemplateParser
 			$items = array();
 			foreach ($children as $item) {
 				if (is_string($item) && preg_match('/^<nq><let>/', $item)) {
-					$letItem = $item;
+					if (!empty($letItem)) {
+						$item = preg_replace('/<nq><let>var /', '', $item);
+						$letItem = preg_replace('/<=let><nq>/', '', $letItem);
+						$letItem = $letItem.','.$item;
+					} else {
+						$letItem = $item;
+					}
 				} else {
 					$items[] = $item;
 				}

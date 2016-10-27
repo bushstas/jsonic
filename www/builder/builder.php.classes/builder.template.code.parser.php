@@ -81,7 +81,8 @@ class TemplateCodeParser
 		'+' => array('a', '0', '~', '&', '@', '.', '-', '(', '"', "'"),
 		'-' => array('a', '0', '.', '~', '&', '-', '(', '+'),
 		'*' => array('a', '0', '.', '~', '&', '-', '(', '+'),
-		'/' => array('a', '0', '.', '~', '&', '$', '-', '(', '+')
+		'/' => array('a', '0', '.', '~', '&', '$', '-', '(', '+'),
+		'%' => array('a', '0', '.', '~', '&', '$', '-', '(', '+')
 	);
 
 	private static $operators = array(
@@ -161,6 +162,7 @@ class TemplateCodeParser
 						case '+'           : self::handleMathSign($sign); break;
 						case '-'           : self::handleMathSign($sign); break;
 						case '*'           : self::handleMathSign($sign); break;
+						case '%'           : self::handleMathSign($sign); break;
 						case '/'           : self::handleMathSign($sign); break;
 						case "'"           : self::handleQuote();         break;
 						case '"'           : self::handleDoubleQuote();   break;
@@ -190,9 +192,6 @@ class TemplateCodeParser
 						self::$parsedCode .= $sign;
 					}
 					$code .= $sign;
-					if (self::$isLet && self::isOpen('letvalue')) {
-						self::$data['let'][count(self::$data['let']) - 1]['value'] .= $signToAdd;						
-					}
 					self::$isStart = false;
 				}
 			}
@@ -258,10 +257,6 @@ class TemplateCodeParser
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
-						if (self::isOpen('letvalue')) {
-							$idx = count(self::$data['let']) - 1;
-							self::$data['let'][$idx]['value'] .= $part;
-						}
 					} else {
 
 						if (self::$isCase) {
@@ -468,6 +463,7 @@ class TemplateCodeParser
 			}
 			if (self::$isLet && empty(self::$open['func']) && !self::$open['array']) {
 				self::off('letvalue');
+				self::$expected[] = ',';
 				self::on('letvarname');
 			} else {
 				self::$expected[] = '(';
@@ -591,6 +587,7 @@ class TemplateCodeParser
 			if (self::$open['array']) {
 				self::off('array');
 				self::off('letvalue');
+				self::$expected[] = ',';
 				self::off('number');
 			} else {
 				self::on('recentVar');
@@ -1081,20 +1078,10 @@ class TemplateCodeParser
 			self::$reactName = '';
 		}
 
-		if (self::$isLet) {
-			if (!self::isOpen('letvalue')) {
-				self::$data['let'][] = array('name' => self::$currentPart);
-			} else {
-				$idx = count(self::$data['let']) - 1;
-				if (!isset(self::$data['let'][$idx]['value'])) {
-					self::$data['let'][$idx]['value'] = '';
-				}
-				self::$data['let'][$idx]['value'] .= self::$currentPart;
-				if (empty(self::$open['parenthesis'])) {
-					self::$expected[] = ',';
-				}
-			}			
+		if (self::$isLet && self::$open['letvalue'] && empty(self::$open['parenthesis'])) {
+			self::$expected[] = ',';
 		}
+
 		self::offVars();
 		self::off('letvalue');
 		self::off('space');
@@ -1343,13 +1330,9 @@ class TemplateCodeParser
 		} 
 		if (!empty(self::$data['react'])) {
 			$code = self::getReactCode($code);
-		} elseif (!empty(self::$data['let'])) {
+		} elseif (self::$isLet) {
 			self::$data['isLet'] = true;
-			$lets = array();
-			foreach (self::$data['let'] as $let) {
-				$lets[] = $let['name'].$let['value'];
-			}
-			$code = implode(',', $lets);
+			$code = preg_replace('/^\s*let\s*/', '', $code);
 		}
 		return $code;
 	}

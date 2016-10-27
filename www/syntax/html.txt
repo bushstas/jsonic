@@ -357,7 +357,7 @@ contexts:
 
         - match: '[=\!><\-\/\+%\?:\*&\|\#~\$@\^\\]'
           captures:         
-            1: comment.block.actionscript.2 
+            0: comment.block.actionscript.2 
 
         - match: -*\d+\.*
           captures:         
