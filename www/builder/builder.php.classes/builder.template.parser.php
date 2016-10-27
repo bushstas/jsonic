@@ -1168,7 +1168,7 @@ class TemplateParser
 			$codes = $matches[1];
 			$count = count($codes);
 			if (empty($codes)) {
-				if (strlen($content) > 3) {
+				if (strlen($content) > 5) {
 					$children[] = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($content).']<nq>';
 				} else {
 					$children[] = $content;
