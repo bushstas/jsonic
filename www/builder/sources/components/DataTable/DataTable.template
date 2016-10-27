@@ -14,7 +14,7 @@
 
 		<span>444</span>
 		</div>
-	{case &bbb}
+	{case ~bbb}
 		wedw
 
 	

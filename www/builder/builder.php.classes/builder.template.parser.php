@@ -538,12 +538,12 @@ class TemplateParser
 		foreach ($switch as $case) {
 			if (isset($case['default'])) {
 				if (!empty($case['children'])) {
-					$child['d'] = $case['children'];
+					$child['d'] = self::getProperChildren($case['children']);
 				}
 			} else {
 				$child['is'][] = $case['case'];
 				if (!empty($case['children'])) {
-					$child['c'][] = $case['children'];
+					$child['c'][] = self::getProperChildren($case['children']);
 				} else {
 					$child['c'][] = '';
 				}
@@ -552,7 +552,7 @@ class TemplateParser
 		TemplateCodeParser::setContext(null);
 	}
 
-	private static function getProperChildren($children) {
+	private static function getProperChildren($children, $addQuotes = false) {
 		if (is_array($children)) {
 			while (is_array($children) && isset($children[0])) {
 				if (count($children) == 1) {
@@ -562,7 +562,10 @@ class TemplateParser
 				}
 			}
 		}
-		return is_array($children) ? '<nq>'.str_replace('\\', '', json_encode($children)).'<nq>' : "'".trim($children, "'")."'";
+		if (is_string($children) && $addQuotes) {
+			$children = "'".trim($children, "'")."'";
+		}
+		return is_array($children) ? '<nq>'.str_replace('\\', '', json_encode($children)).'<nq>' : $children;
 	}
 
 	private static function wrapInFunction(&$children) {		
@@ -638,9 +641,9 @@ class TemplateParser
 		
 		self::parseCases($childrenList, $child);
 		
-		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is']).','.self::getProperChildren($child['c']);
+		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);
 		if (!empty($child['d'])) {
-			$switch .= ','.self::getProperChildren($child['d']);
+			$switch .= ','.self::getProperChildren($child['d'], true);
 		}
 		$switch .= ']';
 		if (!empty($data['reactNames'])) {
