@@ -27,7 +27,6 @@ class TemplateParser
 		'usingThis' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}',
 		'templateCallLoop' => 'Шаблон {??} класса {??} вызывает сам себя',
 		'incorrectForeach' => 'Невалидный код <b>foreach</b> в шаблоне {??} класса {??}: {??}',
-		'switchError' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}<xmp>{?}</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>",
 		'caseExpected' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}. Ожидается оператор <b>case</b><xmp>{case 'triangle'}</xmp>или<xmp>{case 2}</xmp>",
 		'ifCaseExpected' => "Обнаружена ошибка в коде оператора <b>if</b> в шаблоне {??} класса {??}.<br><br>Найдено:<xmp>{?}</xmp>Ожидается оператор <b>case</b><xmp>{case isNumber(~var)}</xmp>или<xmp>{case &a > &b}</xmp>",
 		'fewDefaults' => 'Обнаружено более одного условия <b>default</b> в коде оператора {??} в шаблоне {??} класса {??}',
@@ -634,86 +633,18 @@ class TemplateParser
 	}
 
 	private static function parseSwitch($item, $childrenList, &$child) {
+		$code = rtrim(ltrim($item['content'], '{'), '}');
+		$data = TemplateCodeParser::parse($code, 'switch', self::$parsedItem);
 		
-		preg_match('/^\{\s*switch\s*([^\}]+)\}$/', $item['content'], $match);
-		$switch = $match[1];
-		if (empty($switch)) {
-			new Error(self::$errors['switchError'], array(self::$templateName, self::$className, $item['content']));
-		}
-		Printer::log($item, true);
-		preg_match('/\$(\w+)/', $switch, $match);
-		$param = $match[1];
-
-		$cases = array();
-		$children = array();
-		$default = array();
-		$isDefault = false;
-		$count = -1;
-		$shouldBeCase = true;
-		foreach ($child['c'] as $item) {
-			$isString = is_string($item);
-			if ($shouldBeCase && !$isString) {
-				new Error(self::$errors['caseExpected'], array(self::$templateName, self::$className));
-			}
-			if ($isString) {
-				$it = trim(strip_tags($item));
-				if ($it == 'default') {
-					if (!empty($default)) {
-						new Error(self::$errors['fewDefaults'], array('switch', self::$templateName, self::$className));
-					}
-					if (!empty($shouldBeContent)) {
-						new Error(self::$errors['noSwitchContent'], array('switch', self::$templateName, self::$className, $shouldBeContent));
-					}
-					$isDefault = true;
-					$shouldBeCase = false;
-					$shouldBeContent = $item;
-					continue;
-				}
-				$pos = strpos($it, 'case');
-				if (is_int($pos)) {
-					if ($pos !== 0) {
-						new Error(self::$errors['incorrectCaseCode'], array(self::$templateName, self::$className, $it));
-					}
-					if (!empty($shouldBeContent)) {
-						new Error(self::$errors['conditionEmpty'], array(self::$templateName, self::$className, $shouldBeContent));
-					}
-					if (!preg_match('/^\s*case\s*\'[^\']*\'\s*$/', $it) && !preg_match('/^\s*case\s*"[^"]*"\s*$/', $it) && !preg_match('/^\s*case\s+\-*\d+\s*$/', $it) && !preg_match('/^\s*case\s+(true|false|null|undefined)\s*$/', $it)) {
-						new Error(self::$errors['incorrectCaseCode'], array(self::$templateName, self::$className, $it));
-					}
-					$it = trim(preg_replace('/\s*case\s*/', '', $it));
-					if (!is_numeric($it) && $it[0] != '"' && $it[0] != "'") {
-						$it = '<nq>'.$it.'<nq>';
-					} elseif (!is_numeric($it)) {
-						$it = preg_replace('/[\'"]/', '', $it);
-					}
-					$cases[] = $it;
-					$shouldBeCase = false;
-					$shouldBeContent = $item;
-					$count++;
-					continue;
-				} elseif ($shouldBeCase) {
-					new Error(self::$errors['caseExpected'], array(self::$templateName, self::$className));
-				}
-			}
-			if ($isDefault) {
-				$default[] = $item;
-			} else {
-				if (!is_array($children[$count])) {
-					$children[$count] = array();
-				}
-				$children[$count][] = $item;
-			}
-			$shouldBeContent = false;
-		}
-		$child['sw'] = $switch;
-		$child['s'] = $cases;
-		$child['c'] = $children;
-		if (!empty($default)) {
-			$child['d'] = $default;
-		}
-		if (!empty($param)) {
-			$child['p'] = $param;
-			$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
+		self::parseCases($childrenList, $child);
+		
+		$child['sw'] = '<nq>'.$data['code'].'<nq>';
+		$child['s'] = $child['is'];
+		unset($child['is']);	
+		
+		if (!empty($data['reactNames'])) {
+			$child['p'] = $data['reactNames'];
+			$child['c'] = '<nq>function(){return '.self::getProperChildren($child['c']).'}<nq>';
 		}
 	}
 
@@ -1250,7 +1181,7 @@ class TemplateParser
 					$code = '<nq>'.$data['code'].'<nq>';
 					$isLet = false;
 				}			
-				if (!empty($data['react'])) {
+				if (!empty($data['reactNames'])) {
 					if (!is_array(self::$class)) {
 						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
 					}

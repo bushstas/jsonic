@@ -10,7 +10,7 @@ class TemplateCodeParser
 	private static $space = '¦';
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
-				   $prevSign, $isCase, $notLetValue, $isStart, $quoted,
+				   $prevSign, $isCase, $notLetValue, $isStart, $quoted, $isSwitch,
 				   $thereWasWord, $place, $parsedCode, $element, $context;
 
 	private static $signs = array(
@@ -73,6 +73,8 @@ class TemplateCodeParser
 		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}'
 	);
 
+//	'switchError' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}<xmp>{?}</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>",
+
 	private static $keywords = array(
 		'false', 'true', 'null', 'undefined', 'NaN', 'Infinity'
 	);
@@ -128,6 +130,7 @@ class TemplateCodeParser
 
 		self::$isLet = false;
 		self::$isCase = false;
+		self::$isSwitch = false;
 		self::$quoted = false;
 	}
 
@@ -242,10 +245,15 @@ class TemplateCodeParser
 
 				
 					if (self::$isStart) {
+						self::$isStart = false;
 						switch ($part) {
 							case 'let':
 								self::$isLet = true;
 								self::$expected = array('&', self::$space);
+							break;
+							case 'switch':
+								self::$isSwitch = true;
+								self::$expected = array('~', '@', '&', '$', '#', self::$space);
 							break;
 							case 'case':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
@@ -266,9 +274,8 @@ class TemplateCodeParser
 								self::$thereWasWord = true;
 								self::$expected = array('end', self::$space);
 							break;
-						}
-						self::$isStart = false;
-						if (self::$isCase || $isDefault || self::$isLet) continue;
+						}						
+						if (self::$isCase || $isDefault || self::$isLet || self::$isSwitch) continue;
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
@@ -1144,7 +1151,10 @@ class TemplateCodeParser
 				return 'атрибута компонента';
 			
 			case 'ifcase':
-				return 'case оператора';			
+				return 'case оператора';
+
+			case 'switch':
+				return 'switch оператора';
 
 			case 'textNode':
 				return 'текстового элемента';
@@ -1171,6 +1181,7 @@ class TemplateCodeParser
 			case 'textNode':
 				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@');
 			break;
+			case 'switch':
 			case 'ifcase':
 				self::$expected = array('a');
 			break;
@@ -1342,11 +1353,14 @@ class TemplateCodeParser
 		} 
 		if (!empty(self::$data['react'])) {
 			$code = self::getReactCode($code);
-		} elseif (self::$isLet) {
+		}
+		if (self::$isLet) {
 			self::$data['isLet'] = true;
 			$code = preg_replace('/^\s*let\s*/', '', $code);
 		} elseif (self::$isCase) {
 			$code = preg_replace('/^\s*case\s*/', '', $code);
+		} elseif (self::$isSwitch) {
+			$code = preg_replace('/^\s*switch\s*/', '', $code);
 		}
 		return $code;
 	}
@@ -1365,6 +1379,7 @@ class TemplateCodeParser
 
 	private static function getReactCode($code) {
 		self::$data['reactNames'] = array_keys(self::$data['react']);
+		unset(self::$data['react']);
 		$names = self::$data['reactNames'];
 		if (count($names) == 1) {
 			$names = "'".$names[0]."'";
