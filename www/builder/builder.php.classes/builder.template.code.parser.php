@@ -11,7 +11,7 @@ class TemplateCodeParser
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted,
-				   $thereWasWord, $place, $parsedCode, $element;
+				   $thereWasWord, $place, $parsedCode, $element, $context;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -69,7 +69,8 @@ class TemplateCodeParser
 		'usingGlobalName' => 'Использование зарезервированного глобально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: {{??}}',
 		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}',
-		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}'
+		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
+		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}'
 	);
 
 	private static $keywords = array(
@@ -92,6 +93,10 @@ class TemplateCodeParser
 	//logging
 	private static $logging = false;
 	//private static $logging = true;
+
+	public static function setContext($context) {
+		self::$context = $context;
+	}
 
 	public static function setGlobalNames($names, $reserved, $utilsFuncs, $userUtilsFuncs) {
 		self::$globalNames = $names;
@@ -243,10 +248,20 @@ class TemplateCodeParser
 								self::$expected = array('&', self::$space);
 							break;
 							case 'case':
+								if (self::$context != 'ifswitch' && self::$context != 'switch') {
+									new Error(self::$errors['caseOutOfSwitchContext'], array('case', self::$className, self::$templateName, self::$code));
+								}
 								self::$isCase = true;
-								self::$expected = array('"', "'", 'b', '0', '~', '@', '&', self::$space);
+								if (self::$place != 'ifcase') {
+									self::$expected = array('"', "'", 'b', '0', '~', '@', '&', self::$space);
+								} else {
+									self::$expected = array('!', '"', "'", 'b', '0', '~', '@', '&', '$', self::$space);
+								}
 							break;
 							case 'default':
+								if (self::$context != 'ifswitch' && self::$context != 'switch') {
+									new Error(self::$errors['caseOutOfSwitchContext'], array('default', self::$className, self::$templateName, self::$code));
+								}
 								$isDefault = true;
 								self::$thereWasWord = true;
 								self::$expected = array('end', self::$space);
@@ -259,15 +274,6 @@ class TemplateCodeParser
 						self::$expected = '*';
 					} else {
 
-						if (self::$isCase) {
-							if ($isNum || in_array($part, self::$keywords)) {
-								self::$expected = array('end');
-								self::$isCase = false;
-								continue;
-							} else {
-								self::error('unexpectedLat', array($prevCode, $part, ' ...}', self::getExpected()));
-							}
-						}
 						
 						if (self::prepare($part)) {
 
@@ -703,7 +709,6 @@ class TemplateCodeParser
 			self::set('or', 0);
 		}
 		if (self::$isCase && !self::$open['quote']) {
-			self::$isCase = false;
 			self::off('case');
 			self::$expected = array('end', self::$space);
 		}
@@ -741,7 +746,6 @@ class TemplateCodeParser
 			self::set('or', 0);
 		}
 		if (self::$isCase && !self::$open['doubleQuote']) {
-			self::$isCase = false;
 			self::off('case');
 			self::$expected = array('end', self::$space);
 		}
@@ -997,7 +1001,7 @@ class TemplateCodeParser
 	}
 	
 	private static function couldBeEnd() {
-		return !self::isAnyOpen();
+		return !self::isAnyOpen() || self::$isCase;
 	}
 
 	private static function couldBeAnd() {
@@ -1139,6 +1143,9 @@ class TemplateCodeParser
 			case 'componentAttribute':
 				return 'атрибута компонента';
 			
+			case 'ifcase':
+				return 'case оператора';			
+
 			case 'textNode':
 				return 'текстового элемента';
 			
@@ -1163,6 +1170,9 @@ class TemplateCodeParser
 			break;
 			case 'textNode':
 				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@');
+			break;
+			case 'ifcase':
+				self::$expected = array('a');
 			break;
 			default:
 				self::$expected = array();
@@ -1247,10 +1257,11 @@ class TemplateCodeParser
 	//checking
 	private static function check($code) {
 		$expecteds = self::$expected;
-		if (!self::$isCase && self::$thereWasWord) {
+		if (self::$thereWasWord) {
 			self::$expected = null;
 		}		
 		
+
 		if (!empty(self::$open['ternary']) && !self::$open['functionResult'] && !self::$open['number'] && !self::$open['name'] && !self::$open['recentQuote'] && !self::isAnyVarOpen() && !self::$open['recentVar'])
 		{
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
@@ -1311,6 +1322,7 @@ class TemplateCodeParser
 			if (self::$open['letvalue']) self::$expected = $expecteds;
 			else if (self::$open['letvarname']) self::$expected = $expecteds;
 		}
+
 		
 		if (is_array(self::$expected))
 		{
@@ -1333,6 +1345,8 @@ class TemplateCodeParser
 		} elseif (self::$isLet) {
 			self::$data['isLet'] = true;
 			$code = preg_replace('/^\s*let\s*/', '', $code);
+		} elseif (self::$isCase) {
+			$code = preg_replace('/^\s*case\s*/', '', $code);
 		}
 		return $code;
 	}
