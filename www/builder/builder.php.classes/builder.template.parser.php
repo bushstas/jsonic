@@ -562,7 +562,7 @@ class TemplateParser
 				}
 			}
 		}
-		return '<nq>'.(is_array($children) ? str_replace('\\', '', json_encode($children)) :  $children).'<nq>';
+		return is_array($children) ? '<nq>'.str_replace('\\', '', json_encode($children)).'<nq>' : "'".trim($children, "'")."'";
 	}
 
 	private static function wrapInFunction(&$children) {		
@@ -638,14 +638,20 @@ class TemplateParser
 		
 		self::parseCases($childrenList, $child);
 		
-		$child['sw'] = '<nq>'.$data['code'].'<nq>';
-		$child['s'] = $child['is'];
-		unset($child['is']);	
-		
+		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is']).','.self::getProperChildren($child['c']);
+		if (!empty($child['d'])) {
+			$switch .= ','.self::getProperChildren($child['d']);
+		}
+		$switch .= ']';
 		if (!empty($data['reactNames'])) {
 			$child['p'] = $data['reactNames'];
-			$child['c'] = '<nq>function(){return '.self::getProperChildren($child['c']).'}<nq>';
+			$child['sw'] = '<nq>function(){return'.$switch.'}<nq>';			
+		} else {
+			$child['sw'] = '<nq>'.$switch.'</nq>';
 		}
+		unset($child['d']);
+		unset($child['c']);
+		unset($child['is']);
 	}
 
 	private static function getTemplateProperties($html, &$child, $isInclude = false) {
