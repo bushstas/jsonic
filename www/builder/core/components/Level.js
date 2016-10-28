@@ -71,7 +71,7 @@ function Level() {
 		if (isObject(props['p'])) {
 			var attrName, pn, attr;		
 			for (var k in props['p']) {
-				if (isString(props['p'][k]) || isNumber(props['p'][k])) {
+				if (isString(props['p'][k]) || isNumber(props['p'][k])) {					
 					attrName = attrNames[k] || k;
 					if (attrName == 'scope') component.setScope(element);
 					else if (attrName == 'eid') Core.registerElement.call(component, element, props['p'][k]);
@@ -213,13 +213,18 @@ function Level() {
 			switches[propName] = switches[propName] || [];
 			switches[propName].push(Core.registerPropActivity.call(component, 'swt', propName, swtch));
 		} else {
-			for (var i = 0; i < params['s'].length; i++) {
-				if (params['sw'] === params['s'][i]) {
-					renderItems(params['c'][i]);
+			params = params['sw'];
+			if (!isArray(params[1])) {
+				params[1] = [params[1]];
+				params[2] = [params[2]];
+			}
+			for (var i = 0; i < params[1].length; i++) {					
+				if (params[0] === params[1][i]) {alert(params[0])
+					renderItems(params[1][i]);
 					return;
 				}
 			}
-			if (isArray(params['d'])) renderItems(params['d']);
+			if (!isUndefined(params[3])) renderItems(params[3]);
 		}
 	};
 
@@ -253,9 +258,7 @@ function Level() {
 		if (isString(item['tmp'])) item['tmp'] = Core.getTemplateById.call(component, item['tmp']);
 		if (isFunction(item['tmp'])) {		
 			var items = item['tmp'].call(component, args, component);
-			if (isArray(items)) {
-				for (var i = 0; i < items.length; i++) renderItem(items[i]);
-			}
+			renderItems(items);
 		}
 	};
 

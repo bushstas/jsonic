@@ -64,7 +64,7 @@ class TemplateParser
 		self::$className = $className;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
-		$template = preg_replace('/&nbsp;/', '\u00A0', $template);
+		$template = preg_replace('/&nbsp;/', '_u00A0_', $template);
 
 		preg_match_all("/\{template +\.(\w+) +as +\.(\w+) *\}/", $template, $matches);		
 		foreach ($matches[1] as $i => $match) {
@@ -116,6 +116,8 @@ class TemplateParser
 				$data = str_replace('<plus>', "'+", $data);
 				$data = str_replace('<\/plus>', "+'", $data);
 				$data = str_replace('\\', '', $data);
+				$data = str_replace('_u00A0_', '\\u00A0', $data);
+
 				
 
 				$data = preg_replace("/\['<foreach ([^>]+)>',/", "function($1){return[", $data);
@@ -565,7 +567,7 @@ class TemplateParser
 		if (is_string($children) && $addQuotes) {
 			$children = "'".trim($children, "'")."'";
 		}
-		return is_array($children) ? '<nq>'.str_replace('\\', '', json_encode($children)).'<nq>' : $children;
+		return is_array($children) ? '<nq>'.preg_replace('/\\\(?=[\'"])/', '', json_encode($children)).'<nq>' : $children;
 	}
 
 	private static function wrapInFunction(&$children) {		

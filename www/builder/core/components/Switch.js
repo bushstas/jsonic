@@ -1,22 +1,21 @@
 function Switch(params) {
-	this.value = params['sw'];
-	this.values = params['s'];
-	this.default = params['d'];
-	this.handler = params['c'];
+	this.params = params;
 	this.levels = [];
 }
 
 Switch.prototype.createLevels = function(isUpdating) {
-	var children = this.handler();
-	for (var i = 0; i < this.values.length; i++) {
-		if (this.value === this.values[i]) {
-			for (var j = 0; j < children[i].length; j++) this.createLevel(children[i][j], isUpdating);
+	var p = this.params['sw']();
+	var v = p[0], vs = p[1], ch = p[2], d = p[3];
+	if (!isArray(vs)) {
+		vs = [vs]; ch = [ch];
+	}
+	for (var i = 0; i < vs.length; i++) {
+		if (v === vs[i]) {
+			for (var j = 0; j < ch[i].length; j++) this.createLevel(ch[i][j], isUpdating);
 			return;
 		}
 	}
-	if (isArray(this.default)) {
-		for (i = 0; i < this.default.length; i++) this.createLevel(this.default[i], isUpdating);
-	}
+	if (!isUndefined(d)) this.createLevel(d, isUpdating);
 };
 
 Switch.prototype.update = function(value) {
@@ -31,10 +30,7 @@ Switch.prototype.dispose = function() {
 	this.levels = null;
 	this.parentElement = null;
 	this.parentLevel = null;
-	this.value = null
-	this.values = null;
-	this.default = null;
-	this.handler = null;
+	this.params = null
 	this.nextSiblingChild = null;
 	this.prevSiblingChild = null;
 };
