@@ -1,4 +1,42 @@
-﻿arg-className="frameless" в шаблоне Keywords не обфусцируется
+﻿файлы .ext 
+
+User.ext - доп методы для классов 
+
+тип класса processor 
+
+$ от case переходят в switch и if 
+
+{use [1,'34543543']} в шаблонах
+
+{foreach right}
+
+{$a:Corrector}
+
+{loading} ... {then} ... {/then} => {if !$loaded} ... {else} ... {/if}
+
+each () {
+	each () {
+
+	}
+}
+
+delay () {
+	delay () {
+
+	}
+}
+
+{$:var} переменные Globals
+
+<div onClick=""> валидировать on(...) не менее 3-х символов
+
+onClick=":stop"
+
+onClick=":prevent"
+
+{.template .a as .b}  this.setState('b');
+
+arg-className="frameless" в шаблоне Keywords не обфусцируется
 
 неверный вывод ошибок в шаблонах include (не определен класс)
 
