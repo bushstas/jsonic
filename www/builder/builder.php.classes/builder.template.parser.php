@@ -8,7 +8,7 @@ class TemplateParser
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $cssClassIndex, $templateName, $globalNames,
-				   $parsedItem;
+				   $parsedItem, $globalVarNames;
 
 	private static $textNodes = array();
 
@@ -33,11 +33,16 @@ class TemplateParser
 		'conditionEmpty' => 'Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}. Условие {??} не содержит контента',
 		'elseWithoutIf' => 'Элемент в шаблоне {??} класса {??} содержит атрибут <b>else</b>, но не содержит атрибут <b>if</b>',
 		'incorrectIf' => 'Элемент в шаблоне {??} класса {??} содержит некорректный атрибут <b>if = "{?}"</b><br><br>Атрибут должен иметь вид <b>if = "{$a === true}"</b> или <b>if = "{!&name}"</b>',
-		'eventHandlerExpected' => 'Фигурные скобки внутри атрибута события {??} в шаблоне {??} класса {??}. Ожидается название функции обработчика!',
 		'handlerNotFound' => 'Функция {??}, указанная в шаблоне {??} класса {??} в качестве обработчика события {??}, не найдена среди методов данного класса',
 		'noTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><template templ="table" rows="{~rows}"></xmp>',
 		'noIncludeTemplateName' => 'Вызов шаблона без указания его имени в шаблоне {??} класса {??}. Код должен иметь вид:<xmp><include templ="table" rows="{~rows}"></xmp>',
-		'codeOutsideAttribute' => 'Обнаружен код вне атрибута тега в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
+		'codeOutsideAttribute' => 'Обнаружен код вне атрибута тега в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'keywordInEventAttr' => 'Обнаружено ключевое слово {??} в атрибуте события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'numericEventAttr' => 'Обнаружено числовое значение {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'incorrectEventAttr' => 'Обнаружено некорректное значение {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'unknownSpecEventAttr' => 'Обнаружен неизвестный спецпараметр {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Ожидается одно из значений: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'unknownEventAttr' => 'Обнаружен атрибут неизвестного события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'specEventAttrInComp' => 'Обнаружен спецпараметр {??} события {??} в теге компонента в шаблоне {??} класса {??}<br><br>Данный функционал доступен только для элементов DOM<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
 	public static function init($params) {
@@ -51,7 +56,8 @@ class TemplateParser
 		self::$obfuscate = $params['obfuscateCss'];
 		self::$cssClassIndex = &$params['cssClassIndex'];
 		self::$globalNames = JSGlobals::getUsedNames();
-		$varNames = array_values(JSGlobals::getVarNames());
+		self::$globalVarNames = JSGlobals::getVarNames();
+		$varNames = array_values(self::$globalVarNames);
 		TemplateCodeParser::setGlobalNames(self::$globalNames, $varNames, $params['utilsFuncs'], $params['userUtilsFuncs']);
 	}
 
@@ -865,7 +871,7 @@ class TemplateParser
 			}
 		}
 		$attrContent = implode('+', $attrParts);
-		if ($inFunc) {
+		if ($inFunc && $parsedPlace != 'componentAttribute' && $parsedPlace != 'elementAttribute') {
 			$attrContent = '<nq>function(){return '.$attrContent.'}<nq>';
 		} else {
 			$attrContent = '<nq>'.$attrContent.'<nq>';
@@ -880,7 +886,7 @@ class TemplateParser
 		$ifCondition = false;
 		$else = null;
 		list($propNames, $propValues) = self::getTagAttrs($item['content']);
-
+		$hasNames = false;
 		for ($i = 0; $i < count($propNames); $i++) {		
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
@@ -919,48 +925,8 @@ class TemplateParser
 						}
 					}
 				}
-				if (preg_match("/\bon(\w+)/i", $propName, $match)) {
-					if ($hasCode) {
-						new Error(self::$errors['eventHandlerExpected'], array($propName, self::$templateName, self::$className));
-					}
-					if (!is_array($child['e'])) {
-						$child['e']	= array();
-					}
-					$eventType = strtolower($match[1]);
-					$once = false;
-					$parts = preg_split('/once/i', $eventType);
-					if (isset($parts[1]) && empty($parts[1])) {
-						$eventType = preg_replace("/once$/i", '', $eventType);
-						$once = true;
-					}
-					$isDispatching = preg_match('/^\!/', $propValue);
-					preg_match_all('/\(([^\)]*)\)/', $propValue, $matches);
-					$args = '';
-					if (!empty($matches[1])) {
-						$propValue = str_replace($matches[0][0], '', $propValue);
-						$args = $matches[1][0];
-					}
-					$callback = preg_replace("/[^\w]/", "", $propValue);
-					if (!$isDispatching && is_array(self::$class) && !self::hasComponentMethod($callback, self::$class)) {
-						new Error(self::$errors['handlerNotFound'], array($callback, self::$templateName, self::$className, 'on'.$match[1]));
-					}
-					$eventTypeIndex = array_search($eventType, self::$eventTypesShortcuts);
-					if ($eventTypeIndex > -1) {
-						$eventType = $eventTypeIndex;
-					}
-					$child['e'][] = $eventType;
-					if (!$isDispatching) {
-						if (empty($args)) {
-							$child['e'][] = '<nq><this>'.$callback.'<nq>';
-						} else {
-							$child['e'][] = '<nq><this>'.$callback.'.bind($,'.$args.')<nq>';
-						}
-					} else {
-						$child['e'][] = $callback;
-					}
-					if ($once) {
-						$child['e'][] = true;
-					}
+				if (preg_match("/\bon(\w{3,})/i", $propName, $match)) {
+					self::parseEventAttribute($match[1], $propValue, $child, $item, $isComponentTag);
 					continue;
 				}
 			}
@@ -969,10 +935,7 @@ class TemplateParser
 				$names[$propName] = array();
 				$parsedPlace = $isComponentTag ? 'componentAttribute' : 'elementAttribute';
 				$code = self::processCode($propValue, $parsedPlace, $names[$propName]);
-				$code = self::correctTagAttributeText($propName, $code);
-				//Printer::log($code);
-
-				$props[$propName] = $code;
+				$props[$propName] = self::correctTagAttributeText($propName, $code);
 				$names[$propName] = array_unique($names[$propName]);
 				sort($names[$propName]);
 				if (count($names[$propName]) == 1) {
@@ -980,12 +943,15 @@ class TemplateParser
 				}
 				if (empty($names[$propName])) {
 					unset($names[$propName]);
+				} else {
+					$hasNames = true;
 				}
 			} else if ($isObfClName) {
 				self::getObfuscatedClassName($propValue);
 				$props[$propName] = $propValue;
 			}
 		}
+	
 		if ($isComponentTag) {
 			$comp = '<component class="ComponentClassName">';
 			if ($item['tagName'] == 'control') {
@@ -1029,8 +995,121 @@ class TemplateParser
 				}
 			}
 		}
+		if ($hasNames) {
+			$child['p'] = '<nq>function(){return'.self::getProperChildren($child['p']).'}<nq>';
+		}
 		if (!empty($ifCondition) || !empty($else)) {
 			self::addIfConditionToChild(trim($ifCondition), trim($else), $child);
+		}
+		if ($hasNames) {
+			Printer::log($child);
+		}
+	}
+
+	private static function parseEventAttribute($match, $propValue, &$child, $item, $isComponentTag) {
+		$origValue = $propValue;
+		$isDispatching = $propValue[0] == '!';
+		$isSpecial     = $propValue[0] == ':';
+		if ($isDispatching) {
+			$propValue = preg_replace('/^\!/', '', $propValue);
+			if ($propValue[0] == ':') {
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			}
+		}
+		if ($isSpecial) {
+			$propValue = preg_replace('/^:/', '', $propValue);
+			if ($propValue[0] == '!') {
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			}
+			if ($isComponentTag) {
+				new Error(self::$errors['specEventAttrInComp'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			}
+		}
+		$parts = explode('(', $propValue);
+		$propValue = $parts[0];
+		$eventArgs = '';
+		if (isset($parts[1])) {
+			if ($isSpecial) {
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			}
+			$parts[0] = '';
+			$eventArgs = implode('(', $parts);
+			if ($eventArgs[strlen($eventArgs) - 1] != ')') {
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			}
+			preg_match_all('/\{/', $eventArgs, $matches1);
+			preg_match_all('/\}/', $eventArgs, $matches2);
+			if (count($matches1[0]) != count($matches2[0])) {
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));		
+			}
+			$spacelessArgs = preg_replace('/\s/', '', $eventArgs);
+			if (!empty($matches1[0])) {
+				if (preg_match('/[^\(,]\{/', $spacelessArgs) || preg_match('/\}[^,\)]/', $spacelessArgs)) {
+					new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));		
+				}
+			}
+			$data = TemplateCodeParser::parse('.'.$propValue.preg_replace('/[\{\}]/', '', $eventArgs), 'eventAttribute');
+			$parts = explode('(', rtrim(trim($data['code']), ')'));
+			$parts[0] = '';
+			$eventArgs = trim(implode('(', $parts), '(');
+		} else {
+			if ($isSpecial) {
+				$specs = array('stop', 'prevent');
+				if (!in_array($propValue, $specs)) {
+					new Error(self::$errors['unknownSpecEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, implode(', ', $specs), $item['content']));
+				}
+			}
+		}
+		if (empty($propValue)) {
+			new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+		}
+		if (in_array($propValue, array('this', 'true', 'false', 'null', 'undefined'))) {
+			new Error(self::$errors['keywordInEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+		}
+		if (is_numeric($propValue)) {
+			new Error(self::$errors['numericEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+		}
+
+		if (!preg_match('/^[:\!]*[_a-z]\w+$/i', $propValue)) {
+			new Error(self::$errors['incorrectEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+		}
+		$once      = false;
+		$eventType = strtolower($match);
+		$parts     = preg_split('/once/i', $eventType);		
+		
+		if (!is_array($child['e'])) {
+			$child['e']	= array();
+		}		
+		if (isset($parts[1]) && empty($parts[1])) {
+			$eventType = preg_replace("/once$/i", '', $eventType);
+			$once = true;
+		}
+		
+		$callback = $propValue;
+		if (!$isDispatching && !$isSpecial && is_array(self::$class) && !self::hasComponentMethod($callback, self::$class)) {
+			new Error(self::$errors['handlerNotFound'], array($callback, self::$templateName, self::$className, 'on'.$match));
+		}
+		$eventTypeIndex = array_search($eventType, self::$eventTypesShortcuts);
+		if ($eventTypeIndex > -1) {
+			$eventType = $eventTypeIndex;
+		} elseif (!$isComponentTag) {
+			new Error(self::$errors['unknownEventAttr'], array('on'.$match, self::$templateName, self::$className, $item['content']));
+		}
+ 		$child['e'][] = $eventType;
+		if ($isDispatching) {
+			$callback = 'd.b($,"'.$callback.'"';
+			if (!empty($eventArgs)) {
+				$callback .= ','.$eventArgs;
+			}
+			$callback .= ')';
+		} elseif (!$isSpecial) {
+			if (!empty($eventArgs)) {
+				$callback .= '.b($,'.$eventArgs.')';
+			}
+		}
+		$child['e'][] = '<nq>'.(!$isSpecial ? '$.'.$callback : self::$globalVarNames[$callback]).'<nq>';
+		if ($once) {
+			$child['e'][] = true;
 		}
 	}
 

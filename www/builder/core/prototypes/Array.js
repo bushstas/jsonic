@@ -7,9 +7,10 @@ Array.prototype.contains = function(v) {
 Array.prototype.has = function(v) {
 	return this.indexOf(v) > -1;
 };
-Array.prototype.hasAny = function() {
-	for (var i = 0; i < arguments.length; i++) {
-		if (this.indexOf(arguments[i]) > -1) return true;
+Array.prototype.hasAny = function(a) {
+	if (!isArray(a)) a = arguments;
+	for (var i = 0; i < a.length; i++) {
+		if (this.indexOf(a[i]) > -1) return true;
 	}
 };
 Array.prototype.hasExcept = function() {

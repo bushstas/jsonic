@@ -168,28 +168,6 @@ function Core() {
 	this.getWaitingChild = function(componentName) {
 		return Objects.get(this.waiting, componentName);
 	};
-	this.registerPropActivity = function(type, name, data) {
-		this.propActivities = this.propActivities || {};
-		this.propActivities[type] = this.propActivities[type] || {};
-		this.propActivities[type][name] = this.propActivities[type][name] || [];
-		this.propActivities[type][name].push(data);
-		return this.propActivities[type][name].length - 1;
-	};
-	this.disposePropActivities = function(type, data) {
-		var activities = this.propActivities[type];
-		if (isObject(data)) {
-			var deleted;
-			for (var pn in data) {
-				if (isArray(activities[pn])) {
-					deleted = 0;
-					for (var i = 0; i < data[pn].length; i++) {
-						activities[pn].splice(data[pn][i] - deleted, 1);
-						deleted++;
-					}
-				}
-			}
-		}
-	};
 	this.getTemplateById = function(tmpid) {
 		if (isObject(this.templatesById)) return this.templatesById[tmpid];
 		var parents = this.inheritedSuperClasses;
@@ -254,6 +232,24 @@ function Core() {
 	};
 	this.getParentElement = function() {
 		return this.parentElement;
+	};
+	this.createUpdater = function(u, c, s, p, l) {
+		var updater = new u(s, p);
+		this.addUpdater.call(c, updater, l);
+	};
+	this.addUpdater = function(u, l) {
+		this.updaters = this.updaters || {};
+		var keys = u.getKeys();
+		for (var i = 0; i < keys.length; i++) {
+			this.updaters[keys[i]] = this.updaters[keys[i]] || [];
+			l.push(keys[i], this.updaters[keys[i]].length);
+			this.updaters[keys[i]].push(u);
+		}
+	};
+	this.disposeUpdater = function(type, idx) {
+		if (this.updaters && this.updaters[type] && this.updaters[type][idx]) {
+			this.updaters[type][idx].dispose();
+		}
 	};
 }
 Core = new Core();

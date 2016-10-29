@@ -52,6 +52,9 @@ function isString(a) {
 function isNumber(a) {
 	return typeof a == 'number';
 }
+function isPrimitive(a) {
+	return isString(a) || isNumber(a) || isBool(a);
+}
 function isNumeric(a) {
 	return isNumber(a) || (isString(a) && (/^\d+$/).test(a));
 }

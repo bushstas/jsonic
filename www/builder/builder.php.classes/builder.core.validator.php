@@ -15,7 +15,7 @@ class CoreValidator
 		),
 		'helpers' => array(),
 		'prototypes' => array(
-			'Array', 'Element', 'MouseEvent', 'String'
+			'Array', 'Element', 'MouseEvent', 'String', 'Function'
 		),
 		'services' => array(
 			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator', 'Controllers', 'Logger'
@@ -29,8 +29,8 @@ class CoreValidator
 
 	private $utilsFunctions = array(
 		'generateRandomKey', 'toCamelCase', 'isComponentLike', 'isComponent', 'isController', 'isControl', 'isObject',
-		'isArray', 'isArrayLike', 'isElement', 'isNode', 'isText', 'isFunction', 'isBool', 'isBoolean', 'isString', 'isNumber', 'isNumeric',
-		'isUndefined', 'isNull', 'isNone', 'isZero', 'isNotEmptyString', 'stringToNumber', 'getCount'
+		'isArray', 'isArrayLike', 'isElement', 'isNode', 'isText', 'isFunction', 'isBool', 'isBoolean', 'isString', 'isNumber',
+		'isPrimitive', 'isNumeric', 'isUndefined', 'isNull', 'isNone', 'isZero', 'isNotEmptyString', 'stringToNumber', 'getCount'
 	);
 	
 	public function validate($pathToCore) {

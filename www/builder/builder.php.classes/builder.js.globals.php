@@ -27,7 +27,9 @@ class JSGlobals
 		'user'             => '__USEROPTIONS',
 		'nullFunction'     => '__FNC',
 		'controllers'      => '__CTR',
-		'controller'       => '__C'
+		'controller'       => '__C',
+		'stop'             => '__SP',
+		'prevent'          => '__PD'
 	);
 
 	private static $errors = array(
@@ -61,6 +63,8 @@ class JSGlobals
 		self::addUserOptions($data['user']);
 		self::addControllers($data['controllers']);
 		self::addNullFunction();
+		self::addStopPropagationFunction();
+		self::addPreventDefaultFunction();
 
 		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
 		self::parseTextConstants($jsOutput, $data['texts']);
@@ -268,5 +272,13 @@ class JSGlobals
 
 	private static function addControllers($controllers) {
 		self::add('controllers', str_replace('"', '_#_', json_encode($controllers)));
+	}
+
+	private static function addStopPropagationFunction() {
+		self::add('stop', 'function(e){e.stopPropagation()}');
+	}
+
+	private static function addPreventDefaultFunction() {
+		self::add('prevent', 'function(e){e.preventDefault()}');
 	}
 }

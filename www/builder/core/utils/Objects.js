@@ -88,6 +88,11 @@ function Objects() {
 	this.getKey = function(obj, value) {
 		for (var k in obj) if (obj[k] == value) return k;
 	};
+	this.getValues = function(obj) {
+		var vals = [];
+		for (var k in obj) vals.push(obj[k]);
+		return vals;
+	};
 	this.getKeys = function(obj) {
 		var keys = [];
 		for (var k in obj) keys.push(k);

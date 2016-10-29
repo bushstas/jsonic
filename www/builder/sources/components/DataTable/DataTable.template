@@ -21,6 +21,6 @@
 
 
 {/if}
-<div class="app-datatable-outer-container">
-	<component class="DataTableTabPanel">
+<div class="app-datatable-outer-container" super="{$a}-item-{$b}" fuck="{$a}">
+	<component class="DataTableTabPanel" props="{$p}" aaa="{$aaa}">
 </div>

@@ -11,7 +11,7 @@ class TemplateCodeParser
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted, $isSwitch,
-				   $thereWasWord, $place, $parsedCode, $element, $context;
+				   $thereWasWord, $place, $parsedCode, $element, $context, $nextPart;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -70,7 +70,8 @@ class TemplateCodeParser
 		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: {{??}}',
 		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}',
 		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
-		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}'
+		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
+		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp><br>'
 	);
 
 //	'switchError' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}<xmp>{?}</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>",
@@ -142,6 +143,7 @@ class TemplateCodeParser
 		self::$parsedCode = '';		
 		for ($i = 0; $i < count($parts); $i++) {
 			$part = $parts[$i];
+			self::$nextPart = $parts[$i + 1];
 			if ($part === '') continue;
 			if (!preg_match('/[\wа-я]/si', $part)) {
 				for ($j = 0; $j < strlen($part); $j++) {
@@ -248,10 +250,16 @@ class TemplateCodeParser
 						self::$isStart = false;
 						switch ($part) {
 							case 'let':
+								if (self::$place != 'textNode') {
+									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$className, self::$templateName, self::$element));
+								}
 								self::$isLet = true;
 								self::$expected = array('&', self::$space);
 							break;
 							case 'switch':
+								if (self::$place != 'switch') {
+									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$className, self::$templateName, self::$element));
+								}
 								self::$isSwitch = true;
 								self::$expected = array('~', '@', '&', '$', '#', self::$space);
 							break;
@@ -912,7 +920,9 @@ class TemplateCodeParser
 			self::on('fn');
 			self::$expected = array('(');
 			if (!self::$open['method']) {
-				self::validateFunction($part);
+				if (!empty(self::$nextPart) && self::$nextPart[0] == '(') {
+					self::validateFunction($part);
+				}
 				return false;
 			}
 		}
@@ -1138,6 +1148,9 @@ class TemplateCodeParser
 
 	private static function getPlaceCaption() {
 		switch (self::$place) {
+			case 'eventAttribute':
+				return 'атрибута события элемента';
+
 			case 'componentClass':
 				return 'имени класса компонента';
 			
@@ -1169,6 +1182,7 @@ class TemplateCodeParser
 			case 'componentClass':
 				self::$expected = array('a', '.', '&', '~', '#');
 			break;
+			case 'eventAttribute':
 			case 'if':
 			case 'else':
 			case 'templateAttribute':

@@ -1,6 +1,5 @@
 function Component() {	
 	if (this !== window) return;
-	var attrNames = {{ATTRIBUTES}};
 	var eventTypes = {{EVENTTYPES}};
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
@@ -62,77 +61,19 @@ function Component() {
 	};
 
 	var propagatePropertyChange = function(changedProps) {
-		var pn, pv, i, activities, cnds = [], ifsw = [];
-		for (pn in changedProps) {
-			pv = changedProps[pn];
-			activities = this.propActivities['cnd'];
-			if (activities && isArray(activities[pn])) {
-				for (i = 0; i < activities[pn].length; i++) {
-					if (cnds.indexOf(activities[pn][i]) == -1) {
-						activities[pn][i].update();
-						cnds.push(activities[pn][i]);
-					}
-				}
-			}
-			activities = this.propActivities['isw'];
-			if (activities && isArray(activities[pn])) {
-				for (i = 0; i < activities[pn].length; i++) {
-					if (ifsw.indexOf(activities[pn][i]) == -1) {
-						activities[pn][i].update();
-						ifsw.push(activities[pn][i]);
-					}
-				}
-			}
-			activities = this.propActivities['swt'];
-			if (activities && isArray(activities[pn])) {
-				for (i = 0; i < activities[pn].length; i++) activities[pn][i].update(pv);
-			}
-			activities = this.propActivities['for'];
-			if (activities && isArray(activities[pn])) {
-				for (i = 0; i < activities[pn].length; i++) activities[pn][i].update(pv);
-			}
-			activities = this.propActivities['nod'];
-			if (activities && isArray(activities[pn])) {
-				var node;
-				for (i = 0; i < activities[pn].length; i++) {
-					if (isUndefined(activities[pn][i][1])) {
-						activities[pn][i][0].textContent = pv;
-					} else {
-						activities[pn][i][0].textContent = activities[pn][i][1]();
-					}
-				}
-			}
-			activities = this.propActivities['atr'];
-			if (activities && isArray(activities[pn])) {
-				var key, propAttr, attrParts;
-				for (i = 0; i < activities[pn].length; i++) {
-					key = activities[pn][i];
-					attrParts = activities[pn][i][2]();
-					var attrValue = '';
-					var attrVal;
-					for (var j = 0; j < attrParts.length; j++) {
-						attrVal = isFunction(attrParts[j]) ? attrParts[j]() : attrParts[j];
-						if (!isUndefined(attrVal)) attrValue += attrVal;
-					}
-					attrValue = attrValue.trim();
-					var attrName = attrNames[activities[pn][i][1]] || activities[pn][i][1];
-					activities[pn][i][0].attr(attrName, attrValue);
-				}
-			}
-			activities = this.propActivities['cmp'];
-			if (activities && isArray(activities[pn])) {
-				var component, value;
-				for (i = 0; i < activities[pn].length; i++) {
-					component = activities[pn][i][0];
-					value = activities[pn][i][1]();
-					if (component) {
-						if (activities[pn][i][3] && isObject(value)) refresh.call(this,  value);
-						else component.set(activities[pn][i][2], value);
+		if (!this.updaters) return;
+		var updated = [];
+		for (var k in changedProps) {
+			if (this.updaters[k]) {
+				for (var i = 0; i < this.updaters[k].length; i++) {
+					if (updated.indexOf(this.updaters[k][i]) == -1) {
+						this.updaters[k][i].react(changedProps);
+						updated.push(this.updaters[k][i]);
 					}
 				}
 			}
 		}
-		cnds = ifsw = null;
+		updated = null;
 		callFollowers.call(this, changedProps);
 	};
 
@@ -152,6 +93,21 @@ function Component() {
 		doRendering.call(this);
 	};
 
+	var updateForeach = function(propName, index, item) {
+		var updaters = this.updaters[propName], o;
+		if (isArray(updaters[propName])) {
+			for (i = 0; i < updaters[propName].length; i++) {
+				if (updaters[propName] instanceof OperatorUpdater) {
+					o = updaters[propName][i].getOperator();
+					if (o instanceof Foreach) {
+						if (!isUndefined(item)) o.add(item, index);
+						else o.remove(index);
+					}
+				}
+			}
+		}
+	};
+
 	var unrender = function() {
 		this.elements = null;
 		Core.disposeLinks.call(this);
@@ -161,7 +117,6 @@ function Component() {
 	};
 
 	Component.prototype.initiate = function() {
-		this.propActivities = {};
 		this.propsToSet = {};
 		this.rendered = this.disposed = this.disabled = false;
 	};
@@ -195,7 +150,6 @@ function Component() {
 	Component.prototype.dispatchEvent = function(eventType) {
 		var args = Array.prototype.slice.call(arguments);
 		args.splice(0, 1);
-		args.push(this);
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = eventTypes[this.listeners[i]['type']];
@@ -223,10 +177,7 @@ function Component() {
 		if (isString(index) && isNumeric(index)) index = ~~index;
 		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
 			prop.splice(index, 1);
-			var activities = this.propActivities['for'];
-			if (activities && isArray(activities[propName])) {
-				for (i = 0; i < activities[propName].length; i++) activities[propName][i].remove(index);
-			}
+			updateForeach.call(this, propName, index);
 			callFollower.call(this, propName, prop);
 		}
 	};
@@ -257,10 +208,7 @@ function Component() {
 				if (!isNumber(index)) prop.push(items[j]);
 				else if (index == 0) prop.unshift(items[j]);
 				else prop.insertAt(items[j], index);
-				var activities = this.propActivities['for'];
-				if (activities && isArray(activities[propName])) {
-					for (i = 0; i < activities[propName].length; i++) activities[propName][i].add(items[j], index);
-				}
+				updateForeach.call(this, propName, index, items[j]);
 				if (isNumber(index)) index++;
 			}
 			callFollower.call(this, propName, prop);
@@ -526,7 +474,7 @@ function Component() {
 
 	Component.prototype.dispose = function() {
 		unrender.call(this);
-		this.propActivities = null;
+		this.updaters = null;
 		this.parentElement = null;
 		this.props = null;
 		this.propsToSet = null;	
@@ -548,5 +496,6 @@ function Component() {
 	Component.prototype.disposeInternal=f;
 	Component.prototype.getArgs=f;	
 	Component.prototype.g=Component.prototype.get;
+	Component.prototype.d=Component.prototype.dispatchEvent;
 }
 Component();
