@@ -135,6 +135,7 @@ class TemplateCodeParser
 		self::$isLet = false;
 		self::$isCase = false;
 		self::$isSwitch = false;
+		self::$isForeach = false;
 		self::$quoted = false;
 	}
 
@@ -657,7 +658,9 @@ class TemplateCodeParser
 					return;
 				}
 			}
-			if (self::$open['recentQuote'] || self::$open['functionResult'] || (self::$isLet && !self::$open['letvarname'] && self::$prevSign != '=' && self::$prevSign != '!' && !self::$open['greater'])) {
+			if (self::$open['foreachAs']) {
+				self::$expected = array('>');
+			} elseif (self::$open['recentQuote'] || self::$open['functionResult'] || (self::$isLet && !self::$open['letvarname'] && self::$prevSign != '=' && self::$prevSign != '!' && !self::$open['greater'])) {
 				self::$expected = array('=');
 				self::off('functionResult');
 				self::off('recentQuote');
@@ -725,6 +728,7 @@ class TemplateCodeParser
 		if (self::$open['doubleQuote'] || self::$open['quote']) {
 			self::$expected = '*';
 		} else {
+			self::offEquals();
 			self::on('recentQuote');
 			self::$expected = array( '?', '+', '&&', '||', '=', '!', self::$space);
 			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
@@ -744,7 +748,6 @@ class TemplateCodeParser
 				self::$expected[] = ',';
 			}
 			self::set('math', '');
-			self::off('equal');
 			self::set('or', 0);
 		}
 		if (self::$isCase && !self::$open['quote']) {
@@ -764,6 +767,7 @@ class TemplateCodeParser
 			self::$expected = '*';
 		} else {
 			self::on('recentQuote');
+			self::offEquals();
 			self::$expected = array('?', '+', '&&', '||', '=', '!', self::$space);
 			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
 				self::$expected[] = ':';
@@ -782,7 +786,6 @@ class TemplateCodeParser
 				self::$expected[] = ',';
 			}
 			self::set('math', '');
-			self::off('equal');
 			self::set('or', 0);
 		}
 		if (self::$isCase && !self::$open['doubleQuote']) {
@@ -836,7 +839,7 @@ class TemplateCodeParser
 				self::off('recentVar');
 				array_push(self::$expected, '0', '~', '#', '+', '-', '!', '(', self::$space);
 				self::maybeAddDollar();
-			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math']) && !self::$open['foreachAs']) || self::$open['bracket']) {
+			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math']) && !self::$open['foreachAs'] && !self::$open['foreachAs2']) || self::$open['bracket']) {
 				self::$expected[] = '&';
 			}
 			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis']) && self::$prevSign != '&') {
@@ -900,13 +903,19 @@ class TemplateCodeParser
 
 	private static function handleGreaterSign() {
 		if (!self::$quoted) {
-			self::$expected = array('=', '+', '-', 'a', '0', '~', '&', '#', self::$space);
-			self::maybeAddDollar();
-			self::on('greater');
-			self::off('functionResult');
-			self::off('name');
-			self::off('recentVar');
-			self::$varType = '';
+			if (self::$open['foreachAs']) {
+				self::$expected = array('&', self::$space);
+				self::off('foreachAs');
+				self::on('foreachAs2');
+			} else {
+				self::$expected = array('=', '+', '-', 'a', '0', '~', '&', '#', self::$space);
+				self::maybeAddDollar();
+				self::on('greater');
+				self::off('functionResult');
+				self::off('name');
+				self::off('recentVar');
+				self::$varType = '';
+			}
 		}
 	}
 
@@ -1138,7 +1147,9 @@ class TemplateCodeParser
 		}
 
 		if (self::$isForeach) {
-			if (!empty(self::$open['foreachAs'])) {
+			if (!empty(self::$open['foreachAs2'])) {
+				self::$expected = array(self::$space, 'end');
+			} elseif (!empty(self::$open['foreachAs'])) {
 				self::$expected = array('=', self::$space, 'end');
 			} elseif (empty(self::$open['foreachArr'])) {
 				self::on('foreachArr');
@@ -1156,6 +1167,14 @@ class TemplateCodeParser
 		self::offVars();
 		self::off('letvalue');
 		self::off('space');
+	}
+
+	private static function offEquals() {
+		self::off('equal');
+		self::off('doubleEqual');
+		self::off('tripleEqual');
+		self::off('notEqual');
+		self::set('math', '');
 	}
 
 	private static function offVars() {
@@ -1353,6 +1372,14 @@ class TemplateCodeParser
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
 			self::maybeAddDollar();
 		} 
+		elseif (self::$open['foreachAs2'] && !self::$open['name'])
+		{
+			if (self::$open['var']) {
+				self::$expected = array('a');
+			} else {
+				self::$expected = array('&');
+			}
+		}
 		elseif (self::$open['equal'])
 		{
 			if (self::$open['foreachAs']) {

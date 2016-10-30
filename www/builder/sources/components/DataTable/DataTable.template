@@ -1,7 +1,6 @@
-{let &a = $a}
 <div class="app-datatable-outer-container">
 	<component class="DataTableTabPanel">
 </div>
-{foreach ~aaa as &item =}
+{foreach $aaa as &item => &a}
 	<div>111</div>
 {/foreach}

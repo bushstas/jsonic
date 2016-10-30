@@ -590,7 +590,7 @@ class TemplateParser
 		$content = ltrim(rtrim($item['content'], '}'), '{');
 		$data = TemplateCodeParser::parse($content, 'foreach');
 
-		Printer::log(self::$parsedItem, true);
+		
 		$content = preg_replace('/\s{2,}/', ' ', $item['content']);
 		$content = preg_replace('/\{foreach\s+|\}/', '', $content);
 		$parts = explode(' ', trim($content));
