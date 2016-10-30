@@ -39,7 +39,7 @@ function hide() {
 }
 
 function renderButtons(items) {
-	var $buttons = [];
+	var *$buttons = [], *$aaa = 333, *$ccc = 5;
 	each (items as item) {	
 		buttons.push(this.getButtonData(item));
 	}

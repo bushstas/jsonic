@@ -248,10 +248,11 @@ class JSCompiler
 			if (is_array($classData['extends'])) {
 				$parentalClasses = array_merge($parentalClasses, $classData['extends']);
 			}
-			if (in_array($classData['type'], $this->superClasses) && !in_array($className, $used)) {
+			if ((empty($classData['type']) || in_array($classData['type'], $this->superClasses)) && !in_array($className, $used)) {
 				$notUsedClasses[] = $className;
 			}
 		}
+
 		$parentalClasses = array_unique($parentalClasses);
 		$properNotUsedComponents = array();
 		foreach ($notUsedClasses as $className) {
@@ -638,7 +639,7 @@ class JSCompiler
 	}
 
 	private function finish() {
-		$this->encodeControllerCallings();
+		$this->encodeControllerCallings();		
 		$this->decodeTexts();
 
 		$this->jsOutput = ";(function() {\n".$this->jsOutput;
@@ -667,7 +668,7 @@ class JSCompiler
 					$this->jsOutput .= $cssClassIndex[$cssClasses[$i]];
 				}
 			}
-		}
+		}		
 		$this->jsOutput = preg_replace('/->> */', '', $this->jsOutput);
 		$this->jsOutput = preg_replace('/\{\s+\}/', '{}', $this->jsOutput);
 

@@ -10,7 +10,6 @@ class JSInterpreter
 		self::parseIfShortcuts($content);	
 		self::parseArrayPushOperators($content);
 		self::parseGetDataShortcuts($content);
-		self::deleteExtraSpaces($content);
 		self::parseObjectGets($content);
 		self::parseDialogShortcuts($content);
 		self::parseDispatchEventShortcuts($content);
@@ -42,19 +41,13 @@ class JSInterpreter
 		$content = preg_replace('/([>\)\]\w]) *-> *(\w+)/', "$1.getData('$2')", $content);	
 	}
 
-	private static function deleteExtraSpaces(&$content) {
-		$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
-		$content = preg_replace('/'.$regexp.' {1,}/', "$1", $content);
-		$content = preg_replace('/ {1,}'.$regexp.'/', "$1", $content);
-	}
-
 	private static function parseObjectGets(&$content) {
 		$regexp = '/\b(let|const|var) *\{/';
 		$hasSimilarNativeCode = preg_match($regexp, $content);
 		if ($hasSimilarNativeCode) {
 			$content = preg_replace($regexp, "#_$1_#", $content);
 		}
-		$content = preg_replace('/(\$*[\w\]\[\.]+) *\{ *([\w\]\[\.,]+) *\}/', " Objects.get($1,$2)", $content);
+		$content = preg_replace('/(\$*[\w\]\[\. ]+) *\{ *([\w\]\[\., ]+) *\}/', " Objects.get($1,$2)", $content);
 		if ($hasSimilarNativeCode) {
 			$content = preg_replace('/\#_(let|const|var)_\#/', "$1{", $content);	
 		}

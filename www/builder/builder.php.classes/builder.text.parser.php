@@ -5,7 +5,7 @@ class TextParser
 	private static $texts = array();
 	private static $dictionary = array();
 	private static $mark = 'ENCODEDTEXT';
-	private static $regexp = '/[\'"]/';
+	private static $regexp = '/[\'"\/]/';
 
 	public static function addToDictionary($keywords) {
 		if (is_string($keywords)) {
@@ -22,6 +22,7 @@ class TextParser
 	public static function encode(&$content, $key = null, $mark = null) {
 		if (empty($mark)) $mark = self::$mark;
 		self::initTexts($key);
+		$content = str_replace('\\/', '<bslash>', $content);
 		$content = preg_replace('/\\\"/', '<sldq>', $content);
 		$content = preg_replace("/\\\'/", '<slq>', $content);
 		preg_match_all(self::$regexp, $content, $matches);
@@ -131,6 +132,7 @@ class TextParser
 		}
 		$content = str_replace('<sldq>', '\"', $content);
 		$content = str_replace("<slq>", "\'", $content);
+		$content = str_replace("<bslash>", "\/", $content);
 	}
 
 	public static function decodeThis(&$content) {

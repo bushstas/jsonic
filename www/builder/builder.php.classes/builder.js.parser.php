@@ -128,11 +128,11 @@ class JSParser
 			}
 		}
 		if (preg_match('/\$[a-z]/i', $code)) {
-			$regexp = '/\b(var|let|const)\s+\$(\w+)/';
+			$regexp = '/\*\$(\w+)\s*=(?!=)/';
 			preg_match_all($regexp, $code, $matches);
-			$varsToSet = $matches[2];
+			$varsToSet = $matches[1];
 			if (!empty($varsToSet)) {
-				$code = preg_replace($regexp, "$1 $2", $code);	
+				$code = preg_replace($regexp, "$1=", $code);	
 			}
 			$code = preg_replace('/\$(\w+)\!\s*;*/', "this.toggle('$1');", $code);
 			$code = preg_replace('/\$(\w+)\s*([\+\-\*\/\%])=\s*(\w+)/', "this.plusTo('$1',$3,'$2')", $code);
@@ -144,67 +144,72 @@ class JSParser
 			$code = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.addOne\(/', "this.addOneTo('$1', ", $code);
 			$code = preg_replace('/\$(\w+)=>/', "this.set('$1', $1);", $code);
-			
-			//$code = preg_replace('/\$(\w+)[\s\t]*=(?!=)[\s\t]*([^\r\n;\`]+)/', "this.set('$1',$2)", $code);
-			
-			
+
+			if (!empty($varsToSet)) {
+				$items = array();
+				foreach ($varsToSet as $varToSet) {
+					$items[] = "\n\$".$varToSet."=".$varToSet;
+				}
+				$code .= implode(',', $items).';';
+			}
+
 			$regexp = '/\$(\w+)\s*=(?!=)\s*/';
 			$data = Splitter::split($regexp, $code, 1);
-			$code = $data['items'][0];
-			$signs = array('{' => '}', '(' => ')', '[' => ']');
-			$isComma = false;
-			for ($i = 1; $i < count($data['items']); $i++) {
-				if (isset($data['items'][$i])) {
-					$firstSign = $data['items'][$i][0];
-					$closingSign = $signs[$firstSign];
-					$value = '';
-					if ($firstSign == '{' || $firstSign == '(' || $firstSign == '[') {
-						$d = Splitter::getInner(ltrim($data['items'][$i], $firstSign), $closingSign, $firstSign);
-						$value = $firstSign.preg_replace('/[\r\n\t]/', '', $d['inner']).$closingSign;
-						$data['items'][$i] = $d['outer'];
-					} else {
-						$d = Splitter::split('/[\r\n;]/', $data['items'][$i], 0);
-						$value = $d['items'][0];
-						$trimmed = trim($value);
-						if ($trimmed[strlen($trimmed) - 1] == ',') {
-							$parts = explode(',', $value);
-							$last = count($parts) - 1;
-							$d['items'][0] = ','.$parts[$last];
-							$parts[$last] = '';
-							$value = rtrim(implode(',', $parts), ',');
+			if (!empty($data['items'])) {
+				$code = $data['items'][0];
+				$signs = array('{' => '}', '(' => ')', '[' => ']');
+				$isComma = false;
+				for ($i = 1; $i < count($data['items']); $i++) {
+					if (isset($data['items'][$i])) {
+						$firstSign = $data['items'][$i][0];
+						$closingSign = $signs[$firstSign];
+						$value = '';
+						if ($firstSign == '{' || $firstSign == '(' || $firstSign == '[') {
+							$d = Splitter::getInner(ltrim($data['items'][$i], $firstSign), $closingSign, $firstSign);
+							$value = $firstSign.preg_replace('/[\r\n\t]/', '', $d['inner']).$closingSign;
+							$data['items'][$i] = $d['outer'];
 						} else {
-							$d['items'][0] = '';
+							$d = Splitter::split('/[\r\n;]/', $data['items'][$i], 0);
+							$value = $d['items'][0];
+							$trimmed = trim($value);
+							if ($trimmed[strlen($trimmed) - 1] == ',') {
+								$parts = explode(',', $value);
+								$last = count($parts) - 1;
+								$d['items'][0] = ','.$parts[$last];
+								$parts[$last] = '';
+								$value = rtrim(implode(',', $parts), ',');
+							} else {
+								$d['items'][0] = '';
+							}
+							$data['items'][$i] = Splitter::join($d['items'], $d['delimiters']);
+							
 						}
-						$data['items'][$i] = Splitter::join($d['items'], $d['delimiters']);
-						
-					}
-					$trimmed = trim($data['items'][$i]);
-					if (!$isComma) {
-						if ($trimmed == ',') {
-							$code .= "this.set({'".$data['delimiters'][$i - 1]."':".$value.",";
-							$isComma = true;
+						$trimmed = trim($data['items'][$i]);
+						if (!$isComma) {
+							if ($trimmed == ',') {
+								$code .= "this.set({'".$data['delimiters'][$i - 1]."':".$value.",";
+								$isComma = true;
+							} else {
+								$code .= "this.set('".$data['delimiters'][$i - 1]."',".$value.")".$data['items'][$i];
+							}
 						} else {
-							$code .= "this.set('".$data['delimiters'][$i - 1]."',".$value.")".$data['items'][$i];
+							if ($trimmed == ',') {
+								$code .= "'".$data['delimiters'][$i - 1]."':".$value.",";
+								$isComma = true;
+							} else {
+								$code .= "'".$data['delimiters'][$i - 1]."':".$value."})".$data['items'][$i];
+								$isComma = false;
+							}
 						}
-					} else {
-						if ($trimmed == ',') {
-							$code .= "'".$data['delimiters'][$i - 1]."':".$value.",";
-							$isComma = true;
-						} else {
-							$code .= "'".$data['delimiters'][$i - 1]."':".$value."})".$data['items'][$i];
-							$isComma = false;
-						}
-					}
 
+					}
+					
 				}
-				
 			}
-			Printer::log($code);
-			//Printer::log($data);
-
-
-
 			$code = preg_replace('/\$(\w+)/', "this.get('$1')", $code);
+			$regexp = '([,:=\+\-\*>\!\?<;\(\)\|\}\{\[\]%\/])';
+			$code = preg_replace('/'.$regexp.' {1,}/', "$1", $code);
+			$code = preg_replace('/ {1,}'.$regexp.'/', "$1", $code);
 		}
 		return $code;
 	}

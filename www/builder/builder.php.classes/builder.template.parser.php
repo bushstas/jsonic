@@ -991,12 +991,8 @@ class TemplateParser
 				}
 				if (empty($child['p'])) {
 					unset($child['p']);
-				} else {
-					
+				} else {					
 					self::getProperComponentData($child);
-					if ($hasNames) {
-						Printer::log($child);
-					}
 				}
 			}
 		}
@@ -1006,7 +1002,6 @@ class TemplateParser
 		if (!empty($ifCondition) || !empty($else)) {
 			self::addIfConditionToChild(trim($ifCondition), trim($else), $child);
 		}
-
 	}
 
 	private static function parseEventAttribute($match, $propValue, &$child, $item, $isComponentTag) {

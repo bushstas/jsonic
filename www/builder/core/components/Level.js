@@ -163,7 +163,7 @@ function Level() {
 				props[2] = [props[2]];
 			}
 			for (var i = 0; i < props[1].length; i++) {					
-				if (props[0] === props[1][i]) {alert(props[0])
+				if (props[0] === props[1][i]) {
 					renderItems(props[1][i]);
 					return;
 				}
