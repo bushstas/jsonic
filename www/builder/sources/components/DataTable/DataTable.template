@@ -1,26 +1,3 @@
-{let 
-	&b=3,
-	&a='sdsdd',
-	&d= -5 + 'df'
-}
-{if}
-	{ default}
-	rewr
-	{case '343'}
-	ewrew
-	{case !~a}
-		11111111111{~ss}
-		<div class="qqqq">54543
-
-		<span>444</span>
-		</div>
-	{case ~bbb}
-		wedw
-
-	
-
-
-{/if}
-<div class="app-datatable-outer-container" super="{$a}-item-{$b}" fuck="{$a}">
-	<component class="DataTableTabPanel" props="{$p}" aaa="{$aaa}">
+<div class="app-datatable-outer-container">
+	<component class="DataTableTabPanel">
 </div>

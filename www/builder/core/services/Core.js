@@ -204,7 +204,10 @@ function Core() {
 				}
 			}
 		}
-		if (isString(id)) delete this.children[id];
+		if (isString(id)) {
+			this.children[id] = null;
+			delete this.children[id];
+		}
 	};
 	this.registerControl = function(control, name) {
 	 	this.controls = this.controls || {};
@@ -218,7 +221,10 @@ function Core() {
 		if (this.controls) {
 			var name = control.getName();
 			if (isArray(this.controls[name])) this.controls[name].removeItem(control);
-			else delete this.controls[name];
+			else {
+				this.controls[name] = null;
+				delete this.controls[name];
+			}
 		}
 	};
 	this.provideWithComponent = function(propName, componentName, waitingChild) {
@@ -242,13 +248,17 @@ function Core() {
 		var keys = u.getKeys();
 		for (var i = 0; i < keys.length; i++) {
 			this.updaters[keys[i]] = this.updaters[keys[i]] || [];
-			l.push(keys[i], this.updaters[keys[i]].length);
+			l.push(keys[i], u);
 			this.updaters[keys[i]].push(u);
 		}
 	};
-	this.disposeUpdater = function(type, idx) {
-		if (this.updaters && this.updaters[type] && this.updaters[type][idx]) {
-			this.updaters[type][idx].dispose();
+	this.disposeUpdater = function(t, u) {
+		if (this.updaters && this.updaters[t]) {
+			var i = this.updaters[t].indexOf(u);
+			if (i > -1) {
+				this.updaters[t][i].dispose();
+				this.updaters[t].splice(i, 1);
+			}
 		}
 	};
 }

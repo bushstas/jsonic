@@ -4,6 +4,7 @@ class TemplateParser
 {	
 	private static $calledClasses, $classes, $templates, $sources;
 	private static $regexp = "/\{ *template +\.(\w+) *\}/";
+	private static $space = '_u00A0_';
 	private static $simpleTags = array('br', 'input', 'img', 'hr');
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
@@ -70,7 +71,7 @@ class TemplateParser
 		self::$className = $className;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
-		$template = preg_replace('/&nbsp;/', '_u00A0_', $template);
+		$template = preg_replace('/&nbsp;/', self::$space, $template);
 
 		preg_match_all("/\{template +\.(\w+) +as +\.(\w+) *\}/", $template, $matches);		
 		foreach ($matches[1] as $i => $match) {
@@ -991,7 +992,11 @@ class TemplateParser
 				if (empty($child['p'])) {
 					unset($child['p']);
 				} else {
+					
 					self::getProperComponentData($child);
+					if ($hasNames) {
+						Printer::log($child);
+					}
 				}
 			}
 		}
@@ -1001,9 +1006,7 @@ class TemplateParser
 		if (!empty($ifCondition) || !empty($else)) {
 			self::addIfConditionToChild(trim($ifCondition), trim($else), $child);
 		}
-		if ($hasNames) {
-			Printer::log($child);
-		}
+
 	}
 
 	private static function parseEventAttribute($match, $propValue, &$child, $item, $isComponentTag) {
@@ -1167,30 +1170,9 @@ class TemplateParser
 			foreach ($child['n'] as $k => $v) {
 				if ($k == 'args' || preg_match('/^arg-/', $k)) {
 					unset($child['n'][$k]);
-					if ($k != 'args') $k = preg_replace('/^arg-/', '', $k);
-					if (!is_array($child['na'])) {
-						$child['na'] = array();
-					}
-					$child['na'][$k] = $v;
 				}
 			}
 			if (empty($child['n'])) unset($child['n']);
-		}
-		if (is_array($child['n']) && is_array($child['na'])) {
-			$properNames = array();
-			foreach ($child['n'] as $n) {
-				if (!in_array($n, $child['na'])) {
-					$properNames[] = $n;
-				}
-			}
-			$child['n'] = $properNames;
-			if (empty($child['n'])) unset($child['n']);
-		}
-		if (is_array($child['n'])) {
-			$child['n'] = array_unique($child['n']);
-		}
-		if (is_array($child['na'])) {
-			$child['na'] = array_unique($child['na']);
 		}
 	}
 
@@ -1240,10 +1222,8 @@ class TemplateParser
 		return self::processCode($value, 'componentClass');
 	}
 
-	private static function parseTextNode($content, &$children, &$let, $place = 'textNode') {
-		
-		if (!empty($content)) {
-			
+	private static function parseTextNode($content, &$children, &$let, $place = 'textNode') {		
+		if (!empty($content)) {			
 			$regexp = '/\{([^\}]+)\}/';
 			preg_match_all($regexp, $content, $matches);
 			$codes = $matches[1];
@@ -1368,6 +1348,9 @@ class TemplateParser
 		$index = array_search($text, self::$textNodes);
 		if ($index !== false) {
 			return $index;
+		}
+		if ($text == self::$space) {
+			$text = '\\'.trim(self::$space, '_');
 		}
 		self::$textNodes[] = $text;
 		return count(self::$textNodes) - 1;

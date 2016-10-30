@@ -11,7 +11,6 @@ function OperatorUpdater(o, n) {
 		return o;
 	};
 	this.dispose = function() {
-		o.dispose();
 		o = n = null;
 	};
 }

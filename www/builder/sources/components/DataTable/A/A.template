@@ -1,0 +1,9 @@
+<div class="app-a">
+	<ul>
+		<li>{$name}</li>
+		<li>{$lastname}</li>
+		<li>{$email}</li>
+		<li>{$phone}</li>
+		<li>{$city}</li>
+	</ul>
+</div>

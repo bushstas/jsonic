@@ -336,6 +336,7 @@ function Level() {
 		if (updaters) {
 			for (var i = 0; i < updaters.length; i++) {
 				Core.disposeUpdater.call(component, updaters[i], updaters[i + 1]);
+				updaters[i + 1] = null;
 				i++;
 			}
 		}
@@ -344,6 +345,7 @@ function Level() {
 				Core.unregisterChildComponent.call(component, children[i]);
 			}
 			children[i].dispose();
+			children[i] = null;
 		}
 		if (eventHandler) {
 			eventHandler.dispose();

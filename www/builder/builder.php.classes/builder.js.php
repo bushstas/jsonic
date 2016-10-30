@@ -60,6 +60,7 @@ class JSCompiler
 		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден',
 		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
 		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}',
+		'noMethodFound3' => 'Ошибка вызова метода {??} в коде класса {??}. Метод не найден',
 		'globalVarUsing' => 'В классе {??} обнаружено использование зарезервированных системой имен переменных: {??}',
 		'creatingInstance' => 'В классе {??} обнаружено создание экземпляра класса {??}{?}',
 		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}',
@@ -216,7 +217,7 @@ class JSCompiler
 	}
 
 	private function isValidClassName($name) {
-		return preg_match("/^[A-Z][a-zA-Z\d]+$/", $name);
+		return preg_match("/^[A-Z][a-zA-Z\d]*$/", $name);
 	}
 
 	private function validateUsedClasses() {
@@ -790,7 +791,7 @@ class JSCompiler
 							}
 						}
 						if ($isError) {
-							new Error($this->errors['noMethodFound'], array($callback['called'], $className));
+							new Error($this->errors['noMethodFound3'], array($callback['called'], $className));
 						}
 					}
 				}

@@ -87,18 +87,12 @@ function Component() {
 		if (Objects.has(this.followers, propName)) this.followers[propName].call(this, propValue);
 	};
 
-	var refresh = function(args) {
-		if (args) this.args = args;
-		unrender.call(this);
-		doRendering.call(this);
-	};
-
 	var updateForeach = function(propName, index, item) {
 		var updaters = this.updaters[propName], o;
-		if (isArray(updaters[propName])) {
-			for (i = 0; i < updaters[propName].length; i++) {
-				if (updaters[propName] instanceof OperatorUpdater) {
-					o = updaters[propName][i].getOperator();
+		if (isArray(updaters)) {
+			for (i = 0; i < updaters.length; i++) {
+				if (updaters[i] instanceof OperatorUpdater) {
+					o = updaters[i].getOperator();
 					if (o instanceof Foreach) {
 						if (!isUndefined(item)) o.add(item, index);
 						else o.remove(index);
@@ -462,10 +456,6 @@ function Component() {
 
 	Component.prototype.setScope = function(scope) {
 		this.scope = scope;
-	};
-
-	Component.prototype.log = function(message, method, opts) {
-		Logger.log(message, method, this, opts);
 	};
 
 	Component.prototype.getUniqueId = function() {

@@ -24,20 +24,20 @@ class Splitter
 		return $text;
 	}
 
-	public static function getInner($text, $opening = '}', $closing = '{') {
+	public static function getInner($text, $closing = '}', $opening = '{') {
 		$inner = '';
 		$outer = '';
 		$closed = true;
-		$parts = explode($opening, $text);
+		$parts = explode($closing, $text);
 		if (isset($parts[1])) {
 			$count = 0;
 			$added = 0;
 			foreach ($parts as &$part) {
-				$ps = explode($closing, $part);
+				$ps = explode($opening, $part);
 				if (!isset($ps[1])) {
 					$inner .= $part;
 				} else {
-					$inner .= implode($closing, $ps);
+					$inner .= implode($opening, $ps);
 					$count += count($ps) - 1;
 					$added += count($ps) - 1;
 				}
@@ -47,10 +47,10 @@ class Splitter
 					for ($i = $added; $i < count($parts); $i++) {
 						$p[] = $parts[$i];
 					}
-					$outer = implode($opening, $p);
+					$outer = implode($closing, $p);
 					break;
 				}
-				$inner .= $opening;
+				$inner .= $closing;
 				$count--;
 			}
 

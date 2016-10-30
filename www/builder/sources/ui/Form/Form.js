@@ -62,6 +62,5 @@ function onSuccess(data) {
 }
 
 function onFailure(data) {
-	var error = isObject(data) && isString(data['error']) ? data['error'] : '';
-	this.log(error, 'onFailure', data);
+	
 };
