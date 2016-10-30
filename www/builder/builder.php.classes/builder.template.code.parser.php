@@ -11,7 +11,8 @@ class TemplateCodeParser
 	private static $data, $open, $isNum, $isLet, $varType, $currentPart, $isReact,
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted, $isSwitch,
-				   $thereWasWord, $place, $parsedCode, $element, $context, $nextPart;
+				   $thereWasWord, $place, $parsedCode, $element, $context, $nextPart,
+				   $isForeach, $foreach;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -56,7 +57,9 @@ class TemplateCodeParser
 		'pl' => 'имя плэйсхолдера',
 		'fn' => 'имя функции',
 		'var' => 'имя переменной',
-		'method' => 'название метода класса'
+		'method' => 'название метода класса',
+		'comp' => 'идентификатор дочернего компонента',
+		'as' => 'ключевое слово as'
 	);
 
 	private static $errors = array(
@@ -249,6 +252,13 @@ class TemplateCodeParser
 					if (self::$isStart) {
 						self::$isStart = false;
 						switch ($part) {
+							case 'foreach':
+								if (self::$place != 'foreach') {
+									new Error(self::$errors['operatorInAppropPlace'], array('foreach', self::$className, self::$templateName, self::$element));
+								}
+								self::$isForeach = true;
+								self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
+							break;
 							case 'let':
 								if (self::$place != 'textNode') {
 									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$className, self::$templateName, self::$element));
@@ -283,13 +293,16 @@ class TemplateCodeParser
 								self::$expected = array('end', self::$space);
 							break;
 						}						
-						if (self::$isCase || $isDefault || self::$isLet || self::$isSwitch) continue;
+						if (self::$isCase || $isDefault || self::$isLet || self::$isSwitch || self::$isForeach) continue;
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
-					} else {
-
-						
+					} elseif ($part == 'as' && self::$open['foreachArr']) {
+						self::off('name');
+						self::off('foreachArr');
+						self::on('foreachAs');
+						self::$expected = array('&', self::$space);
+					} else {						
 						if (self::prepare($part)) {
 
 							if (self::couldBeColon()) {
@@ -622,6 +635,11 @@ class TemplateCodeParser
 			} else {
 				self::$expected[] = 'end';
 			}
+			if (self::isForeachContext()) {
+				self::removeExpected('?');
+				self::$expected = array('a', self::$space);
+			}
+			self::off('recentQuote');
 		}
 	}
 
@@ -648,13 +666,18 @@ class TemplateCodeParser
 				if (!self::$open['doubleEqual'] && !self::$open['greater'] && !self::$open['notEqual']) {
 					if (self::$prevSign == '!') {
 						self::on('notEqual');
+						self::off('equal');
 					} elseif (self::$prevSign == '=') {
 						if (!self::$open['doubleEqual']) {
 							self::on('doubleEqual');
+							self::off('equal');
 						}
+					} else {
+						self::on('equal');
 					}
 				} else {
 					self::removeExpected('=');
+					self::off('equal');
 					self::off('doubleEqual');
 					self::on('tripleEqual');
 				}
@@ -721,6 +744,7 @@ class TemplateCodeParser
 				self::$expected[] = ',';
 			}
 			self::set('math', '');
+			self::off('equal');
 			self::set('or', 0);
 		}
 		if (self::$isCase && !self::$open['quote']) {
@@ -758,6 +782,7 @@ class TemplateCodeParser
 				self::$expected[] = ',';
 			}
 			self::set('math', '');
+			self::off('equal');
 			self::set('or', 0);
 		}
 		if (self::$isCase && !self::$open['doubleQuote']) {
@@ -808,11 +833,10 @@ class TemplateCodeParser
 				self::off('letvarname');
 				self::set('or', 2);
 				self::off('var');
-				self::off('name');
 				self::off('recentVar');
 				array_push(self::$expected, '0', '~', '#', '+', '-', '!', '(', self::$space);
 				self::maybeAddDollar();
-			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math'])) || self::$open['bracket']) {
+			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math']) && !self::$open['foreachAs']) || self::$open['bracket']) {
 				self::$expected[] = '&';
 			}
 			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis']) && self::$prevSign != '&') {
@@ -837,6 +861,7 @@ class TemplateCodeParser
 			if ((self::$prevSign != '(' && empty(self::$open['parenthesis'])) || self::$open['func']) {
 				self::$expected[] = ')';
 			}
+			self::off('var2');
 		}
 	}
 
@@ -862,7 +887,14 @@ class TemplateCodeParser
 			}
 			if (!empty(self::$open['bracket'])) {
 				self::$expected[] = ']';
+			} else {
+				self::on('var2');
 			}
+			if (self::isForeachContext()) {
+				self::removeExpected('?');
+				self::$expected = array('a', self::$space);
+			}
+			self::off('recentQuote');
 		}
 	}
 
@@ -898,6 +930,7 @@ class TemplateCodeParser
 		self::$objVar = self::$anyVar && self::$notTextOrComp;
 		self::$decOpen = self::isOpen('decimal');
 		self::$notLetValue = !self::$open['letvarname'];
+		self::$foreach = self::isForeachContext();
 
 		
 		if (self::$isNum) {
@@ -918,6 +951,7 @@ class TemplateCodeParser
 		}
 		if (!self::$isNum && !self::$anyVar && !self::$isKey && !self::$open['comp'] && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
 			self::on('fn');
+
 			self::$expected = array('(');
 			if (!self::$open['method']) {
 				if (!empty(self::$nextPart) && self::$nextPart[0] == '(') {
@@ -936,6 +970,10 @@ class TemplateCodeParser
 			return false;
 		}
 		return true;
+	}
+
+	private static function isForeachContext() {
+		return self::$isForeach && empty(self::$open['bracket']) && empty(self::$open['func']) && empty(self::$open['array']) && empty(self::$open['method']);
 	}
 
 	private static function validateFunction($funcName) {
@@ -998,7 +1036,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeQuestion() {
-		return (!self::$open['comp'] && !self::$open['text'] && !self::$open['letvarname']) || self::$open['bracket'] || self::$isKey;
+		return (!self::$open['comp'] && !self::$open['text'] && !self::$open['letvarname'] && !self::$foreach) || self::$open['bracket'] || self::$isKey;
 	}
 
 	private static function couldBeExclamation() {
@@ -1099,6 +1137,18 @@ class TemplateCodeParser
 			self::$reactName = '';
 		}
 
+		if (self::$isForeach) {
+			if (!empty(self::$open['foreachAs'])) {
+				self::$expected = array('=', self::$space, 'end');
+			} elseif (empty(self::$open['foreachArr'])) {
+				self::on('foreachArr');
+				self::$expected = array('(', self::$space);
+				if (!self::$open['method'] && !self::$open['fn']) {
+					array_push(self::$expected, 'a', '[', '.');
+				}
+			}
+		}
+
 		if (self::$isLet && self::$open['letvalue'] && empty(self::$open['parenthesis'])) {
 			self::$expected[] = ',';
 		}
@@ -1119,6 +1169,7 @@ class TemplateCodeParser
 		self::off('comp');
 		self::set('or', 0);
 		self::set('math', '');
+		self::off('equal');
 	}
 
 	
@@ -1148,6 +1199,9 @@ class TemplateCodeParser
 
 	private static function getPlaceCaption() {
 		switch (self::$place) {
+			case 'foreach':
+				return 'foreach оператора';
+
 			case 'eventAttribute':
 				return 'атрибута события элемента';
 
@@ -1197,6 +1251,7 @@ class TemplateCodeParser
 			break;
 			case 'switch':
 			case 'ifcase':
+			case 'foreach':
 				self::$expected = array('a');
 			break;
 			default:
@@ -1261,6 +1316,12 @@ class TemplateCodeParser
 		if (!empty(self::$open['method'])) {
 			return self::$names['method'];
 		}
+		if (!empty(self::$open['comp'])) {
+			return self::$names['comp'];
+		}
+		if (!empty(self::$open['foreachArr'])) {
+			return self::$names['as'];
+		}
 		return self::$names['fn'];
 	}
 
@@ -1292,6 +1353,25 @@ class TemplateCodeParser
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
 			self::maybeAddDollar();
 		} 
+		elseif (self::$open['equal'])
+		{
+			if (self::$open['foreachAs']) {
+				self::$expected = array(">");	
+			} elseif (self::$isLet) {
+				self::$expected = array('a', '0', 'b', '.', '~', '$', '@', '#', '-', '+', '!', '[', '(', "'", '"');
+			} elseif (self::$open['placeholderShouldHaveDefaultValue']) {
+				self::$expected = array('a', '0', '.', '&', '~', '@', '#', '-', '+', '!', '[', '(', "'", '"');
+			} else {
+				self::$expected = array('=');
+			}
+		}
+		elseif (self::$open['doubleEqual'] || self::$open['tripleEqual'] || self::$open['notEqual'])
+		{
+			self::$expected = array('a', '0', 'b', '.', '&', '~', '$', '@', '#', '-', '+', '!', '(', "'", '"');
+			if (!self::$open['tripleEqual']) {
+				self::$expected[] = '=';
+			}
+		}
 		elseif (self::$open['decimal'])
 		{
 			self::$expected = array("1");

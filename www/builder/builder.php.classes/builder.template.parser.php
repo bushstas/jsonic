@@ -398,12 +398,8 @@ class TemplateParser
 						$child['e'] = $data['e'];
 					}
 				}
-				if ($tagName != 'foreach' && $tagName != 'if') {
-					if ($tagName == 'forma') $tagName = 'form';
-					$child['t'] = self::getTagIndex($tagName);
-					self::getTagProperties($item, $child);
-				} else {
-					if ($tagName == 'if') {
+				switch ($tagName) {
+					case 'if':
 						self::parseIf($match[1], $child);
 						if (is_array($child) && !empty($child['e'])) {
 							$json = json_encode($child['e']);
@@ -413,9 +409,16 @@ class TemplateParser
 								$child['e'] = self::getProperChildren($child['e']);
 							}
 						}
-					} elseif ($tagName == 'foreach') {
-						self::getForeach($item, $child);
-					}	
+					break;
+					
+					case 'foreach':
+						self::parseForeach($item, $child);
+					break;
+
+					default:
+						if ($tagName == 'forma') $tagName = 'form';
+						$child['t'] = self::getTagIndex($tagName);
+						self::getTagProperties($item, $child);
 				}
 			}
 		}
@@ -581,10 +584,13 @@ class TemplateParser
 		$children = '<nq>function(){return '.self::getProperChildren($children).'}<nq>';
 	}
 
-	private static function getForeach($item, &$child) {
+	private static function parseForeach($item, &$child) {
 		$child['h'] = $child['c'];
 		unset($child['c']);
+		$content = ltrim(rtrim($item['content'], '}'), '{');
+		$data = TemplateCodeParser::parse($content, 'foreach');
 
+		Printer::log(self::$parsedItem, true);
 		$content = preg_replace('/\s{2,}/', ' ', $item['content']);
 		$content = preg_replace('/\{foreach\s+|\}/', '', $content);
 		$parts = explode(' ', trim($content));
@@ -979,8 +985,7 @@ class TemplateParser
 			if (is_array($child['p'])) {
 				foreach ($child['p'] as $k => $v) {
 					$v = strip_tags(trim($v));
-					preg_match('/^\^(\w+)$/', $v, $match);
-					if (!empty($match[1])) {
+					if ($v[0] == '^') {
 						unset($child['p'][$k]);
 						if (!is_array($child['w'])) {
 							$child['w'] = array();
@@ -988,7 +993,7 @@ class TemplateParser
 						$child['w'][] = $k;
 						$child['w'][] = $match[1];
 					}
-				}
+				}				
 				if (empty($child['p'])) {
 					unset($child['p']);
 				} else {					
