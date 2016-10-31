@@ -298,6 +298,8 @@ class TemplateCodeParser
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
+					} elseif ($part == 'right' && self::$isForeach) {
+
 					} elseif ($part == 'as' && self::$open['foreachArr']) {
 						self::off('name');
 						self::off('foreachArr');
@@ -1165,6 +1167,7 @@ class TemplateCodeParser
 		}
 
 		self::offVars();
+		self::offEquals();
 		self::off('letvalue');
 		self::off('space');
 	}
@@ -1482,6 +1485,21 @@ class TemplateCodeParser
 			$code = preg_replace('/^\s*case\s*/', '', $code);
 		} elseif (self::$isSwitch) {
 			$code = preg_replace('/^\s*switch\s*/', '', $code);
+		} elseif (self::$isForeach) {
+			$code = preg_replace('/^\s*foreach\s*/', '', $code);
+			if (preg_match('/^right\b/', $code)) {
+				$code = preg_replace('/^right\s*/', '', $code);
+				self::$data['right'] = true;
+			}
+			$parts = preg_split('/\s+as\s+/', $code);
+			self::$data['items'] = '<nq>'.$parts[0].'<nq>';
+			$parts = preg_split('/\s*=>\s*/', $parts[1]);
+			if (isset($parts[1])) {
+				self::$data['key'] = '<nq>'.$parts[0].'<nq>';
+				self::$data['value'] = '<nq>'.$parts[1].'<nq>';
+			} else {
+				self::$data['value'] = '<nq>'.$parts[0].'<nq>';
+			}
 		}
 		return $code;
 	}

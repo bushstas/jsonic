@@ -27,7 +27,7 @@ function Level() {
 		else if (i.hasOwnProperty('t'))   createElement(i);
 		else if (i.hasOwnProperty('pr'))  createPropertyNode(i);
 		else if (i.hasOwnProperty('i'))   createCondition(i);
-		else if (isFunction(i['h']))      createForeach(i);	
+		else if (i.hasOwnProperty('h'))   createForeach(i);	
 		else if (i.hasOwnProperty('tmp')) includeTemplate(i);
 		else if (i.hasOwnProperty('cmp')) renderComponent(i);
 		else if (i.hasOwnProperty('is'))  createIfSwitch(i);
@@ -119,11 +119,11 @@ function Level() {
 	};
 
 	var createForeach = function(props) {
-		if (props['f']) {
+		if (props['n']) {
 			var foreach = new Foreach(props);
 			foreach.render(parentElement, self);
 			registerChild(foreach);
-			createUpdater(OperatorUpdater, foreach, props['f']);
+			createUpdater(OperatorUpdater, foreach, props['n']);
 		} else {
 			if (isArray(props['p'])) {
 				for (var i = 0; i < props['p'].length; i++) renderItems(props['h'](props['p'][i], i));

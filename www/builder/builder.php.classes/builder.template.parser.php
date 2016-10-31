@@ -5,13 +5,24 @@ class TemplateParser
 	private static $calledClasses, $classes, $templates, $sources;
 	private static $regexp = "/\{ *template +\.(\w+) *\}/";
 	private static $space = '_u00A0_';
-	private static $simpleTags = array('br', 'input', 'img', 'hr');
+	private static $textNodes = array();
+	
+	private static $simpleTags = array(
+		'br', 'input', 'img', 'hr'
+	);
+
+	private static $singleTags = array(
+		'template', 'include', 'component', 'control', 'form', 'menu', 'else', 'ifempty'
+	);
+	
+	private static $contexts = array(
+		'else' => 'if', 'ifempty' => 'foreach'
+	);
+
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $cssClassIndex, $templateName, $globalNames,
 				   $parsedItem, $globalVarNames;
-
-	private static $textNodes = array();
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
@@ -27,7 +38,6 @@ class TemplateParser
 		'dataInTextNode' => 'Обнаружено использование контстанты данных {??} внутри текстового нода в шаблоне {??} класса {??}<br><br>Допускается использование только внутри атрибутов тегов <xmp><component Item args="{#itemDefaultArgs}"></xmp>или внутри javascript кода класса<xmp>var params = #itemDefaultParams</xmp>',
 		'usingThis' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}',
 		'templateCallLoop' => 'Шаблон {??} класса {??} вызывает сам себя',
-		'incorrectForeach' => 'Невалидный код <b>foreach</b> в шаблоне {??} класса {??}: {??}',
 		'caseExpected' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}. Ожидается оператор <b>case</b><xmp>{case 'triangle'}</xmp>или<xmp>{case 2}</xmp>",
 		'ifCaseExpected' => "Обнаружена ошибка в коде оператора <b>if</b> в шаблоне {??} класса {??}.<br><br>Найдено:<xmp>{?}</xmp>Ожидается оператор <b>case</b><xmp>{case isNumber(~var)}</xmp>или<xmp>{case &a > &b}</xmp>",
 		'fewDefaults' => 'Обнаружено более одного условия <b>default</b> в коде оператора {??} в шаблоне {??} класса {??}',
@@ -43,7 +53,11 @@ class TemplateParser
 		'incorrectEventAttr' => 'Обнаружено некорректное значение {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'unknownSpecEventAttr' => 'Обнаружен неизвестный спецпараметр {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Ожидается одно из значений: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'unknownEventAttr' => 'Обнаружен атрибут неизвестного события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'specEventAttrInComp' => 'Обнаружен спецпараметр {??} события {??} в теге компонента в шаблоне {??} класса {??}<br><br>Данный функционал доступен только для элементов DOM<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
+		'specEventAttrInComp' => 'Обнаружен спецпараметр {??} события {??} в теге компонента в шаблоне {??} класса {??}<br><br>Данный функционал доступен только для элементов DOM<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'operatorOutOfPlace' => 'Обнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}',
+		'operatorInInnerLevel' => 'Обнаружен оператор {??} не на одном уровне с оператором {??} в шаблоне {??} класса {??}',
+		'doubleOperator' => 'Обнаружен оператор {??} внутри другого оператора {??} в шаблоне {??} класса {??}',
+		'fewSameOperators' => 'Обнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
 	);
 
 	public static function init($params) {
@@ -110,8 +124,6 @@ class TemplateParser
 				$data = str_replace('"', "'", $data);
 		
 				$data = str_replace("\'", "'", $data);
-				//replacing
-				//Printer::log($data);
 				
 				$data = str_replace('<this>', '$.', $data);
 				$data = preg_replace("/'<nq>/", '', $data);
@@ -185,7 +197,7 @@ class TemplateParser
 				$html .= $matches[$i];
 			}
 		}
-		$regexp = "/(<\/*[a-z]+[^>]*>|\{\s*\/*foreach[^\}]*\}|\{\s*\/*if[^\}]*\}|\{\s*else\}|\{\s*\/*switch[^\}]*\})/i";
+		$regexp = "/(<\/*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
 		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
 		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
@@ -255,13 +267,17 @@ class TemplateParser
 		return in_array($tagName, self::$simpleTags);
 	}
 
+	private	static function isSingleTag($tagName) {
+		return in_array($tagName, self::$singleTags);
+	}
+
 	private	static function checkTagsPairing($list) {
 		$closed = array();
 		$opened = array();
 		foreach ($list as $item) {
 			$tn = $item['tagName'];
 			if (!empty($tn)) {
-				if (!self::isSimpleTag($tn) && $tn != 'template' && $tn != 'include' && $tn != 'component' && $tn != 'control' && $tn != 'form' && $tn != 'menu' && $tn != 'else') {
+				if (!self::isSimpleTag($tn) && !self::isSingleTag($tn)) {
 					if ($item['isClosing'] == 0) {
 						if (!isset($opened[$tn])) {
 							$opened[$tn] = 0;
@@ -296,8 +312,10 @@ class TemplateParser
 		}
 		$children = array();
 		$elseChildren = array();
+		$ifEmptyChildren = array();
 		$currentList = array();
 		$isElse = false;
+		$isIfempty = false;
 		$currentIf = null;
 		for ($i = 0; $i < count($list); $i++) {
 			
@@ -316,33 +334,38 @@ class TemplateParser
 					$elseChildren[] = '<br>';
 				}
 			} elseif ($item['isClosing'] != 1) {
-				$child = self::getHtmlChild($item, $i, $list);
-				if (!$isElse) {
-					$children[] = $child;
-				} else {
+				$child = self::getHtmlChild($item, $i, $list, $isElse, $isIfempty);
+				if ($isElse) {
 					$elseChildren[] = $child;
+				} elseif ($isIfempty) {
+					$ifEmptyChildren[] = $child;
+				} else {
+					$children[] = $child;
 				}
 			} else {
 				if ($tagName == 'if') {
 					$isElse = false;
+				} elseif ($tagName == 'foreach') {
+					$isIfempty = false;
 				}
 			}
 		}
 		if (!empty($elseChildren)) {
-			if (is_array($elseChildren[0]['c'])) {
-				$elseChildren = $elseChildren[0]['c'];
-			}
 			return array('c' => $children, 'e' => $elseChildren);
+		} elseif (!empty($ifEmptyChildren)) {
+			return array('c' => $children, 'ie' => $ifEmptyChildren);
 		} else {
 			return $children;
 		}
 	}
 
-	private	static function getHtmlChild($item, &$i, $list) {
+	private	static function getHtmlChild($item, &$i, $list, &$isElse = null, &$isIfempty = null) {
 		$child = array();
 		$tagName = trim($item['tagName']);
 		if ($tagName == 'else') {
 			$isElse = true;
+		} elseif ($tagName == 'ifempty') {
+			$isIfempty = true;
 		}
 		$content = $item['content'];
 		if (self::isSimpleTag($tagName))
@@ -361,6 +384,7 @@ class TemplateParser
 		else
 		{					
 			
+			$toProper = false;
 			$childrenList = self::gatherChildren($list, $i, $tagName);
 
 			if ($tagName == 'if') {
@@ -391,11 +415,17 @@ class TemplateParser
 					}
 				}
 				if (!empty($data)) {
+					$toProper = true;
 					if (!is_array($data) || !isset($data['c'])) {
 						$child['c'] = $data;
 					} else {
 						$child['c'] = $data['c'];
-						$child['e'] = $data['e'];
+						if (isset($data['e'])) {
+							$child['e'] = $data['e'];
+						}
+						if (isset($data['ie'])) {
+							$child['ie'] = $data['ie'];
+						}
 					}
 				}
 				switch ($tagName) {
@@ -410,9 +440,14 @@ class TemplateParser
 							}
 						}
 					break;
-					
+				
 					case 'foreach':
 						self::parseForeach($item, $child);
+						//if (!empty())
+					break;
+
+					case 'else':
+					case 'ifempty':
 					break;
 
 					default:
@@ -422,12 +457,36 @@ class TemplateParser
 				}
 			}
 		}
+		if ($toProper) {
+			if (is_array($child['c'])) {
+				$child['c'] = self::getProperChildren($child['c']);
+			}
+			if (is_array($child['e'])) {
+				$child['e'] = self::getProperChildren($child['e']);
+			}
+			if (isset($child['ie'])) {
+				$child['ie'] = self::getProperChildren($child['ie']);
+			}
+		}
 		return $child;
 	}
 
 	private	static function gatherChildren($list, &$i, $tagName) {
 		$childrenList = array();
 		$openedTagsCount = 1;
+		$context = array();
+		$levels = array();
+		$operators = array();
+		foreach (self::$contexts as $k => $v) {
+			$levels[$v] = array();
+			$operators[$k] = 0;
+			if ($tagName == $v) {
+				$context[] = $v;
+				$levels[$v][] = 1;
+			}
+		}
+		$isTrue = $list[$i]['content'] == '<a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope data-id="{~Id}">';
+		
 		$i++;
 		while (isset($list[$i])) {
 			if ($list[$i]['type'] == 'tag') {
@@ -439,6 +498,34 @@ class TemplateParser
 			}
 			if ($openedTagsCount > 0) {
 				$childrenList[] = $list[$i];
+				foreach (self::$contexts as $k => $v) {
+					if ($list[$i]['tagName'] == $v) {
+						if (!$list[$i]['isClosing']) {
+							$context[] = $v;
+							$levels[$v][] = $openedTagsCount;
+						} else {
+							array_pop($context);
+							array_pop($levels[$v]);
+							$operators[$k]--;
+						}
+					} elseif ($list[$i]['tagName'] == $k) {
+						Printer::log(array($k, $contextLevel ,$openedTagsCount));
+						$operators[$k]++;
+						$contextLevel = $levels[$v][count($levels[$v]) - 1];
+						if (!in_array($v, $context) || $contextLevel != $openedTagsCount) {
+							if ($operators[$k] > 1) {
+								new Error(self::$errors['doubleOperator'], array($k, $k, self::$templateName, self::$className));
+							} elseif ($contextLevel > 0) {
+								new Error(self::$errors['operatorInInnerLevel'], array($k, $v, self::$templateName, self::$className));
+							}
+							new Error(self::$errors['operatorOutOfPlace'], array($k, $v, self::$templateName, self::$className));
+						} elseif ($operators[$k] > 1) {
+							Printer::log($childrenList, true);
+							
+							new Error(self::$errors['fewSameOperators'], array($k, $v, self::$templateName, self::$className));
+						}
+					}
+				}
 				$i++;
 			} else break;
 		}
@@ -519,8 +606,7 @@ class TemplateParser
 			} else {
 				if ($shouldBeCase) {
 					new Error(self::$errors[$errorType], array(self::$templateName, self::$className, $item['content']));
-				}
-				
+				}		
 
 				$childList = self::gatherChildren($childrenList, $j, $item['tagName']);
 				array_unshift($childList, $item);
@@ -528,7 +614,6 @@ class TemplateParser
 				TemplateCodeParser::setContext(null);
 				$children = array_merge($children, self::getHtmlChildren($childList, $let));
 				TemplateCodeParser::setContext($switchType);
-
 			}
 		}
 		if ($defaultCase) {
@@ -541,9 +626,7 @@ class TemplateParser
 				'case' => $case,
 				'children' => $children
 			);
-		}
-		
-		
+		}		
 
 		$child['is'] = array();
 		$child['c'] = array();
@@ -564,7 +647,7 @@ class TemplateParser
 		TemplateCodeParser::setContext(null);
 	}
 
-	private static function getProperChildren($children, $addQuotes = false) {
+	private static function getProperChild($children) {
 		if (is_array($children)) {
 			while (is_array($children) && isset($children[0])) {
 				if (count($children) == 1) {
@@ -574,79 +657,46 @@ class TemplateParser
 				}
 			}
 		}
+		return $children;
+	}
+
+	private static function getProperChildren($children, $addQuotes = false) {
+		$children = self::getProperChild($children);
 		if (is_string($children) && $addQuotes) {
 			$children = "'".trim($children, "'")."'";
 		}
 		return is_array($children) ? '<nq>'.preg_replace('/\\\(?=[\'"])/', '', json_encode($children)).'<nq>' : $children;
 	}
 
-	private static function wrapInFunction(&$children) {		
-		$children = '<nq>function(){return '.self::getProperChildren($children).'}<nq>';
+	private static function wrapInFunction(&$children, $args = '') {
+		$children = '<nq>function('.$args.'){return '.self::getProperChildren($children).'}<nq>';
 	}
 
 	private static function parseForeach($item, &$child) {
+		if (is_array($child['ie'])) {
+			$child['ie'] = self::getProperChild($child['ie']);
+			if (isset($child['ie']['c'])) {
+				$child['ie'] = $child['ie']['c'];
+			}
+		}
 		$child['h'] = $child['c'];
 		unset($child['c']);
 		$content = ltrim(rtrim($item['content'], '}'), '{');
 		$data = TemplateCodeParser::parse($content, 'foreach');
-
-		
-		$content = preg_replace('/\s{2,}/', ' ', $item['content']);
-		$content = preg_replace('/\{foreach\s+|\}/', '', $content);
-		$parts = explode(' ', trim($content));
-		
-		if ($parts[1] != 'as' || (isset($parts[3]) && $parts[3] != '=>')) {
-			new Error(self::$errors['incorrectForeach'], array(self::$templateName, self::$className, $item['content']));
+		$child['p'] = $data['items'];
+		if (!empty($data['reactNames'])) {
+			$child['n'] = self::getProperChildren($data['reactNames']);
+			self::wrapInFunction($child['p']);
 		}
-		$variable = $parts[0];
-		if (isset($parts[4])) {
-			$key = $parts[2];
-			$val = $parts[4];
-		} else {
-			$key = '';
-			$val = $parts[2];
-			$parts = explode('=>', $val);
-			if (isset($parts[1])) {
-				$key = $parts[0];
-				$val = $parts[1];
-			}
+		$args = array($data['value']);
+		if (isset($data['key'])) {
+			$args[] = $data['key'];
 		}
-		if (!preg_match_all('/^([\$&~])(\w[\w\.]*)$/', $variable, $matches)) {
-			new Error(self::$errors['incorrectForeach'], array(self::$templateName, self::$className, $item['content']));
+		if ($data['right']) {
+			$child['r'] = 1;
 		}
-		$sign = $matches[1][0];
-		$variableParts = explode('.', $matches[2][0]);
-		$variable = $variableParts[0];
-		if ($sign == '&' || $sign == '~') {
-			$variableParts[0] = '';
-			$variableParts = implode('.', $variableParts);
-			$variable .= $variableParts;
-		} else {
-			if (isset($variableParts[1])) {
-				new Error(self::$errors['incorrectForeach'], array(self::$templateName, self::$className, $item['content']));
-			}
-		}
-
-		if (!preg_match('/^\&\w+$/', $val)) {
-			new Error(self::$errors['incorrectForeach'], array(self::$templateName, self::$className, $item['content']));
-		}
-		if (!empty($key) && !preg_match('/^\&\w+$/', $key)) {
-			new Error(self::$errors['incorrectForeach'], array(self::$templateName, self::$className, $item['content']));
-		}
-		if ($sign == '~') {
-			$child['p'] = "<nq>_['".$variable."']<nq>";
-		} elseif ($sign == '&') {
-			$child['p'] = '<nq>'.$variable.'<nq>';
-		} else {
-			$child['p'] = "<nq>\<this>g('".$variable."')<nq>";
-			$child['f'] = $variable;
-		}
-		if (!empty($key)) {
-			$key = ','.str_replace('&', '', $key);
-		}
-		$val = str_replace('&', '', $val);
-		array_unshift($child['h'], '<foreach '.$val.$key.'>');
-		array_push($child['h'], '</foreach>');
+		$args = implode(',', $args);
+		self::wrapInFunction($child['h'], $args);
 		return $child;
 	}
 
@@ -662,7 +712,7 @@ class TemplateParser
 		}
 		$switch .= ']';
 		if (!empty($data['reactNames'])) {
-			$child['p'] = $data['reactNames'];
+			$child['p'] = self::getProperChildren($data['reactNames']);
 			$child['sw'] = '<nq>function(){return'.$switch.'}<nq>';			
 		} else {
 			$child['sw'] = '<nq>'.$switch.'</nq>';
@@ -697,7 +747,7 @@ class TemplateParser
 			if ($propName == 'else') {
 				$else = $propValue;
 				continue;
-			}			
+			}
 			$hasCode = self::hasCode($propValue);
 			if ($hasCode) {
 				$propValue = self::processCode($propValue, 'templateAttribute');
@@ -757,9 +807,7 @@ class TemplateParser
 		$names = array();
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
 		$ifCondition = self::processCode($ifCondition, 'if', $names);
-		
-		//Printer::log($child, true);
-		
+			
 		$child['i'] = $ifCondition;
 		if (!empty($names)) {
 			$child['p'] = $names;
@@ -769,7 +817,6 @@ class TemplateParser
 				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
 			}
 		} else {
-			//Printer::log($child['i']);
 			$then = '""';
 			$else = '""';
 			if (!empty($child['c'])) {
@@ -780,12 +827,9 @@ class TemplateParser
 			}
 			if (!empty($child['e'])) {
 				$else = is_array($child['e']) ? (count($child['e']) > 1 || is_array($child['e'][0]) ? str_replace('\\', '', json_encode($child['e'])) : $child['e'][0]) :  $child['e'];
-				//Printer::log($else);
 			}
 			$child = '<nq>'.str_replace('<nq>', '', $child['i']).'?'.$then.':'.$else.'<nq>';
-			//unset($child['i'], $child['e']);
 		}
-		//Printer::log($child);
 	}
 
 	private static function getTagIndex($tagName) {
@@ -842,7 +886,6 @@ class TemplateParser
 				$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
 				$data = TemplateCodeParser::parse($code, $parsedPlace, self::$parsedItem);
 				$code = $data['code'];
-				//Printer::log($data);
 				if ($data['inFunc']) {
 					$inFunc = true;
 				}
@@ -1274,7 +1317,6 @@ class TemplateParser
 			if (!empty($letCode)) {
 				array_unshift($items, $letCode);
 			}
-			//Printer::log($items);
 			foreach ($items as $item) {
 				if (!empty($item)) {
 					$children[] = $item;

@@ -1,6 +1,8 @@
 function Foreach(params) {
-	this.items = params['p'];
+	this.getItems = params['p'];
+	this.items = params['p']();
 	this.handler = params['h'];
+	this.isRight = !!params['r'];
 	this.levels = [];
 }
 
@@ -12,12 +14,26 @@ Foreach.prototype.render = function(parentElement, parentLevel) {
 
 Foreach.prototype.createLevels = function(isUpdating) {
 	if (isArray(this.items)) {
-		for (var i = 0; i < this.items.length; i++) {
-			this.createLevel(this.handler(this.items[i], i), isUpdating);
+		if (!this.isRight) {
+			for (var i = 0; i < this.items.length; i++) {
+				this.createLevel(this.handler(this.items[i], i), isUpdating);
+			}
+		} else {
+			for (var i = this.items.length - 1; i >= 0; i--) {
+				this.createLevel(this.handler(this.items[i], i), isUpdating);
+			}
 		}
 	} else if (isObject(this.items)) {
-		for (var k in this.items) {
-			this.createLevel(this.handler(this.items[k], k), isUpdating);
+		if (!this.isRight) {
+			for (var k in this.items) {
+				this.createLevel(this.handler(this.items[k], k), isUpdating);
+			}
+		} else {
+			var keys = Objects.getKeys(this.items);
+			keys.reverse();
+			for (var i = 0; i < keys.length; i++) {
+				this.createLevel(this.handler(this.items[keys[i]], keys[i]), isUpdating);
+			}
 		}
 	}
 };
@@ -36,7 +52,7 @@ Foreach.prototype.createLevel = function(items, isUpdating, index) {
 };
 
 Foreach.prototype.update = function(items) {
-	this.items = items;
+	this.items = this.getItems();
 	this.disposeLevels();
 	this.createLevels(true);
 };
@@ -65,7 +81,9 @@ Foreach.prototype.dispose = function() {
 	this.levels = null;
 	this.parentElement = null;
 	this.parentLevel = null;
-	this.items = null
+	this.items = null;
+	this.isRight = null;
+	this.getItems = null;
 	this.handler = null;
 	this.nextSiblingChild = null;
 	this.prevSiblingChild = null;

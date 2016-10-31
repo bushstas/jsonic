@@ -1,6 +1,11 @@
 <div class="app-datatable-outer-container">
 	<component class="DataTableTabPanel">
+	
+	{foreach right $data as &k => &v}			
+		<div class="xxxxx">
+			{&v}
+		</div>
+		{ifempty}
+		324
+	{/foreach}
 </div>
-{foreach $aaa as &item => &a}
-	<div>111</div>
-{/foreach}
