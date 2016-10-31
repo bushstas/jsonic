@@ -1,5 +1,5 @@
+<template templ="controls" if="{!~nocontrols}">
 <a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope data-id="{~Id}">		
-	
 	<template templ="controls" if="{!~nocontrols}">
 	<div class="app-datatable-standart-row-top">
 		<div class="app-datatable-standart-row-top-item">
@@ -9,7 +9,6 @@
 			<div class="app-datatable-standart-row-top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list" pos="left-top">
 				<template templ="count" count="{~multiregion}">
 				{~regionName}
-				<div>{else}</div>
 			</div>
 		{else}
 			<div class="app-datatable-standart-row-top-item">

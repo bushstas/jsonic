@@ -26,8 +26,9 @@ class TemplateParser
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
-		'noClosingTag' => 'Ошибка валидации шаблона {??} класса {??}. Один из {?} {??} не имеет закрывающего тега',
-		'extraClosingTag' => 'Ошибка валидации шаблона {??}  класса {??}. Обнаружен лишний закрывающийся {?} {??}',
+		'noClosingTag' => 'Обнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>Данный {?} {?}-й по счету открывающийся {?} {??}<br><br>Тег полностью:<xmp>{?}</xmp>',
+		'noClosingTag2' => 'Обнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>Данный {?} следует после {?}-го по счету {?} {?} {??}<br><br>Тег полностью:<xmp>{?}</xmp>',
+		'extraClosingTag' => 'Обнаружен лишний закрывающийся {?} {??} в шаблоне {??} класса {??}<br>Данный {?} следует после {?}-го по счету {?} {?} {??}<br><br>Ожидается закрытие тега {??}<br>Он следует после {?}-го по счету {?} {?} {??}',
 		'unknownComponent' => 'Неопределенный компонент в шаблоне {??} класса {??}<xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'controlWithoutName' => 'Контрол {??} в шаблоне {??} класса {??} не имеет атрибута <b>name</b><xmp>{?}</xmp>Ожидается запись вида<xmp>{?}</xmp>',
 		'reactVarInInclude' => 'Шаблон {??}, содержащийся в файле {??} содержит код с реактивными переменными {??}<br><br>Глобальные шаблоны с типом <b>include</b> не могут содержать их. Допускается использование только входящих аргументов <b>~arg</b> и локальных переменных <b>&var</b>',
@@ -213,7 +214,13 @@ class TemplateParser
 				$tagName = strtolower($match[1]);
 				$tagContent = $tags[$j];
 				$isClosing = self::isTagClosing($tagName, $tagContent);
-				$list[] = array('type' => 'tag', 'content' => $tagContent, 'tagName' => $tagName, 'isClosing' => $isClosing);
+				$list[] = array(
+					'type' => 'tag',
+					'content' => $tagContent,
+					'tagName' => $tagName,
+					'isClosing' => $isClosing,
+					'isSingle' => self::isSingleTag($tagName) || self::isSimpleTag($tagName)
+				);
 			}
 		}
 		$isLet = 0;
@@ -272,37 +279,121 @@ class TemplateParser
 	}
 
 	private	static function checkTagsPairing($list) {
-		$closed = array();
+		$all = array();
+		$allTypes = array();
+		$indexes = array();
 		$opened = array();
-		foreach ($list as $item) {
+		$closed = array();
+		$opened2 = array();
+		$openedTags = array();
+		$closedTags = array();
+		$lastType = '';
+		$ix = 0;
+		$aixs = array();
+		foreach ($list as $aix => $item) {
 			$tn = $item['tagName'];
 			if (!empty($tn)) {
-				if (!self::isSimpleTag($tn) && !self::isSingleTag($tn)) {
+				if (!$item['isSingle']) {
 					if ($item['isClosing'] == 0) {
-						if (!isset($opened[$tn])) {
-							$opened[$tn] = 0;
+						if (!isset($openedTags[$tn])) {
+							$openedTags[$tn] = 0;
 						}
-						$opened[$tn]++;
+						$openedTags[$tn]++;
+						$opened[] = $tn;
+						$opened2[] = $tn;
+						$lastType = 'open';
+						$all[] = $tn;
+						$allTypes[] = 'open';
+						$indexes[] = $ix;
+						$aixs[$ix] = $aix;
+						$ix++;
 					} else {
-						if (!isset($closed[$tn])) {
-							$closed[$tn] = 0;
+						$prev = $opened[count($opened) - 1];
+						if (!isset($prev) || $prev != $tn) {
+
+							if (in_array($tn, $opened)) { 								
+								$prevIndex = array_pop($indexes);
+								$realIndex = $aixs[$prevIndex];
+								$count = 0;
+								foreach ($all as $i => $tag) {
+									if ($tag == $prev && $allTypes[$i] == 'open') {
+										$count++;
+									}
+									if ($i == $realIndex) break;
+								}
+								$object = $prev == 'if' || $prev == 'switch' || $prev == 'foreach' || $prev == 'else' || $prev == 'ifempty' ? 'оператор' : 'тег';
+								new Error(
+									self::$errors['noClosingTag'], array($object, strtoupper($prev), self::$templateName, self::$class['name'], $object, $count, $object, strtoupper($prev), $list[$realIndex]['content']
+								));
+								
+							} else {
+								if ($lastType == 'open') {
+									$prev2 = $opened2[count($opened2) - 1];
+								} else {
+									$prev2 = $closed[count($closed) - 1];
+								}
+								$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' || $tn == 'else' || $tn == 'ifempty' ? 'оператор' : 'тег';
+								$object2 = $prev2 == 'if' || $prev2 == 'switch' || $prev2 == 'foreach' || $prev2 == 'else' || $prev2 == 'ifempty' ? 'оператора' : 'тега';
+								$typeTag = $lastType == 'open' ? 'открывающегося' : 'закрывающегося';
+								if ($prev != $prev2 && $lastType == 'open') {
+									$typeTag = '';
+								}
+
+
+								new Error(
+									self::$errors['extraClosingTag'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2),
+									strtoupper($prev), $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2)
+								));
+							}
 						}
-						$closed[$tn]++;
+						if (!isset($$closedTags[$tn])) {
+							$$closedTags[$tn] = 0;
+						}
+						$closedTags[$tn]++;
+						$closed[] = $tn;
+						array_pop($opened);
+						array_pop($indexes);
+						$all[] = $tn;
+						$lastType = 'closed';
+						$allTypes[] = 'closed';
 					}
+				} else {
+					if (!isset($openedTags[$tn])) {
+						$openedTags[$tn] = 0;
+					}
+					$opened2[] = $tn;
+					$openedTags[$tn]++;
+					$lastType = 'open';
+					$all[] = $tn;
+					$allTypes[] = '';
 				}
 			}
 		}
-		foreach ($opened as $tn => $count) {
-			if ($count > $closed[$tn]) {
-				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'операторов' : 'тегов';
-				new Error(self::$errors['noClosingTag'], array(self::$templateName, self::$class['name'], $object, strtoupper($tn)));
+		if (!empty($opened)) {
+			$opened = array_reverse($opened);
+			$allr = array_reverse($opened2);
+			$tn = $opened[0];
+			$idx = count($allr) - array_search($tn, $allr) - 1;
+			
+ 			$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' ? 'оператор' : 'тег';
+			$prev = $all[$idx - 1];
+			$prevType = $allTypes[$idx - 1];
+			
+			$object2 = $prev == 'if' || $prev == 'switch' || $prev == 'foreach' || $prev == 'else' || $prev == 'ifempty' ? 'оператора' : 'тега';
+			$typeTag = $prevType == 'open' ? 'открывающегося' : 'закрывающегося';
+			if (empty($prevType)) {
+				$typeTag = '';
 			}
-		}
-		foreach ($closed as $tn => $count) {
-			if ($count > $opened[$tn]) {
-				$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' ? 'оператор' : 'тег';
-				new Error(self::$errors['extraClosingTag'], array(self::$templateName, self::$class['name'], $object, strtoupper($tn)));
+			$count = 0;
+			foreach ($all as $i => $tag) {
+				if ($i == $idx) break;
+				if ($tag == $prev && $allTypes[$i] == $prevType) {
+					$count++;
+				}
 			}
+			Printer::log($opened);
+			Printer::log(array_search($tn, $allr));
+		 	new Error(self::$errors['noClosingTag2'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $count, $typeTag, $object2, strtoupper($prev), $list[$idx + 2]['content']));
 		}
 	}
 
@@ -477,6 +568,7 @@ class TemplateParser
 		$context = array();
 		$levels = array();
 		$operators = array();
+		$level = 1;
 		foreach (self::$contexts as $k => $v) {
 			$levels[$v] = array();
 			$operators[$k] = 0;
@@ -490,10 +582,12 @@ class TemplateParser
 		$i++;
 		while (isset($list[$i])) {
 			if ($list[$i]['type'] == 'tag') {
-				if (!$list[$i]['isClosing'] && $list[$i]['tagName'] == $tagName) {
-					$openedTagsCount++;
-				} elseif ($list[$i]['isClosing'] && $list[$i]['tagName'] == $tagName) {
-					$openedTagsCount--;
+				if (!$list[$i]['isClosing']) {
+					if (!$list[$i]['isSingle']) $level++;
+					if ($list[$i]['tagName'] == $tagName) $openedTagsCount++;
+				} elseif ($list[$i]['isClosing']) {
+					if (!$list[$i]['isSingle']) $level--;
+					if ($list[$i]['tagName'] == $tagName) $openedTagsCount--;
 				}
 			}
 			if ($openedTagsCount > 0) {
@@ -502,26 +596,23 @@ class TemplateParser
 					if ($list[$i]['tagName'] == $v) {
 						if (!$list[$i]['isClosing']) {
 							$context[] = $v;
-							$levels[$v][] = $openedTagsCount;
+							$levels[$v][] = $level;
 						} else {
 							array_pop($context);
 							array_pop($levels[$v]);
 							$operators[$k]--;
 						}
 					} elseif ($list[$i]['tagName'] == $k) {
-						Printer::log(array($k, $contextLevel ,$openedTagsCount));
 						$operators[$k]++;
 						$contextLevel = $levels[$v][count($levels[$v]) - 1];
-						if (!in_array($v, $context) || $contextLevel != $openedTagsCount) {
+						if (!in_array($v, $context) || $contextLevel != $level) {
 							if ($operators[$k] > 1) {
 								new Error(self::$errors['doubleOperator'], array($k, $k, self::$templateName, self::$className));
 							} elseif ($contextLevel > 0) {
 								new Error(self::$errors['operatorInInnerLevel'], array($k, $v, self::$templateName, self::$className));
 							}
 							new Error(self::$errors['operatorOutOfPlace'], array($k, $v, self::$templateName, self::$className));
-						} elseif ($operators[$k] > 1) {
-							Printer::log($childrenList, true);
-							
+						} elseif ($operators[$k] > 1) {							
 							new Error(self::$errors['fewSameOperators'], array($k, $v, self::$templateName, self::$className));
 						}
 					}
