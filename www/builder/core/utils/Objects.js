@@ -95,7 +95,11 @@ function Objects() {
 	};
 	this.getKeys = function(obj) {
 		var keys = [];
-		for (var k in obj) keys.push(k);
+		if (isObject(obj)) {
+			for (var k in obj) keys.push(k);
+		} else if (isArray(obj)) {
+			for (var i = 0; i < obj.length; i++) keys.push(i);
+		}
 		return keys;
 	};
 	this.flatten = function(obj, flattened, transformed) {

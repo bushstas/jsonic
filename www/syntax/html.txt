@@ -326,10 +326,6 @@ contexts:
             1: comment2.block.actionscript.2
             2: variable.parameter.function.actionscript.2
 
-        - match: '([a-zA-Z]\w*)(?=\()'
-          captures:
-            1: variable.parameter.function.actionscript.2
-
         - match: '(\|)(noAutoescape)'
           captures:
             1: comment2.block.actionscript.2
@@ -358,6 +354,10 @@ contexts:
         - match: '[=\!><\-\/\+%\?:\*&\|\#~\$@\^\\]'
           captures:         
             0: comment.block.actionscript.2 
+
+        - match: ([a-zA-Z]\w*(?=\())
+          captures:
+            0: support.class.actionscript.2
 
         - match: -*\d+\.*
           captures:         

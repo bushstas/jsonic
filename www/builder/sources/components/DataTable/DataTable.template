@@ -1,13 +1,18 @@
 <div class="app-datatable-outer-container">	
 	<component class="DataTableTabPanel">	
-	{foreach right $data as &k => &v}
-
+	{foreach $items as &v => &g limit 5}
 		<div class="xxxxx">
 			{&v}
 		</div>
 		{ifempty}
-		324
+			<ul>
+				<li>Empty</li>
+				<li>Empty</li>
+				<li>Empty</li>
+				<li>Empty</li>
+				<li>Empty</li>
+			</ul>
 		
-	{/foreach}
-	
+	{/foreach}	
 </div>
+{ifempty}

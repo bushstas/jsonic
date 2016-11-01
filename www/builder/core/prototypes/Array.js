@@ -54,3 +54,12 @@ Array.prototype.insertAt = function(item, index) {
 	if (!isNumber(index) || index >= this.length) this.push(item);
 	else this.splice(index, 0, item);
 };
+Array.prototype.shuffle = function() {
+	var tmp;
+	for (var i = this.length - 1; i > 0; i--) {
+		var j = Math.floor(Math.random() * (i + 1));
+		tmp = this[i];
+		this[i] = this[j];
+		this[j] = tmp;
+	}
+};

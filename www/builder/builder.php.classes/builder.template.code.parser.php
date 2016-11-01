@@ -5,6 +5,7 @@ class TemplateCodeParser
 	private static $code, $templateName, $className, $globalNames, $reservedNames,
 				   $utilsFuncs;
 	private static $expected = array();
+	private static $expectedKeywords = array();
 	private static $ternaries = array();
 	private static $queue = array();
 	private static $space = '¦';
@@ -12,7 +13,7 @@ class TemplateCodeParser
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted, $isSwitch,
 				   $thereWasWord, $place, $parsedCode, $element, $context, $nextPart,
-				   $isForeach, $foreach;
+				   $isForeach, $foreach, $foreachKeyword;
 
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
@@ -56,10 +57,10 @@ class TemplateCodeParser
 	private static $names = array(
 		'pl' => 'имя плэйсхолдера',
 		'fn' => 'имя функции',
+		'limit' => 'ключевое слово limit',
 		'var' => 'имя переменной',
 		'method' => 'название метода класса',
-		'comp' => 'идентификатор дочернего компонента',
-		'as' => 'ключевое слово as'
+		'comp' => 'идентификатор дочернего компонента'
 	);
 
 	private static $errors = array(
@@ -74,7 +75,8 @@ class TemplateCodeParser
 		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}',
 		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
-		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp><br>'
+		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
+		'doubleForeachKeyword' => 'Обнаружено более одного ключевого слова в операторе <b>foreach</b> в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
 //	'switchError' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}<xmp>{?}</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>",
@@ -137,6 +139,8 @@ class TemplateCodeParser
 		self::$isSwitch = false;
 		self::$isForeach = false;
 		self::$quoted = false;
+		self::$foreachKeyword = false;
+		self::$expectedKeywords = array();
 	}
 
 	public static function parse($code, $place, $element = null) {
@@ -216,12 +220,14 @@ class TemplateCodeParser
 				$isLatin = $part == $withoutCyr;
 				
 				$isNum = is_numeric($part);
-				self::$isNum = $isNum;
-				
+				self::$isNum = $isNum;				
+		
 				if ($isLatin) {
 					if (!self::isLatinTextExpected($part, $code)) {
 						self::error('unexpectedLat', array($code, $part, ' ...}', self::getExpected()));
 					}
+
+
 					
 					//adding
 					if (!empty(self::$open['method']))
@@ -248,7 +254,6 @@ class TemplateCodeParser
 						self::$parsedCode .= $part;
 					}
 					$code .= $part;
-
 				
 					if (self::$isStart) {
 						self::$isStart = false;
@@ -298,15 +303,19 @@ class TemplateCodeParser
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
-					} elseif ($part == 'right' && self::$isForeach) {
-
+					} elseif (($part == 'right' || $part == 'random') && self::$isForeach) {
+						if (!self::$foreachKeyword) {
+							self::$foreachKeyword = true;
+						} else {
+							new Error(self::$errors['doubleForeachKeyword'], array(self::$className, self::$templateName, self::$code));
+						}
 					} elseif ($part == 'as' && self::$open['foreachArr']) {
 						self::off('name');
 						self::off('foreachArr');
 						self::on('foreachAs');
 						self::$expected = array('&', self::$space);
 					} else {						
-						if (self::prepare($part)) {
+						if (self::prepare($part, $code)) {
 
 							if (self::couldBeColon()) {
 								self::$expected[] = ':';
@@ -661,7 +670,9 @@ class TemplateCodeParser
 				}
 			}
 			if (self::$open['foreachAs']) {
+				self::on('equal');
 				self::$expected = array('>');
+				self::$expectedKeywords = array();
 			} elseif (self::$open['recentQuote'] || self::$open['functionResult'] || (self::$isLet && !self::$open['letvarname'] && self::$prevSign != '=' && self::$prevSign != '!' && !self::$open['greater'])) {
 				self::$expected = array('=');
 				self::off('functionResult');
@@ -909,6 +920,7 @@ class TemplateCodeParser
 				self::$expected = array('&', self::$space);
 				self::off('foreachAs');
 				self::on('foreachAs2');
+				self::off('foreachAsVar');
 			} else {
 				self::$expected = array('=', '+', '-', 'a', '0', '~', '&', '#', self::$space);
 				self::maybeAddDollar();
@@ -927,7 +939,7 @@ class TemplateCodeParser
 		}
 	}
 
-	private static function prepare($part) {
+	private static function prepare($part, $code) {
 		self::$currentPart = $part;		
 		if ($part == 'this') {
 			new Error(self::$errors['thisKeyword'], array(self::$className, self::$templateName, self::$code));
@@ -943,7 +955,6 @@ class TemplateCodeParser
 		self::$notLetValue = !self::$open['letvarname'];
 		self::$foreach = self::isForeachContext();
 
-		
 		if (self::$isNum) {
 			if (self::$decOpen) {
 				self::off('decimal');
@@ -960,9 +971,17 @@ class TemplateCodeParser
 			self::$expected = array('end');
 			return false;
 		}
+
+		if ($part == 'limit' && (self::$open['foreachAs'] || self::$open['foreachAs2']) && self::$open['foreachAsVar']) {
+			self::on('foreachLimit');
+			self::off('foreachAs2');
+			self::off('foreachAs');
+			self::off('foreachAsVar');
+			self::$expected = array('0', '~', '$', '&', '#', '.', self::$space);
+			return false;
+		} 
 		if (!self::$isNum && !self::$anyVar && !self::$isKey && !self::$open['comp'] && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
 			self::on('fn');
-
 			self::$expected = array('(');
 			if (!self::$open['method']) {
 				if (!empty(self::$nextPart) && self::$nextPart[0] == '(') {
@@ -970,7 +989,11 @@ class TemplateCodeParser
 				}
 				return false;
 			}
-		}
+		}			
+		if ((self::$open['foreachAs'] || self::$open['foreachAs2']) && !self::$isNum) {
+			self::on('foreachAsVar');
+			return false;
+		}		
 		if (self::isOpen('placeholder') && !self::isOpen('placeholderShouldHaveDefaultValue')) {
 			self::$expected = array('=', 'end', self::$space);
 			return false;
@@ -1127,6 +1150,7 @@ class TemplateCodeParser
 	}
 
 	private static function finish() {
+		self::$expectedKeywords = array();
 		self::off('recentQuote');
 		if (self::$open['placeholder']) {
 			if (!self::$open['placeholderShouldHaveDefaultValue']) {
@@ -1134,8 +1158,7 @@ class TemplateCodeParser
 			} else {
 				self::on('placeholderHasDefaultValue');
 			}
-		}
-		
+		}		
 
 		if (self::$isReact) {
 			if (empty(self::$reactName)) {
@@ -1148,14 +1171,24 @@ class TemplateCodeParser
 			self::$reactName = '';
 		}
 
-		if (self::$isForeach) {
+		if (self::$isForeach && !self::$open['foreachLimit']) {
 			if (!empty(self::$open['foreachAs2'])) {
 				self::$expected = array(self::$space, 'end');
+				self::$expectedKeywords = array('limit');
 			} elseif (!empty(self::$open['foreachAs'])) {
 				self::$expected = array('=', self::$space, 'end');
+				self::$expectedKeywords[] = 'limit';
 			} elseif (empty(self::$open['foreachArr'])) {
 				self::on('foreachArr');
-				self::$expected = array('(', self::$space);
+				if (!self::$open['fn']) {
+					self::$expected = array(self::$space);
+
+					if (!empty(self::$nextPart) && self::$nextPart[0] == '(' && !self::$anyVar) {
+						array_push(self::$expected, '(');
+					}
+				} else {
+					self::$expected = array('(');
+				}				
 				if (!self::$open['method'] && !self::$open['fn']) {
 					array_push(self::$expected, 'a', '[', '.');
 				}
@@ -1294,6 +1327,9 @@ class TemplateCodeParser
 		if (is_numeric($text) && in_array('0', self::$expected)) {
 			return true;
 		}
+		if (!empty(self::$expectedKeywords) && in_array($text, self::$expectedKeywords)) {
+			return true;
+		}
 		if (in_array('a', self::$expected) || in_array('b', self::$expected)) {
 			if (is_numeric($text[0])) {
 				return false;
@@ -1312,6 +1348,11 @@ class TemplateCodeParser
 				$items[] = self::$signs[$exp];
 			}
 
+		}
+		if (!empty(self::$expectedKeywords)) {
+			foreach (self::$expectedKeywords as $exp) {
+				array_unshift($items, 'ключевое слово '.$exp);
+			}			
 		}
 		return implode("\n", $items);
 	}
@@ -1341,9 +1382,6 @@ class TemplateCodeParser
 		if (!empty(self::$open['comp'])) {
 			return self::$names['comp'];
 		}
-		if (!empty(self::$open['foreachArr'])) {
-			return self::$names['as'];
-		}
 		return self::$names['fn'];
 	}
 
@@ -1369,13 +1407,32 @@ class TemplateCodeParser
 			self::$expected = null;
 		}		
 		
-
-		if (!empty(self::$open['ternary']) && !self::$open['functionResult'] && !self::$open['number'] && !self::$open['name'] && !self::$open['recentQuote'] && !self::isAnyVarOpen() && !self::$open['recentVar'])
+		if (!empty(self::$open['fn']))
+		{
+			self::$expected = array('(');
+		}
+		elseif (!empty(self::$open['ternary']) && !self::$open['functionResult'] && !self::$open['number'] && !self::$open['name'] && !self::$open['recentQuote'] && !self::isAnyVarOpen() && !self::$open['recentVar'])
 		{
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
 			self::maybeAddDollar();
+		}
+		elseif (self::$isForeach && !self::$open['foreachAs'] && !self::$open['foreachAs2'] && !self::$open['foreachLimit'])
+		{
+			if (self::$open['foreachArr']) {
+				self::$expected = array();
+				self::$expectedKeywords = array('as');
+			} elseif (self::$open['foreachAs']) {				
+				self::$expected = array('&');
+			} else {
+				if (self::$foreachKeyword) {
+					self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
+				} else {
+					self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
+					array_push(self::$expectedKeywords, 'right', 'random');
+				}
+			}
 		} 
-		elseif (self::$open['foreachAs2'] && !self::$open['name'])
+		elseif ((self::$open['foreachAs2'] && !self::$open['name']) || (self::$open['foreachAs'] && !self::$open['foreachAsVar']))
 		{
 			if (self::$open['var']) {
 				self::$expected = array('a');
@@ -1409,10 +1466,8 @@ class TemplateCodeParser
 		elseif (self::$open['placeholder'] && !self::$thereWasWord)
 		{
 			self::$expected = array("a");
-		} elseif (self::$open['fn'])
-		{
-			self::$expected = array("(");
-		} elseif (!empty(self::$open['math']))
+		}
+		elseif (!empty(self::$open['math']))
 		{
 			self::$expected = self::$lists[self::$open['math']];
 		}
@@ -1457,8 +1512,6 @@ class TemplateCodeParser
 			if (self::$open['letvalue']) self::$expected = $expecteds;
 			else if (self::$open['letvarname']) self::$expected = $expecteds;
 		}
-
-		
 		if (is_array(self::$expected))
 		{
 			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);
@@ -1487,9 +1540,17 @@ class TemplateCodeParser
 			$code = preg_replace('/^\s*switch\s*/', '', $code);
 		} elseif (self::$isForeach) {
 			$code = preg_replace('/^\s*foreach\s*/', '', $code);
+			if (preg_match('/\slimit\s/', $code)) {
+				$parts = preg_split('/\slimit\s/', $code);
+				$code = $parts[0];
+				self::$data['limit'] = '<nq>'.trim($parts[1]).'<nq>';
+			}
 			if (preg_match('/^right\b/', $code)) {
 				$code = preg_replace('/^right\s*/', '', $code);
 				self::$data['right'] = true;
+			} elseif (preg_match('/^random\b/', $code)) {
+				$code = preg_replace('/^random\s*/', '', $code);
+				self::$data['random'] = true;
 			}
 			$parts = preg_split('/\s+as\s+/', $code);
 			self::$data['items'] = '<nq>'.$parts[0].'<nq>';

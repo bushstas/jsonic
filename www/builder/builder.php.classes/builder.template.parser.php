@@ -6,6 +6,7 @@ class TemplateParser
 	private static $regexp = "/\{ *template +\.(\w+) *\}/";
 	private static $space = '_u00A0_';
 	private static $textNodes = array();
+	private static $openContexts = array();
 	
 	private static $simpleTags = array(
 		'br', 'input', 'img', 'hr'
@@ -422,9 +423,9 @@ class TemplateParser
 		$isElse = false;
 		$isIfempty = false;
 		$currentIf = null;
-		for ($i = 0; $i < count($list); $i++) {
-			
-			$item = $list[$i];		
+
+		for ($i = 0; $i < count($list); $i++) {			
+			$item = $list[$i];
 			$tagName = trim($item['tagName']);
 			if ($item['type'] == 'text') {
 				if (!$isElse) {
@@ -438,7 +439,7 @@ class TemplateParser
 				} else {
 					$elseChildren[] = '<br>';
 				}
-			} elseif ($item['isClosing'] != 1) {
+			} else {
 				$child = self::getHtmlChild($item, $i, $list, $isElse, $isIfempty);
 				if ($isElse) {
 					$elseChildren[] = $child;
@@ -446,12 +447,6 @@ class TemplateParser
 					$ifEmptyChildren[] = $child;
 				} else {
 					$children[] = $child;
-				}
-			} else {
-				if ($tagName == 'if') {
-					$isElse = false;
-				} elseif ($tagName == 'foreach') {
-					$isIfempty = false;
 				}
 			}
 		}
@@ -490,7 +485,6 @@ class TemplateParser
 		{					
 			
 			$toProper = false;
-			$childrenList = self::gatherChildren($list, $i, $tagName);
 
 			if ($tagName == 'if') {
 				preg_match("/^\{\s*if\b\s*([^\}]+)\}/i",  $item['content'], $match);
@@ -499,6 +493,11 @@ class TemplateParser
 				$ifContentIsEmpty = preg_replace('/\s/', '', $ifContent) === '';
 			}
 			
+			if ($tagName == 'foreach' || ($tagName == 'if' && !$ifContentIsEmpty)) {
+				self::$openContexts[] = $tagName;
+			}
+			$childrenList = self::gatherChildren($list, $i, $tagName);
+		
 			$isLet = 0;
 			if ($ifContentIsEmpty) {
 				self::parseCases($childrenList, $child, true);
@@ -584,6 +583,10 @@ class TemplateParser
 		$operators = array();
 		$level = 1;
 		foreach (self::$contexts as $k => $v) {
+			
+			if ($tagName == $k && !in_array($v, self::$openContexts)) {
+				new Error(self::$errors['operatorOutOfPlace'], array($k, $v, self::$templateName, self::$className));
+			}
 			$levels[$v] = array();
 			$operators[$k] = 0;
 			if ($tagName == $v) {
@@ -600,6 +603,12 @@ class TemplateParser
 					if (!$list[$i]['isSingle']) $level++;
 					if ($list[$i]['tagName'] == $tagName) $openedTagsCount++;
 				} elseif ($list[$i]['isClosing']) {
+
+					if ($list[$i]['tagName'] == 'if' || $list[$i]['tagName'] == 'foreach') {
+						Printer::log('============'.$list[$i]['tagName'].'<br>');
+						if (self::$openContexts[count(self::$openContexts) - 1] == $list[$i]['tagName']) array_pop(self::$openContexts);
+					}
+
 					if (!$list[$i]['isSingle']) $level--;
 					if ($list[$i]['tagName'] == $tagName) $openedTagsCount--;
 				}
@@ -784,6 +793,9 @@ class TemplateParser
 				$child['ie'] = $child['ie']['c'];
 			}
 		}
+		if (empty($child['ie'])) {
+			unset($child['ie']);	
+		}
 		$child['h'] = $child['c'];
 		unset($child['c']);
 		$content = ltrim(rtrim($item['content'], '}'), '{');
@@ -799,6 +811,11 @@ class TemplateParser
 		}
 		if ($data['right']) {
 			$child['r'] = 1;
+		} elseif ($data['random']) {
+			$child['ra'] = 1;
+		}
+		if (!empty($data['limit'])) {
+			$child['l'] = $data['limit'];
 		}
 		$args = implode(',', $args);
 		self::wrapInFunction($child['h'], $args);
