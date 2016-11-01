@@ -6,7 +6,6 @@ class TemplateParser
 	private static $regexp = "/\{ *template +\.(\w+) *\}/";
 	private static $space = '_u00A0_';
 	private static $textNodes = array();
-	private static $openContexts = array();
 	
 	private static $simpleTags = array(
 		'br', 'input', 'img', 'hr'
@@ -20,6 +19,63 @@ class TemplateParser
 		'else' => 'if', 'ifempty' => 'foreach'
 	);
 
+	private static $forbiddenElements = array(
+		'body', 'head', 'html', 'script', 'noscript', 'style', 'meta', 'link', 'title', 'frame',
+		'base', 'bgsound', 'blink', 'center', 'comment', 'dir', 'font', 'applet', 'acronym',
+		'frameset', 'hgroup', 'isindex', 'marquee', 'nobr', 'noembed', 'noframes', 'object',
+		'plaintext', 'strike', 'tt', 'u', 'xmp'
+	);
+
+	private static $forbiddenInnerElements = array(
+		'a' => array('a', 'form', 'caption'),
+		'form' => array('a', 'form'),
+		'address' => array('nav'),
+		'pre' => array('big', 'img', 'small', 'sub', 'sup')
+	);
+
+	private static $onlyParentalElements = array(
+		'command' => array('menu'),
+		'tbody' => array('table'),
+		'thead' => array('table'),
+		'tr' => array('table', 'thead', 'tbody'),
+		'th' => array('tr'),
+		'td' => array('tr'),
+		'tfoot' => array('table'),
+		'colgroup' => array('table'),
+		'col' => array('colgroup', 'table'),
+		'area' => array('map'),
+		'source' => array('audio', 'video'),
+		'dd' => array('dl'),
+		'dt' => array('dl'),
+		'fieldset' => array('form'),
+		'figcaption' => array('figure'),
+		'keygen' => array('form'),
+		'li' => array('ul', 'ol', 'menu'),
+		'optgroup' => array('select'),
+		'option' => array('select', 'optgroup'),
+		'summary' => array('details')
+	);
+
+	private static $allowedInnerElements = array(
+		'p' => array(
+			'span', 'table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'a', 'input',
+			'img', 'video', 'audio', 'b', 'big', 'button', 'canvas', 'code', 'i',
+			'iframe', 'label', 's', 'select', 'strong', 'textarea', 'small', 'abbr',
+			'map', 'basefont', 'cite', 'datalist', 'del', 'dfn', 'em', 'embed', 'ins',
+			'kbd', 'mark', 'meter', 'output', 'progress', 'q', 'samp', 'sub', 'sup', 'time',
+			'var', 'wbr'
+		),
+		'canvas' => array(),
+		'iframe' => array(),
+		'textarea' => array(),
+		'table' => array(
+			'caption', 'tbody', 'thead', 'tr', 'td', 'th', 'colgroup', 'col', 'tfoot'
+		),
+		'dl' => array('dt', 'dd'),
+		'select' => array('optgroup', 'option'),
+		'details' => array('summary')
+	);
+
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $cssClassIndex, $templateName, $globalNames,
@@ -27,7 +83,10 @@ class TemplateParser
 
 	private static $errors = array(
 		'noMainTemplate' => 'Ўаблон <b>main</b> класса {??} не найден среди прочих',
+		'forbiddenTag' => 'ќбнаружен недопустимый тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>',
 		'noClosingTag' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
+		'tagInsideTag' => 'ќбнаружена недопустима€ вложенность: тег {??} внутри тега {??} в шаблоне {??} класса {??}<br>ƒанный тег {?}-й по счету открывающийс€ тег {??}<xmp>{?}</xmp>',
+		'tagOutsideProperTag' => 'ќбнаружена недопустима€ вложенность: тег {??} вне {?} {??} в шаблоне {??} класса {??}<br>ƒанный тег {?}-й по счету открывающийс€ тег {??}<xmp>{?}</xmp>',
 		'noClosingTag2' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>ќжидаетс€ закрытие тега {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag2' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>',
@@ -61,7 +120,7 @@ class TemplateParser
 		'operatorOutOfPlace' => 'ќбнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}',
 		'operatorInInnerLevel' => 'ќбнаружен оператор {??} не на одном уровне с оператором {??} в шаблоне {??} класса {??}',
 		'doubleOperator' => 'ќбнаружен оператор {??} внутри другого оператора {??} в шаблоне {??} класса {??}',
-		'fewSameOperators' => 'ќбнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
+		'fewSameOperators' => 'ќбнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}'
 	);
 
 	public static function init($params) {
@@ -286,6 +345,7 @@ class TemplateParser
 		$allTypes = array();
 		$indexes = array();
 		$opened = array();
+		$openedHtml = array();
 		$openedData = array();
 		
 		$closed = array();
@@ -300,11 +360,38 @@ class TemplateParser
 			if (!empty($tn)) {
 				if (!$item['isSingle']) {
 					if ($item['isClosing'] == 0) {
+						
 						if (!isset($openedTags[$tn])) {
 							$openedTags[$tn] = 0;
 						}
+
+						$last = $openedHtml[count($openedHtml) - 1];					
+
 						$openedTags[$tn]++;
+						if (in_array($tn, self::$forbiddenElements)) {
+							new Error(self::$errors['forbiddenTag'], array(strtoupper($tn), self::$templateName, self::$class['name'], $item['content']));
+						}
+						
+						if (isset(self::$forbiddenInnerElements[$last]) && in_array($tn, self::$forbiddenInnerElements[$last])) {
+							new Error(self::$errors['tagInsideTag'], array(strtoupper($tn), strtoupper($last), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
+						}
+						if (isset(self::$onlyParentalElements[$tn]) && !in_array($last, self::$onlyParentalElements[$tn])) {
+							new Error(self::$errors['tagOutsideProperTag'], array(strtoupper($tn), count(self::$onlyParentalElements[$tn]) > 1 ? 'тегов' : 'тега', strtoupper(implode(', ', self::$onlyParentalElements[$tn])), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
+						}
+						if (isset(self::$allowedInnerElements[$last]) && !in_array($tn, self::$allowedInnerElements[$last])) {
+							new Error(self::$errors['tagInsideTag'], array(strtoupper($tn), strtoupper($last), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
+						}
+
+						
+
+						
+						// if ( && in_array('p', $opened)) {
+						// 	new Error(self::$errors['blockElementInsideP'], array(self::$templateName, self::$class['name'], $openedTags[$tn], $item['content']));	
+						// }
 						$opened[] = $tn;
+						if (self::isHtmlTag($tn)) {
+							$openedHtml[] = $tn;
+						}
 						$openedData[] = array(
 							'tag' => $tn,
 							'content' => $item['content'],
@@ -380,6 +467,9 @@ class TemplateParser
 						$closedTags[$tn]++;
 						$closed[] = $tn;
 						array_pop($opened);
+						if (self::isHtmlTag($tn)) {
+							array_pop($openedHtml);
+						}
 						array_pop($openedData);
 						array_pop($indexes);
 						$all[] = $tn;
@@ -387,6 +477,11 @@ class TemplateParser
 						$allTypes[] = 'closed';
 					}
 				} else {
+					if ($tn == 'ifempty' && !in_array('foreach', $opened)) {
+						new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className));
+					} elseif ($tn == 'else' && !in_array('if', $opened)) {
+						new Error(self::$errors['operatorOutOfPlace'], array('else', 'if', self::$templateName, self::$className));
+					}
 					if (!isset($openedTags[$tn])) {
 						$openedTags[$tn] = 0;
 					}
@@ -408,6 +503,10 @@ class TemplateParser
 		}
 	}
 
+	private	static function isHtmlTag($tn) {
+		return !($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty');
+	}
+
 	private	static function getTagTypeName($tn, $ending = '') {
 		return ($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' ? 'оператор' : 'тег').$ending;
 	}
@@ -426,6 +525,7 @@ class TemplateParser
 
 		for ($i = 0; $i < count($list); $i++) {			
 			$item = $list[$i];
+
 			$tagName = trim($item['tagName']);
 			if ($item['type'] == 'text') {
 				if (!$isElse) {
@@ -484,6 +584,7 @@ class TemplateParser
 		else
 		{					
 			
+			
 			$toProper = false;
 
 			if ($tagName == 'if') {
@@ -493,9 +594,6 @@ class TemplateParser
 				$ifContentIsEmpty = preg_replace('/\s/', '', $ifContent) === '';
 			}
 			
-			if ($tagName == 'foreach' || ($tagName == 'if' && !$ifContentIsEmpty)) {
-				self::$openContexts[] = $tagName;
-			}
 			$childrenList = self::gatherChildren($list, $i, $tagName);
 		
 			$isLet = 0;
@@ -576,6 +674,7 @@ class TemplateParser
 	}
 
 	private	static function gatherChildren($list, &$i, $tagName) {
+		$t = $list[$i];
 		$childrenList = array();
 		$openedTagsCount = 1;
 		$context = array();
@@ -583,10 +682,6 @@ class TemplateParser
 		$operators = array();
 		$level = 1;
 		foreach (self::$contexts as $k => $v) {
-			
-			if ($tagName == $k && !in_array($v, self::$openContexts)) {
-				new Error(self::$errors['operatorOutOfPlace'], array($k, $v, self::$templateName, self::$className));
-			}
 			$levels[$v] = array();
 			$operators[$k] = 0;
 			if ($tagName == $v) {
@@ -603,12 +698,6 @@ class TemplateParser
 					if (!$list[$i]['isSingle']) $level++;
 					if ($list[$i]['tagName'] == $tagName) $openedTagsCount++;
 				} elseif ($list[$i]['isClosing']) {
-
-					if ($list[$i]['tagName'] == 'if' || $list[$i]['tagName'] == 'foreach') {
-						Printer::log('============'.$list[$i]['tagName'].'<br>');
-						if (self::$openContexts[count(self::$openContexts) - 1] == $list[$i]['tagName']) array_pop(self::$openContexts);
-					}
-
 					if (!$list[$i]['isSingle']) $level--;
 					if ($list[$i]['tagName'] == $tagName) $openedTagsCount--;
 				}
