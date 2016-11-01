@@ -26,9 +26,11 @@ class TemplateParser
 
 	private static $errors = array(
 		'noMainTemplate' => 'Ўаблон <b>main</b> класса {??} не найден среди прочих',
-		'noClosingTag' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<br><br>“ег полностью:<xmp>{?}</xmp>',
-		'noClosingTag2' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<br><br>“ег полностью:<xmp>{?}</xmp>',
-		'extraClosingTag' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<br><br>ќжидаетс€ закрытие тега {??}<br>ќн следует после {?}-го по счету {?} {?} {??}',
+		'noClosingTag' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
+		'noClosingTag2' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
+		'extraClosingTag' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>ќжидаетс€ закрытие тега {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
+		'extraClosingTag2' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>',
+		'extraClosingTag3' => 'ќбнаружен закрывающийс€ {?} {??} в начале шаблона {??} класса {??}',
 		'unknownComponent' => 'Ќеопределенный компонент в шаблоне {??} класса {??}<xmp>{?}</xmp>ќжидаетс€ запись вида<xmp>{?}</xmp>',
 		'controlWithoutName' => ' онтрол {??} в шаблоне {??} класса {??} не имеет атрибута <b>name</b><xmp>{?}</xmp>ќжидаетс€ запись вида<xmp>{?}</xmp>',
 		'reactVarInInclude' => 'Ўаблон {??}, содержащийс€ в файле {??} содержит код с реактивными переменными {??}<br><br>√лобальные шаблоны с типом <b>include</b> не могут содержать их. ƒопускаетс€ использование только вход€щих аргументов <b>~arg</b> и локальных переменных <b>&var</b>',
@@ -224,7 +226,7 @@ class TemplateParser
 			}
 		}
 		$isLet = 0;
-		self::checkTagsPairing($list);
+		self::checkHtmlTagStructure($list);
 		$children = self::getHtmlChildren($list, $isLet, false);
 
 		$let = '';
@@ -278,11 +280,13 @@ class TemplateParser
 		return in_array($tagName, self::$singleTags);
 	}
 
-	private	static function checkTagsPairing($list) {
+	private	static function checkHtmlTagStructure($list) {
 		$all = array();
 		$allTypes = array();
 		$indexes = array();
 		$opened = array();
+		$openedData = array();
+		
 		$closed = array();
 		$opened2 = array();
 		$openedTags = array();
@@ -300,6 +304,11 @@ class TemplateParser
 						}
 						$openedTags[$tn]++;
 						$opened[] = $tn;
+						$openedData[] = array(
+							'tag' => $tn,
+							'content' => $item['content'],
+							'orderNumber' => $openedTags[$tn]
+						);
 						$opened2[] = $tn;
 						$lastType = 'open';
 						$all[] = $tn;
@@ -316,15 +325,16 @@ class TemplateParser
 								$realIndex = $aixs[$prevIndex];
 								$count = 0;
 								foreach ($all as $i => $tag) {
-									if ($tag == $prev && $allTypes[$i] == 'open') {
-										$count++;
-									}
+									if ($tag == $prev && $allTypes[$i] == 'open') $count++;
 									if ($i == $realIndex) break;
 								}
-								$object = $prev == 'if' || $prev == 'switch' || $prev == 'foreach' || $prev == 'else' || $prev == 'ifempty' ? 'оператор' : 'тег';
+								$object = self::getTagTypeName($prev);
 								new Error(
-									self::$errors['noClosingTag'], array($object, strtoupper($prev), self::$templateName, self::$class['name'], $object, $count, $object, strtoupper($prev), $list[$realIndex]['content']
-								));
+									self::$errors['noClosingTag'], 
+									array(
+										$object, strtoupper($prev), self::$templateName, self::$class['name'], $object, $count, $object, strtoupper($prev), $list[$realIndex]['content']
+									)
+								);
 								
 							} else {
 								if ($lastType == 'open') {
@@ -332,26 +342,44 @@ class TemplateParser
 								} else {
 									$prev2 = $closed[count($closed) - 1];
 								}
-								$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach' || $tn == 'else' || $tn == 'ifempty' ? 'оператор' : 'тег';
-								$object2 = $prev2 == 'if' || $prev2 == 'switch' || $prev2 == 'foreach' || $prev2 == 'else' || $prev2 == 'ifempty' ? 'оператора' : 'тега';
+								$openedData = array_reverse($openedData);
+								if (isset($openedData[0])) {
+									extract($openedData[0]);
+								}
+
+								$object = self::getTagTypeName($tn);
+								$object2 = self::getTagTypeName($prev2, 'а');
+								
 								$typeTag = $lastType == 'open' ? 'открывающегос€' : 'закрывающегос€';
 								if ($prev != $prev2 && $lastType == 'open') {
 									$typeTag = '';
 								}
-
-
-								new Error(
-									self::$errors['extraClosingTag'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2),
-									strtoupper($prev), $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2)
-								));
+								if (!empty($prev2)) {
+									if (isset($content)) {
+										$object3 = self::getTagTypeName($tag);
+										new Error(
+											self::$errors['extraClosingTag'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2), $list[$aix - 1]['content'],
+											strtoupper($tag), $object3, $orderNumber, $object3, strtoupper($tag), $content
+										));
+									} else {
+										new Error(
+											self::$errors['extraClosingTag2'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2), $list[$aix - 1]['content']
+										));
+									}
+								} else {
+									new Error(
+										self::$errors['extraClosingTag3'], array($object, strtoupper($tn), self::$templateName, self::$class['name']
+									));
+								}
 							}
 						}
-						if (!isset($$closedTags[$tn])) {
-							$$closedTags[$tn] = 0;
+						if (!isset($closedTags[$tn])) {
+							$closedTags[$tn] = 0;
 						}
 						$closedTags[$tn]++;
 						$closed[] = $tn;
 						array_pop($opened);
+						array_pop($openedData);
 						array_pop($indexes);
 						$all[] = $tn;
 						$lastType = 'closed';
@@ -369,32 +397,18 @@ class TemplateParser
 				}
 			}
 		}
-		if (!empty($opened)) {
-			$opened = array_reverse($opened);
-			$allr = array_reverse($opened2);
-			$tn = $opened[0];
-			$idx = count($allr) - array_search($tn, $allr) - 1;
-			
- 			$object = $tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' ? 'оператор' : 'тег';
-			$prev = $all[$idx - 1];
-			$prevType = $allTypes[$idx - 1];
-			
-			$object2 = $prev == 'if' || $prev == 'switch' || $prev == 'foreach' || $prev == 'else' || $prev == 'ifempty' ? 'оператора' : 'тега';
-			$typeTag = $prevType == 'open' ? 'открывающегос€' : 'закрывающегос€';
-			if (empty($prevType)) {
-				$typeTag = '';
-			}
-			$count = 0;
-			foreach ($all as $i => $tag) {
-				if ($i == $idx) break;
-				if ($tag == $prev && $allTypes[$i] == $prevType) {
-					$count++;
-				}
-			}
-			Printer::log($opened);
-			Printer::log(array_search($tn, $allr));
-		 	new Error(self::$errors['noClosingTag2'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $count, $typeTag, $object2, strtoupper($prev), $list[$idx + 2]['content']));
+		if (!empty($openedData)) {
+			$openedData = array_reverse($openedData);
+			extract($openedData[0]);			
+ 			$object = self::getTagTypeName($tag);
+		 	new Error(self::$errors['noClosingTag2'], array(
+		 		$object, strtoupper($tag), self::$templateName, self::$class['name'], $object, $orderNumber, $object, strtoupper($tag), $content
+		 	));
 		}
+	}
+
+	private	static function getTagTypeName($tn, $ending = '') {
+		return ($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' ? 'оператор' : 'тег').$ending;
 	}
 
 	private	static function getHtmlChildren($list, &$let) {

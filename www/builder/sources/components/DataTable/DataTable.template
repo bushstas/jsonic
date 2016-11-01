@@ -1,14 +1,5 @@
-<div>
-
-</div>
-<div>
-
-</div>
-<div class="app-datatable-outer-container">
-	
-	<component class="DataTableTabPanel">
-
-	
+<div class="app-datatable-outer-container">	
+	<component class="DataTableTabPanel">	
 	{foreach right $data as &k => &v}
 
 		<div class="xxxxx">
@@ -19,9 +10,4 @@
 		
 	{/foreach}
 	
-</div>
-<span id="45">
-<span class="dfdsf">
-</span>
-<div>
 </div>
