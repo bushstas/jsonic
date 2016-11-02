@@ -24,7 +24,7 @@ initial helpers = [
 	}
 ]
 
-function onRendered() {	
+function onRendered() {
 	this.refresh();
 }
 

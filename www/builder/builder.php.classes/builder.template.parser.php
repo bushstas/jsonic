@@ -79,7 +79,7 @@ class TemplateParser
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $cssClassIndex, $templateName, $globalNames,
-				   $parsedItem, $globalVarNames;
+				   $parsedItem, $globalVarNames, $initials;
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
@@ -120,10 +120,12 @@ class TemplateParser
 		'operatorOutOfPlace' => 'Обнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}',
 		'operatorInInnerLevel' => 'Обнаружен оператор {??} не на одном уровне с оператором {??} в шаблоне {??} класса {??}',
 		'doubleOperator' => 'Обнаружен оператор {??} внутри другого оператора {??} в шаблоне {??} класса {??}',
-		'fewSameOperators' => 'Обнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}'
+		'fewSameOperators' => 'Обнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
+		'loadingOperatorWithoutLoader' => 'Обнаружено использование одного из операторов <b>loading, loader</b> в шаблоне {??} класса {??}. У данного класса отсутствует initial параметр <b>loader</b>'
 	);
 
 	public static function init($params) {
+		self::$initials = $params['initialsParser']->get();
 		self::$calledClasses = $params['classNames'];
 		self::$classes = $params['classes'];
 		self::$sources = $params['sources'];
@@ -171,6 +173,14 @@ class TemplateParser
 		
 		$templates = array();
 		for ($i = 0; $i < count($templateNames); $i++) {
+			if (preg_match('/\{ *(\/*loading|\/*onload) *\}/', $templateContents[$i])) {
+				if (!isset(self::$initials[$className]['loader'])) {
+					new Error(self::$errors['loadingOperatorWithoutLoader'], array($templateNames[$i], $className));
+				}
+				$templateContents[$i] = preg_replace('/\{ *loading *\}/', '{if $__loading}', $templateContents[$i]);
+				$templateContents[$i] = preg_replace('/\{ *onload *\}/', '{if !$__loading}', $templateContents[$i]);
+				$templateContents[$i] = preg_replace('/\{ *\/(loading|onload) *\}/', '{/if}', $templateContents[$i]);
+			}
 			self::$templateName = $templateNames[$i];
 			TemplateCodeParser::init(self::$templateName, $className);
 			$templates[] = self::getParsedTemplate($templateContents[$i]);
@@ -551,7 +561,7 @@ class TemplateParser
 			}
 		}
 		if (!empty($elseChildren)) {
-			return array('c' => $children, 'e' => $elseChildren);
+			return array('c' => $children, 'e' => $elseChildren[0]['c']);
 		} elseif (!empty($ifEmptyChildren)) {
 			return array('c' => $children, 'ie' => $ifEmptyChildren);
 		} else {
@@ -892,6 +902,8 @@ class TemplateParser
 		$child['p'] = $data['items'];
 		if (!empty($data['reactNames'])) {
 			$child['n'] = self::getProperChildren($data['reactNames']);
+		}
+		if ($data['reactiveItems']) {
 			self::wrapInFunction($child['p']);
 		}
 		$args = array($data['value']);
@@ -904,6 +916,9 @@ class TemplateParser
 			$child['ra'] = 1;
 		}
 		if (!empty($data['limit'])) {
+			if ($data['reactiveLimit']) {
+				self::wrapInFunction($data['limit']);
+			}
 			$child['l'] = $data['limit'];
 		}
 		$args = implode(',', $args);

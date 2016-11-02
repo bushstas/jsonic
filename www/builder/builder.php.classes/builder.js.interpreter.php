@@ -5,7 +5,6 @@ class JSInterpreter
 	public static function parse(&$content, $className) {
 		self::prepareCode($content);
 		self::parseDataConstants($content);
-		self::parseEachOperators($content);
 		self::parseDelayOperators($content);
 		self::parseIfShortcuts($content);	
 		self::parseArrayPushOperators($content);
@@ -16,6 +15,10 @@ class JSInterpreter
 		self::parseTagShortcuts($content);		
 		self::cleanCode($content);
 	}
+	
+	public static function parseFunction(&$content, $className) {
+		self::parseEachOperators($content);
+	}
 
 	private static function parseDataConstants(&$content) {
 		$content = preg_replace('/\#([a-z]\w*)/i', "_DATA_#$1", $content);
@@ -24,13 +27,30 @@ class JSInterpreter
 	private static function parseEachOperators(&$content) {
 		$itemsName = '_items';
 		$names = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','_');		
+		$regexp = '/\beach\s*\(([\w\.\[\]]+) +as +(\w+)\)\s*\{/';
+		$data = Splitter::split($regexp, $content);
+		if (empty($data['items'])) return;
+		$properNames = array();
+
 		foreach ($names as $name) {
 			if (!preg_match('/\b'.$name.'\b/', $content)) {
-				$itemsName = $name;
-				break;
+				$properNames[] = $name;
+				if (count($properNames) >= count($data['delimiters'])) {
+					break;
+				}
 			}
 		}
-		$content = preg_replace('/\beach\s*\(([\w\.\[\]]+) +as +(\w+)\)\s*\{/', "var ".$itemsName."=$1,idx;for(idx=0;idx<".$itemsName.".length;idx++){var $2=".$itemsName."[idx];", $content);
+		$content = '';
+		foreach ($data['items'] as $i => $item) {
+			$content .= $item;
+			if (isset($data['delimiters'][$i])) {
+				$v = $properNames[$i];
+				$idx = $i + 1;
+				if ($idx == 1) $idx = '';
+				$d = $data['delimiters'][$i];
+				$content .= preg_replace($regexp, "var ".$v."=$1,idx".$idx.";for(idx".$idx."=0;idx".$idx."<".$v.".length;idx".$idx."++){var $2=".$v."[idx".$idx."];", $d);
+			}
+		}		
 	}
 
 	private static function parseArrayPushOperators(&$content) {
@@ -159,16 +179,23 @@ class JSInterpreter
 	}
 
 	private static function parseDelayOperators(&$content) {
-		$data = Splitter::split('/\bdelay *\( *(\d+) *\) *\{/', $content, 1);
-		if (is_array($data)) {
-			$content = '';
-			for ($i = 0; $i < count($data['items']); $i++) {
-				$content .= $data['items'][$i];
-				if (isset($data['delimiters'][$i])) {
-					$d = Splitter::getInner($data['items'][$i + 1]);
-					$line = 'this.delay(function(){'.$d['inner'].'},'.$data['delimiters'][$i].');';
-					$content .= $line;
-					$data['items'][$i + 1] = $d['outer'];
+		$regexp = '/\bdelay *\( *(\d+) *\) *\{/';
+		$parts = preg_split($regexp, $content);
+		$count = count($parts) - 1;
+		if ($count > 0) {
+			for ($j = 0; $j < $count; $j++) {
+				$data = Splitter::splitOne($regexp, $content, 1);
+				if (is_array($data)) {
+					$content = '';
+					for ($i = 0; $i < count($data['items']); $i++) {
+						$content .= $data['items'][$i];
+						if (isset($data['delimiters'][$i])) {
+							$d = Splitter::getInner($data['items'][$i + 1]);
+							$line = 'this.delay(function(){'.$d['inner'].'},'.$data['delimiters'][$i].');';
+							$content .= $line;
+							$data['items'][$i + 1] = $d['outer'];
+						}
+					}
 				}
 			}
 		}

@@ -4,6 +4,7 @@ function Component() {
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
+			this.preset('__loading', true);
 			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
 			this.loader.subscribe('load', onDataLoad.bind(this, isAsync), this);
@@ -24,6 +25,7 @@ function Component() {
 	};
 
 	var onDataLoad = function(isAsync, data) {
+		this.toggle('__loading');
 		this.onLoaded(data);
 		if (!isAsync) onReadyToRender.call(this);
 	};
@@ -110,26 +112,21 @@ function Component() {
 		this.level = this.listeners = null;
 	};
 
-	Component.prototype.initiate = function() {
-		this.propsToSet = {};
-		this.rendered = this.disposed = this.disabled = false;
-	};
-
 	Component.prototype.render = function(parentElement) {
 		this.parentElement = parentElement;
 		load.call(this);
 	};
 
 	Component.prototype.isDisabled = function() {
-		return this.disabled;
+		return !!this.disabled;
 	};
 
 	Component.prototype.isRendered = function() {
-		return this.rendered;
+		return !!this.rendered;
 	};
 
 	Component.prototype.isDisposed = function() {
-		return this.disposed;
+		return !!this.disposed;
 	};
 
 	Component.prototype.instanceOf = function(classFunc) {
@@ -210,7 +207,7 @@ function Component() {
 	};
 
 	Component.prototype.get = function(propName) {
-		var prop = this.propsToSet[propName] || this.props[propName];
+		var prop = this.props[propName];
 		if (isUndefined(arguments[1]) || !isArrayLike(prop)) return prop;
 		var end;
 		for (var i = 1; i < arguments.length; i++) {
@@ -264,7 +261,10 @@ function Component() {
 		if (!isUndefined(propValue)) {
 			props = {};
 			props[propName] = propValue;
-		} else props = propName;
+		} else if (isObject(propName)) {
+			props = propName;
+		} else return;
+
 		var isChanged = false;
 		var changedProps = {};
 		var currentValue;
@@ -284,12 +284,7 @@ function Component() {
 	};
 
 	Component.prototype.preset = function(propName, propValue) {
-		this.propsToSet[propName] = propValue;
-	};
-
-	Component.prototype.update = function() {
-		this.set(this.propsToSet);
-		this.propsToSet = {};
+		this.props[propName] = propValue;
 	};
 
 	Component.prototype.delay = function(f, n, p) {
@@ -467,7 +462,6 @@ function Component() {
 		this.updaters = null;
 		this.parentElement = null;
 		this.props = null;
-		this.propsToSet = null;	
 		this.provider = null;
 		this.children = null;
 		this.disposed = true;

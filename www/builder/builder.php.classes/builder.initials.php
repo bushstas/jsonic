@@ -33,6 +33,7 @@ class InitialsParser
 	private $initials = array();
 	private $regexp = '/\binitial\s+([\s\S]+?)(?=(initial|function|@EOF))/';
 	private $regexp2 = '/^([a-zA-Z]\w*)\s*=\s*([\s\S]+?)[;\s]*$/';
+	private $actionsCache = array();
 
 	public function fetch(&$content, &$class) {
 		$this->defineForClass($class);
@@ -121,6 +122,14 @@ class InitialsParser
 				$this->validateCorrectorsInitials($value, $type);
 			break;
 		}
+	}
+
+	public function get() {
+		return $this->initials;
+	}
+
+	public function getControllerActions($ctr) {
+		return $this->actionsCache[$ctr];
 	}
 
 	private	function parseInitialsObject($value, $type) {
@@ -252,12 +261,16 @@ class InitialsParser
 	}
 
 	private function validateActionsInitials($value, $type) {
+		if (!is_array($this->actionsCache[$this->currentClassName])) {
+			$this->actionsCache[$this->currentClassName] = array();
+		}		
 		$initials = $this->currentObject;
 		if (!$this->isAssocArray($initials, $value)) {
 			$this->initialAssocArrayTypeError($value, $type);
 		}
 		$this->validateObjectFields($initials, $value, $type);
 		foreach ($initials as $key => $val) {
+			$this->actionsCache[$this->currentClassName][] = $key;
 			if (!$this->isAssocArray($val, $value)) {
 				new Error($this->errors['fieldNotAssocArray'], array($type, $this->currentClassName, $key, $type, $value, $this->getInitialParamExample($type)));
 			}

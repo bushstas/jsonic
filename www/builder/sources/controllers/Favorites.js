@@ -7,7 +7,7 @@ initial actions = {
 	'add': {
 		'url': CONFIG.favorites.add
 	},
-	'remove': {
+	'put': {
 		'url': CONFIG.favorites.remove
 	}
 }

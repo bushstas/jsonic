@@ -1,68 +1,81 @@
 function Foreach(params) {
-	this.getItems = params['p'];
-	this.items = params['p']();
-	this.handler = params['h'];
-	this.isRight = !!params['r'];
-	this.isRandom = !!params['ra'];
-	this.ifEmpty = params['ie'];
-	this.limit = ~~params['l'];
+	var handler = params['h'];
+	var isRight = !!params['r'];
+	var isRandom = !!params['ra'];
+	var ifEmpty = params['ie'];
 	this.levels = [];
 
 	var getKeysInRandomOrder = function() {
-		var keys = Objects.getKeys(this.items);
+		var keys = Objects.getKeys(getItems());
 		keys.shuffle();
 		return keys;
 	};
 
 	var createIfEmptyLevel = function() {
-		if (!isUndefined(this.ifEmpty)) {
-			this.createLevel(this.ifEmpty);
+		if (!isUndefined(ifEmpty)) {
+			this.createLevel(ifEmpty);
 		}
 	};
 
+	var getItems = function() {
+		if (isFunction(params['p'])) {
+			return params['p']();
+		} 
+		return params['p'];
+	};
+
+	var getLimit = function() {
+		if (isFunction(params['l'])) {
+			return params['l']();
+		} 
+		return ~~params['l'];
+	};
+
 	this.createLevels = function(isUpdating) {
-		if (isArrayLike(this.items)) {
-			if (this.isRandom) {
-				if (!Objects.empty(this.items)) {
-					var keys = getKeysInRandomOrder.call(this);
+		var items = getItems();
+		var limit = getLimit();
+		if (isArrayLike(items)) {
+			if (isRandom) {
+				if (!Objects.empty(items)) {
+					var keys = getKeysInRandomOrder();
 					for (var i = 0; i < keys.length; i++) {
-						if (this.limit && i + 1 > this.limit) break;
-						this.createLevel(this.handler(this.items[keys[i]], keys[i]), isUpdating);
+						if (limit && i + 1 > limit) break;
+						this.createLevel(handler(items[keys[i]], keys[i]), isUpdating);
 					}
 					return;
 				}
-			} else if (isArray(this.items)) {
-				if (!this.items.isEmpty()) {
-					if (!this.isRight) {
-						for (var i = 0; i < this.items.length; i++) {
-							if (this.limit && i + 1 > this.limit) break;
-							this.createLevel(this.handler(this.items[i], i), isUpdating);
+			} else if (isArray(items)) {
+				if (!items.isEmpty()) {
+					if (!isRight) {
+						for (var i = 0; i < items.length; i++) {
+							if (limit && i + 1 > limit) break;
+							this.createLevel(handler(items[i], i), isUpdating);
 						}
 					} else {
 						var j = 0;
-						for (var i = this.items.length - 1; i >= 0; i--) {
+						for (var i = items.length - 1; i >= 0; i--) {
 							j++;
-							if (this.limit && j > this.limit) break;
-							this.createLevel(this.handler(this.items[i], i), isUpdating);
+							if (limit && j > limit) break;
+							this.createLevel(handler(items[i], i), isUpdating);
 						}
 					}
 					return;
 				}
-			} else if (isObject(this.items)) {
-				if (!Objects.empty(this.items)) {
-					if (!this.isRight) {
+			} else if (isObject(items)) {
+				if (!Objects.empty(items)) {
+					if (!isRight) {
 						var i = 0;
-						for (var k in this.items) {
+						for (var k in items) {
 							i++;
-							if (this.limit && i > this.limit) break;
-							this.createLevel(this.handler(this.items[k], k), isUpdating);
+							if (limit && i > limit) break;
+							this.createLevel(handler(items[k], k), isUpdating);
 						}
 					} else {
-						var keys = Objects.getKeys(this.items);
+						var keys = Objects.getKeys(items);
 						keys.reverse();
 						for (var i = 0; i < keys.length; i++) {
-							if (this.limit && i + 1 > this.limit) break;
-							this.createLevel(this.handler(this.items[keys[i]], keys[i]), isUpdating);
+							if (limit && i + 1 > limit) break;
+							this.createLevel(handler(items[keys[i]], keys[i]), isUpdating);
 						}
 					}
 					return;
@@ -72,14 +85,13 @@ function Foreach(params) {
 		createIfEmptyLevel.call(this)
 	};
 
-	this.update = function(items) {
-		this.items = this.getItems();
+	this.update = function() {
 		this.disposeLevels();
 		this.createLevels(true);
 	};
 
 	this.add = function(item, index) {
-		this.createLevel(this.handler(item, ~~index), false, index);	
+		this.createLevel(handler(item, ~~index), false, index);	
 	};
 
 	this.remove = function(index) {
@@ -95,13 +107,10 @@ function Foreach(params) {
 		this.levels = null;
 		this.parentElement = null;
 		this.parentLevel = null;
-		this.items = null;
-		this.isRight = null;
-		this.ifEmpty = null;
-		this.getItems = null;
-		this.handler = null;
 		this.nextSiblingChild = null;
 		this.prevSiblingChild = null;
+		handler = null;
+		params = null;
 	};
 }
 
@@ -110,7 +119,6 @@ Foreach.prototype.render = function(parentElement, parentLevel) {
 	this.parentLevel = parentLevel;
 	this.createLevels(false);
 };
-
 
 Foreach.prototype.createLevel = function(items, isUpdating, index) {
 	var level = new Level();

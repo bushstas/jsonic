@@ -18,7 +18,7 @@ $includes = array(
 	'error', 'core.validator', 'config', 'gatherer', 'css', 'js', 'templates', 'html', 'routes',
 	'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser', 'js.checker', 'js.globals',
 	'data', 'tags', 'props', 'events', 'template.parser', 'css.obfuscator', 'printer', 'js.interpreter',
-	'splitter', 'template.code.parser', 'utils'
+	'splitter', 'template.code.parser', 'utils', 'controllers.parser'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	

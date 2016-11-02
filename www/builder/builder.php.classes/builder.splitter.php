@@ -2,6 +2,25 @@
 
 class Splitter
 {
+	public static function splitOne($regexp, $text, $matchesIndex = 0) {
+		$all = self::split($regexp, $text, 'all');
+		$items = array($all['items'][0]);
+		$delimiters = array($all['delimiters'][$matchesIndex][0]);
+		$rest = '';
+		for ($i = 1; $i < count($all['items']); $i++) {
+			$rest .= $all['items'][$i];
+			if (isset($all['delimiters'][0][$i])) {
+				$rest .= $all['delimiters'][0][$i];
+			}
+		}
+		$items[] = $rest;
+		$data = array(
+			'items' => $items,
+			'delimiters' => $delimiters
+		);
+		return $data;
+	}
+
 	public static function split($regexp, $text, $matchesIndex = 0) {
 		preg_match_all($regexp, $text, $matches);
 		if (empty($matches[0])) return;

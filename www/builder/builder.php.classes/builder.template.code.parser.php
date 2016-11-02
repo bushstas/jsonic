@@ -1544,6 +1544,7 @@ class TemplateCodeParser
 				$parts = preg_split('/\slimit\s/', $code);
 				$code = $parts[0];
 				self::$data['limit'] = '<nq>'.trim($parts[1]).'<nq>';
+				self::$data['reactiveLimit'] = preg_match('/\$\.g/', $parts[1]);
 			}
 			if (preg_match('/^right\b/', $code)) {
 				$code = preg_replace('/^right\s*/', '', $code);
@@ -1554,6 +1555,7 @@ class TemplateCodeParser
 			}
 			$parts = preg_split('/\s+as\s+/', $code);
 			self::$data['items'] = '<nq>'.$parts[0].'<nq>';
+			self::$data['reactiveItems'] = preg_match('/\$\.g/', $parts[0]);
 			$parts = preg_split('/\s*=>\s*/', $parts[1]);
 			if (isset($parts[1])) {
 				self::$data['key'] = '<nq>'.$parts[0].'<nq>';

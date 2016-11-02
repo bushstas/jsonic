@@ -57,6 +57,7 @@ class JSParser
 				}
 				$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
 				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
+				JSInterpreter::parseFunction($code, $class['name']);
 				$functions[] = array(
 					'name' => $functionName, 
 					'args' => $arguments,
@@ -127,7 +128,7 @@ class JSParser
 				}
 			}
 		}
-		if (preg_match('/\$[a-z]/i', $code)) {
+		if (preg_match('/\$[_a-z]/i', $code)) {
 			$regexp = '/\*\$(\w+)\s*=(?!=)/';
 			preg_match_all($regexp, $code, $matches);
 			$varsToSet = $matches[1];

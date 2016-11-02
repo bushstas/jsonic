@@ -11,7 +11,7 @@ initial followers = {
 }
 
 function load(words) {
-	RecommendationsLoader.loadFor(this, {'excepcions': words});
+	RecommendationsLoader.load({'excepcions': words});
 }
 
 function onChangeItems(items) {

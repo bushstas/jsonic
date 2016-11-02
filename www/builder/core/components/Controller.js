@@ -182,19 +182,8 @@ function Controller() {
 		return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
 	};
 
-	Controller.prototype.loadFor = function(owner, options) {
-		this.doActionFor(owner, 'load', options);
-	};
 
-	Controller.prototype.load = function(options) {
-		this.doAction('load', options);
-	};
-
-	Controller.prototype.doActionFor = function(owner, actionName, options, url) {
-		this.doAction(actionName, options, url, owner);
-	};
-
-	Controller.prototype.doAction = function(actionName, options, url, owner) {
+	Controller.prototype.doAction = function(owner, actionName, options, url) {
 		if (this.activeRequests.indexOf(actionName) > -1) return;
 		var action = getAction.call(this, actionName);
 		if (actionName == 'load' && gotFromStore.call(this, actionName, options, owner)) return;
@@ -216,7 +205,7 @@ function Controller() {
 	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
 		if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
 			setCurrentRouteOptions.call(this, routeOptions, getAction.call(this, 'load'));
-			this.doAction('load');
+			this.doAction(null, 'load');
 		}
 	};
 
