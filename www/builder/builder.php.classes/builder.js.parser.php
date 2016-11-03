@@ -67,7 +67,9 @@ class JSParser
 				$matches = $matches[1];
 				if (!empty($matches)) {
 					foreach ($matches as $match) {
-						$class['calledMethods'][] = array('method' => $functionName, 'called' => $match);
+						if (!isset($class['calledMethods'][$match])) {
+							$class['calledMethods'][$match] = $functionName;
+						}
 					}						
 				}
 				if ($functionName != '__constructor') {

@@ -49,8 +49,8 @@ function Core() {
 	};
 	var attachController = function(options) {
 		if (isObject(options['on'])) {
-			for (var k in options['on']) options.controller.subscribe(k, options['on'][k], this);
-		} else options.controller.subscribe('', null, this);
+			for (var k in options['on']) options.controller.addSubscriber(k, options['on'][k], this, !!options['private']);
+		} else options.controller.addSubscriber('', null, this);
 	};
 	var addCorrector = function(name, handler) {
 		if (isFunction(handler)) {

@@ -10,11 +10,3 @@ initial props = {
 	'items2': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 	'limit': 3
 }
-
-
-function onRendered() {
-	Favorites.put({id: 2});
-	Favorites.load();
-
-	var a = Favorites;
-}

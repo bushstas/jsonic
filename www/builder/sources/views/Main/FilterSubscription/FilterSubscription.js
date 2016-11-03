@@ -13,7 +13,6 @@ initial helpers = [
 	}
 ];
 
-
 function onLoaded(filters) {
 	$filters = filters;
 	$total = this.getTotalCount(),
@@ -39,7 +38,7 @@ function onFreqChange(e) {
 function onSubscribeButtonClick(target, e) {
 	var filterId = e.getTargetData('.->> app-subscription-filter-row', 'filterId');
 	if (filterId) {
-		Filters.doAction('subscribe', {
+		Filters.subscribe({
 			'filterId': filterId,
 			'value': target.hasClass('->> subscribed') ? '0' : '1'
 		});

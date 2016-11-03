@@ -17,6 +17,6 @@ initial helpers = [
 function onCheckboxChange(e) {
 	var params = {};
 	params[e['name']] = e['intChecked'];
-	Subscription.doAction('save', params);
+	Subscription.save(params);
 }
 

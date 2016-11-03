@@ -60,7 +60,7 @@ class JSCompiler
 		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден',
 		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
 		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}',
-		'noMethodFound3' => 'Ошибка вызова метода {??} в коде класса {??}. Метод не найден',
+		'noMethodFound3' => 'Ошибка вызова {??} из метода {??} в коде класса {??}. Метод не найден',
 		'globalVarUsing' => 'В классе {??} обнаружено использование зарезервированных системой имен переменных: {??}',
 		'creatingInstance' => 'В классе {??} обнаружено создание экземпляра класса {??}{?}',
 		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}',
@@ -765,21 +765,21 @@ class JSCompiler
 				}
 			}
 			if (is_array($class['calledMethods'])) {
-				foreach ($class['calledMethods'] as $callback) {
-					if (!$this->hasComponentMethod($callback['called'], $class)) {
+				foreach ($class['calledMethods'] as $callback => $callerFunc) {
+					if (!$this->hasComponentMethod($callback, $class)) {
 						$isError = true;
 						if (!isset($this->usedComponents[$className])) {
 							$childClasses = array();
 							$this->getChildClasses($className, $childClasses);
 							foreach ($childClasses as $chcls) {
-								if ($this->hasComponentMethod($callback['called'], $this->classes[$chcls])) {
+								if ($this->hasComponentMethod($callback, $this->classes[$chcls])) {
 									$isError = false;
 									break;
 								}
 							}
 						}
 						if ($isError) {
-							new Error($this->errors['noMethodFound3'], array($callback['called'], $className));
+							new Error($this->errors['noMethodFound3'], array($callback, $callerFunc, $className));
 						}
 					}
 				}
@@ -949,11 +949,13 @@ class JSCompiler
 					$objCode[] = "\n\t\t'".$name."':".$code;
 				}
 			}
-		}		
+		}
+		$objCode = implode(",\n", $objCode);
+		ControllersParser::parseInitialsCode($objCode);
 		if (!empty($objCode)) {
 			$this->jsOutput[] = $className.".prototype.getInitials=function(){";
 			$this->jsOutput[] = "\n\treturn {\n";
-			$this->jsOutput[] = implode(",\n", $objCode);
+			$this->jsOutput[] = $objCode;
 			$this->jsOutput[] = "\t};\n};";
 		}
 	}

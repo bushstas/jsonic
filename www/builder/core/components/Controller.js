@@ -23,7 +23,13 @@ function Controller() {
 		}
 		return false;
 	};
+	var isPrivateOwner = function(owner) {
+		for (var i = 0; i < this.subscribers.length; i++) {
+			if (this.subscribers[i][2] == owner) return this.subscribers[i][3];
+		}
+	}
 	var onActionComplete = function(actionName, isFromStorage, owner, data) {
+		if (owner && !isPrivateOwner.call(this, owner)) owner = null;
 		this.data = this.data || {};
 		this.data[actionName] = data;
 		var action = getAction.call(this, actionName);
@@ -128,11 +134,11 @@ function Controller() {
 		this.activeRequests = [];
 	};
 
-	Controller.prototype.subscribe = function(eventType, callback, subscriber) {
-		this.subscribers.push([eventType, callback, subscriber]);
+	Controller.prototype.addSubscriber = function(eventType, callback, subscriber, isPrivate) {
+		this.subscribers.push([eventType, callback, subscriber, isPrivate]);
 	};
 
-	Controller.prototype.unsubscribe = function(subscriber, eventType) {
+	Controller.prototype.removeSubscriber = function(subscriber, eventType) {
 		var done = false;
 		while (!done) {
 			done = true;

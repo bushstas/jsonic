@@ -29,7 +29,7 @@ function onLoadFilters(filters) {
 }
 
 function onCheckboxChange(e) {
-	Filters.doAction('set', {'filterId': e.value, 'param': 'isAutoOpen', 'value': e.checked});
+	Filters.set({'filterId': e.value, 'param': 'isAutoOpen', 'value': e.checked});
 }
 
 function getButtonData(item) {

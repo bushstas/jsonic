@@ -13,7 +13,7 @@ function Controllers() {
 		for (var i = 0; i < ids.length; i++) {
 			ctr = this.get(ids[i]);
 			if (isController(ctr)) {
-				ctr.load();
+				ctr.doAction(null, 'load');
 			}
 		}
 	};

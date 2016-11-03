@@ -271,7 +271,7 @@ class JSGlobals
 	}
 
 	private static function addControllers($controllers) {
-		self::add('controllers', str_replace('"', '_#_', json_encode($controllers)));
+		self::add('controllers', str_replace('"', '<nq>', json_encode($controllers)));
 	}
 
 	private static function addStopPropagationFunction() {
