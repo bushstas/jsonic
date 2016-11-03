@@ -13,7 +13,8 @@ class ControllersParser
 
 	private static $errors = array(
 		'incorrectUse' => "Обнаружено некорректное использование контроллера {??} в методе {??} класса {??}<br>Попытка закешировать или передать в качестве аргумента контроллер, который по своей сути является синглтоном<br><br>Корректное использование:<xmp>Controller.load()</xmp>или<xmp>Controller.save({data: ...})</xmp><br>Некорректное использование:<xmp>var ctr = Controller;\nctr.load();</xmp>или<xmp>this.doSome(Controller);</xmp>или<xmp>var data = [Controller];</xmp>или<xmp>var data = {ctr: Controller};</xmp>",
-		'doActionUse' => 'Обнаружен прямой вызов метода <b>doAction</b> контроллера {??} в методе {??} класса {??}<br><br>Используйте код вида:<xmp>Controller.load();</xmp>или<xmp>Controller.remove({id: 345});</xmp><br>Где <b>load</b> и <b>remove</b> initial параметр <b>actions</b> данного контроллера'
+		'doActionUse' => 'Обнаружен прямой вызов метода <b>doAction</b> контроллера {??} в методе {??} класса {??}<br><br>Используйте код вида:<xmp>Controller.load();</xmp>или<xmp>Controller.remove({id: 345});</xmp><br>Где <b>load</b> и <b>remove</b> initial параметр <b>actions</b> данного контроллера',
+		'hasIntersects' => 'Обнаружен метод {??} и одноименный initial параметр action  у класса {??}<br>Данный метод будет доступен автоматически и не может быть переопределен.'
 	);
 
 	public static function init($classes, $controllers, $initialsParser) {
@@ -35,7 +36,6 @@ class ControllersParser
 			}
 			self::parseCode($func);
 		}
-				
 
 		if ($class['type'] == 'controller') {
 			$actions = self::$initialsParser->getControllerActions($class['name']);
@@ -44,6 +44,10 @@ class ControllersParser
 			foreach ($actions as $a) {
 				unset($class['calledMethods'][$a]);
 			}
+			$intersects = array_values(array_intersect($class['functionList'], $actions));
+			if (!empty($intersects)) {
+				new Error(self::$errors['hasIntersects'], array($intersects[0], self::$class['name']));
+			}			
 		}
 	}
 
