@@ -69,3 +69,13 @@ $imgsrc = ../images/searchform
 ~b .confirm-reset-filter {
     $(lh36 pointer bc#B35050 p9_15)
 }
+
+.@button {
+    $(pointer)
+}
+.@button.search-keywords {
+    $(p5_25_5_25)
+}
+.@button.search-keywords div {
+    $(bgwhite lh38 br3 bo#38414f c#72798c box pl15)
+}

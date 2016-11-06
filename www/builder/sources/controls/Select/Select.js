@@ -45,7 +45,7 @@ function selectByIndex(index) {
 
 function syncTooltip(index) {
 	var optionElement = this.getOptionElementAt(index);
-	var tooltipElement = optionElement<.app-tooltip>;	
+	var tooltipElement = optionElement<.tooltip>;	
 }
 
 function enableOption(index, isEnabled) {

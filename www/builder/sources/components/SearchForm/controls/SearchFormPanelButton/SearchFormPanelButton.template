@@ -1,3 +1,5 @@
-<div class="app-search-form-button {~className}" onClick="onClick">
+{namespace .SearchForm}
+
+<div class="@button {~className}" onClick="onClick">
 	<template templ="content">
 </div>

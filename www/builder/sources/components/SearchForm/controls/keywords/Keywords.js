@@ -4,8 +4,8 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> app-keywords-add-request': this.addRequest,
-			'->> app-keywords-remove-request': this.onRemoveRequestClick
+			'->> @add-request': this.addRequest,
+			'->> @remove-request': this.onRemoveRequestClick
 		}
 	}
 ]
@@ -46,7 +46,7 @@ function onKeywordsChange(kw) {
 
 function onSelectTab(index) {
 	index = $keywordsCount - index - 1;
-	<:area>.scrollTo(<.app-keywords-block[index]>, 300);
+	<:area>.scrollTo(<.@block[index]>, 300);
 }
 
 function onTagEdit(tag) {
@@ -59,7 +59,7 @@ function onTagEdited() {
 }
 
 function onRemoveRequestClick(target) {
-	var block = target.getAncestor('.->> app-keywords-block');
-	var blocks = <.app-keywords-block[]>;
+	var block = target.getAncestor('.->> @block');
+	var blocks = <.@block[]>;
 	this.removeRequest(blocks.indexOf(block), true);
 }

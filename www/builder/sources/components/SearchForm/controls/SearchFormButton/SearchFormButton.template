@@ -1,3 +1,5 @@
-<div class="app-search-form-button {~className}">
+{namespace .SearchForm}
+
+<div class="@button {~className}">
 	<template templ="content">
 </div>
