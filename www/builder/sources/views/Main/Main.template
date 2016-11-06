@@ -1,9 +1,9 @@
 <div class="view-content main-view-content" scope>
-	<table class="app-mainpage-table" cellpadding="0px" cellspacing="0px">
+	<table class="mainpage-table" cellpadding="0px" cellspacing="0px">
 		<tr>
-			<td class="app-mainpage-left-column">
-				<div class="app-mainpage-left-column-area">
-					<div class="app-mainpage-left-column-title">
+			<td class="mainpage-left-column">
+				<div class="mainpage-left-column-area">
+					<div class="mainpage-left-column-title">
 						{@personal}
 					</div>
 					<component class="UserInfo">
@@ -14,17 +14,17 @@
 					<component class="FavoritesCalendar">
 				</div>
 			</td>
-			<td class="app-mainpage-content-column">
+			<td class="mainpage-content-column">
 				<component class="TabPanel" args="{#mainPageTabs}">
-				<div class="app-mainpage-content">
-					<div class="app-tab-content">
+				<div class="mainpage-content">
+					<div class="tab-content">
 						<component class="FilterStatistics" args="{#mainPageFilterStat}">
 					</div>
-					<div class="app-tab-content">
+					<div class="tab-content">
 						<component class="FilterSubscriptionOptions">
 						<component class="FilterSubscription">
 					</div>
-					<div class="app-tab-content">
+					<div class="tab-content">
 						11111111
 					</div>
 				</div>

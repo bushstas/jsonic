@@ -271,8 +271,8 @@
 			$items[] = '<b>get options, value</b> - Обычно используется в начале функции. Автоматически получает значения реактивных переменных и записывает их в одноименные переменные.
 			<xmp>var options = this.get(\'options\');</xmp><xmp>var value = this.get(\'value\');</xmp>';
 
-			$items[] = '<b>var $items = []</b> - Означает, что данная переменная должна установить значение одноименной реактивной переменной в конце функции
-			<xmp>var $items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp>Реальный код будет выглядеть так:
+			$items[] = '<b>var *$items = []</b> - Означает, что данная переменная должна установить значение одноименной реактивной переменной в конце функции
+			<xmp>var *$items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp>Реальный код будет выглядеть так:
 			<xmp>var items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp><xmp>this.set(\'items\', items);</xmp>';
 
 			$items[] = '<b>$value++</b> - Изменяет значение реактивной переменной на 1
@@ -333,6 +333,18 @@
 			<xmp>var i = <.item>;</xmp><xmp>var i = this.findElement(\'.item\');</xmp>
 			<xmp>var h = <.item>.innerHTML;</xmp><xmp>var h = this.findElement(\'.item\').innerHTML;</xmp>
 			<xmp><.item>.show();</xmp><xmp>this.findElement(\'.item\').show();</xmp>';
+
+			$items[] = "<b>&lt;.@name&gt;</b> - Возвращает первый элемент в переделах компонента, имеющий сокращенный class = @name<br>
+			Сокращенное имя класса состоит из имени класса компонента и дополнительного слова (в данном случае <b>name</b>)<br>
+			Сокращения имен классов элементов подменяются на полные имена до парсинга самого кода шаблона<br><br>
+			Элементы с сокращенными именами класса в шаблоне компонента <b>CatalogItem</b>:
+			<xmp><div class=\"@\">\n   <div class=\"@name\">Item name</div>\n   <div class=\"@price\">2 000</div>\n</div></xmp>
+			После преобразований код шаблона будет выглядеть так:
+			<xmp><div class=\"catalog-item\">\n   <div class=\"catalog-item_name\">Item name</div>\n   <div class=\"catalog-item_price\">2 000</div>\n</div></xmp>
+			Соответственно сокращения в JS коде выглядят так:
+			<xmp><.@></xmp>
+			<xmp><.@name></xmp>
+			<xmp><.@price></xmp>";
 
 			$items[] = '<b>&lt;.block[]&gt;</b> - Возвращает все элементы в переделах компонента, имеющие class = block
 			<xmp>var blocks = <.block[]>;</xmp><xmp>var blocks = this.findElements(\'.block\');</xmp>

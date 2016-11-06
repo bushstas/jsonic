@@ -6,7 +6,7 @@ function onRendered() {
 }
 
 function onClick(e) {
-	var target = e.getTarget('.->> app-popup-menu-button');
+	var target = e.getTarget('.->> @button');
 	if (!isNull(target)) {
 		get buttons;
 		var idx = target.getData('index');
@@ -25,7 +25,7 @@ function onShowButtonClick() {
 }
 
 function show() {
-	var innerElement = <.app-popup-menu-inner-container>;
+	var innerElement = <.@inner-container>;
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, this.options{ 'maxHeight', 400 });
 	this.setStyle({maxHeight: height + 'px', height: height + 'px'});

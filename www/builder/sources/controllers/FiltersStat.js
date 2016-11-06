@@ -2,7 +2,7 @@ controller FiltersStat
 
 initial options = {
 	'key': 'filterId',
-	'store': true,
+	'store': false,
 	'storeAs': 'filterStat_$filterId',
 	'storePeriod': '4hour'
 }

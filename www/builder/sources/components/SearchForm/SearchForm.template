@@ -1,8 +1,19 @@
-<div class="app-search-form" scope>
-	<div class="app-search-form-title">
+{template .main}
+<div class="@" scope>
+	<div class="@title">
 		{~title}
 	</div>
-	<div class="app-search-form-close-side" onClick="!expand"/>
-	<div class="app-search-form-close" onClick="!expand"/>
-	<component class="TenderSearchForm">
+	<div class="@close-side" onClick="!expand"/>
+	<div class="@close" onClick="!expand"/>
+	<template templ="content">
+</div>
+
+{template .reset}
+<div class="@reset {$reset?'->>active'}">
+	<div class="hover-label" onClick="onResetButtonClick">
+		{@clearFilter}
+	</div>
+	<div class="confirm-label" onClick="onResetConfirmed">
+		{@sure} <i class="confirm-reset-filter">{@yes}</i>
+	</div>
 </div>

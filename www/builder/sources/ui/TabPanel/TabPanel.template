@@ -1,11 +1,11 @@
-<div class="app-tab-panel" scope>
+<div class="@" scope>
 	{foreach ~tabs as &idx => &tab}
-		<div class="app-tab app-content-tab" data-index="{&idx}">
+		<div class="@tab content-tab" data-index="{&idx}">
 			{&tab['title']}
 		</div>
 	{/foreach}
 	{if isObject(~rest)}
-		<div class="app-tab app-tab-rest{$count?' shown'}">
+		<div class="@tab tab-rest{$count?' ->>shown'}">
 			{~rest['title']||@restTabs}
 			{if ~rest['showCount']}
 				 ({$count})

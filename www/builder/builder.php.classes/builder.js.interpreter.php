@@ -1,8 +1,11 @@
 <?php
 
 class JSInterpreter 
-{
+{	
+	private static $className;
+
 	public static function parse(&$content, $className) {
+		self::$className = $className;
 		self::prepareCode($content);
 		self::parseDataConstants($content);
 		self::parseDelayOperators($content);
@@ -133,10 +136,10 @@ class JSInterpreter
 	private static function parseTagShortcuts(&$content) {
 		$content = preg_replace('/<::(\w+)> *<>/', "<::$1>.getElement()", $content);
 		$content = str_replace('<>', ' this.getElement()', $content);
-		$regexp = '/[\w\]\[\.]*<[\.\#:]*[a-z][\w\-\.\#\]\[]*>/i';
+		$regexp = '/[\w\]\[\.]*<[\.\#:]*[@a-z][\w\-\.\#\]\[]*>/i';
 		$parts = preg_split($regexp, $content);
 		preg_match_all($regexp, $content, $matches);
-		$matches = $matches[0];		
+		$matches = $matches[0];
 		$content = '';
 		foreach ($parts as $i => $part) {
 			$content .= $part;
@@ -158,13 +161,20 @@ class JSInterpreter
 						$index = $p[0];
 					}
 				}
-				$tag = preg_replace('/[^\.\#:\-\w]/', '', $tag);
-				preg_match_all('/([\.\#:]*)([\w\-\.\#]+)/', $tag, $ms);
+				$tag = preg_replace('/[^\.\#:\-\w@]/', '', $tag);
+				preg_match_all('/([\.\#:]*)([@\w\-\.\#]+)/', $tag, $ms);
 				if ($ms[1][0] == ':') {
 					$content .= " this.getElement('".$ms[2][0]."')";
 				} elseif ($ms[1][0] == '::') {
 					$content .= " this.getChild('".$ms[2][0]."')";
-				} else {
+				} else {					
+					if ($ms[2][0][0] == '@') {
+						if ($ms[2][0] != '@') { 
+							$ms[2][0] = self::getTagClassName().'_'.ltrim($ms[2][0], '@');
+						} else {
+							$ms[2][0] = self::getTagClassName();
+						}
+					}
 					$selector = !empty($ms[1][0]) ? $ms[1][0].'->>' : '';
 					if ($index === null) {
 						$content .= " this.findElement('".$selector.$ms[2][0].$scope."')";
@@ -176,6 +186,19 @@ class JSInterpreter
 				}
 			}
 		}
+	}
+
+	private static function getTagClassName() {
+		$className = self::$className;
+		$data = Splitter::split('/[A-Z]/', $className);
+		$className = '';
+		foreach ($data['items'] as $i => $item) {
+			$className .= $item.'-';
+			if (isset($data['delimiters'][$i])) {
+				$className .= strtolower($data['delimiters'][$i]);
+			}
+		}
+		return trim($className, '-');
 	}
 
 	private static function parseDelayOperators(&$content) {

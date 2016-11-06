@@ -1,11 +1,11 @@
-.app-popup-menu-outer-container {
+.@outer-container {
     $abs $z500 $w200 $mt1 $left $t100% $br3 $bgwhite $bol#6C7992 $bor#6C7992 $mah0 $ovh
     transition: all 0.2s;
 }
-.app-popup-menu-inner-container {
+.@inner-container {
     $abs $l $r $b $bot#6C7992 $bob#6C7992 $bgwhite $br3
     padding: 5px 0;
 }
-.app-popup-menu-button {
+.@button {
     $rel $pl15 $lh30 $fs14 $c#424b57 $pointer $nowrap $ovh $h30
 }

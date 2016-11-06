@@ -1,20 +1,20 @@
-.app-mainpage-user-info {
+.mainpage-user-info {
 	$mt10
 }
-.app-mainpage-user-info td {
+.mainpage-user-info td {
     $(lh14 vmid)
     padding: 6px 0;
 }
-.app-mainpage-user-info td:first-child {
+.mainpage-user-info td:first-child {
     $(w55% c#7f828a)
 }
-.app-mainpage-user-info td:last-child {
+.mainpage-user-info td:last-child {
     $(w45% c#4c546b)
 }
-.app-mainpage-user-info td:last-child.red {
+.mainpage-user-info td:last-child.red {
 	$(c#cd380a bold)
 }
-.app-mainpage-left-column .standart-button {
+.mainpage-left-column .standart-button {
  	$(w140 inb mt10)
 }
 .standart-button.access {

@@ -1,7 +1,7 @@
-<div class="app-popup-menu-outer-container {~className}" scope>
-	<div class="app-popup-menu-inner-container" onClick="onClick" style="{~maxHeight?'max-height:'+~maxHeight+'px;'}">
+<div class="@outer-container {~className}" scope>
+	<div class="@inner-container" onClick="onClick" style="{~maxHeight?'max-height:'+~maxHeight+'px;'}">
 		{foreach $buttons as &idx => &button}
-			<div class="app-popup-menu-button" data-value="{&button['value']}" data-index="{&idx}">
+			<div class="@button" data-value="{&button['value']}" data-index="{&idx}">
 				{&button['name']}
 				<template templ="content" item="{&button}">
 			</div>

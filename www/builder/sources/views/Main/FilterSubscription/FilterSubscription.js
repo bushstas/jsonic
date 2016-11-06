@@ -8,7 +8,7 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> subscr-button': this.onSubscribeButtonClick
+			'->> @button': this.onSubscribeButtonClick
 		}
 	}
 ];
@@ -36,7 +36,7 @@ function onFreqChange(e) {
 }
 
 function onSubscribeButtonClick(target, e) {
-	var filterId = e.getTargetData('.->> app-subscription-filter-row', 'filterId');
+	var filterId = e.getTargetData('.->> @filter-row', 'filterId');
 	if (filterId) {
 		Filters.subscribe({
 			'filterId': filterId,

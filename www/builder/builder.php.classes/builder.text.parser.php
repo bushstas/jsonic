@@ -38,6 +38,15 @@ class TextParser
 					$isText = true;
 					$currentQuote = $matches[$i];
 					$currentText = $currentQuote;
+					if ($matches[$i] == '/') {
+						$p = trim($parts[$i][strlen($parts[$i]) - 1]);
+						if ($p != '(' && $p != '=') {
+							$isText = false;
+							$currentQuote = '';
+							$currentText = '';
+							$content .= $matches[$i];
+						}
+					}
 				}
 			} else {
 				$currentText .= $part;
@@ -108,7 +117,7 @@ class TextParser
 		return in_array($keyword, self::$dictionary);
 	}
 
-	public static function decode(&$content, $key, $mark = null) {
+	public static function decode(&$content, $key = null, $mark = null) {
 		if (empty($mark)) $mark = self::$mark;
 		if (is_string($key)) {
 			$texts = self::$texts[$key];
@@ -152,5 +161,13 @@ class TextParser
 			}
 		}
  		$object = str_replace('"', "'", $object);
+	}
+
+	public static function getTexts($key) {
+		return self::$texts[$key];
+	}
+
+	public static function setTexts($texts, $key) {
+		return self::$texts[$key] = $texts;
 	}
 }

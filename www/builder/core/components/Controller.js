@@ -1,59 +1,59 @@
 function Controller() {	
 	if (this !== window) return;
 	var makeUrl = function(url, options) {
-		var regExp;
+		var regExp, tmpUrl;
 		for (var k in options) {
 			if (isString(options[k]) || isNumber(options[k])) {
 				regExp = new RegExp('\\$' + k)
+				tmpUrl = url;
 				url = url.replace(regExp, options[k]);
+				if (tmpUrl != url) delete options[k];
 			}
 		}
 		return url;
 	};
-	var gotFromStore = function(actionName, options, owner) {
-		if (shouldStore.call(this)) {
+	var gotFromStore = function(actionName, options, initiator) {
+		if (actionName == 'load' && shouldStore.call(this)) {
 			var storeAs = getStoreAs.call(this, options);
 			if (isString(storeAs) && typeof StoreKeeper != 'undefined') {
 				var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
 				if (isArrayLike(storedData)) {
-					onActionComplete.call(this, actionName, true, owner, storedData);
+					onActionComplete.call(this, actionName, true, initiator, storedData);
 					return true;
 				}
 			}
 		}
 		return false;
 	};
-	var isPrivateOwner = function(owner) {
-		for (var i = 0; i < this.subscribers.length; i++) {
-			if (this.subscribers[i][2] == owner) return this.subscribers[i][3];
-		}
+	var isPrivate = function(initiator) {
+		return initiator && this.privateSubscribers.has(initiator.getUniqueId());
 	}
-	var onActionComplete = function(actionName, isFromStorage, owner, data) {
-		if (owner && !isPrivateOwner.call(this, owner)) owner = null;
+	var onActionComplete = function(actionName, isFromStorage, initiator, data) {
+		this.activeRequests.removeItem(actionName);
+		if (initiator && !isPrivate.call(this, initiator)) initiator = null;
 		this.data = this.data || {};
 		this.data[actionName] = data;
 		var action = getAction.call(this, actionName);
 		if (isObject(action) && isFunction(action['callback'])) {
 			action['callback'].call(this, data);
 		}
-		if (action['autoset']) autoset.call(this, action['autoset'], data, owner);
-		this.dispatchEvent(actionName, data, owner);
+		if (action['autoset']) autoset.call(this, action['autoset'], data, initiator);
+		this.dispatchEvent(actionName, data, initiator);
 		if (!isFromStorage && actionName == 'load' && shouldStore.call(this)) {
 			store.call(this, true, data);
 		}
-		this.activeRequests.removeItem(actionName);
 	};
-	var autoset = function(opts, data, owner) {
+	var autoset = function(opts, data, initiator) {
 		var props = {};
 		if (isString(opts)) {
 			props[opts] = data; 
 		} else if (isObject(opts)) {
 			for (var k in opts) props[opts[k]] = data[k];
 		}
-		if (owner) owner.set(props);
-		else {
-			for (var i = 0; i < this.subscribers.length; i++) {
-				this.subscribers[i][2].set(props);
+		if (initiator) initiator.set(props);
+		else if (isArray(this.subscribers['load'])) {
+			for (var i = 0; i < this.subscribers['load'].length; i++) {
+				this.subscribers['load'][i]['initiator'].set(props);
 			}
 		}
 	};
@@ -121,44 +121,71 @@ function Controller() {
 				}
 				return action;
 			}
-			log('action is invalid', 'getAction', this, {action: action});
-		} else {
-			log('no actions', 'getAction', this, {actions: actions});
 		}
 		return null;
 	};
+	var getRequest = function(action) {
+		return this.requests[action['name']] = this.requests[action['name']] || new AjaxRequest();
+	};
+	var getOptions = function(options, action, initiator) {
+		if (!isObject(options)) options = {};
+		if (isObject(action['options'])) Objects.merge(options, action['options']);
+		if (isPrivate.call(this, initiator)) {
+			Objects.merge(options, getPrivateOptions.call(this, initiator));
+		}
+		return options;
+	};
+	var getPrivateOptions = function(initiator) {
+		return this.privateOptions[initiator.getUniqueId()];
+	};
+	var send = function(action, options, initiator) {
+		var url = makeUrl(action['url'], options);
+		var req = getRequest.call(this, action);
+		req.setCallback(onActionComplete.bind(this, action['name'], false, initiator));
+		req.send(action['method'], options, url);
+		this.activeRequests.push(action['name']);		
+	};
 
 	Controller.prototype.initiate = function() {
-		this.subscribers = [];
+		this.subscribers = {};
 		this.requests = {};
 		this.activeRequests = [];
+		this.privateSubscribers = [];
+		this.privateOptions = {};
 	};
 
-	Controller.prototype.addSubscriber = function(eventType, callback, subscriber, isPrivate) {
-		this.subscribers.push([eventType, callback, subscriber, isPrivate]);
+	Controller.prototype.addSubscriber = function(actionName, data, isPriv, options) {
+		this.subscribers[actionName] = this.subscribers[actionName] || [];
+		this.subscribers[actionName].push(data);
+		if (isPriv) {
+			var uid = data['initiator'].getUniqueId();
+			this.privateSubscribers.push(uid); 
+			if (options) this.privateOptions[uid] = options;
+		}
 	};
 
-	Controller.prototype.removeSubscriber = function(subscriber, eventType) {
+	Controller.prototype.removeSubscriber = function(initiator) {
+		this.privateSubscribers.removeItem(initiator.getUniqueId());
 		var done = false;
-		while (!done) {
-			done = true;
-			for (var i = 0; i < this.subscribers.length; i++) {
-				if (this.subscribers[i][2] == subscriber && (!eventType || this.subscribers[i][0] == eventType)) {
-					this.subscribers.splice(i, 1);
-					done = false;
+		for (var actionName in this.subscribers) {
+			for (var i = 0; i < this.subscribers[actionName].length; i++) {
+				if (this.subscribers[actionName][i]['initiator'] == initiator) {
+					this.subscribers[actionName].splice(i, 1);
 					break;
 				}
 			}
 		}
 	};
 
-	Controller.prototype.dispatchEvent = function(eventType, data, owner) {
+	Controller.prototype.dispatchEvent = function(actionName, data, initiator) {
 		var dataToDispatch = data;
 		if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
-		if (isArray(this.subscribers)) {
-			for (var i = 0; i < this.subscribers.length; i++) {
-				if ((!owner || owner == this.subscribers[i][2]) && this.subscribers[i][0] == eventType && isFunction(this.subscribers[i][1])) {
-					this.subscribers[i][1].call(this.subscribers[i][2] || null, dataToDispatch, this);
+		var s = this.subscribers[actionName], i, p;
+		if (isArray(s)) {
+			for (i = 0; i < s.length; i++) {
+				p = (!initiator && !isPrivate.call(this, s[i]['initiator'])) || initiator == s[i]['initiator'];
+				if (p && isFunction(s[i]['callback'])) {
+					s[i]['callback'].call(s[i]['initiator'], dataToDispatch, this);
 				}
 			}
 		}
@@ -189,23 +216,13 @@ function Controller() {
 	};
 
 
-	Controller.prototype.doAction = function(owner, actionName, options, url) {
-		if (this.activeRequests.indexOf(actionName) > -1) return;
+	Controller.prototype.doAction = function(initiator, actionName, options) {
+		if (this.activeRequests.has(actionName)) return;
 		var action = getAction.call(this, actionName);
-		if (actionName == 'load' && gotFromStore.call(this, actionName, options, owner)) return;
-		if (!isObject(options)) options = {};
-		if (action && isObject(action) && action['options'] && isObject(action['options'])) {
-			Objects.merge(options, action['options']);
+		if (isObject(action) && !gotFromStore.call(this, actionName, options, initiator)) {
+			options = getOptions.call(this, options, action, initiator);
+			send.call(this, action, options, initiator);
 		}
-		var method = action['method'] || 'POST';
-		url = url || makeUrl(action['url'], options);
-		if (!url || !isString(url)) {
-			log('url to execute the action ' + actionName + ' is invalid or empty', 'doAction', this, {action: action});
-		}		
-		if (!this.requests[actionName]) this.requests[actionName] = new AjaxRequest(url);
-		this.requests[actionName].setCallback(onActionComplete.bind(this, actionName, false, owner));
-		this.requests[actionName].send(method, options, url);
-		this.activeRequests.push(actionName);		
 	};
 
 	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
@@ -225,6 +242,8 @@ function Controller() {
 		this.activeRequests = null;
 		this.requests = null;
 		this.currentRouteOptions = null;
+		this.privateSubscribers = null;
+		this.privateOptions = null;
 	};
 }
 Controller();

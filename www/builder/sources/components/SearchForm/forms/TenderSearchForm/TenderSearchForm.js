@@ -1,4 +1,8 @@
-component TenderSearchForm extends FiltersForm
+component TenderSearchForm extends SearchForm
+
+initial args = {
+	'title': @searchFormTitle
+};
 
 function initiate() {
 	Globals.addListeners({
@@ -11,17 +15,6 @@ function onRendered() {
 	this.setParams({
 		'registryContracts': 1
 	});
-}
-
-function onResetButtonClick() {
-	$reset = true;
-	delay(2500) {
-		$reset = false;
-	}
-}
-
-function onResetConfirmed() {
-
 }
 
 function onChange() {

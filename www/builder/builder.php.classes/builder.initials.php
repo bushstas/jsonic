@@ -24,7 +24,9 @@ class InitialsParser
 		'itemNoParam' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого отсутствует параметр {??}><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'paramNotArray' => 'Initial параметр {??} в классе {??} имеет элемент с индексом {??}, у которого параметр {??} не €вл€етс€ массивом<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'typeError' => ' ласс {??} с типом {??} не может содержать initial параметр {??}',
-		'noActions' => '” контроллера {??} отсутствуют initial параметр <b>actions</b>.<br><br><b>ѕараметр должен иметь вид:</b> {?}'
+		'noActions' => '” контроллера {??} отсутствуют initial параметр <b>actions</b>.<br><br><b>ѕараметр должен иметь вид:</b> {?}',
+		'privateParamNotBool' => 'Initial параметр {??} в классе {??} имеет поле <b>private</b>, которое не €вл€етс€ true или false<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
+		'controllerMustBePrivate' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но его поле <b>private</b> отсутствует или не €вл€етс€ true<br>“олько работа€ с компонентом приватно, контрорллер может использовать параметр <b>options</b><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}'
 
 	);
 
@@ -146,7 +148,6 @@ class InitialsParser
 		$this->currentBindings = $binds[1];
 		
 		$text = preg_replace($regexp, '__BIND__', $value);
-		TextParser::encode($text);
 		TextParser::transformIntoValidJson($text);
 		
 		$this->currentObject = json_decode($text, true);
@@ -174,7 +175,7 @@ class InitialsParser
 			case 'followers':
 				return "<xmp>initial followers = {\n\t'somePropName': this.onChangeSomeProp,\n\t'somePropName2': this.onChangeSomeProp2\n}</xmp>";
 			case 'controllers':
-				return "<xmp>initial controllers = [\n\t{\n\t\t'controller': ControllerClass,\n\t\t'on': {\n\t\t\t'load': this.onLoad,\n\t\t\t'add': this.onAdd\n\t\t}\n\t}\n]</xmp>";
+				return "<xmp>initial controllers = [\n\t{\n\t\t'controller': ControllerClass,\n\t\t'on': {\n\t\t\t'load': this.onLoad,\n\t\t\t'add': this.onAdd\n\t\t},\n\t\t'options': {\n\t\t\t'load': {...},\n\t\t\t'add': {...}\n\t\t},\n\t\t'private': true\n\t}\n]</xmp>";
 		
 		}
 	}
@@ -392,6 +393,22 @@ class InitialsParser
 					new Error($this->errors['paramNotArray'], array($type, $this->currentClassName, $i, 'on', $type, $value, $this->getInitialParamExample($type)));
 				}
 				$this->validateObjectFields($val['on'], $value, $type);
+				foreach ($val['on'] as $action => $callback) {
+					$this->validateCallback($callback, $value, $type, $i, 'callback');
+					$this->currentClass['onActions'][] = array('controller' => $val['controller'], 'action' => $action);
+				}
+			}
+			if (isset($val['private']) && !is_bool($val['private'])) {
+				new Error($this->errors['privateParamNotBool'], array($type, $this->currentClassName, $type, $value, $this->getInitialParamExample($type)));
+			}
+			if (isset($val['options'])) {
+				if ($val['private'] !== true) {
+					new Error($this->errors['controllerMustBePrivate'], array($type, $this->currentClassName, $type, $value, $this->getInitialParamExample($type)));
+				}
+				if (!is_array($val['options'])) {
+					new Error($this->errors['paramNotArray'], array($type, $this->currentClassName, $i, 'options', $type, $value, $this->getInitialParamExample($type)));
+				}
+				$this->validateObjectFields($val['options'], $value, $type);
 				foreach ($val['on'] as $action => $callback) {
 					$this->validateCallback($callback, $value, $type, $i, 'callback');
 					$this->currentClass['onActions'][] = array('controller' => $val['controller'], 'action' => $action);

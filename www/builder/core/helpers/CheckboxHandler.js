@@ -1,7 +1,7 @@
 function CheckboxHandler() {
 	var subscribers = [];
 	var options = [];
-	var defaultCheckboxClass = '->> app-ui-checkbox';
+	var defaultCheckboxClass = '->> checkbox';
 	var defaultCheckboxCheckedClass = '->> checked';
 	var currentOptions, currentObject, currentScope, checkbox, labelClass,
 		checkboxClass, targetClasses, currentCheckedClass, currentTarget;

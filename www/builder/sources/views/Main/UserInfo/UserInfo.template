@@ -1,4 +1,4 @@
-<table class="app-mainpage-user-info" cellpadding="0px" cellspacing="0px" scope>
+<table class="mainpage-user-info" cellpadding="0px" cellspacing="0px" scope>
 	<tr>
 		<td>{@client}:</td>
 		<td>{$userName}</td>

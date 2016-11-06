@@ -1,16 +1,16 @@
-<div class="app-calendar">
-	<div class="app-calendar-header">
-		<div class="app-calendar-prev" onClick="onPrevClick"></div>
-		<div class="app-calendar-month">
+<div class="@">
+	<div class="@header">
+		<div class="@prev" onClick="onPrevClick"></div>
+		<div class="@month">
 			{$month}
-			<span class="app-calendar-year">
+			<span class="@year">
 				{$year}
 			</span>
 		</div>
-		<div class="app-calendar-next" onClick="onNextClick"></div>
+		<div class="@next" onClick="onNextClick"></div>
 	</div>
-	<div class="app-calendar-content">
-		<div class="app-calendar-day-names">
+	<div class="@content">
+		<div class="@day-names">
 			<span>{@mon}</span>
 			<span>{@tue}</span>
 			<span>{@wed}</span>
@@ -19,9 +19,9 @@
 			<span>{@sat}</span>
 			<span>{@sun}</span>
 		</div>
-		<div class="app-calendar-days">
+		<div class="@days">
 			{foreach $days as &day}
-				<span class="{&day.another?'another'} {&day.current?'current'} {&day.marked?'marked'}">
+				<span class="{&day.another?'->>another'} {&day.current?'->>current'} {&day.marked?'->>marked'}">
 					{&day.num}
 				</span>
 			{/foreach}

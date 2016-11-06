@@ -7,9 +7,12 @@ function Component() {
 			this.preset('__loading', true);
 			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
-			this.loader.addSubscriber('load', onDataLoad.bind(this, isAsync), this);
 			var options = loader['options'];
 			if (isFunction(options)) options = options();
+			this.loader.addSubscriber('load', {
+				'initiator': this,
+				'callback': onDataLoad.bind(this, isAsync)
+			}, !!loader['private']);			
 			this.loader.doAction(this, 'load', options);
 			if (!isAsync) {
 				renderTempPlaceholder.call(this);

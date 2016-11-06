@@ -25,6 +25,10 @@ class CoreValidator
 		)
 	);
 
+	public static $utilsClasses = array(
+		'Dates', 'Decliner'
+	);
+
 	private $allUtilsFunctionNames = array();
 
 	private $utilsFunctions = array(

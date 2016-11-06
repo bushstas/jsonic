@@ -1,10 +1,10 @@
 {template .main}
-<div class="app-tags" scope>
-	<div class="app-tags-container">
+<div class="@" scope>
+	<div class="@container">
 		<template templ="topContent">
 		<template templ="input">
-		<div class="app-tags-content">
-			<div class="app-tags-placeholder">
+		<div class="@content">
+			<div class="@placeholder">
 				{foreach $items as &item}
 					<template templ="tag" text="{&item}">
 				{/foreach}
@@ -18,9 +18,9 @@
 <component class="AutoComplete" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant">
 
 {template .tag}
-<div class="app-tags-item">
-	<span class="app-tags-item-text" data-text="{~text}">
+<div class="@item">
+	<span class="@item-text" data-text="{~text}">
 		{~text}
 	</span>
-	<span class="app-tags-remove"/>
+	<span class="@remove"/>
 </div>

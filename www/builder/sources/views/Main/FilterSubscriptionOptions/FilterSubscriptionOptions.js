@@ -9,7 +9,7 @@ initial helpers = [
 		'helper': CheckboxHandler,
 		'options': {
 			'callback': this.onCheckboxChange,			
-			'labelClass': '->> app-subscription-option'
+			'labelClass': '->> @option'
 		}
 	}
 ]

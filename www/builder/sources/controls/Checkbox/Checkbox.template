@@ -1,4 +1,4 @@
-<span class="app-checkbox-label" onClick="onClick">
-	<span class="app-ui-checkbox{$checked?' checked'}"></span>
+<span class="checkbox_label" onClick="onClick">
+	<span class="checkbox {$checked?'->>checked'}"></span>
 	{~text}
 </span>

@@ -1,25 +1,24 @@
 $imgsrc = ../images/searchform
-$imgsrc = ../images/ui
 
-.app-keywords-options ==o {
+.@options ==o {
 	$(nowrap pl5 bob#e0e4eb h34 rel)
 }
 ~o .bold {
 	$(inb vmid)
 }
-~o .app-select {
+~o .select {
 	$(w200 inb vmid regular ml12)
 }
-~o .app-checkbox-label {
+~o .checkbox_label {
 	$(vmid ml10 pr10)
 }
-~o .app-ui-checkbox {
+~o .checkbox {
 	$(mt2)
 }
 ~o .keywords-hint {
 	$(abs r2 t8)
 }
-.app-keywords-add-request ==r {
+.@add-request ==r {
 	$(abs r35 t7)
 }
 ~r span {
@@ -28,94 +27,67 @@ $imgsrc = ../images/ui
 ~r span:hover {
 	$c#49658f
 }
-.app-keywords-area ==a {
+.@area ==a {
 	$(abs t100 l r b4 ova p0_15 z1)
 }
 ~a.multi {
 	$t132
 }
-.app-keywords-block ==b {
+.@block ==b {
 	$(rel z1 mt20 h97% mih500)
 }
 ~b:first-child {
 	$mt0
 }
-.app-keywords-left {
+.@left {
 	$(abs t l b r33% z2)
 }
-~b.switched .app-keywords-left {
+~b.switched .@left {
 	$r68.5%
 }
-.app-keywords-right {
+.@right {
 	$(abs t l68.5% b r z1)	
 }
-~b.switched .app-keywords-right {
+~b.switched .@right {
 	$l33%
 }
-.app-keywords-tags-title {
+.@tags-title {
 	$(bold c#3B4452 fs16 lh16)
 }
-~a .app-tags-container {
+~a .tags_container {
 	$(abs mih0 nomaxh ha t22 l r b)
 }
-~a ~b.with-recommendations:not(.switched) .app-tags-container {
+~a ~b.with-recommendations:not(.switched) .tags_container {
 	$b50%
 }
-~a .app-tags-content {
+~a .tags_content {
 	$t75
 }
-.app-tags-top {
-	$(h16 nowrap p2_0_2_0 rel z12)
-}
-.app-tags-top-buttons {
-	$(fright fs12)
-}
-~b.switched .app-keywords-left .app-tags-top-buttons,
-~b:not(.switched) .app-keywords-right .app-tags-top-buttons {
+~b.switched .@left .tags_top-buttons,
+~b:not(.switched) .@right .tags_top-buttons {
 	$none
 }
-.app-tags-top-buttons-item {
-	$(inb h18 lh18)
-}
-.app-tags-top-buttons-item:first-child {
-	$(c#5f6b7f pr12)
-}
-.app-tags-top-buttons-item:nth-child(2) {
-	$(pl14 bol#cfd5e1 pr3)
-}
-.app-tags-top-buttons-item:nth-child(2) span {
-	$(pointer c#a66666)
-}
-.app-tags-top-buttons-item:nth-child(2) span:hover {
-	$c#6c3a3a
-}
-.app-search-form-panel.keywords-panel .app-tabs {
+.app-search-form-panel.keywords-panel .tabs {
 	$mt4
 }
-.app-keywords-index {
+.@index {
 	$(c#a1a1a1 fs14 regular none ml10)
 }
-~a.multi .app-keywords-index {
+~a.multi .@index {
 	$inb
 }
-.app-keywords-remove-request {
+.@remove-request {
 	$(pointer c#a66666 inb ml10 fs12)
 }
-.app-keywords-remove-request:hover {
+.@remove-request:hover {
 	$c#6c3a3a
 }
-.app-tags-select-button {
-	$(fs12 c#5f6b7f mr12 inb pointer png2=select-arrow-small norep pr12 bp100%_50% rel)
-}
-.app-tags-select-button:hover {
-	$(c#444c61)
-}
-~b .app-recommendations {
+~b .recommendations {
 	$(abs l r-327 t50% b none)
 }
-~b.with-recommendations .app-recommendations {
+~b.with-recommendations .recommendations {
 	$block
 }
-~b.switched .app-recommendations {
+~b.switched .recommendations {
 	display: none !important;
 }

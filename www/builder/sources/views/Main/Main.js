@@ -14,7 +14,7 @@ function onRendered() {
 }
 
 function onResize() {
-	var element = <.app-mainpage-content>;
+	var element = <.mainpage-content>;
 	element.setHeight('');
 	var height = element.getHeight();
 	var bodyHeight = document.body.getHeight();

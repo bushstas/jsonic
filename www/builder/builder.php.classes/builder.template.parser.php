@@ -78,7 +78,7 @@ class TemplateParser
 
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
-				   $cssClassIndex, $templateName, $globalNames,
+				   $templateName, $globalNames,
 				   $parsedItem, $globalVarNames, $initials;
 
 	private static $errors = array(
@@ -134,7 +134,6 @@ class TemplateParser
 		self::$eventTypesShortcuts = Events::getList();
 		self::$tagShortcuts = Tags::getList();
 		self::$obfuscate = $params['obfuscateCss'];
-		self::$cssClassIndex = &$params['cssClassIndex'];
 		self::$globalNames = JSGlobals::getUsedNames();
 		self::$globalVarNames = JSGlobals::getVarNames();
 		$varNames = array_values(self::$globalVarNames);
@@ -193,39 +192,23 @@ class TemplateParser
 			if ($data == '[]') {
 				$data = '';
 			} else {
-
-				$data = str_replace('"', "'", $data);
-		
-				$data = str_replace("\'", "'", $data);
-				
+				$data = str_replace('"', "'", $data);		
+				$data = str_replace("\'", "'", $data);				
 				$data = str_replace('<this>', '$.', $data);
 				$data = preg_replace("/'<nq>/", '', $data);
 				$data = preg_replace("/<nq>'/", '', $data);
 				$data = preg_replace("/<nq>/", '', $data);
-				$data = preg_replace("/,*<nc>,*/", '', $data);
-				$data = preg_replace("/\[*<nb>\]*/", '', $data);
 
-				$data = str_replace('<plus>', "'+", $data);
-				$data = str_replace('<\/plus>', "+'", $data);
 				$data = str_replace('\\', '', $data);
 				$data = str_replace('_u00A0_', '\\u00A0', $data);
-
-				
-
-				$data = preg_replace("/\['<foreach ([^>]+)>',/", "function($1){return[", $data);
-				$data = preg_replace("/,*'<\/foreach>'\]/", ']}', $data);
-
-				
+							
 				$data = str_replace("<=let>,<let>", ";", $data);
 				$data = str_replace("<let>", "function(){", $data);
 				$data = preg_replace("/<=let>,*/", ";return[", $data);
 				$data = preg_replace("/,'<\/let>'/", "]}", $data);
 				$data = preg_replace("/<\/let>'/", "']}", $data);
 				$data = str_replace("<quote>", "'", $data);
-
 				$data = preg_replace("/''\+|\+''/", "", $data);
-				
-
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
 			$templateFunctions[] = array('content' => $data, 'name' => $template['name'], 'let' => $template['let']);
@@ -251,7 +234,9 @@ class TemplateParser
 
 	private static function getParsedTemplate($content) {
 		$html = preg_replace(self::$regexp, '', $content);
+		$html = str_replace('->>', "#classobfus#", $html);
 		$html = preg_replace('/<(\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
+		$html = str_replace('#classobfus#', '->>', $html);
 		$html = preg_replace('/<\/(img|br|hr|input|component|control|form|menu)>/', '', $html);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
@@ -699,8 +684,7 @@ class TemplateParser
 				$levels[$v][] = 1;
 			}
 		}
-		$isTrue = $list[$i]['content'] == '<a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope data-id="{~Id}">';
-		
+	
 		$i++;
 		while (isset($list[$i])) {
 			if ($list[$i]['type'] == 'tag') {
@@ -1085,7 +1069,7 @@ class TemplateParser
 		);
 	}
 
-	private static function processCode($code, $parsedPlace = 'elementAttribute', &$names = null) {
+	private static function processCode($code, $parsedPlace = 'elementAttribute', &$names = null, $isObfClName = false) {
 		$attrParts = array();
 		if (is_array(self::$class) && !is_array(self::$class['tmpCallbacks'])) {
 			self::$class['tmpCallbacks'] = array();
@@ -1132,9 +1116,6 @@ class TemplateParser
 				}
 				if ($data['ternary'] && $hasText) {
 					$code = '('.$code.')';
-				}
-				if ($isObfClName) {
-					self::getObfuscatedClassName($code);
 				}
 				$attrParts[] = $code;
 			}
@@ -1210,7 +1191,7 @@ class TemplateParser
 			if ($hasCode) {
 				$names[$propName] = array();
 				$parsedPlace = $isComponentTag ? 'componentAttribute' : 'elementAttribute';
-				$code = self::processCode($propValue, $parsedPlace, $names[$propName]);
+				$code = self::processCode($propValue, $parsedPlace, $names[$propName], $isObfClName);
 				$props[$propName] = self::correctTagAttributeText($propName, $code);
 				$names[$propName] = array_unique($names[$propName]);
 				sort($names[$propName]);
@@ -1260,7 +1241,7 @@ class TemplateParser
 							$child['w'] = array();
 						}
 						$child['w'][] = $k;
-						$child['w'][] = $match[1];
+						$child['w'][] = trim($v, '^');
 					}
 				}				
 				if (empty($child['p'])) {
@@ -1570,45 +1551,25 @@ class TemplateParser
 		return $funcs;
 	}
 
-	private static function getObfuscatedClassName(&$value, $isCode = false) {
-		if (!$isCode) {
-			$value = "'".$value."'";
-		}
-		$value = preg_replace('/\[\s*[\'"]([^\'"]+)[\'"]\s*\]/', "[#$1#]", $value);
-		$regexp = '/"[^"]+"|\'[^\']+\'/';
-		preg_match_all($regexp, $value, $matches);
-		$strings = $matches[0];
-		$codeParts = preg_split($regexp, $value);
-		$obfuscatedValue = '';
-		foreach ($codeParts as $i => $codePart) {
-			$obfuscatedValue .= $codePart;
-			if (isset($strings[$i])) {
-				$string = preg_replace('/["\']/', '', $strings[$i]);
-				$parts = explode(' ', $string);
-				$newClassName = array();
-				foreach ($parts as $part) {
-					if (!empty($part) && isset(self::$cssClassIndex[$part])) {
-						$newClassName[] = self::$cssClassIndex[$part];
-					} else {
-						if (!empty($part)) {
-							$part = self::addToCssClassIndex($part);
-						}
-						$newClassName[] = $part;
-					}
+	private static function getObfuscatedClassName(&$value) {
+		$parts = explode(' ', $value);
+		$newClassName = array();
+		foreach ($parts as $part) {
+			if (!empty($part) && isset(CSSCompiler::$cssClassIndex[$part])) {
+				$newClassName[] = CSSCompiler::$cssClassIndex[$part];
+			} else {
+				if (!empty($part)) {
+					$part = self::addToCssClassIndex($part);
 				}
-				$obfuscatedValue .= "'".implode(' ', $newClassName)."'";
+				$newClassName[] = $part;
 			}
-		}		
-		if (!$isCode) {
-			$obfuscatedValue = trim($obfuscatedValue, "'");
 		}
-		$obfuscatedValue = preg_replace('/\[\#([^\#]+)\#\]/', "['$1']", $obfuscatedValue);
-		$value = preg_replace('/ {2,}/', ' ', $obfuscatedValue);
+		$value = implode(' ', $newClassName);
 	}
 
 	private static function addToCssClassIndex($className) {
 		$obfuscatedClassName = CSSObfuscator::generate();
-		self::$cssClassIndex[$className] = $obfuscatedClassName;
+		CSSCompiler::$cssClassIndex[$className] = $obfuscatedClassName;
 		return $obfuscatedClassName;
 	}
 

@@ -1,7 +1,7 @@
-.app-popup-menu-outer-container.create-filters-menu .app-popup-menu-inner-container {
+.popup-menu_outer-container.create-filters-menu .popup-menu_inner-container {
 	border: none;
 }
-.app-popup-menu-outer-container.create-filters-menu {
+.popup-menu_outer-container.create-filters-menu {
     margin-top: 3px;
     -webkit-box-shadow: 0px 5px 14px 0px rgba(0,0,0,0.75);
     -moz-box-shadow: 0px 5px 14px 0px rgba(0,0,0,0.75);

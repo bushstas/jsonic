@@ -4,8 +4,8 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> app-tab-rest': this.onRestTabClick,
-			'->> app-tab': this.onTabClick
+			'->> tab-rest': this.onRestTabClick,
+			'->> content-tab': this.onTabClick
 		}
 	}
 ]
@@ -29,7 +29,7 @@ function redraw() {
 	this.hiddenTabs = [];
 	var tabPanelWidth = <>.getWidth();
 	var controlWidth = this.getControlsWidth();
-	var tabs = <.app-tab[]>;
+	var tabs = <.@tab[]>;
 	var totalWidth = 0;
 	each (tabs as tab) {
 		tab.toggleClass('->> first', idx == 0);
@@ -46,10 +46,10 @@ function redraw() {
 
 function getControlsWidth() {
 	var width = 0;
-	var restButton = <.app-tab-rest>;
+	var restButton = <.tab-rest>;
 	width += @(restButton).getWidth() + this.tabMargin;
 
-	var plusButton = <.app-tab-plus>;
+	var plusButton = <.tab-plus>;
 	width += @(plusButton).getWidth() + this.tabMargin;
 	return width;
 }
@@ -66,11 +66,11 @@ function onTabClick(target) {
 }
 
 function activateTab(tabIndex, isShown) {
-	var contents = <>.next().finds('.->>app-tab-content');
+	var contents = <>.next().finds('.->>tab-content');
 	@(contents[tabIndex]).show(isShown);
 	if (isShown) {
 		-->select (tabIndex)
 		this.activeTab = tabIndex;		
 	}
-	<.app-content-tab[tabIndex]>.toggleClass('->> active', isShown);
+	<.content-tab[tabIndex]>.toggleClass('->> active', isShown);
 }

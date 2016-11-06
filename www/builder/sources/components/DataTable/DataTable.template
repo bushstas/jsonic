@@ -1,4 +1,4 @@
-<div class="app-datatable-outer-container">
+<div class="@outer-container">
 	<component class="DataTableTabPanel">
 	{foreach $items2 as &v => &g limit $limit}
 		<div class="xxxxx">

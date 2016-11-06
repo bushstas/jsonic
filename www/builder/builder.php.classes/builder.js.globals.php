@@ -3,6 +3,7 @@
 class JSGlobals
 {
 	private static $output	= array();
+	private static $excluded = array();
 	private static $varNames = array(
 		'textConstants'    => '__',
 		'textNodes'        => '__T',
@@ -37,7 +38,8 @@ class JSGlobals
 		'textConstNotFound' => 'Текстовая константа {??} используемая в шаблоне {??} класса {??} не найдена',
 		'textConstNotFound2' => 'Текстовая константа {??} используемая в методе {??} класса {??} не найдена',
 		'dataConstNotFound' => 'Константа данных {??} не найдена',
-		'noApiConfigPath' => 'Параметр <b>CONFIG.{?}.{?}</b> не найден в файле конфигурации <b>config.js</b>'
+		'noApiConfigPath' => 'Параметр <b>CONFIG.{?}.{?}</b> не найден в файле конфигурации <b>config.js</b>',
+		'noDeclFilesFound' => "Обнаружено использование утилины <b>Decliner</b>, но не найден ни один файл с расширением <b>decl</b><br><br>Пример содержимого такого файла:<xmp>@item: штука,штуки,штук\n@ball: мяч,мяча,мячей</xmp>"
 	);
 	
 	public static function run(&$jsOutput, $data) {
@@ -97,6 +99,10 @@ class JSGlobals
 		);
 	}
 
+	public static function exclude($varKey) {
+		self::$excluded[] = $varKey;
+	}
+
 	public static function getVarName($key) {
 		return self::$varNames[$key];
 	}
@@ -106,7 +112,10 @@ class JSGlobals
 	}
 
 	private static function add($key, $content) {
-		self::$output[] = "var ".self::$varNames[$key]." = ".$content.';';
+		if (!in_array($key, self::$excluded)) {
+			self::$output[] = "var ".self::$varNames[$key]." = ".$content.';';
+			return true;
+		}
 	}
 
 	private static function addTextNodes() {
@@ -209,7 +218,9 @@ class JSGlobals
 	}
 
 	private static function addDecls($decls) {
-		self::add('decls', str_replace('"', "'", json_encode($decls)));
+		if (self::add('decls', str_replace('"', "'", json_encode($decls))) && empty($decls)) {
+			new Error(self::$errors['noDeclFilesFound']);
+		}
 	}
 
 	private static function addEvents($events) {

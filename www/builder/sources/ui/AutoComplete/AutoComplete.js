@@ -19,7 +19,7 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> app-autocomplete-variant': this.onVariantPick
+			'->> @variant': this.onVariantPick
 		}
 	}
 ];
@@ -71,7 +71,7 @@ function onBlur() {
 function onEnter(value) {
 	get currentVariant;
 	if (isNumber(currentVariant)) {
-		var e = <.app-autocomplete-variant.active>;
+		var e = <.@variant.active>;
 		--> enter (e->value)
 		this.onEscape();
 		return false;
@@ -125,9 +125,9 @@ function highlightVariant(step) {
 }
 
 function onChangeCurrentVariant(index) {
-	var e = <.app-autocomplete-variant.active>;
+	var e = <.@variant.active>;
 	@(e).removeClass('active');
-	e = <.app-autocomplete-variant[index]>;
+	e = <.@variant[index]>;
 	@(e).addClass('active');
 }
 

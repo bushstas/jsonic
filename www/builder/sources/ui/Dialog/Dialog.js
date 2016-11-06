@@ -22,7 +22,7 @@ function show() {
 function reposition() {
 	var rect = <>.getRect();	
 	$marginTop = Math.round(rect.height / -2) + 'px',
-	$marginLeft = Math.round(rect.width / -2) + 'px';	
+	$marginLeft = Math.round(rect.width / -2) + 'px';
 }
 
 function hide() {

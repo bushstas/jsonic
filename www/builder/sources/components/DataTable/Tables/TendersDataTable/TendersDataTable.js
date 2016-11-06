@@ -1,1 +1,0 @@
-component TendersDataTable extends DataTable

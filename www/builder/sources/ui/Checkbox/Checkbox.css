@@ -1,7 +1,7 @@
 $imgsrc = ../images/ui
-.app-ui-checkbox {
+.checkbox {
 	$(fleft block bg mr7 pointer wh14 bo#76849C bc#eaeef3 br3)
 }
-.app-ui-checkbox.checked {
+.checkbox.checked {
     $(boc#7E9CCA bgwhite png=checkb)
 }

@@ -47,10 +47,14 @@ function Core() {
 	var getInitial = function(initialName) {
 		return Objects.get(this.initials, initialName);
 	};
-	var attachController = function(options) {
+	var attachController = function(options) {		
 		if (isObject(options['on'])) {
-			for (var k in options['on']) options.controller.addSubscriber(k, options['on'][k], this, !!options['private']);
-		} else options.controller.addSubscriber('', null, this);
+			var data;
+			for (var actionName in options['on']) {
+				data = {'initiator': this, 'callback': options['on'][actionName]};
+				options['controller'].addSubscriber(actionName, data, !!options['private'], Objects.get(options['options'], actionName));
+			}
+		}
 	};
 	var addCorrector = function(name, handler) {
 		if (isFunction(handler)) {

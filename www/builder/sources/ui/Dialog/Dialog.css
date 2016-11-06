@@ -1,12 +1,12 @@
 $imgsrc = ../images/ui/
 
-.app-dialog-mask ==m {
+.@mask ==m {
 	$(none fix rubber z699 bc#212D42 opac65)
 }
 ~m.shown {
 	$block
 }
-.app-dialog ==d {
+.@ ==d {
 	$(fix incenter br5 bgwhite none z700)
 }
 ~d.shown {
@@ -15,7 +15,7 @@ $imgsrc = ../images/ui/
 ~d.expanded {
     $(rubber br0 nosize nomargin)
 }
-.app-dialog-title ==t {
+.@title ==t {
     $(rel p12 c#4a5b6f z100 bob#e5e9f3 bc#f6f7f9 lh22 fs16 bold center br5_5_0_0)
 }
 ~t:empty {
@@ -24,11 +24,11 @@ $imgsrc = ../images/ui/
 ~d.expanded ~t {
     $br0
 }
-.app-dialog-content {
+.@content {
 	$(rel z2 p15_20)
 }
-.app-dialog-close ==c,
-.app-dialog-expand ==e {
+.@close ==c,
+.@expand ==e {
     $ (abs z102 r t10 mr8 wh23 bg pointer opac7 png=close-dialog)
 }
 ~e {

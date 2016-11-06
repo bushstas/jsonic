@@ -1,19 +1,19 @@
-.app-subscription ==s {
+.@ ==s {
 
 }
-.app-subscription-title {
+.@title {
 	$(rel fs16 c#4c546b p10_5)
 }
-.app-subscription-head {
+.@head {
 	$(bob#e4e4e4 pt5 bold lh32)
 }
-.app-subscription-head-total {
+.@head-total {
 	$(inb bob#b65f5f_2 ml10)
 }
-.app-subscription-head-subscribed {
+.@head-subscribed {
 	$(fright bob#38986a_2 mr45)
 }
-.app-subscription-table ==t {
+.@table ==t {
 	$w100%
 }
 ~t th {
@@ -45,16 +45,16 @@
 	$c#6484ca
 }
 
-~s .subscr-button:after {
+~s .@button:after {
     content: 'Подписаться';
 }
-~s .subscr-button.green-button:after {
+~s .@button.green-button:after {
     content: 'Подписка оформлена';
 }
-~s .subscr-button.green-button:hover {
+~s .@button.green-button:hover {
 	$bc#b65f5f
   	background-image: url(../images/buttons/red.png);
 }
-~s .subscr-button.green-button:hover:after {
+~s .@button.green-button:hover:after {
     content: 'Отписаться';
 }

@@ -1,44 +1,44 @@
 <template templ="controls" if="{!~nocontrols}">
-<a href="#tender/{~Id}" target="_blank" class="app-datatable-row" scope data-id="{~Id}">		
+<a class="@" href="#tender/{~Id}" target="_blank" data-id="{~Id}" scope>
 	<template templ="controls" if="{!~nocontrols}">
-	<div class="app-datatable-standart-row-top">
-		<div class="app-datatable-standart-row-top-item">
+	<div class="@top">
+		<div class="@top-item">
 			{getFzName(~type)}
 		</div>
 		{if ~multiregion}
-			<div class="app-datatable-standart-row-top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list" pos="left-top">
+			<div class="@top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list" pos="left-top">
 				<template templ="count" count="{~multiregion}">
 				{~regionName}
 			</div>
 		{else}
-			<div class="app-datatable-standart-row-top-item">
+			<div class="@top-item">
 				{~regionName}
 			</div>
 		{/if}
 		{if ~multicategory}
-			<div class="app-datatable-standart-row-top-item tooltiped" txt="{~subcategories}" cap="{@categories}" del="1" cor="list" pos="left-top">
+			<div class="@top-item tooltiped" txt="{~subcategories}" cap="{@categories}" del="1" cor="list" pos="left-top">
 				<template templ="count" count="{~multicategory}">
 				{~subcategory}
 			</div>
 		{else}
-			<div class="app-datatable-standart-row-top-item">
+			<div class="@top-item">
 				{~subcategory}
 			</div>
 		{/if}
-		<div class="app-datatable-standart-row-top-item">
+		<div class="@top-item">
 			<include templ="unavailable" if="{~razm == 'N/A'}" else="{~razm}" tariff="{~isUnavailable}" width="66px">
 		</div>
 	</div>
-	<div class="app-datatable-standart-row-price">
+	<div class="@price">
 		{~price}
 	</div>
-	<div class="app-datatable-standart-row-name">
+	<div class="@name">
 		{if ~hot}
 			<template templ="hotMark">
 		{/if}
 		{~name}	
 	</div>
-	<div class="app-datatable-standart-row-bottom">
+	<div class="@bottom">
 	
 	</div>
 	{if ~fragments}

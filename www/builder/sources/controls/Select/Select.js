@@ -56,7 +56,7 @@ function enableOption(index, isEnabled) {
 }
 
 function onOptionsClick(e) {
-	var target = e.getTarget('.->> app-select-option');
+	var target = e.getTarget('.->> @option');
 	if (target && !target.hasClass('->> disabled')) {
 		var value = target->value;
 		if (this.selectByValue(value)) {
@@ -67,7 +67,7 @@ function onOptionsClick(e) {
 }
 
 function getOptionElementAt(index) {
-	return <.app-select-options>.getChildAt(index);
+	return <.@options>.getChildAt(index);
 }
 
 function setProperValue(value) {

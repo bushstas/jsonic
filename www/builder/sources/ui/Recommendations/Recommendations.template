@@ -1,6 +1,6 @@
-<div class="app-recommendations" scope>
+<div class="@" scope>
 	{foreach $items as &item}
-		<div class="app-recommendations-item">
+		<div class="@item">
 			{&item['keyword']}
 		</div>
 	{/foreach}

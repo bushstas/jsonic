@@ -6,7 +6,7 @@ class CSSCompiler
 	private $imagesFolderDefined = false;
 	private $hasCssConstFiles = false;
 	private $cssConstants = array();
-	private $cssClassIndex = array();
+	public static $cssClassIndex = array();
 
 	private $numericShortcuts = array(
 		'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
@@ -76,12 +76,16 @@ class CSSCompiler
 	}
 
 	public function getCssClassIndex() {
-		return $this->cssClassIndex;
+		return self::$cssClassIndex;
 	}
 
 	public function run($cssFiles, $cssConstFiles) {
 		if (is_array($cssFiles) && !empty($cssFiles)) {
 			$this->init();
+			foreach ($cssFiles as &$file) {
+				$this->parseClasses($file['name'], $file['content']);
+			}
+
 			$this->initCssConstants($cssConstFiles);
 			$content = array();
 			foreach ($cssFiles as $file) {
@@ -129,9 +133,23 @@ class CSSCompiler
 		}
 	}
 
+	private function parseClasses($className, &$content) {
+		$data = Splitter::split('/[A-Z]/', $className);
+		$className = '';
+		foreach ($data['items'] as $i => $item) {
+			$className .= $item.'-';
+			if (isset($data['delimiters'][$i])) {
+				$className .= strtolower($data['delimiters'][$i]);
+			}
+		}
+		$className = trim($className, '-');
+		$content = preg_replace('/\.@(?![A-Za-z])/', '.'.$className, $content);
+		$content = str_replace('.@', '.'.$className.'_', $content);
+	}
+
 	private function parseVariables(&$css, $filename) {
 		$keys = array();
-		preg_match_all('/([~\.\#a-z\- \*:]+) *==(\w+)/i', $css, $matches);
+		preg_match_all('/([~\.\#a-z_\- \*:]+) *==(\w+)/i', $css, $matches);
 		for ($i = 0; $i < count($matches[1]); $i++) {
 			if (preg_match_all('/~(\w+)/', $matches[1][$i], $ms)) {
 				foreach ($ms[1] as $m) {
@@ -298,9 +316,9 @@ class CSSCompiler
 		preg_match_all('/\.([a-z][\w\-]{3,})/i', $css, $matches);
 		$classes = array_unique($matches[1]);
 		foreach ($classes as $class) {
-			$this->cssClassIndex[$class] = CSSObfuscator::generate();
+			self::$cssClassIndex[$class] = CSSObfuscator::generate();
 		}
-		foreach ($this->cssClassIndex as $k => $v) {
+		foreach (self::$cssClassIndex as $k => $v) {
 			$css = preg_replace('/\.'.$k.'([\s\.\#,\{:\)])/', '.'.$v."$1", $css);
 		}
 		$parts = explode('__URL__', $css);

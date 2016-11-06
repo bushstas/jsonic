@@ -8,16 +8,23 @@ class TemplateCompiler
 	private $errors = array(
 		'differentTypes' => 'Используются различные типы при вызове компонента {??}<br><br>В шаблоне класса {??} указан тип {??},<br><br>{?} в шаблоне класса {??} указан другой тип {??}',
 		'includeNoTemplateNames' => "В файле {??} нет ни одного имени шаблона. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>",
-		'includeHasTemplateKeys' => "В файле {??} один или несколько шаблонов имеют оператор <b>as</b>, что недопустимо. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>"
+		'includeHasTemplateKeys' => "В файле {??} один или несколько шаблонов имеют оператор <b>as</b>, что недопустимо. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>",
+		'fewNamespaces' => 'Обнаружено более одной метки <b>namespace</b> в шаблоне класса {??}',
+		'unknownNamespaces' => 'Обнаружена <b>namespace</b> метка {??} ссылающаяся на несуществующий класс в шаблоне класса {??}'
 	);
 	private $templates = array();
 	private $includedTemlates = array();
 	private $usedComponents = array();
 
-	public function run($templatesFiles, $includesFiles) {
+	public function run($templatesFiles, $includesFiles) {		
 		if (is_array($templatesFiles)) {
+			$namespaces = array();
+			foreach ($templatesFiles as $templateFile) {
+				$namespaces[] = $templateFile['name'];
+			}
 			foreach ($templatesFiles as $templateFile) {
 				$content = $templateFile['content'];
+				$this->parseElementClasses($templateFile['name'], $content, $namespaces);
 				$this->templates[$templateFile['name']] = preg_replace("/<\!--.*?-->/", '', $content);
 				$this->initUsedComponents($templateFile['name'], $content);
 			}
@@ -77,5 +84,31 @@ class TemplateCompiler
 			}
 			$used[$name]['type'] = $typeMatches[$i];
 		}
+	}
+
+	private function parseElementClasses($className, &$content, $namespaces) {
+		preg_match_all('/\{ *namespace +\.(\w+) *\}/', $content, $matches);
+		if (!empty($matches[1])) {
+			if (count($matches[1]) > 1) {
+				new Error($this->errors['fewNamespaces'], array($className));
+			}
+			$namespace = $matches[1][0];
+			if (!in_array($namespace, $namespaces)) {
+				new Error($this->errors['unknownNamespaces'], array($namespace, $className));	
+			}
+			$className = $namespace;
+			$content = preg_replace('/\{ *namespace +\.(\w+) *\}/', '', $content);
+		}
+		$data = Splitter::split('/[A-Z]/', $className);
+		$className = '';
+		foreach ($data['items'] as $i => $item) {
+			$className .= $item.'-';
+			if (isset($data['delimiters'][$i])) {
+				$className .= strtolower($data['delimiters'][$i]);
+			}
+		}
+		$className = trim($className, '-');
+		$content = preg_replace('/class=["\']@(?=[\'" ])/', "class=\"".$className." ", $content);
+		$content = preg_replace('/class=["\']@([\w\-]+)([^\'"\{]*)/', "class=\"".$className."_$1$2", $content);
 	}
 }

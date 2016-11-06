@@ -1,6 +1,6 @@
 $imgsrc = ../images/searchform
 
-.app-search-form ==f {
+.@ ==f {
 	$(abs z2 t7 l-300 b7 w330 br4 c#222121 bc#444b57)
 }
 .view-content.form-expanded ~f {
@@ -8,7 +8,7 @@ $imgsrc = ../images/searchform
 }
 
 
-.app-search-form-title ==t {
+.@title ==t {
     $(h37 lh39 pl31 bold fs14 box c#edf0f4 bob#3e4552 br4_4_0_0 gr_bottom_#647188_#4d5768)
 }
 ~t:before {
@@ -16,7 +16,7 @@ $imgsrc = ../images/searchform
 }
 
 
-.app-search-form-close-side ==s {
+.@close-side ==s {
     $(abs noimg t r b pointer w30 z25 bc#6279A7 br0_3_3_0 ha)
 }
 ~s:hover {
@@ -31,7 +31,7 @@ $imgsrc = ../images/searchform
 }
 
 
-.app-search-form-close ==c {
+.@close ==c {
     $(rot180 block abs r t7 norep pointer z26 wh23 png = close bp100%_50%)
     transition: all 0.2s ease-out;
 }
@@ -40,7 +40,7 @@ $imgsrc = ../images/searchform
 }
 
 
-.app-search-form-reset ==a {
+.@reset ==a {
     $(abs r34 t5 pl22 lh16 h25 w0 fs14 bold norep pointer nowrap z10 png = clear c#5c606a bp100%_50%)
 }
 ~a .hover-label {
@@ -68,9 +68,4 @@ $imgsrc = ../images/searchform
 }
 ~b .confirm-reset-filter {
     $(lh36 pointer bc#B35050 p9_15)
-}
-
-
-.app-tender-search-form-content {
-    $(abs l r b t130)
 }

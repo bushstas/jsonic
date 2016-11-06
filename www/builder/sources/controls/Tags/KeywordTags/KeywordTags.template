@@ -1,19 +1,21 @@
+{namespace .Tags}
+
 {template .topButtons}
-<div class="app-tags-top-buttons">
-	<div class="app-tags-top-buttons-item">
+<div class="@top-buttons">
+	<div class="@top-buttons-item">
 		{@wordsAdded} {$count}
 	</div>
-	<div class="app-tags-top-buttons-item">
-		<span class="app-tags-remove-all">
+	<div class="@top-buttons-item">
+		<span class="@remove-all">
 			{@removeAll}
 		</span>
 	</div>
 </div>
 
 {template .tag}
-<div class="app-tags-item {.hasOption(~text)?'optioned'}">
-	<span class="app-tags-item-text" data-text="{~text}">
+<div class="@item {.hasOption(~text)?'->>optioned'}">
+	<span class="@item-text" data-text="{~text}">
 		{.getProperTagText(~text)}
 	</span>
-	<span class="app-tags-remove"/>
+	<span class="@remove"/>
 </div>

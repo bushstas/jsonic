@@ -1,16 +1,18 @@
-<div class="app-keywords-block{$switched?' switched'}{$hasRecomm?' with-recommendations'}" scope>
-	<div class="app-keywords-left">
-		<div class="app-keywords-tags-title">
+{namespace .Keywords}
+
+<div class="@block{$switched?' switched'}{$hasRecomm?' with-recommendations'}" scope>
+	<div class="@left">
+		<div class="@tags-title">
 			{@contains}
-			<span class="app-keywords-index">
+			<span class="@index">
 				{@request} {$index}
-				<span class="app-keywords-remove-request">{@removeRequest}</span>
+				<span class="@remove-request">{@removeRequest}</span>
 			</span>
 		</div>
 		<control class="ContainKeywordTags" name="containKeyword" items="{~items[0]}" onFocus="onFocus(false)" onEdit="!edit" onRecChange="onRecommendationsChange">
 	</div>
-	<div class="app-keywords-right">
-		<div class="app-keywords-tags-title">
+	<div class="@right">
+		<div class="@tags-title">
 			{@excludes}
 		</div>
 		<control class="ExcludeKeywordTags" name="notcontainKeyword" items="{~items[1]}" onFocus="onFocus(true)" onEdit="!edit">

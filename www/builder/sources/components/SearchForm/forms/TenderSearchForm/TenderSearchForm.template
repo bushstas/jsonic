@@ -1,16 +1,9 @@
+{template .content}
 <component class="KeywordsPanel" cmpid="keywordsPanel">
-
-<div class="app-search-form-reset {$reset?'active'}">
-	<div class="hover-label" onClick="onResetButtonClick">
-		{@clearFilter}
-	</div>
-	<div class="confirm-label" onClick="onResetConfirmed">
-		{@sure} <i class="confirm-reset-filter">{@yes}</i>
-	</div>
-</div>
-<div class="app-tender-search-form" scope="1">
+<template templ="reset">
+<div class="@" scope="1">
 	<component class="SearchFormFilters">
-	<div class="app-tender-search-form-content">
+	<div class="@content">
 		<component class="KeywordsButton" panel="{^keywordsPanel}">
 	</div>
 </div>

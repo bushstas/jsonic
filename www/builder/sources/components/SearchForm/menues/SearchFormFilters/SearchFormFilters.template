@@ -1,26 +1,26 @@
-<div class="app-search-form-filters" scope="1">
-	<div class="app-search-form-filters-create-button">
+<div class="@" scope="1">
+	<div class="@create-button">
 		<span>
 			{@createFilter}
 		</span>
 		<component class="SearchFormCreateFilterMenu">
 	</div>
-	<div class="app-search-form-filters-button{!$quantity?' with-plus'}">
-		<div class="app-search-form-filters-button-inner">
+	<div class="@button{!$quantity?' with-plus'}">
+		<div class="@button-inner">
 			{@myFilters}
 		</div>
-		<div class="app-search-form-filters-button-side">
-			<label class="app-search-form-filters-button-quantity">
+		<div class="@button-side">
+			<label class="@button-quantity">
 				{$quantity}
 			</label>
-			<div class="app-search-form-filters-button-plus"></div>
+			<div class="@button-plus"></div>
 		</div>
 		<component class="SearchFormFilterMenu">
 	</div>
-	<div class="app-search-form-filter-name" onClick="onSaveFilterClick">
+	<div class="@name" onClick="onSaveFilterClick">
 		{$filterName}
 	</div>
-	<div class="app-search-form-filter-save-button" onClick="onSaveFilterClick">
+	<div class="@save-button" onClick="onSaveFilterClick">
 		{@saveFilter}
 	</div>
 </div>

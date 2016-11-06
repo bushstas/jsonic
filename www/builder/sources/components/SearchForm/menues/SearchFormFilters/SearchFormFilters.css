@@ -1,4 +1,4 @@
-.app-search-form-filters {
+.@ {
 	position: relative;
     margin-top: 12px;
     margin-left: 26px;
@@ -8,7 +8,7 @@
     font-size: 14px;
     z-index: 12;	
 }
-.app-search-form-filters-create-button {
+.@create-button {
     position: absolute;
     z-index: 2;
     left: 0;
@@ -29,10 +29,10 @@
     -webkit-transition: right 0.3s;
     border-right: 1px solid #3b4451;
 }
-.app-search-form-filters-create-button:hover {
+.@create-button:hover {
     background-position: 0 100%;
 }
-.app-search-form-filters-button {
+.@button {
     position: absolute;
     left: 45%;
     right: 0px;
@@ -44,7 +44,7 @@
     cursor: pointer;
     border-radius: 0px 4px 4px 0px;
 }
-.app-search-form-filters-button-inner {
+.@button-inner {
     width: 100px;
     position: absolute;
     left: 0;
@@ -52,7 +52,7 @@
     bottom: 0;
     text-align: center;
 }
-.app-search-form-filters-button-side {
+.@button-side {
     position: absolute;
     right: 4px;
     top: 4px;
@@ -63,7 +63,7 @@
     background-image: url(../images/searchform/button-bg.png);
     background-position: 0% 12%;
 }
-.app-search-form-filters-button-side:before {
+.@button-side:before {
     content: '';
     position: absolute;
     top: 0;
@@ -74,7 +74,7 @@
     background-position: 85% 50%;
     background-repeat: no-repeat;
 }
-.app-search-form-filters-button-quantity {
+.@button-quantity {
     font-family: ptsansbold;
     line-height: 30px;
     display: block;
@@ -85,17 +85,17 @@
     box-sizing: border-box;
     padding-right: 13px;
 }
-.app-search-form-filters-button-plus {
+.@button-plus {
     display: none;
 }
-.app-search-form-filters.with-plus .app-search-form-filters-button-plus {
+.@.with-plus .@button-plus {
     display: block;
     height: 30px;
     background-image: url(../images/searchform/plus.png);
     background-position: 50% 50%;
     background-repeat: no-repeat;    
 }
-.app-search-form-filter-save-button {
+.@save-button {
     position: absolute;
     top: 48px;
     right: 0;
@@ -112,10 +112,10 @@
     font-family: ptsansbold;
     border-radius: 5px;
 }
-.app-search-form-filter-save-button:hover {
+.@save-button:hover {
     background-color: #499059;
 }
-.app-search-form-filter-name {
+.@name {
     max-width: 170px;
     position: absolute;
     top: 52px;
@@ -129,7 +129,7 @@
     text-overflow: ellipsis;
     padding-right: 20px;
 }
-.app-search-form-filter-name:before {
+.@name:before {
     content: '';
     border-bottom: 1px dashed #a9adb3;
     position: absolute;

@@ -1,7 +1,7 @@
-<div class="app-editor-mask {$shown?'shown'}" onClick="hide"/>
-<div class="app-editor {$shown?'shown'}" scope>
-	<div class="app-editor-close" onClick="close"/>
-	<div class="app-editor-title">
+<div class="@mask {$shown?'->>shown'}" onClick="hide"/>
+<div class="@ {$shown?'->>shown'}" scope>
+	<div class="@close" onClick="close"/>
+	<div class="@title">
 		{@editing}
 	</div>
 	<component class="AutoComplete" opts="{#keywordsAutoCompleteOptions}" active="{$withAutoComplete}" onEnter="onEnter">

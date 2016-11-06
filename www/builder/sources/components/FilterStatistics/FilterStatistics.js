@@ -10,7 +10,8 @@ initial controllers = [
 		'controller': FiltersStat,
 		'on': {
 			'load': this.updateFilterCount
-		}
+		},
+		'private': true
 	}
 ]
 
@@ -18,8 +19,8 @@ initial helpers = [
 	{
 		'helper': ClickHandler,
 		'options': {
-			'->> app-filter-stat-refresh': this.onRefreshButtonClick,
-			'->> app-filter-stat-row-name': this.onFilterClick
+			'->> @refresh': this.onRefreshButtonClick,
+			'->> @name': this.onFilterClick
 		}
 	}
 ]
@@ -29,6 +30,7 @@ function onRendered() {
 }
 
 function onRefreshButtonClick() {
+	var a = <.@>;
 	$filters.each(function(filter) {
 		StoreKeeper.remove('filterStat_' + filter['filterId']);
 	});
@@ -55,7 +57,7 @@ function updateFilterCount(data) {
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 }
 
-function getCountForFilterWithIndex(index) {	
+function getCountForFilterWithIndex(index) {
 	var filter = $filters{ index };
 	if (isObject(filter)) {
 		FiltersStat.load({'filterId': filter['filterId']});

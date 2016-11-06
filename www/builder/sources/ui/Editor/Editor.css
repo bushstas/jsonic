@@ -1,23 +1,23 @@
 $imgsrc = ../images/ui
-.app-editor-mask {
+.@mask {
 	$(fix z900 rubber bc#212D42 opac65 none)
 }
-.app-editor {
+.@ {
 	$(abs mt-50 ml-10 bgwhite p12 w380 bsh_0_0_10_#383838 br3 z901 none)
 }
-.app-editor.shown,
-.app-editor-mask.shown {
+.@.shown,
+.@mask.shown {
 	$block
 }
-.app-editor-title {
+.@title {
 	$(bold fs16 c#505b6e pb6)
 }
-.app-editor .app-autocomplete-variants {
+.@ .auto-complete_variants {
 	$(nosh bo#3f4963)
 }
-.app-editor-close {
+.@close {
 	$(wh18 abs pointer r10 t10 opac5 png=clear bg)
 }
-.app-editor-close:hover {
+.@close:hover {
 	$opac10
 }

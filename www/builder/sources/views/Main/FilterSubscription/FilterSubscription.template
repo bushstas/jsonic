@@ -1,35 +1,35 @@
-<div class="app-subscription" scope>
-	<div class="app-subscription-title">
+<div class="@" scope>
+	<div class="@title">
 		{@subscrSetting} <b>{@ofNewTenders}</b>
 	</div>
-	<div class="app-subscription-head">
-		<div class="app-subscription-head-total">
+	<div class="@head">
+		<div class="@head-total">
 			{$total}
 		</div>
-		<div class="app-subscription-head-subscribed">
+		<div class="@head-subscribed">
 			{$subscribed}
 		</div>
 	</div>
-	<table class="app-subscription-table" cellpadding="0px" cellspacing="0px">
+	<table class="@table" cellpadding="0px" cellspacing="0px">
 		<thead>
 			<tr>
-				<th class="settings-filter-name">{@filterName}</th>
-				<th class="settings-filter-freq">{@subscrFreq}</th>
-				<th class="settings-filter-subscrbttn">{@mailSubscr}</th>
-				<th class="settings-filter-delete">&nbsp;</th>
+				<th>{@filterName}</th>
+				<th>{@subscrFreq}</th>
+				<th>{@mailSubscr}</th>
+				<th>&nbsp;</th>
 			</tr>
 		</thead>
 		<tbody>
 			{foreach $filters as &filter}
-				<tr data-filterid="{&filter['filterId']}" class="app-subscription-filter-row">
+				<tr data-filterid="{&filter['filterId']}" class="@filter-row">
 					<td>
-						<span class="settings-filter">{&filter['header']}</span>
+						<span class="@filter">{&filter['header']}</span>
 					</td>
 					<td>
 						<control class="Select" name="freqSubs" options="{#subscrFreqOptions}" value="{&filter['freqSubs']}" onChange="onFreqChange">
 					</td>
 					<td>
-						<div class="subscr-button {&filter['isSubs']==1?@greenButton+' subscribed':@whiteButton}"></div>
+						<div class="@button {&filter['isSubs']==1?@greenButton+' ->>subscribed':@whiteButton}"></div>
 					</td>
 					<td>
 						Delete

@@ -80,7 +80,7 @@ class JSCompiler
 
 	private $superClasses = array('component', 'dialog', 'form', 'control', 'menu');
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
-	private $componentLikeClasses = array('Dialog', 'Form', 'Control', 'Menu', 'View', 'Application');
+	public static $componentLikeClasses = array('Dialog', 'Form', 'Control', 'Menu', 'View', 'Application');
 	private $classes = array();
 	private $classesByTypes = array();
 	private $sources = array();
@@ -130,7 +130,7 @@ class JSCompiler
 		$this->validateTooltipHelper();
 	}
 
-	public function run($jsFiles, $coreFiles, $scriptFiles, $dataFiles) {
+	public function run($jsFiles, $coreFiles, $scriptFiles, $dataFiles, $utilsFiles) {
 		if (!is_array($jsFiles) || empty($jsFiles)) {
 			new Error($this->errors['jsFilesNotFound']);
 		}
@@ -155,6 +155,7 @@ class JSCompiler
 		}
 		$this->addClasses();
 		$this->addIncludes();
+		$this->addUtils($utilsFiles);
 		$this->addInheritance();
 		$this->addGlobals();
 		$this->finish();
@@ -337,6 +338,7 @@ class JSCompiler
 			$this->sources[$coreFile['name']] = $coreFile;
 		}
 		$this->checkHelpersUse();
+		$this->checkUtilsUse();
 	}
 
 	private function checkHelpersUse() {
@@ -358,6 +360,25 @@ class JSCompiler
 		foreach ($missingHelpers as $missingHelper) {
 			if (isset($this->sources[$missingHelper]) && $this->sources[$missingHelper]['isHelper']) {
 				unset($this->sources[$missingHelper]);
+			}
+		}
+	}
+
+	private function checkUtilsUse() {
+		$missingUtils = array();
+		$classes = CoreValidator::$utilsClasses;
+		foreach ($classes as $utilsClass) {
+			$regexp = '/\b'.$utilsClass.'\b/';
+			if (!preg_match($regexp, $this->jsCode)) {
+				$missingUtils[] = $utilsClass;
+			}
+		}
+		foreach ($missingUtils as $utilsClass) {
+			if (isset($this->sources[$utilsClass])) {
+				if ($utilsClass == 'Decliner') {
+					JSGlobals::exclude('decls');
+				}
+				unset($this->sources[$utilsClass]);
 			}
 		}
 	}
@@ -478,6 +499,10 @@ class JSCompiler
 
 	private function parseSpecialJSCode(&$content, $className) {
 		TextParser::encode($content, $className);
+		$texts = TextParser::getTexts($className);
+		if (!empty($texts) && TagClassNameParser::parseTexts($texts, $className)) {
+			TextParser::setTexts($texts, $className);
+		}
 		JSInterpreter::parse($content, $className);
 	}
 	
@@ -651,11 +676,13 @@ class JSCompiler
 		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
 		$this->jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", JSGlobals::getVarName('nullFunction'), $this->jsOutput);
 
+
 		if ($this->configProvider->needCssObfuscation()) {
 			$cssClassIndex = &$this->cssCompiler->getCssClassIndex();
 			$this->jsOutput = preg_replace('/\.\s+->>/', '.->>', $this->jsOutput);
 			$regexp = '/->>\s*([a-z][\w\-]+)/';
 			preg_match_all($regexp, $this->jsOutput, $matches);
+
 			$cssClasses = $matches[1];
 			$parts = preg_split($regexp, $this->jsOutput);
 			$this->jsOutput = '';
@@ -725,7 +752,6 @@ class JSCompiler
 				'sources' => $this->sources,
 				'templates' => $templates,
 				'obfuscateCss' => $this->configProvider->needCssObfuscation(),
-				'cssClassIndex' => $this->cssCompiler->getCssClassIndex(),
 				'utilsFuncs' => $this->validator->getUtilsFunctionNames(),
 				'userUtilsFuncs' => $this->utilsCompiler->getFunctionsList(),
 				'initialsParser' => $this->initialsParser
@@ -794,6 +820,12 @@ class JSCompiler
 		$includes = $this->templateCompiler->getIncludes();
 		foreach ($includes as $file => $include) {
 			$this->addIncludeFunction($include, $file);
+		}
+	}
+
+	private function addUtils($utilsFiles) {
+		foreach ($utilsFiles as $utilsFile) {
+			$this->jsOutput[] = "\n".$utilsFile['content'];
 		}
 	}
 
@@ -873,7 +905,7 @@ class JSCompiler
 				if (is_array($this->sources[$parent]) && preg_match('/\b'.$parent.'\.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
 					return true;	
 				}
-				if (in_array($parent, $this->componentLikeClasses) && preg_match('/\bComponent.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
+				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\bComponent.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
 					return true;
 				}
 			}
@@ -939,7 +971,7 @@ class JSCompiler
 		$objCode = array();
 		foreach ($initials as $name => $code) {
 			if (!empty($code)) {
-
+				TagClassNameParser::parseTexts($code, $className, true);
 				$code = preg_replace('/(:\s*)@(\w+)/', "$1__.$2", $code);
 				$code = preg_replace('/\#([a-z]\w*)/i', "<data>$1", $code);
 				$code = preg_replace("/[\t\r\n]/", '', $code);
@@ -974,7 +1006,7 @@ class JSCompiler
 	}
 
 	private function parseClasses() {
-		ControllersParser::init($this->classes, $this->classesByTypes['controller'], $this->initialsParser);
+		ControllersParser::init($this->classes, $this->sources, $this->classesByTypes['controller'], $this->initialsParser);
 		$globals = JSGlobals::getVarNames();
 		$classNames = array_keys($this->classes);
 		$coreClassNames = $this->reservedNames;

@@ -1,6 +1,6 @@
 $imgsrc = ../images/ui
 
-.app-autocomplete ==a {
+.@ ==a {
 	$(rel)
 }
 ~a .add {
@@ -9,16 +9,16 @@ $imgsrc = ../images/ui
 ~a .add:after {
 	$(cnt abs l-22 t50% wh22 mt-11 png=enter bg bgwhite)
 }
-~a-variants ==v {
+.@variants ==v {
 	$(abs t100% mt2 l r p5 pr0 bgwhite br2 bsh_1_1_6_#bec9d4 box z100 bo#788097 none)
 }
 ~v.shown {
 	$block
 }
-~v-inner {
+.@inner {
 	$(mah290 ova rel z2 pr5)
 }
-.app-autocomplete-variant ==vv {
+.@variant ==vv {
 	$(block rel p6_8 lh16 pointer nowrap c#515a71 br3)
 }
 ~vv.active,

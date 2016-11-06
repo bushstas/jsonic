@@ -1,6 +1,8 @@
+{namespace .Tags}
+
 {template .topContent}
-<div class="app-tags-top">
-	<span class="app-tags-select-button" data-index="1">
+<div class="@top">
+	<span class="@select-button" data-index="1">
 		{$opt1}
 		<component class="PopupSelect" cmpid="opt1" arg-options="{#wordExcludeOptions}" title="{@findExcludes}" onChange="onChangeOption">
 	</span>

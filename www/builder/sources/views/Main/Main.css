@@ -6,33 +6,33 @@ $imgsrc = ../images/mainpage
 ~c table {
 	$w100%
 }
-.app-mainpage-table ==tb > tr > td {
+.mainpage-table ==tb > tr > td {
 	$vtop
 }
-~tb .app-mainpage-left-column {
+~tb .mainpage-left-column {
 	$(w354 p12)
 }
-~tb .app-mainpage-content-column {
+~tb .mainpage-content-column {
     $(pt12 rel)
 }
-.app-mainpage-left-column-area {
+.mainpage-left-column-area {
 	$(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
-.app-mainpage-left-column-title {
+.mainpage-left-column-title {
     $(abs l r t lh39 h37 c#edf0f4 bc#51648d pl43 bold norep png = person-icon br3_3_0_0 bp17_50%)
 }
-.app-mainpage-left-column > div:last-child {
+.mainpage-left-column > div:last-child {
     $(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
 .mainpage-leftcolumn-title ==t {
     $(mt27 fs16 c#4c546b pb7)
 }
-~t .app-tooltip {
+~t .tooltip {
     $fright
 }
-.app-mainpage-content {
+.mainpage-content {
     $(abs b12 t46 l r12 br3 ova p12_15 box)
     box-shadow: 0 0 6px #c1c5d1;
 }

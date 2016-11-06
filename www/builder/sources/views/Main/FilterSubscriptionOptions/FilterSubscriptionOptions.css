@@ -1,6 +1,6 @@
-.app-subscription-option ==o {
+.@option ==o {
 	$(mb12 br3 bo#E0E6F3 p10 pointer)
 }
-~o .app-ui-checkbox {
+~o .checkbox {
 	$(mt2)
 }
