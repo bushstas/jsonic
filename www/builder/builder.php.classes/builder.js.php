@@ -757,6 +757,7 @@ class JSCompiler
 				'initialsParser' => $this->initialsParser
 			)
 		);
+		$this->jsOutput[] = "\nvar p;";
 		foreach ($this->classes as $className => &$class) {
 			$type = $class['type'];
 			if (is_array($class['functions'])) {
@@ -767,6 +768,7 @@ class JSCompiler
 						$this->addPrototypeFunction($className, $func['name'], $args, $func['code']);
 					} else {
 						$this->addConstructorFunction($className, in_array($type, $this->componentLikeClassTypes));
+						$this->jsOutput[] = "\np=".$className.'.prototype;';
 					}						
 				}
 			}
@@ -933,7 +935,7 @@ class JSCompiler
 	}
 
 	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
-		$this->jsOutput[] = $className.'.prototype.'.$method.'=function('.$args.'){';
+		$this->jsOutput[] = 'p.'.$method.'=function('.$args.'){';
 		$this->jsOutput[] = $code;
 		$this->jsOutput[] = '};';
 	}
@@ -955,7 +957,7 @@ class JSCompiler
 		}
 		if (!empty($tmpids)) {
 			foreach ($tmpids as $k => &$v) $v = '<nq>'.$className.'.prototype.getTemplate'.ucfirst($v).'<nq>';
-			$this->jsOutput[] = $className.'.prototype.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
+			$this->jsOutput[] = 'p.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
 		}
 	}
 
@@ -985,7 +987,7 @@ class JSCompiler
 		$objCode = implode(",\n", $objCode);
 		ControllersParser::parseInitialsCode($objCode);
 		if (!empty($objCode)) {
-			$this->jsOutput[] = $className.".prototype.getInitials=function(){";
+			$this->jsOutput[] = "p.getInitials=function(){";
 			$this->jsOutput[] = "\n\treturn {\n";
 			$this->jsOutput[] = $objCode;
 			$this->jsOutput[] = "\t};\n};";
