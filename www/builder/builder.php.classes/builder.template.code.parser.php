@@ -76,10 +76,10 @@ class TemplateCodeParser
 		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
-		'doubleForeachKeyword' => 'Обнаружено более одного ключевого слова в операторе <b>foreach</b> в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>'
+		'doubleForeachKeyword' => 'Обнаружено более одного ключевого слова в операторе <b>foreach</b> в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
+		'improperCallback' => 'Обнаружен вызов неподходящего для этого метода {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
-//	'switchError' => "Обнаружена ошибка в коде оператора <b>switch</b> в шаблоне {??} класса {??}<xmp>{?}</xmp><b>Ожидается код вида</b><xmp>{switch \$type}</xmp><b>или</b><xmp>{switch ~type}</xmp><b>или</b><xmp>{switch &type}</xmp><b>или</b><xmp>{switch .getType(\$a, ~b, &c)}</xmp>",
 
 	private static $keywords = array(
 		'false', 'true', 'null', 'undefined', 'NaN', 'Infinity'
@@ -115,6 +115,7 @@ class TemplateCodeParser
 	public static function init($templateName, $className) {
 		self::$templateName = $templateName;
 		self::$className = $className;
+		TemplateCallbackValidator::init();
 	}
 
 	private static function initiate(&$code, $place, $element) {
@@ -979,7 +980,7 @@ class TemplateCodeParser
 			self::off('foreachAsVar');
 			self::$expected = array('0', '~', '$', '&', '#', '.', self::$space);
 			return false;
-		} 
+		}
 		if (!self::$isNum && !self::$anyVar && !self::$isKey && !self::$open['comp'] && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
 			self::on('fn');
 			self::$expected = array('(');
@@ -988,6 +989,10 @@ class TemplateCodeParser
 					self::validateFunction($part);
 				}
 				return false;
+			} else {
+				if (!TemplateCallbackValidator::isProper(self::$currentPart)) {
+					new Error(self::$errors['improperCallback'], array(self::$currentPart, self::$className, self::$templateName, !empty(self::$element) ? self::$element : self::$code));
+				}
 			}
 		}			
 		if ((self::$open['foreachAs'] || self::$open['foreachAs2']) && !self::$isNum) {

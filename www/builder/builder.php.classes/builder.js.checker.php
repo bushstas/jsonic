@@ -3,7 +3,7 @@
 class JSChecker
 {	
 	private static $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
-	private static $solidMethods = array(
+	public static $solidMethods = array(
 		'render' => 'onRendered',
 		'disable' => '',
 		'isDisabled' => '',
@@ -14,6 +14,7 @@ class JSChecker
 		'plusTo' => '',
 		'addOneTo' => '',
 		'addTo' => '',
+		'g' => '',
 		'get' => '',
 		'showElement' => '',
 		'setStyle' => '',
@@ -58,26 +59,7 @@ class JSChecker
 		'setScope' => '',
 		'log' => '',
 		'getUniqueId' => '',
-		'dispose' => 'disposeInternal',
-
-		'_getParentElement' => '',
-		'_provideWithComponent' => '',
-		'_getNextSiblingChild' => '',
-		'_setPrevSiblingChild' => '',
-		'_setNextSiblingChild' => '',
-		'_disposeLinks' => '',
-		'_getFirstNodeChild' => '',
-		'_subscribe' => '',
-		'_getWaitingChild' => '',
-		'_registerElement' => '',
-		'_registerChildComponent' => '',
-		'_unregisterChildComponent' => '',
-		'_registerControl' => '',
-		'_unregisterControl' => '',
-		'_setParent' => '',
-		'_registerPropActivity' => '',
-		'_disposePropActivities' => '',
-		'_getTemplateById' => ''
+		'dispose' => 'disposeInternal'
 	);
 	private static $errors = array(
 		'Класс {??} не может иметь метод {??}, т.к. он зарезервирован и наследуется от класса <b>Component</b>. Вместо этого используйте метод {??}',
