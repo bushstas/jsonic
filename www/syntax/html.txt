@@ -346,7 +346,7 @@ contexts:
           captures:
             0: support.class.actionscript.2    
 
-        - match: ([\$&@\#~\^\.](?=[a-zA-Z])\w+)
+        - match: ([%\$&@\#~\^\.](?=[a-zA-Z])\w+)
           captures:
             0: support.class.actionscript.2
 

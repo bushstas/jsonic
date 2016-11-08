@@ -2,7 +2,8 @@
 
 class TemplateParser 
 {	
-	private static $calledClasses, $classes, $templates, $sources;
+	private static $calledClasses, $templates, $sources;
+	public static $classes;
 	private static $regexp = "/\{ *template +\.(\w+) *\}/";
 	private static $space = '_u00A0_';
 	private static $textNodes = array();
@@ -144,7 +145,7 @@ class TemplateParser
 		return self::$textNodes;
 	}
 
-	public static function parse($template, &$class, $className = '', &$tmpids = '') {
+	public static function parse($template, &$class, $className = '', &$tmpids = '') {		
 		self::$class = &$class;
 		self::$className = $className;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
@@ -159,6 +160,9 @@ class TemplateParser
 		self::$tmpids = $tmpids;
 		preg_match_all(self::$regexp, $template, $matches);
 		$templateNames = $matches[1];
+		if (is_array($templateNames)) {
+			self::$class['templatesList'] = $templateNames;
+		}
 		if (!empty($templateNames)) {
 			if (!empty($className) && !preg_match("/\{template +\.main *\}/", $template) && !self::hasParentMainTemplate($class) && in_array($className, self::$calledClasses)) {
 				new Error(self::$errors['noMainTemplate'], $className);
@@ -167,6 +171,7 @@ class TemplateParser
 			array_shift($templateContents);
 		} else {
 			$templateNames = array('main');
+			self::$class['templatesList'] = $templateNames;
 			$templateContents = array($template);
 		}
 		
@@ -945,11 +950,6 @@ class TemplateParser
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
-			if ($propName == 'templ') {
-				$tmpName = $propValue;
-				$child['tmp'] = '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>';
-				continue;
-			}
 			if ($propName == 'if') {
 				$ifCondition = $propValue;
 				continue;
@@ -959,6 +959,15 @@ class TemplateParser
 				continue;
 			}
 			$hasCode = self::hasCode($propValue);
+			if ($propName == 'templ') {
+				$tmpName = $propValue;
+				if (!$hasCode) {
+					$child['tmp'] = '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>';
+				} else {
+					$child['tmp'] = self::processCode($propValue, 'templateAttribute');
+				}
+				continue;
+			}
 			if ($hasCode) {
 				$propValue = self::processCode($propValue, 'templateAttribute');
 			}

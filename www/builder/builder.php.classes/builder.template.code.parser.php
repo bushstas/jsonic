@@ -77,7 +77,13 @@ class TemplateCodeParser
 		'caseOutOfSwitchContext' => 'ќбнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br> од в котором произошла ошибка: {{??}}',
 		'operatorInAppropPlace' => 'ќбнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'doubleForeachKeyword' => 'ќбнаружено более одного ключевого слова в операторе <b>foreach</b> в шаблоне {??} класса {??}<br><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>',
-		'improperCallback' => 'ќбнаружен вызов неподход€щего дл€ этого метода {??} в шаблоне {??} класса {??}<br><br> од в котором произошла ошибка: <xmp>{?}</xmp>'
+		'improperCallback' => 'ќбнаружен вызов неподход€щего дл€ этого метода {??} в шаблоне {??} класса {??}<br><br> од в котором произошла ошибка: <xmp>{?}</xmp>',
+		'improperPlaceForTempl' => "ќбнаружена попытка передать ссылку на шаблон {??} в неподход€щем месте в шаблоне {??} класса {??}<br>—сылки на шаблоны можно передавать только дочерним компонентам<xmp>{template .main}\n   <component class=\"Component\" tpl=\"{%item}\">\n{/template}\n\n{template .item}\n   <div></div>\n{/template}</xmp>",
+		'improperTemplMain' => "ќбнаружена попытка передать ссылку на шаблон {??} в шаблоне {??} класса {??}<br>ѕередача ссылок на главные шаблоны запрещена<br><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>",
+		'improperTempl' =>  "ќбнаружена попытка передать ссылку на шаблон {??} в этом же шаблоне класса {??}<br>“акое действие вызовет бесконечный вызов функции шаблона<br><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>",
+		'incorrectClassType' => "ќбнаружена попытка передать ссылку на класс {??} с типом {??} в шаблоне {??} класса {??}<br>ƒл€ передачи классов по ссылке доступны типы:<xmp>component\ncontrol\nmenu\nform</xmp><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>",
+		'unknownClass' => "ќбнаружена попытка передать ссылку на неподход€щий или несуществуюший класс {??} в шаблоне {??} класса {??}<br>ƒл€ передачи классов по ссылке доступны типы:<xmp>component\ncontrol\nmenu\nform</xmp><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>",
+		'improperClass' => "ќбнаружена попытка передать ссылку на класс {??} в шаблоне {??} того же класса<br> ласс не может передать сам себ€ по ссылке<br><br>Ёлeмент в котором произошла ошибка: <xmp>{?}</xmp>"
 	);
 
 
@@ -257,32 +263,47 @@ class TemplateCodeParser
 					$code .= $part;
 				
 					if (self::$isStart) {
+						if (preg_match('/^[A-Z]/', $part)) {
+							if (in_array($part, array_keys(TemplateParser::$classes))) {
+								if (!in_array(TemplateParser::$classes[$part]['type'], array('component', 'control', 'form', 'menu'))) {
+									new Error(self::$errors['incorrectClassType'], array($part, TemplateParser::$classes[$part]['type'], self::$templateName, self::$className, self::$element));
+								}
+								if ($part == self::$className) {
+									new Error(self::$errors['improperClass'], array($part, self::$templateName, self::$element));
+								}
+								self::$expected = array('end');
+								self::$thereWasWord = true;
+								continue;
+							} else {
+								new Error(self::$errors['unknownClass'], array($part, self::$templateName, self::$className, self::$element));
+							}
+						}
 						self::$isStart = false;
 						switch ($part) {
 							case 'foreach':
 								if (self::$place != 'foreach') {
-									new Error(self::$errors['operatorInAppropPlace'], array('foreach', self::$className, self::$templateName, self::$element));
+									new Error(self::$errors['operatorInAppropPlace'], array('foreach', self::$templateName, self::$className, self::$element));
 								}
 								self::$isForeach = true;
 								self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
 							break;
 							case 'let':
 								if (self::$place != 'textNode') {
-									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$className, self::$templateName, self::$element));
+									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$templateName, self::$className, self::$element));
 								}
 								self::$isLet = true;
 								self::$expected = array('&', self::$space);
 							break;
 							case 'switch':
 								if (self::$place != 'switch') {
-									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$className, self::$templateName, self::$element));
+									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$templateName, self::$className, self::$element));
 								}
 								self::$isSwitch = true;
 								self::$expected = array('~', '@', '&', '$', '#', self::$space);
 							break;
 							case 'case':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
-									new Error(self::$errors['caseOutOfSwitchContext'], array('case', self::$className, self::$templateName, self::$code));
+									new Error(self::$errors['caseOutOfSwitchContext'], array('case', self::$templateName, self::$className, self::$code));
 								}
 								self::$isCase = true;
 								if (self::$place != 'ifcase') {
@@ -293,7 +314,7 @@ class TemplateCodeParser
 							break;
 							case 'default':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
-									new Error(self::$errors['caseOutOfSwitchContext'], array('default', self::$className, self::$templateName, self::$code));
+									new Error(self::$errors['caseOutOfSwitchContext'], array('default', self::$templateName, self::$className, self::$code));
 								}
 								$isDefault = true;
 								self::$thereWasWord = true;
@@ -308,7 +329,7 @@ class TemplateCodeParser
 						if (!self::$foreachKeyword) {
 							self::$foreachKeyword = true;
 						} else {
-							new Error(self::$errors['doubleForeachKeyword'], array(self::$className, self::$templateName, self::$code));
+							new Error(self::$errors['doubleForeachKeyword'], array(self::$templateName, self::$className, self::$code));
 						}
 					} elseif ($part == 'as' && self::$open['foreachArr']) {
 						self::off('name');
@@ -974,6 +995,17 @@ class TemplateCodeParser
 		}
 
 		if (self::$open['comp'] || self::$open['template']) {
+			if (self::$open['template']) {
+				if (self::$place != 'componentAttribute') {
+					new Error(self::$errors['improperPlaceForTempl'], array(sself::$templateName, self::$className));
+				}
+				if (self::$currentPart == self::$templateName) {
+					new Error(self::$errors['improperTempl'], array(self::$templateName, self::$className, self::$element));
+				}
+				if (self::$currentPart == 'main') {
+					new Error(self::$errors['improperTemplMain'], array(self::$currentPart, self::$templateName, self::$className, self::$element));
+				}
+			}
 			self::$expected = array('end');
 			return false;
 		}
@@ -1299,25 +1331,25 @@ class TemplateCodeParser
 	private static function defineExpected($place) {
 		switch ($place) {
 			case 'componentClass':
-				self::$expected = array('a', '.', '&', '~', '#');
+				self::$expected = array('a', '.', '&', '~', '#', '%');
 			break;
 			case 'eventAttribute':
 			case 'if':
 			case 'else':
 			case 'templateAttribute':
 			case 'elementAttribute':
-				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#');
+				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '%');
 			break;
 			case 'componentAttribute':
 				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%');
 			break;
 			case 'textNode':
-				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@');
+				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%');
 			break;
 			case 'switch':
 			case 'ifcase':
 			case 'foreach':
-				self::$expected = array('a');
+				self::$expected = array('a', '%');
 			break;
 			default:
 				self::$expected = array();

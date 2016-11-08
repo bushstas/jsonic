@@ -1,16 +1,10 @@
+{template .main}
 <div class="@outer-container">
-	<component class="DataTableTabPanel" arg-caption="{%caption}">
+	<component class="DataTableTabPanel" a="{%aaa + 1}">
 	{foreach $items2 as &v => &g limit $limit}
 		<div class="xxxxx">
 			{&v}
 		</div>
 		{ifempty}
-			<ul>
-				<li>Empty</li>
-				<li>Empty</li>
-				<li>Empty</li>
-				<li>Empty</li>
-				<li>Empty</li>
-			</ul>
 	{/foreach}	
 </div>

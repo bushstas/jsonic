@@ -67,7 +67,8 @@ class JSCompiler
 		'noCorrectMethod' => 'В классе-корректоре {??} отсутсвует метод <b>correct</b>',
 		'overrideController' => 'Обнаружено переопределение существующего класса {??} в одном из методов класса {??}',
 		'overrideGlobal' => 'Обнаружено переопределение системной переменной {??} в одном из методов класса {??}',
-		'overrideUtilsFunc' => 'Обнаружено переопределение системной функции {??} в одном из методов класса {??}'
+		'overrideUtilsFunc' => 'Обнаружено переопределение системной функции {??} в одном из методов класса {??}',
+		'noMainTemplate' => 'У класса {??} и ни у одного из его супер-классов не найден шаблон <b>main</b>'
 	);
 
 	private $coreClasses = array(
@@ -816,6 +817,26 @@ class JSCompiler
 				$this->jsOutput[] = $className.'=new '.$className.'();';
 			}
 		}
+		foreach ($this->usedComponentsNames as $className) {
+			if (!$this->hasMainTemplate($className)) {
+				new Error($this->errors['noMainTemplate'], $className);
+			}
+		}
+	}
+
+	private function hasMainTemplate($className) {
+		$ownTemplates = $this->classes[$className]['templatesList'];		
+		if (is_array($ownTemplates) && in_array('main', $ownTemplates)) {
+			return true;
+		}
+		$parents = $this->classes[$className]['extends'];
+		if (is_array($parents)) {
+			foreach ($parents as $parentClassName) {
+				if ($this->hasMainTemplate($parentClassName)) {
+					return true;
+				}
+			}
+		}		
 	}
 
 	private function addIncludes() {
