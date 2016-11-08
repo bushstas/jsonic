@@ -1,5 +1,5 @@
 <div class="@outer-container">
-	<component class="DataTableTabPanel" aaa="{.getElement2()}">
+	<component class="DataTableTabPanel" arg-caption="{%caption}">
 	{foreach $items2 as &v => &g limit $limit}
 		<div class="xxxxx">
 			{&v}

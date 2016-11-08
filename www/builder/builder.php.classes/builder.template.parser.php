@@ -1241,7 +1241,9 @@ class TemplateParser
 							$child['w'] = array();
 						}
 						$child['w'][] = $k;
-						$child['w'][] = trim($v, '^');
+						$child['w'][] = ltrim($v, '^');
+					} elseif ($v[0] == '%') {
+						$child['p'][$k] = '<nq>$.getTemplate'.ucfirst(ltrim($v, '%')).'<nq>';
 					}
 				}				
 				if (empty($child['p'])) {

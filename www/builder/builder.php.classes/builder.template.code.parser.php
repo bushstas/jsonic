@@ -718,6 +718,11 @@ class TemplateCodeParser
 	private static function handleMathSign($sign) {
 		if (!self::$quoted) {
 			self::$expected = self::$lists[$sign];
+			if ($sign == '%' && self::$isStart) {
+				self::$expected = array('a');
+				self::on('template');
+				return;
+			}
 			if ($sign == '-' || $sign == '+') {
 				self::removeExpected($sign);
 			}
@@ -968,7 +973,7 @@ class TemplateCodeParser
 			}
 		}
 
-		if (self::$open['comp']) {
+		if (self::$open['comp'] || self::$open['template']) {
 			self::$expected = array('end');
 			return false;
 		}
@@ -1304,7 +1309,7 @@ class TemplateCodeParser
 				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#');
 			break;
 			case 'componentAttribute':
-				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^');
+				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%');
 			break;
 			case 'textNode':
 				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@');

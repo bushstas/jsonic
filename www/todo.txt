@@ -107,11 +107,9 @@ $func(), ~func()
 
 ------------------------------
 
-<component class="DataTableTabPanel" cityTempl="{template:city}">
-<component class="DataTableTabPanel" cityTempl="{template:#city}"> by key
-<div>
-	{~cityTempl->}
-</div>
+<component class="A" t="{%caption}">
+
+<component class="A" t="{%main}"> нельзя передавать main / не может передавать сам себя
 
 ------------------------------
 
@@ -128,5 +126,9 @@ $func(), ~func()
 -----------------------------
 
 проверить класс builder.checker
+
+-----------------------------
+
+controller action 'before': Corrector, 'after': Corrector
 
 -----------------------------
