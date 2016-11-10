@@ -150,7 +150,7 @@ function Core() {
 		if (this.nextSiblingChild instanceof Node) return this.nextSiblingChild;
 		var firstNodeChild = Core.getFirstNodeChild.call(this.nextSiblingChild);
 		if (firstNodeChild) return firstNodeChild;
-		return this.nextSiblingChild._getNextSiblingChild();	
+		return Core.getNextSiblingChild.call(this.nextSiblingChild, this);	
 	};
 	this.setNextSiblingChild = function(nextSiblingChild) {
 		this.nextSiblingChild = nextSiblingChild;
