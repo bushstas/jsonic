@@ -61,6 +61,7 @@ class JSCompiler
 		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
 		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}',
 		'noMethodFound3' => 'Ошибка вызова {??} из метода {??} в коде класса {??}. Метод не найден',
+		'noMethodFound4' => 'Обработчик события {??}, указанный в одном из initial параметров, не найден среди методов класса {??}',
 		'globalVarUsing' => 'В классе {??} обнаружено использование зарезервированных системой имен переменных: {??}',
 		'creatingInstance' => 'В классе {??} обнаружено создание экземпляра класса {??}{?}',
 		'obfuscatorError' => 'Ошибка обфусцирующего компилятора:<br><br>{?}<br><br>{?}',
@@ -104,8 +105,6 @@ class JSCompiler
 	private $cssCompiler;
 	private $usedComponents;
 	private $usedComponentsNames;
-
-
 
 	public function __construct($configProvider) {
 		$this->configProvider = $configProvider;
@@ -350,7 +349,7 @@ class JSCompiler
 				$isMissing = true;
 				if ($helper == 'Tooltiper') {
 					$isMissing = empty($this->config['tooltipClass']);
-				} elseif ($helper == 'Globals') {
+				} elseif ($helper == 'GlobalState') {
 					$isMissing = !preg_match('/\binitial globals\b/', ' '.$this->jsCode);
 				} elseif ($helper == 'StoreKeeper') {
 					$isMissing = !preg_match('/\bstoreAs\b/', ' '.$this->jsCode);
@@ -790,6 +789,13 @@ class JSCompiler
 				foreach ($class['callbacks'] as $callback) {
 					if (!$this->hasComponentMethod($callback, $class)) {
 						new Error($this->errors['noMethodFound2'], array($callback, $className));
+					}
+				}
+			}
+			if (is_array($class['initialCallbacks'])) {
+				foreach ($class['initialCallbacks'] as $callback) {
+					if (!$this->hasComponentMethod($callback, $class)) {
+						new Error($this->errors['noMethodFound4'], array($callback, $className));
 					}
 				}
 			}

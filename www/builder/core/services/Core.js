@@ -1,4 +1,4 @@
-function Core() {
+var Core = new (function() {
 	var extendInitials = function(initials1, initials2) {
 		if (isNull(initials1)) {
 			initials1 = initials2;
@@ -28,8 +28,17 @@ function Core() {
 				if (isArrayLike(initials[k])) {
 					if (k == 'correctors') {
 						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
+					} else if (k == 'listeners') {
+						if (isObject(initials[k]['global'])) {
+							for (var j in initials[k]['global']) GlobalState.listen(j, initials[k]['global'][j], this);
+						}
+						if (isObject(initials[k]['local'])) {
+							for (var j in initials[k]['local']) LocalState.listen(j, initials[k]['local'][j], this);
+						}
 					} else if (k == 'globals') {
-						for (var j in initials[k]) Globals.subscribe(j, initials[k][j], this);
+						for (var j in initials[k]) GlobalState.subscribe(j, initials[k][j], this);
+					} else if (k == 'locals') {
+						for (var j in initials[k]) LocalState.subscribe(j, initials[k][j], this);
 					} else if (k == 'followers') {
 						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
 					} else if (k == 'controllers') {
@@ -265,5 +274,4 @@ function Core() {
 			}
 		}
 	};
-}
-Core = new Core();
+});

@@ -1,7 +1,8 @@
-String.prototype.isEmpty = function() {
+p=String.prototype;
+p.isEmpty = function() {
 	return !(/[^\s]/).test(this);
 };
-String.prototype.toArray = function(delimiter) {
+p.toArray = function(delimiter) {
 	delimiter = delimiter || ',';
 	var ar = [];
 	var parts= this.split(delimiter);

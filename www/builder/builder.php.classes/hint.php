@@ -383,12 +383,17 @@
 			$items[] = 'События';
 			$items[] = false;
 
-			$items[] = '<b>--> change</b> - Инициирует событие change 
+			$items[] = '<b>--> change</b> - Инициирует событие (в пределах компонента) change 
 			<xmp>--> change;</xmp><xmp>this.dispatchEvent(\'change\');</xmp>
 			<xmp>-->change(params);</xmp><xmp>this.dispatchEvent(\'change\', params);</xmp>';
-			$items[] = '<b>==> everythingReady</b> - Инициирует глобальное событие everythingReady 
-			<xmp>==> everythingReady;</xmp><xmp>Globals.dispatchEvent(\'everythingReady\');</xmp>
-			<xmp>==> everythingReady (params);</xmp><xmp>Globals.dispatchEvent(\'everythingReady\', params);</xmp>';
+			
+			$items[] = '<b>==> everythingReady</b> - Инициирует локальное (в пределах текущего маршрута) событие everythingReady 
+			<xmp>==> everythingReady;</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\');</xmp>
+			<xmp>==> everythingReady (params);</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\', params);</xmp>';
+
+			$items[] = '<b>===> everythingReady</b> - Инициирует глобальное (в пределах всего приложения) событие everythingReady<br>Доступно только для одностраничных приложений
+			<xmp>===> everythingReady;</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\');</xmp>
+			<xmp>===> everythingReady (params);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', params);</xmp>';
 
 			$items[] = true;
 			$items[] = 'Диалоговые окна';

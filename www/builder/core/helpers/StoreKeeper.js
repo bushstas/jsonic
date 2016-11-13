@@ -1,67 +1,56 @@
 function StoreKeeper() {
-	var prefix = 'stored_';
-	var secondsInMeasures = {
+	var x = 'stored_';
+	var s = {
 		'month': 2592000,
 		'day'  : 86400,
 		'hour' : 3600,
 		'min'  : 60
 	};
-	this.set = function(key, value) {
-		var localStorageKey = getLocalStorageKey(key);
-		var item = JSON.stringify({
-			'data': value,
-			'timestamp': (window['Date']['now']()).toString()
+	this.set = function(k, v) {
+		var lk = g(k);
+		var i = JSON.stringify({
+			'data': v,
+			'timestamp': Date.now().toString()
 		});
-		window.localStorage.setItem(localStorageKey, item);
+		localStorage.setItem(lk, i);
 	};
-	this.get = function(key) {
-		var item = getItem(key);
-		return Objects.has(item, 'data') ? item['data'] : null;
+	this.get = function(k) {
+		var i = gi(k);
+		return Objects.has(i, 'data') ? i['data'] : null;
 	};
-	this.getActual = function(key, period) {
-		var item = getItem(key);
-		return Objects.has(item, 'data') && isActual(item['timestamp'], period) ? item['data'] : null;
+	this.getActual = function(k, p) {
+		var i = gi(k);
+		return Objects.has(i, 'data') && ia(i['timestamp'], p) ? i['data'] : null;
 	};
-	this.remove = function(key) {
-		var localStorageKey = getLocalStorageKey(key);
-		window.localStorage.removeItem(localStorageKey);
+	this.remove = function(k) {
+		var lk = g(k);
+		localStorage.removeItem(lk);
 	};
-	var isActual = function(savedMilliseconds, period) {
-		var nowMilliseconds    = window['Date']['now'](),
-			periodMilliseconds = getMilliseconds(period);
-		if (isString(savedMilliseconds)) {
-			savedMilliseconds = stringToNumber(savedMilliseconds);
-		}
-		return periodMilliseconds && savedMilliseconds && nowMilliseconds - savedMilliseconds < periodMilliseconds;
+	var ia = function(sm, p) {
+		var nm = Date.now(), pm = gm(p);
+		if (isString(sm)) sm = stringToNumber(sm);
+		return pm && sm && nm - sm < pm;
 	};
-	var getItem = function(key) {
-		var localStorageKey = getLocalStorageKey(key);
-		var item = window.localStorage.getItem(localStorageKey);
-		if (!item) return null;
+	var gi = function(k) {
+		var lk = g(k);
+		var i = localStorage.getItem(lk);
+		if (!i) return null;
 		try {
-			item = JSON.parse(item);
-		} catch (exception) {
-			log('Json parse exception', 'getItem', this, {'item': item});
-			return null;	
+			i = JSON.parse(i);
+		} catch (e) {
+			return null;
 		}
-		return item;
+		return i;
 	};
-	var getMilliseconds = function(period) {
-		var periodNumber  = ~~period.replace(/[^\d]/g, '');
-		var periodMeasure =   period.replace(/\d/g, '');
-
-		if (!periodNumber) {
-			log('Given period number is empty', 'getMilliseconds', this);
-			return 0;		
-		}
-		if (!secondsInMeasures[periodMeasure]) {
-			log('No given measure: ' + periodMeasure, 'getMilliseconds', this);
-			return 0;
-		}
-		return secondsInMeasures[periodMeasure] * periodNumber * 1000;
+	var gm = function(p) {
+		var n  = ~~p.replace(/[^\d]/g, '');
+		var m = p.replace(/\d/g, '');
+		if (!n) return 0;		
+		if (!s[m]) return 0;
+		return s[m] * n * 1000;
 	};
-	var getLocalStorageKey = function(key) {
-		return prefix + key;
+	var g = function(k) {
+		return x + k;
 	};
 }
 StoreKeeper = new StoreKeeper();

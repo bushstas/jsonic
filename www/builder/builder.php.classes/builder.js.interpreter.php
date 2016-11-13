@@ -130,7 +130,8 @@ class JSInterpreter
 
 	private static function parseDispatchEventShortcuts(&$content) {
 		$content = preg_replace('/--> *(\w+) *(\((.*)\))* *;*/', "this.dispatchEvent('$1',$3);", $content);
-		$content = preg_replace('/==> *(\w+) *(\((.*)\))* *;*/', "Globals.dispatchEvent('$1',$3);", $content);
+		$content = preg_replace('/===> *(\w+) *(\((.*)\))* *;*/', "GlobalState.dispatchEvent('$1',$3);", $content);
+		$content = preg_replace('/==> *(\w+) *(\((.*)\))* *;*/', "LocalState.dispatchEvent('$1',$3);", $content);
 	}
 
 	private static function parseTagShortcuts(&$content) {

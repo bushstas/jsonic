@@ -1,15 +1,16 @@
 var __StyleNameCache = {};
-Element.prototype.setClass = function(className) {
+p=Element.prototype;
+p.setClass = function(className) {
 	this.className = className.trim();
 }
-Element.prototype.toggleClass = function(className, isAdding) {
+p.toggleClass = function(className, isAdding) {
 	if (isAdding) {
 		this.addClass(className);
 	} else {
 		this.removeClass(className);
 	}
 };
-Element.prototype.switchClasses = function(className1, className2) {
+p.switchClasses = function(className1, className2) {
 	var classes = this.getClasses();
 	if (classes.contains(className1)) { 
 		this.removeClass(className1);
@@ -19,7 +20,7 @@ Element.prototype.switchClasses = function(className1, className2) {
 		this.addClass(className1);
 	}
 };
-Element.prototype.addClass = function(className) {
+p.addClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();
 		var addedClasses = className.split(' ');
@@ -31,7 +32,7 @@ Element.prototype.addClass = function(className) {
 		this.className = classNames.join(' ');
 	}
 };
-Element.prototype.removeClass = function(className) {
+p.removeClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();
 		var removedClasses = className.split(' ');
@@ -44,21 +45,21 @@ Element.prototype.removeClass = function(className) {
 		this.className = newClasses.join(' ');
 	}
 };
-Element.prototype.hasClass = function(className) {
+p.hasClass = function(className) {
 	return this.getClasses().indexOf(className) > -1;
 };
-Element.prototype.getClasses = function() {
+p.getClasses = function() {
 	var classNames = (this.className || '').trim().replace(/ {2,}/g, ' ');
 	if (classNames) {
 		return classNames.split(' ');
 	}
 	return [];
 };
-Element.prototype.getAncestor = function(selector) {
+p.getAncestor = function(selector) {
 	if (isNone(selector) || !isString(selector)) {
 		return null;
 	}
-	if (isFunction(Element.prototype.closest)) {
+	if (isFunction(p.closest)) {
 		return this.closest(selector);
 	}
 	var parts = selector.trim().split(' ');
@@ -87,34 +88,34 @@ Element.prototype.getAncestor = function(selector) {
 	}
 	return null;
 };
-Element.prototype.getData = function(name) {
+p.getData = function(name) {
 	return this.getAttribute('_' + name) || '';
 };
-Element.prototype.setData = function(name, value) {
+p.setData = function(name, value) {
 	this.setAttribute('_' + name, value);
 };
-Element.prototype.getRect = function() {
+p.getRect = function() {
 	return this.getBoundingClientRect();
 };
-Element.prototype.setWidth = function(width) {
+p.setWidth = function(width) {
 	this.style.width = isNumber(width) ? width + 'px' : width;
 };
-Element.prototype.setHeight = function(height) {
+p.setHeight = function(height) {
 	this.style.height = isNumber(height) ? height + 'px' : height;
 };
-Element.prototype.getWidth = function() {
+p.getWidth = function() {
 	return this.getRect().width;
 };
-Element.prototype.getHeight = function() {
+p.getHeight = function() {
 	return this.getRect().height;
 };
-Element.prototype.getTop = function() {
+p.getTop = function() {
 	return this.getRect().top;
 };
-Element.prototype.getLeft = function() {
+p.getLeft = function() {
 	return this.getRect().left;
 };
-Element.prototype.css = function(style) {
+p.css = function(style) {
 	var element = this;
 	var set = function(value, style) {
 		var propertyName = getVendorJsStyleName(style);	
@@ -138,10 +139,10 @@ Element.prototype.css = function(style) {
 	   	}
 	}
 };
-Element.prototype.getChildAt = function(index) {
+p.getChildAt = function(index) {
 	return this.childNodes[index];
 };
-Element.prototype.attr = function(attrName) {
+p.attr = function(attrName) {
 	if (!isUndefined(arguments[1])) {
 		if (attrName == 'class') {
 			this.setClass(arguments[1]);
@@ -154,23 +155,23 @@ Element.prototype.attr = function(attrName) {
 		return this.getAttribute(attrName);
 	}
 };
-Element.prototype.show = function(isShown) {
+p.show = function(isShown) {
 	var display = isString(isShown) ? isShown : (isUndefined(isShown) || isShown ? 'block' : 'none');
 	this.style.display = display;
 };
-Element.prototype.hide = function() {
+p.hide = function() {
 	this.show(false);
 };
-Element.prototype.find = function(selector) {
+p.find = function(selector) {
 	return this.querySelector(selector);
 };
-Element.prototype.finds = function(selector) {
+p.finds = function(selector) {
 	return this.querySelectorAll(selector);
 };
-Element.prototype.getParent = function() {
+p.getParent = function() {
 	return this.parentNode;
 };
-Element.prototype.scrollTo = function(pxy, duration) {
+p.scrollTo = function(pxy, duration) {
 	if (isElement(pxy)) pxy = pxy.getRelativePosition(this).y
 	if (!duration || !isNumber(duration)) this.scrollTop = pxy;
 	else {
@@ -186,18 +187,18 @@ Element.prototype.scrollTo = function(pxy, duration) {
 		if (px != 0) cb();
 	}
 };
-Element.prototype.getRelativePosition = function(element) {
+p.getRelativePosition = function(element) {
 	var a = this.getRect();
 	var b = element.getRect();
 	return {x: Math.round(a.left - b.left + element.scrollLeft), y:  Math.round(a.top - b.top + element.scrollTop)};
 };
-Element.prototype.clear = function() {
+p.clear = function() {
 	if (isString(this.value)) this.value = '';
 	else this.innerHTML = '';
 };
-Element.prototype.prev = function() {
+p.prev = function() {
 	return this.previousSibling;
 };
-Element.prototype.next = function() {
+p.next = function() {
 	return this.nextSibling;
 };

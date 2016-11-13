@@ -2,13 +2,13 @@ component TenderSearchForm extends SearchForm
 
 initial args = {
 	'title': @searchFormTitle
-};
+}
 
-function initiate() {
-	Globals.addListeners({
+initial listeners = {
+	'local': {
 		'TenderSearchFormChanged': this.onChange,
 		'TenderSearchFormGotParams': this.setParams
-	}, this);
+	}
 }
 
 function onRendered() {

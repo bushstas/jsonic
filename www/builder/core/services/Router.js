@@ -65,10 +65,7 @@ function Router() {
 		return currentRoute;
 	};
 	this.getCurrentRouteName = function() {
-		if (currentRoute) {
-			return currentRoute['name'];
-		}
-		return null;
+		if (currentRoute) return currentRoute['name'];
 	};
 	var getRoute = function() {
 		var params = window.location.search;
