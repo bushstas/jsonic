@@ -343,14 +343,15 @@ class JSCompiler
 
 	private function checkHelpersUse() {
 		$missingHelpers = array();
+		$isStatesUsed = $this->isStatesUsed();
 		foreach ($this->helpers as $helper) {
 			$isMissing = false;
 			if (!preg_match('/\b'.$helper.'\b/', $this->jsCode)) {
 				$isMissing = true;
 				if ($helper == 'Tooltiper') {
 					$isMissing = empty($this->config['tooltipClass']);
-				} elseif ($helper == 'GlobalState') {
-					$isMissing = !preg_match('/\binitial globals\b/', ' '.$this->jsCode);
+				} elseif ($helper == 'State' || $helper == 'StateManager') {
+					$isMissing = !$isStatesUsed;
 				} elseif ($helper == 'StoreKeeper') {
 					$isMissing = !preg_match('/\bstoreAs\b/', ' '.$this->jsCode);
 				}
@@ -362,6 +363,13 @@ class JSCompiler
 				unset($this->sources[$missingHelper]);
 			}
 		}
+	}
+
+	private function isStatesUsed() {
+		$code = $this->jsCode;
+		return preg_match('/\binitial (global|local|listener)s\b/', $code) ||
+			   preg_match('/\b(Loc|Glob)alState\b/', $code) || 
+			   preg_match('/\$:{1,2}\w/', $code);
 	}
 
 	private function checkUtilsUse() {

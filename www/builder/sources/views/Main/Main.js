@@ -18,8 +18,7 @@ function onResize() {
 	element.setHeight('');
 	var height = element.getHeight();
 	var bodyHeight = document.body.getHeight();
-	var diff = bodyHeight - 100 - height;
-	if (diff > 0) {
+	if (bodyHeight - 100 - height > 0) {
 		element.setHeight(bodyHeight - 100);
 	}
 }

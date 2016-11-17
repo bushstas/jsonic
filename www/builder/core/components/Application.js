@@ -4,6 +4,7 @@ function Application() {
 	var errorRoutes = {{ERRORROUTES}};
 	var viewContainerClass = {{VIEWCONTAINER}};
 	var defaultPagetitle = {{PAGETITLE}};
+	var parentalContainerClass = {{PARENTALVIEWCNT}}
 	
 	var getViewParams = function(route, allParams) {
 		var params;
@@ -42,7 +43,7 @@ function Application() {
 				view = this.currentView = this.views[route['name']] = new route['view']();
 				Core.initiate.call(view, viewParams);
 				view.setOnReadyHandler(onViewReady.bind(this));
-				var viewContentElement = createViewContentElement.call(this);
+				var viewContentElement = createViewContentElement.call(this, route['name']);
 				view.render(viewContentElement);
 				loadControllers(route);
 				if (typeof Dictionary != 'undefined') {
@@ -122,8 +123,10 @@ function Application() {
 			this.setPageTitle(title || defaultPagetitle || '');
 		}
 	};
-	var createViewContentElement = function() {
+	var createViewContentElement = function(name) {
 		var element = document.createElement('div');
+		element.className = parentalContainerClass;
+		element.setData('name', name);
 		this.viewContainer.appendChild(element);
 		return element;
 	};

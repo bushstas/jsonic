@@ -14,7 +14,7 @@
 <component class="Tabs" items="{$tabs}" activeTab="{$activeTab}" cmpid="tabs" onSelect="onSelectTab" onRemove="removeRequest">
 <div class="@area {$keywordsCount>1?'->>multi'}" eid="area">
 	{foreach $keywords as &item}
-		<control class="KeywordsControl" name="tags" arg-items="{&item}" onEdit="onTagEdit">
+		<control class="KeywordsControl" name="tags" arg-items="{&item}" onEdit="onTagEdit" onChange="onChange">
 	{/foreach}
 </div>
 <component class="KeywordTagEditor" cmpid="editor" onHide="onTagEdited">

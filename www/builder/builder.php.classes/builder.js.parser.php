@@ -214,6 +214,7 @@ class JSParser
 			$code = preg_replace('/'.$regexp.' {1,}/', "$1", $code);
 			$code = preg_replace('/ {1,}'.$regexp.'/', "$1", $code);
 		}
+		StatesManagerParser::parse($code, $functionName, $className);
 		return $code;
 	}
 

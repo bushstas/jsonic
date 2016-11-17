@@ -22,7 +22,7 @@ contexts:
        2: storage.type.class.actionscript.2
        3: keyword.control.actionscript.2
 
-    - match: '\$(?=\w)'
+    - match: '\$(?=[\w:])'
       captures: 
        0: variable.parameter.function.actionscript.2
 

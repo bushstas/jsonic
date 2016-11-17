@@ -28,17 +28,6 @@ var Core = new (function() {
 				if (isArrayLike(initials[k])) {
 					if (k == 'correctors') {
 						for (var j in initials[k]) addCorrector.call(this, j, initials[k][j]);
-					} else if (k == 'listeners') {
-						if (isObject(initials[k]['global'])) {
-							for (var j in initials[k]['global']) GlobalState.listen(j, initials[k]['global'][j], this);
-						}
-						if (isObject(initials[k]['local'])) {
-							for (var j in initials[k]['local']) LocalState.listen(j, initials[k]['local'][j], this);
-						}
-					} else if (k == 'globals') {
-						for (var j in initials[k]) GlobalState.subscribe(j, initials[k][j], this);
-					} else if (k == 'locals') {
-						for (var j in initials[k]) LocalState.subscribe(j, initials[k][j], this);
 					} else if (k == 'followers') {
 						for (var j in initials[k]) addFollower.call(this, j, initials[k][j]);
 					} else if (k == 'controllers') {
@@ -81,6 +70,24 @@ var Core = new (function() {
 		var helpers = getInitial.call(this, 'helpers');
 		if (isArray(helpers)) {
 			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
+		}
+		var listeners = getInitial.call(this, 'listeners');
+		var s = StateManager;
+		if (isObject(listeners)) {
+			if (isObject(listeners['global'])) {
+				for (var j in listeners['global']) s.listen(this, 1, j, listeners['global'][j]);
+			}
+			if (isObject(listeners['local'])) {
+				for (var j in listeners['local']) s.listen(this, 0, j, listeners['local'][j]);
+			}
+		} 
+		var globals = getInitial.call(this, 'globals');
+		if (isObject(globals)) {
+			for (var j in globals) s.subscribe(this, 1, j, globals[j]);
+		}
+		var locals = getInitial.call(this, 'locals');
+		if (isObject(locals)) {
+			for (var j in locals) s.subscribe(this, 0, j, locals[j]);
 		}
 	};
 	var subscribeToHelper = function(options) {

@@ -1,26 +1,13 @@
-function GlobalState(isLocal) {
+function State() {
 	var listeners = {};
 	var subscribers = {};
-	var globalVars = {};
-	var gr = function() {
-		return Router.getCurrentRouteName();
-	};
-	var gs = function(name) {
-		return !isLocal ? subscribers[name] : Objects.get(subscribers[gr()], name);
-	};
-	this.subscribe = function(name, callback, subscriber) {
-		var s, r;
-		if (!isLocal) {
-			s = subscribers[name] = subscribers[name] || [];			
-		} else {
-			var r = Router.getCurrentRouteName();
-			subscribers[r] = subscribers[r] || {};
-			s = subscribers[r][name] = subscribers[r][name] || [];
-		}
+	var vars = {};
+	this.subscribe = function(subscriber, name, callback) {
+		var s = subscribers[name] = subscribers[name] || [];
 		s.push([callback, subscriber]);
 	};
 	this.unsubscribe = function(subscriber, name) {
-		var s = gs(name);
+		var s = subscribers[name];
 		if (isArray(s)) {
 			var done = false;
 			while (!done) {
@@ -36,20 +23,27 @@ function GlobalState(isLocal) {
 		}
 	};
 	this.get = function(name) {
-		return !isLocal ? globalVars[name] : Objects.get(globalVars[gr()], name);
+		return vars[name];
 	};
 	this.set = function(name, value) {
-		globalVars[name] = value;
-		var s = gs(name);
-		if (isArray(s)) {
-			for (var i = 0; i < s.length; i++) {
-				if (isFunction(s[i][0])) {
-					s[i][0].call(s[i][1] || null, value, name);
+		var data = name;
+		if (!isUndefined(value)) {
+			data = {};
+			data[name] = value;
+		}
+		for (var k in data) {
+			vars[k] = data[k];
+			var s = subscribers[k];
+			if (isArray(s)) {
+				for (var i = 0; i < s.length; i++) {
+					if (isFunction(s[i][0])) {
+						s[i][0].call(s[i][1] || null, data[k], k);
+					}
 				}
 			}
 		}
 	};
-	this.listen = function(name, callback, listener) {if(isLocal)alert(gr())
+	this.listen = function(listener, name, callback) {
 		if (!isArray(listeners[name])) listeners[name] = [];
 		listeners[name].push([callback, listener]);
 	};
@@ -72,5 +66,3 @@ function GlobalState(isLocal) {
 		}
 	};
 }
-LocalState = new GlobalState(true);
-GlobalState = new GlobalState();

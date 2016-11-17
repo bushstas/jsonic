@@ -21,6 +21,7 @@ class JSGlobals
 		'indexRoute'       => '__INDEXROUTE',
 		'defaultRoute'     => '__DEFAULTROUTE',
 		'viewContainer'    => '__VIEWCONTAINER',
+		'viewContainer2'   => '__VIEWCONTAINER2',
 		'tooltipClass'     => '__TC',
 		'tooltipApi'       => '__TA',
 		'pathToApi'        => '__APIDIR',
@@ -75,27 +76,28 @@ class JSGlobals
 
 	public static function getUsedNames() {
 		return array(
-			'ATTRIBUTES'    => self::$varNames['props'],
-			'EVENTTYPES'    => self::$varNames['events'],
-			'TAGS'          => self::$varNames['tags'],
-			'ROUTES'        => self::$varNames['routes'],
-			'ERRORROUTES'   => self::$varNames['errorRoutes'],
-			'VIEWCONTAINER' => self::$varNames['viewContainer'],
-			'PAGETITLE'     => self::$varNames['pagetitle'],
-			'DICTURL'       => self::$varNames['pathToDictionary'],
-			'DICTIONARY'    => self::$varNames['dictionary'],
-			'TOOLTIPCLASS'  => self::$varNames['tooltipClass'],
-			'TOOLTIPAPI'    => self::$varNames['tooltipApi'],
-			'APIDIR'        => self::$varNames['pathToApi'],
-			'INDEXROUTE'    => self::$varNames['indexRoute'],
-			'DEFAULTROUTE'  => self::$varNames['defaultRoute'],
-			'HASHROUTER'    => self::$varNames['hashRouter'],
-			'USEROPTIONS'   => self::$varNames['user'],
-			'WORDS'         => self::$varNames['decls'],
-			'TEXTS'         => self::$varNames['textNodes'],
-			'CONSTANTS'     => self::$varNames['textConstants'],
-			'CONTROLLERS'   => self::$varNames['controllers'],
-			'CONTROLLER'    => self::$varNames['controller']
+			'ATTRIBUTES'      => self::$varNames['props'],
+			'EVENTTYPES'      => self::$varNames['events'],
+			'TAGS'            => self::$varNames['tags'],
+			'ROUTES'          => self::$varNames['routes'],
+			'ERRORROUTES'     => self::$varNames['errorRoutes'],
+			'VIEWCONTAINER'   => self::$varNames['viewContainer'],
+			'PARENTALVIEWCNT' => self::$varNames['viewContainer2'],
+			'PAGETITLE'       => self::$varNames['pagetitle'],
+			'DICTURL'         => self::$varNames['pathToDictionary'],
+			'DICTIONARY'      => self::$varNames['dictionary'],
+			'TOOLTIPCLASS'    => self::$varNames['tooltipClass'],
+			'TOOLTIPAPI'      => self::$varNames['tooltipApi'],
+			'APIDIR'          => self::$varNames['pathToApi'],
+			'INDEXROUTE'      => self::$varNames['indexRoute'],
+			'DEFAULTROUTE'    => self::$varNames['defaultRoute'],
+			'HASHROUTER'      => self::$varNames['hashRouter'],
+			'USEROPTIONS'     => self::$varNames['user'],
+			'WORDS'           => self::$varNames['decls'],
+			'TEXTS'           => self::$varNames['textNodes'],
+			'CONSTANTS'       => self::$varNames['textConstants'],
+			'CONTROLLERS'     => self::$varNames['controllers'],
+			'CONTROLLER'      => self::$varNames['controller']
 		);
 	}
 
@@ -254,6 +256,7 @@ class JSGlobals
 
 	private static function addViewContainer($viewContainer) {
 		self::add('viewContainer', "'->>".$viewContainer."'");
+		self::add('viewContainer2', "'->>parental-view-container'");
 	}
 
 	private static function addTooltipClass($tooltipClass) {

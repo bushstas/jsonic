@@ -13,7 +13,9 @@ class CoreValidator
 		'components' => array(
 			'Application', 'Component', 'Condition', 'Control', 'Controller', 'Foreach', 'IfSwitch', 'Level', 'Menu', 'Switch', 'View'
 		),
-		'helpers' => array(),
+		'helpers' => array(
+			'State', 'StateManager'
+		),
 		'prototypes' => array(
 			'Array', 'Element', 'MouseEvent', 'String', 'Function'
 		),
