@@ -1,41 +1,41 @@
-@personal: ЛИЧНЫЙ КАБИНЕТ
-@client: Клиент
-@org: Организация
-@email: Email
-@tariff: Тарифный план
-@from: Начало доступа
-@to: Окончание доступа
-@tariffsLink: http://initpro.ru/tariffs/
-@tariffs: Тарифные планы
-@manager: Ваш персональный менеджер
-@orderLink: http://initpro.ru/order/#1
-@orderTariff: Заказать тариф
-@prolongAccess: Продлить доступ
-@managerPhone: 8-800-700-12-50
-@freeCall: Звонок бесплатный
-@or: или
-@orderCall: Заказать звонок
-@calendar: Календарь моих закупок
-@commonInfo: Общая информация
-@mailingParams: Параметры рассылки
-@settings: Настройки
-@filterStatTitle: Статистика по моим фильтрам
-@refresh: Обновить
-@name: Название
-@forToday: За сегодня
-@forYesterday: За вчера
-@forCurrent: Текущих
-@forWeek: За неделю
-@forMonth: За месяц
-@notifyMe: Уведомлять меня о появлении 
-@favTenderChange: изменений по тендерам в Избранном
-@protocolChange: протоколов по тендерам в Избранном
-@newProtocols: новых протоколов по моим фильтрам
-@subscrSetting: Настройка параметров рассылки
-@ofNewTenders: новых тендеров по моим фильтрам
-@per2hours: каждые 2 часа
-@per1day: каждый день
-@per2days: через день
-@filterName: Название фильтра
-@subscrFreq: Периодичность рассылки
-@mailSubscr: Подписка на рассылку
+@personal:        	 ЛИЧНЫЙ КАБИНЕТ
+@client:         	 Клиент
+@org:            	 Организация
+@email:          	 Email
+@tariff:         	 Тарифный план
+@from:           	 Начало доступа
+@to:             	 Окончание доступа
+@tariffsLink:    	 http://initpro.ru/tariffs/
+@tariffs:        	 Тарифные планы
+@manager:        	 Ваш персональный менеджер
+@orderLink:      	 http://initpro.ru/order/#1
+@orderTariff:    	 Заказать тариф
+@prolongAccess:  	 Продлить доступ
+@managerPhone:  	 8-800-700-12-50
+@freeCall:       	 Звонок бесплатный
+@or:             	 или
+@orderCall:      	 Заказать звонок
+@calendar:     	 	 Календарь моих закупок
+@commonInfo:    	 Общая информация
+@mailingParams:  	 Параметры рассылки
+@settings:       	 Настройки
+@filterStatTitle:	 Статистика по моим фильтрам
+@refresh:        	 Обновить
+@name:           	 Название
+@forToday:      	 За сегодня
+@forYesterday:   	 За вчера
+@forCurrent:     	 Текущих
+@forWeek:        	 За неделю
+@forMonth:       	 За месяц
+@notifyMe:       	 Уведомлять меня о появлении 
+@favTenderChange:	 изменений по тендерам в Избранном
+@protocolChange: 	 протоколов по тендерам в Избранном
+@newProtocols:   	 новых протоколов по моим фильтрам
+@subscrSetting:  	 Настройка параметров рассылки
+@ofNewTenders:   	 новых тендеров по моим фильтрам
+@per2hours:      	 каждые 2 часа
+@per1day:        	 каждый день
+@per2days:      	 через день
+@filterName:    	 Название фильтра
+@subscrFreq:    	 Периодичность рассылки
+@mailSubscr:    	 Подписка на рассылку
