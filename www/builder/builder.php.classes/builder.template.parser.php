@@ -1104,6 +1104,7 @@ class TemplateParser
 			if (isset($attrData['delimiters'][$idx])) {
 				$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
 				$data = TemplateCodeParser::parse($code, $parsedPlace, self::$parsedItem);
+				
 				$code = $data['code'];
 				if ($data['inFunc']) {
 					$inFunc = true;
@@ -1509,7 +1510,24 @@ class TemplateParser
 					$code = '';
 					$lets[] = $data['code'];
 				} else {
-					$code = '<nq>'.$data['code'].'<nq>';
+					if ($data['inFunc']) {
+						self::wrapInFunction($data['code']);
+					}
+					if (!empty($data['reactNames']) || !empty($data['localNames']) || !empty($data['globalNames'])) {
+						$child = array('p' => '<nq>'.$data['code'].'<nq>');
+						if (!empty($data['reactNames'])) {
+							$child['pr'] = self::getProperChildren($data['reactNames']);
+						}
+						if (!empty($data['localNames'])) {
+							$child['lc'] = self::getProperChildren($data['localNames']);
+						}
+						if (!empty($data['globalNames'])) {
+							$child['gl'] = self::getProperChildren($data['globalNames']);
+						}
+						$code = '<nq>'.json_encode($child).'<nq>';
+					} else {
+						$code = '<nq>'.$data['code'].'<nq>';
+					}
 					$isLet = false;
 				}			
 				if (!empty($data['reactNames'])) {

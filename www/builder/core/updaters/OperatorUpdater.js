@@ -1,4 +1,5 @@
-function OperatorUpdater(o, n) {
+function OperatorUpdater(o, p) {
+	var n = o instanceof Foreach ? p['n'] : p['p'];
 	var a = isArray(n) ? n : [n];
 	this.getKeys = function() {
 		return a;
@@ -11,6 +12,6 @@ function OperatorUpdater(o, n) {
 		return o;
 	};
 	this.dispose = function() {
-		o = n = null;
+		n = o = p = null;
 	};
 }

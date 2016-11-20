@@ -1,6 +1,7 @@
 function State() {
 	var listeners = {};
 	var subscribers = {};
+	var updaters = {};
 	var vars = {};
 	this.subscribe = function(subscriber, name, callback) {
 		var s = subscribers[name] = subscribers[name] || [];
@@ -25,23 +26,44 @@ function State() {
 	this.get = function(name) {
 		return vars[name];
 	};
-	this.set = function(name, value) {
-		var data = name;
+	this.set = function(name, value) {alert(name)
+		var updated, data = name;
 		if (!isUndefined(value)) {
 			data = {};
 			data[name] = value;
 		}
+		var changed = {}, isChanged = false;
 		for (var k in data) {
-			vars[k] = data[k];
-			var s = subscribers[k];
-			if (isArray(s)) {
-				for (var i = 0; i < s.length; i++) {
-					if (isFunction(s[i][0])) {
-						s[i][0].call(s[i][1] || null, data[k], k);
+			if (vars[k] == data[k]) continue;
+			if (isArray(vars[k]) && isArray(data[k]) && Objects.equals(vars[k], data[k])) continue;
+			isChanged = true;
+			changed[k] = data[k];
+		}
+		if (isChanged) {
+			console.log(changed)
+			for (var k in changed) {
+				vars[k] = changed[k];
+				var s = subscribers[k];
+				if (isArray(s)) {
+					for (var i = 0; i < s.length; i++) {
+						if (isFunction(s[i][0])) {
+							s[i][0].call(s[i][1] || null, changed[k], k);
+						}
+					}
+				}
+				var u = updaters[k];
+				if (isArray(u)) {
+					updated = [];
+					for (var i = 0; i < u.length; i++) {
+						if (updated.indexOf(u[i]) == -1) {
+							u[i].react(changed);
+							updated.push(u[i]);
+						}
 					}
 				}
 			}
 		}
+		updated = changed = data = null;
 	};
 	this.listen = function(listener, name, callback) {
 		if (!isArray(listeners[name])) listeners[name] = [];
@@ -63,6 +85,14 @@ function State() {
 					listeners[name][i][0].call(listeners[name][i][1] || null, params);
 				}
 			}
+		}
+	};
+	this.createUpdater = function(updater, component, obj, props) {
+		var u = new updater(obj, props);
+		var keys = u.getKeys()
+		for (var i = 0; i < keys.length; i++) {
+			updaters[keys[i]] = updaters[keys[i]] || [];
+			updaters[keys[i]].push(u);
 		}
 	};
 }

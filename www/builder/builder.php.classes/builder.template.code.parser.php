@@ -60,7 +60,9 @@ class TemplateCodeParser
 		'limit' => 'ключевое слово limit',
 		'var' => 'имя переменной',
 		'method' => 'название метода класса',
-		'comp' => 'идентификатор дочернего компонента'
+		'comp' => 'идентификатор дочернего компонента',
+		'local' => 'имя переменной LocalState',
+		'global' => 'имя переменной GlobalState'
 	);
 
 	private static $errors = array(
@@ -73,6 +75,8 @@ class TemplateCodeParser
 		'usingGlobalName' => 'Использование зарезервированного глобально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: {{??}}',
 		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}',
+		'globalVarAsCompAttr' => 'Обнаружена попытка передать переменную GlobalState/LocalState дочернему компоненту в шаблоне {??} класса {??}<br>Данная переменная глобальна и не нуждается в передаче по ссылке<br><br>Код в котором произошла ошибка: {{??}}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
+		'globalVarAsTemplAttr' => 'Обнаружена попытка передать переменную GlobalState/LocalState дочернему шаблону в шаблоне {??} класса {??}<br>Данная переменная глобальна и не нуждается в передаче по ссылке<br><br>Код в котором произошла ошибка: {{??}}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
@@ -134,6 +138,8 @@ class TemplateCodeParser
 		$code = preg_replace('/\s+/', self::$space, $code);
 		self::$data = array(
 			'react' => array(),
+			'local' => array(),
+			'global' => array(),
 			'let' => array(),
 			'callbacks' => array()
 		);
@@ -244,6 +250,14 @@ class TemplateCodeParser
 					elseif (self::$open['react'])
 					{
 						self::$parsedCode = self::$parsedCode.".g('".$part."')";
+					}
+					elseif (self::$open['local'])
+					{
+						self::$parsedCode = rtrim(self::$parsedCode, ':').".a('".$part."')";
+					}
+					elseif (self::$open['global'])
+					{
+						self::$parsedCode = rtrim(self::$parsedCode, ':').".a('".$part."',1)";
 					}
 					elseif (self::$open['var'])
 					{
@@ -481,7 +495,20 @@ class TemplateCodeParser
 		elseif (!self::$quoted)
 		{
 			self::$expected = array();
-			if (self::$prevSign == ':')
+			if (self::$prevSign == ':' && self::$open['local']){
+				self::off('local');
+				self::on('global');
+				self::$expected = array('a');
+			} elseif (self::$prevSign == '$'){
+				if (self::$place == 'componentAttribute') {
+					new Error(self::$errors['globalVarAsCompAttr'], array(self::$className, self::$templateName, self::$code, self::$element));
+				} elseif (self::$place == 'templateAttribute') {
+					new Error(self::$errors['globalVarAsTemplAttr'], array(self::$className, self::$templateName, self::$code, self::$element));
+				}
+				self::off('react');
+				self::on('local');
+				self::$expected = array('a', ':');
+			} else if (self::$prevSign == ':')
 			{
 				self::$expected = array('a', '0', self::$space);
 				self::on('placeholder');
@@ -504,7 +531,7 @@ class TemplateCodeParser
 			self::off('react2');
 			self::on('react');
 			self::$reactName = '';
-			self::$expected = array('a');
+			self::$expected = array('a', ':');
 			self::$varType = 'r';
 		}
 	}
@@ -973,7 +1000,7 @@ class TemplateCodeParser
 		}
 		self::$expected = array();
 		
-		self::$isReact = self::isOpen('react', 'react2');
+		self::$isReact = self::isOpen('react', 'react2', 'local', 'global');
 		self::$notTextOrComp = !self::isOpen('text', 'comp');
 		self::$isKey = self::isKeyword();
 		self::$anyVar = self::isAnyVarOpen();
@@ -1164,11 +1191,11 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeEqual() {
-		return self::$open['var'] || self::$open['react'] || self::$open['react2'] || self::$isKey || self::$open['letvarname'] || self::$isNum;
+		return self::$open['var'] || self::$open['react'] || self::$open['react2'] || self::$open['local'] || self::$open['global'] || self::$isKey || self::$open['letvarname'] || self::$isNum;
 	}
 
 	private static function couldBeGreater() {
-		return (self::$open['var'] && !self::$open['letvarname']) || self::$isNum || self::$open['react'] || self::$open['react2'];
+		return (self::$open['var'] && !self::$open['letvarname']) || self::$isNum || self::$open['react'] || self::$open['react2'] || self::$open['local'] || self::$open['global'];
 	}
 
 	private static function couldBeSpace() {
@@ -1203,11 +1230,17 @@ class TemplateCodeParser
 		}		
 
 		if (self::$isReact) {
+			$key = 'react';
+			if (self::$open['local']) {
+				$key = 'local';
+			} elseif (self::$open['global']) {
+				$key = 'global';
+			}
 			if (empty(self::$reactName)) {
-				self::$data['react'][self::$currentPart] = array();
+				self::$data[$key][self::$currentPart] = array();
 				self::$reactName = self::$currentPart;
 			} else {
-				self::$data['react'][self::$reactName][] = self::$currentPart;
+				self::$data[$key][self::$reactName][] = self::$currentPart;
 			}
 		} else {
 			self::$reactName = '';
@@ -1259,6 +1292,8 @@ class TemplateCodeParser
 		if (!self::$isNum) {
 			self::on('name');
 		}
+		self::off('local');
+		self::off('global');
 		self::off('react');
 		self::off('var');
 		self::off('data');
@@ -1271,7 +1306,7 @@ class TemplateCodeParser
 
 	
 	private static function isAnyVarOpen() {
-		return self::isOpen('react', 'react2', 'text', 'comp', 'var', 'var2', 'data');
+		return self::isOpen('react', 'react2', 'text', 'comp', 'var', 'var2', 'data', 'local', 'global');
 	}
 
 	private static function isOpen() {
@@ -1338,13 +1373,13 @@ class TemplateCodeParser
 			case 'else':
 			case 'templateAttribute':
 			case 'elementAttribute':
-				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '%');
+				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '%');
 			break;
 			case 'componentAttribute':
-				self::$expected = array('0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%');
+				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%');
 			break;
 			case 'textNode':
-				self::$expected = array('0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%');
+				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%');
 			break;
 			case 'switch':
 			case 'ifcase':
@@ -1417,6 +1452,12 @@ class TemplateCodeParser
 		}
 		if (self::$open['var'] || self::$open['react']) {
 			return self::$names['var'];
+		}
+		if (self::$open['local']) {
+			return self::$names['local'];
+		}
+		if (self::$open['global']) {
+			return self::$names['global'];
 		}
 		if (!empty(self::$open['method'])) {
 			return self::$names['method'];
@@ -1533,7 +1574,7 @@ class TemplateCodeParser
 		{
 			self::$expected = $expecteds;
 		}
-		elseif (self::isOpen('react', 'text', 'comp', 'var', 'data') && !self::$open['placeholderHasName'])
+		elseif (self::isOpen('react', 'text', 'comp', 'var', 'data', 'local', 'global') && !self::$open['placeholderHasName'])
 		{
 			self::$expected = array('a');
 		}
@@ -1572,6 +1613,12 @@ class TemplateCodeParser
 		} 
 		if (!empty(self::$data['react'])) {
 			$code = self::getReactCode($code);
+		}
+		if (!empty(self::$data['local'])) {
+			$code = self::getLocalVarsCode($code);
+		}
+		if (!empty(self::$data['global'])) {
+			$code = self::getGlobalVarsCode($code);
 		}
 		if (self::$isLet) {
 			self::$data['isLet'] = true;
@@ -1633,11 +1680,37 @@ class TemplateCodeParser
 		if (!preg_match('/^\$\.g\(\'\w+\'\)$/', $code)) {
 			self::$data['inFunc'] = true;
 		}
-		if (self::$place == 'textNode') {
-			return "{'pr':".$names.",'p':".$code."}";
+		return $code;
+	}
+
+	private static function getLocalVarsCode($code) {
+		self::$data['localNames'] = array_keys(self::$data['local']);
+		unset(self::$data['local']);
+		$names = self::$data['localNames'];
+		if (count($names) == 1) {
+			$names = "'".$names[0]."'";
 		} else {
-			return $code;
+			$names = json_encode($names);
 		}
+		if (!self::$data['inFunc'] && !preg_match('/^\$\.a\(\'\w+\'\)$/', $code)) {
+			self::$data['inFunc'] = true;
+		}
+		return $code;
+	}
+
+	private static function getGlobalVarsCode($code) {
+		self::$data['globalNames'] = array_keys(self::$data['global']);
+		unset(self::$data['global']);
+		$names = self::$data['globalNames'];
+		if (count($names) == 1) {
+			$names = "'".$names[0]."'";
+		} else {
+			$names = json_encode($names);
+		}
+		if (!self::$data['inFunc'] && !preg_match('/^\$\.a\(\'\w+\',1\)$/', $code)) {
+			self::$data['inFunc'] = true;
+		}
+		return $code;
 	}
 
 }

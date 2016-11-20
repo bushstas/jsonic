@@ -30,5 +30,8 @@ function StateManager() {
 	this.get = function(c, g, n) {
 		return gs(g||gv(c)).get(n);
 	};
+	this.createUpdater = function(u, c, s, p, g) {
+		gs(g||gv(c)).createUpdater(u, c, s, p);
+	};
 }
 StateManager = new StateManager();

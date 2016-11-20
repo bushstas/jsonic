@@ -15,6 +15,10 @@ function onRendered() {
 	this.setParams({
 		'registryContracts': 1
 	});
+
+	delay(6000) {
+		$::aaa = 'super-puper-class'
+	}
 }
 
 function onChange() {

@@ -1,3 +1,4 @@
 <div class="@outer-container">
 	<component class="DataTableTabPanel">
+	{$a + $::aaa}
 </div>

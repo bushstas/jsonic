@@ -47,9 +47,11 @@ function Level() {
 		else appendChild(document.createTextNode(content));
 	};
 
-	var createUpdater = function(u, s, p) {
+	var createUpdater = function(u, s, p, l) {
 		updaters = updaters || [];
-		Core.createUpdater(u, component, s, p, updaters);
+		if (l) Core.createUpdater(u, component, s, p, updaters);
+		if (p['lc']) StateManager.createUpdater(u, component, s, p, false);
+		if (p['gl']) StateManager.createUpdater(u, component, s, p, true);
 	};
 
 	var createPropertyNode = function(props) {
@@ -59,7 +61,7 @@ function Level() {
 		}
 		node = document.createTextNode(p);		
 		appendChild(node);
-		createUpdater(NodeUpdater, node, props);
+		createUpdater(NodeUpdater, node, props, !!props['pr']);
 	};
 
 	var createElement = function(props) {
@@ -72,13 +74,13 @@ function Level() {
 				a = attrNames[k] || k;
 				if (a == 'scope') component.setScope(element);
 				else if (a == 'eid') Core.registerElement.call(component, element, pr[k]);
-				else {
-					if (isPrimitive(pr[k]) && pr[k] !== '') {
-						element.attr(a, pr[k]);
-					}
+				else if (isPrimitive(pr[k]) && pr[k] !== '') {
+					element.attr(a, pr[k]);
 				}
 			}
-			if (props['n']) createUpdater(ElementUpdater, element, props);
+			if (props['n'] || props['lc'] || props['gl']) {
+				createUpdater(ElementUpdater, element, props, !!props['n']);
+			}
 		}
 		if (isArray(props['e'])) {
 			var eventType, callback, isOnce, i;
@@ -110,7 +112,7 @@ function Level() {
 			var condition = new Condition(props);
 			condition.render(parentElement, self);				
 			registerChild(condition);
-			createUpdater(OperatorUpdater, condition, props['p']);
+			createUpdater(OperatorUpdater, condition, props, !!props['p']);
 		} else if (!!props['i']) {
 			renderItems(props['c']);
 		} else if (!isUndefined(props['e'])) {
@@ -119,11 +121,11 @@ function Level() {
 	};
 
 	var createForeach = function(props) {
-		if (props['n']) {
+		if (props['n'] || props['lc'] || props['gl']) {
 			var foreach = new Foreach(props);
 			foreach.render(parentElement, self);
 			registerChild(foreach);
-			createUpdater(OperatorUpdater, foreach, props['n']);
+			createUpdater(OperatorUpdater, foreach, props, !!props['n']);
 		} else {
 			if (isArray(props['p'])) {
 				for (var i = 0; i < props['p'].length; i++) renderItems(props['h'](props['p'][i], i));
@@ -134,11 +136,11 @@ function Level() {
 	};
 
 	var createIfSwitch = function(props) {
-		if (props['p']) {
+		if (props['p'] || props['lc'] || props['gl']) {
 			var swtch = new IfSwitch(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);
-			createUpdater(OperatorUpdater, swtch, props['p']);
+			createUpdater(OperatorUpdater, swtch, props, !!props['p']);
 		} else {
 			for (var i = 0; i < props['is'].length; i++) {
 				if (!!props['is'][i]) {
@@ -151,11 +153,11 @@ function Level() {
 	};
 
 	var createSwitch = function(props) {
-		if (props['p']) {
+		if (props['p'] || props['lc'] || props['gl']) {
 			var swtch = new Switch(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);
-			createUpdater(OperatorUpdater, swtch, props['p']);
+			createUpdater(OperatorUpdater, swtch, props, !!props['p']);
 		} else {
 			props = props['sw'];
 			if (!isArray(props[1])) {
@@ -227,7 +229,7 @@ function Level() {
 					}
 				}				
 			}
-			if (ir) createUpdater(ComponentUpdater, cmp, item);
+			if (ir) createUpdater(ComponentUpdater, cmp, item, true);
 			if (isArray(item['w'])) {
 				for (i = 0; i < item['w'].length; i += 2) {
 					Core.provideWithComponent.call(component, item['w'][i], item['w'][i + 1], cmp);

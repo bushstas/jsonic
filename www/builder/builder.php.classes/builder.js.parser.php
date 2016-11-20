@@ -162,6 +162,7 @@ class JSParser
 				$code = $data['items'][0];
 				$signs = array('{' => '}', '(' => ')', '[' => ']');
 				$isComma = false;
+				$parensOpen = 0;
 				for ($i = 1; $i < count($data['items']); $i++) {
 					if (isset($data['items'][$i])) {
 						$firstSign = $data['items'][$i][0];
@@ -172,20 +173,24 @@ class JSParser
 							$value = $firstSign.preg_replace('/[\r\n\t]/', '', $d['inner']).$closingSign;
 							$data['items'][$i] = $d['outer'];
 						} else {
-							$d = Splitter::split('/[\r\n;]/', $data['items'][$i], 0);
-							$value = $d['items'][0];
-							$trimmed = trim($value);
-							if ($trimmed[strlen($trimmed) - 1] == ',') {
-								$parts = explode(',', $value);
-								$last = count($parts) - 1;
-								$d['items'][0] = ','.$parts[$last];
-								$parts[$last] = '';
-								$value = rtrim(implode(',', $parts), ',');
-							} else {
-								$d['items'][0] = '';
+							$d = Splitter::split('/[\r\n;,]/', $data['items'][$i], 0);
+							$value = '';
+							foreach ($d['items'] as $j => $val) {
+								preg_match_all('/\(/', $val, $ms);
+								$parensOpen = count($ms[0]);
+								preg_match_all('/\)/', $val, $ms);
+								$parensOpen -= count($ms[0]);
+								$value .= $val;								
+								if ($parensOpen > 0) {
+									$value .= $d['delimiters'][$j];
+								} else break;
 							}
-							$data['items'][$i] = Splitter::join($d['items'], $d['delimiters']);
-							
+							$itm = $d['delimiters'][$j];
+							for ($jj = $j + 1; $jj < count($d['items']); $jj++) {
+								$itm .= $d['items'][$jj];
+								$itm .= $d['delimiters'][$jj];
+							}
+							$data['items'][$i] = $itm;							
 						}
 						$trimmed = trim($data['items'][$i]);
 						if (!$isComma) {
@@ -204,9 +209,7 @@ class JSParser
 								$isComma = false;
 							}
 						}
-
-					}
-					
+					}					
 				}
 			}
 			$code = preg_replace('/\$(\w+)/', "this.get('$1')", $code);

@@ -279,7 +279,7 @@ function Component() {
 			isChanged = true;
 			this.props[k] = props[k];
 			changedProps[k] = props[k];
-		}	
+		}
 		if (this.isRendered()) {
 			if (isChanged) propagatePropertyChange.call(this, changedProps);
 		}
@@ -473,6 +473,9 @@ function Component() {
 		this.followers = null;
 		this.correctors = null;
 		this.controls = null;
+	};
+	Component.prototype.a = function(n, g) {
+		return StateManager.get(this, g, n);
 	};
 	var f = function(){return};
 	Component.prototype.initOptions=f;
