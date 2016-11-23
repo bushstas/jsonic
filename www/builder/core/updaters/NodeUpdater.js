@@ -1,11 +1,11 @@
 function NodeUpdater(n, p) {
-	var a = isArray(p['pr']) ? p['pr'] : [p['pr']];
+	var a = isArray(p['n']) ? p['n'] : [p['n']];
 	this.getKeys = function() {
 		return a;
 	};
 	this.react = function(d) {
 		var c;
-		if (isFunction(p['p'])) c = p['p'](); 
+		if (isFunction(p['v'])) c = p['v'](); 
 		else c = d[a[0]];
 		n.textContent = c || '';
 	};

@@ -25,7 +25,7 @@ function Level() {
 		}
 		if (!isObject(i)) createTextNode(i);
 		else if (i.hasOwnProperty('t'))   createElement(i);
-		else if (i.hasOwnProperty('pr'))  createPropertyNode(i);
+		else if (i.hasOwnProperty('v'))   createPropertyNode(i);
 		else if (i.hasOwnProperty('i'))   createCondition(i);
 		else if (i.hasOwnProperty('h'))   createForeach(i);	
 		else if (i.hasOwnProperty('tmp')) includeTemplate(i);
@@ -55,13 +55,13 @@ function Level() {
 	};
 
 	var createPropertyNode = function(props) {
-		var p = '', isFunc, node, names, data;
-		if (!isUndefined(props['p'])) {
-			p = isFunction(props['p']) ? props['p']() : props['p'];
+		var v = '', isFunc, node, names, data;
+		if (!isUndefined(props['v'])) {
+			v = isFunction(props['v']) ? props['v']() : props['v'];
 		}
-		node = document.createTextNode(p);		
+		node = document.createTextNode(v);		
 		appendChild(node);
-		createUpdater(NodeUpdater, node, props, !!props['pr']);
+		createUpdater(NodeUpdater, node, props, !!props['n']);
 	};
 
 	var createElement = function(props) {

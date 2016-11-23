@@ -1514,9 +1514,9 @@ class TemplateParser
 						self::wrapInFunction($data['code']);
 					}
 					if (!empty($data['reactNames']) || !empty($data['localNames']) || !empty($data['globalNames'])) {
-						$child = array('p' => '<nq>'.$data['code'].'<nq>');
+						$child = array('v' => '<nq>'.$data['code'].'<nq>');
 						if (!empty($data['reactNames'])) {
-							$child['pr'] = self::getProperChildren($data['reactNames']);
+							$child['n'] = self::getProperChildren($data['reactNames']);
 						}
 						if (!empty($data['localNames'])) {
 							$child['lc'] = self::getProperChildren($data['localNames']);
