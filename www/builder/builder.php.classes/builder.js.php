@@ -83,6 +83,7 @@ class JSCompiler
 	private $superClasses = array('component', 'dialog', 'form', 'control', 'menu');
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
 	public static $componentLikeClasses = array('Dialog', 'Form', 'Control', 'Menu', 'View', 'Application');
+	private $inheritance = array();
 	private $classes = array();
 	private $classesByTypes = array();
 	private $sources = array();
@@ -111,7 +112,10 @@ class JSCompiler
 		$this->initialsParser = new InitialsParser();
 	}
 
-	public function init() {
+	public function init($jsFiles, $coreFiles, $scriptFiles, $dataFiles, $utilsFiles) {
+		if (!is_array($jsFiles) || empty($jsFiles)) {
+			new Error($this->errors['jsFilesNotFound']);
+		}
 		$provider = $this->configProvider;
 		$builder = $provider->getBuilder();
 		$this->config = $provider->getJsConfig();
@@ -128,15 +132,18 @@ class JSCompiler
 		$this->validateEntry();
 		$this->validateJsFolder();
 		$this->validateTooltipHelper();
-	}
 
-	public function run($jsFiles, $coreFiles, $scriptFiles, $dataFiles, $utilsFiles) {
-		if (!is_array($jsFiles) || empty($jsFiles)) {
-			new Error($this->errors['jsFilesNotFound']);
-		}
 		foreach ($jsFiles as $jsFile) {
 			$this->processJSFile($jsFile);
-		}		
+		}
+		$this->files = array(
+			$jsFiles, $coreFiles, $scriptFiles, $dataFiles, $utilsFiles
+		);
+	}
+
+	public function run() {
+		list($jsFiles, $coreFiles, $scriptFiles, $dataFiles, $utilsFiles) = $this->files;
+	
 		$this->dataCompiler->run($dataFiles);
 		$this->initCore($coreFiles);
 		$this->validateApplication();
@@ -160,6 +167,10 @@ class JSCompiler
 		$this->addGlobals();
 		$this->finish();
 		$this->addScripts($scriptFiles);
+	}
+
+	public function getClassInheritance() {
+		return $this->inheritance;
 	}
 
 	private function validateApplication() {
@@ -476,6 +487,9 @@ class JSCompiler
 			}
 			$properExtends[] = $superClassName;
 		}
+		if (!empty($properExtends)) {
+			$this->inheritance[$className] = $properExtends;
+		}
 		array_unshift($properExtends, ucfirst($classType));
 		if ($classType == 'corrector') {
 			$className .=  'Crr';
@@ -650,7 +664,7 @@ class JSCompiler
 			'props'            => Props::getList(true),
 			'events'           => Events::getList(),
 			'decls'            => $this->declCompiler->get(),
-			'routes'           => $this->config['router']['routes'],
+			'routes'           => $this->routesCompiler->getRoutes(),
 			'errorRoutes'      => $this->routesCompiler->getErrorRoutes(),
 			'hashRouter'       => $this->routesCompiler->getHashRouter(),
 			'indexRoute'       => $this->routesCompiler->getIndexRoute(),
@@ -752,6 +766,8 @@ class JSCompiler
 	}
 
 	private function addClasses() {
+		$disabledRoutes = $this->routesCompiler->getDisabledRoutes();
+		$used = $this->templateCompiler->getAllUsedComponentsList();
 		$templates = $this->templateCompiler->getTemplates();
 		TemplateParser::init(
 			array(
@@ -766,8 +782,11 @@ class JSCompiler
 			)
 		);
 		$this->jsOutput[] = "\nvar p;";
-		foreach ($this->classes as $className => &$class) {
+		foreach ($this->classes as $className => &$class) {			
 			$type = $class['type'];
+			if ($type == 'view' && in_array($className, $disabledRoutes) && !in_array($className, $used)) {
+				continue;
+			}
 			if (is_array($class['functions'])) {
 				foreach ($class['functions'] as $func) {
 					$constructorCode = '';
@@ -908,9 +927,22 @@ class JSCompiler
 			}
 		}
 		$inheritance = array();
+		$disabledRoutes = $this->routesCompiler->getDisabledRoutes();
+		$used = $this->templateCompiler->getAllUsedComponentsList();
 		foreach ($inherited as $parentClass => $childClasses) {
-			$inheritance[] = $parentClass;
-			$inheritance[] = '['.implode(',',$childClasses).']';
+			if ($parentClass == 'View' && !empty($disabledRoutes)) {
+				$enabledClasses = array();
+				foreach ($childClasses as $childClass) {
+					if (!in_array($childClass, $disabledRoutes) || in_array($childClass, $used)) {
+						$enabledClasses[] = $childClass;
+					}
+				}
+				$childClasses = $enabledClasses;
+			}
+			if (!empty($childClasses)) {
+				$inheritance[] = $parentClass;
+				$inheritance[] = '['.implode(',', $childClasses).']';
+			}
 		}		
 		$this->bottomOutput[] = "Core.inherits([".implode(',', $inheritance).']);';
 		$controllers = array('Router', 'User');

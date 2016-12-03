@@ -47,7 +47,10 @@ class Builder
 		$this->routesCompiler = new RoutesCompiler($this->config);
 		$this->routesCompiler->init();
 
+		$this->jsCompiler = new JSCompiler($this->config);
 		$this->templateCompiler = new TemplateCompiler();
+		$this->templateCompiler->init($this->jsCompiler, $this->routesCompiler);
+
 		$this->textsCompiler = new TextsCompiler();
 		$this->dataCompiler = new DataCompiler();
 		$this->declCompiler = new DeclCompiler();
@@ -56,16 +59,16 @@ class Builder
 			$this->testsCompiler->init();
 		}
 
-		$this->jsCompiler = new JSCompiler($this->config);
-		$this->jsCompiler->init();
+		$this->gatherer = new Gatherer($this->config);
+		$this->gatherer->init();		
+		$this->files = $this->gatherer->gatherFiles();
+		
+		$this->jsCompiler->init($this->files['js'], $this->files['core'], $this->files['scripts'], $this->files['data'], $this->files['utils']);
 
 		$this->htmlCompiler = new HTMLCompiler($this->config);
 		$this->htmlCompiler->init();
 		
-		$this->gatherer = new Gatherer($this->config);
-		$this->gatherer->init();
-		
-		$this->files = $this->gatherer->gatherFiles();
+
 		$this->coreValidator->validateUtilsFunction($this->files['core']);
 		$this->runCompilers();
 	}
@@ -77,7 +80,7 @@ class Builder
 		$this->textsCompiler    -> run ($this->files['texts']);
 		$this->declCompiler     -> run ($this->files['decl']);
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
-		$this->jsCompiler       -> run ($this->files['js'], $this->files['core'], $this->files['scripts'], $this->files['data'], $this->files['utils']);
+		$this->jsCompiler       -> run ();
 	}
 
 	public function getCompiler($compilerName) {

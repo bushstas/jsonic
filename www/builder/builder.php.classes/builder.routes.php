@@ -5,7 +5,10 @@ class RoutesCompiler
 	private $configProvider, $config, $routerMenu,
 			$defaultRoute, $indexRoute, $isHashRouter;
 
+	private $routes = array();
 	private $routeControllersToLoad = array();
+	private $disabledRoutes = array();
+	private $disabledRouteNames = array();
 	private $routeControllersByViews = array();
 	private $errorRoutes = array();
 	private $errorCodes = array('404', '401');
@@ -41,7 +44,11 @@ class RoutesCompiler
 		'incorrectHash' => "Параметр конфигурации <b>router['hash']</b> должен быть равен null, true или false",
 		'errorRouteNotString' => "Параметр <b>router['{?}']</b> не является строкой",
 		'errorRouteHasForbiddenSymbols' => "Параметр <b>router['{?}']</b> = '{??}' содержит запрещенные символы",
-		'noPatternErrorRoute' => "Параметр <b>router['{?}']</b> = '{??}' не соответствует паттерну [A-Z]\w+"
+		'noPatternErrorRoute' => "Параметр <b>router['{?}']</b> = '{??}' не соответствует паттерну [A-Z]\w+",
+		'incorrectDisabled' => "Параметр <b>disabled</b> у маршрута с именем {??} должен иметь значение с типом <b>boolean</b>",
+		'defaultRouteDisabled' => "Параметр конфигурации <b>router['defaultRoute']</b> ссылается на маршрут {??}, который отключен",
+		'indexRouteDisabled' => "Параметр конфигурации <b>router['indexRoute']</b> ссылается на маршрут {??}, который отключен",
+		'errorRouteDisabled' => "Параметр конфигурации <b>router['{?}']</b> ссылается на маршрут {??}, который отключен",
 	);
 
 	public function __construct($configProvider) {
@@ -53,13 +60,11 @@ class RoutesCompiler
 		if (empty($this->config) || !is_array($this->config)) {
 			new Error($this->errors['incorrectRouter']);
 		}
-
-
-		$routes = $this->config['routes'];
-		if (empty($routes) || !is_array($routes)) {
+		$this->routes = $this->config['routes'];
+		if (empty($this->routes) || !is_array($this->routes)) {
 			new Error($this->errors['incorrectRoutes']);
 		}
-		$this->validateRoutes($routes);
+		$this->validateRoutes($this->routes);
 		$this->validateRouteMenu();
 		$this->validateDefaultRoute();
 		$this->validateIndexRoute();
@@ -69,6 +74,27 @@ class RoutesCompiler
 		if ($this->isHashRouter !== null && !is_bool($this->isHashRouter)) {
 			new Error($this->errors['incorrectHash']);
 		}
+	}
+
+	public function getDisabledRoutes() {
+		return $this->disabledRoutes;
+	}
+
+	public function getRoutes() {
+		return $this->routes;
+	}
+
+	public function getRouteViews() {
+		$views = array();
+		foreach ($this->config['routes'] as $route) {
+			$views[] = $route['view'];
+		}
+		foreach ($this->errorCodes as $errorCode) {
+			if (!empty($this->config[$errorCode])) {
+				$views[] = $this->config[$errorCode];
+			}
+		}
+		return $views;
 	}
 
 	public function getErrorRoutes() {
@@ -99,8 +125,9 @@ class RoutesCompiler
 		return $this->isHashRouter;
 	}
 
-	private	function validateRoutes($routes) {
-		foreach ($routes as $route) {
+	private	function validateRoutes(&$routes) {
+		$enabledRoutes = array();
+		foreach ($this->routes as &$route) {
 			$this->routeControllersByViews[$route['view']] = array();
 			if (!is_array($route)) {
 				new Error($this->errors['routeIsNotAnArray']);
@@ -173,7 +200,20 @@ class RoutesCompiler
 				}
 				$this->validateRoutes($route['children']);
 			}
+			if (isset($route['disabled'])) {
+				if (!is_bool($route['disabled'])) {
+					new Error($this->errors['incorrectDisabled'], array($route['name']));
+				}
+				if ($route['disabled']) {
+					$this->disabledRoutes[] = $route['view'];
+					$this->disabledRouteNames[] = $route['name'];
+				}
+			}
+			if (empty($route['disabled'])) {
+				$enabledRoutes[] = $route;
+			}
 		}
+		$routes = $enabledRoutes;
 		$this->routeControllersToLoad = array_unique($this->routeControllersToLoad);
 	}
 
@@ -209,6 +249,9 @@ class RoutesCompiler
 				new Error($this->errors['defaultRouteNotFound'], array($this->defaultRoute));
 			}
 		}
+		if (in_array($this->defaultRoute, $this->disabledRouteNames)) {
+			new Error($this->errors['defaultRouteDisabled'], array($this->defaultRoute));
+		}
 	}
 
 	private function validateIndexRoute() {
@@ -218,6 +261,9 @@ class RoutesCompiler
 		}
 		if (!$this->isRoute($this->indexRoute, $this->config['routes'])) {
 			new Error($this->errors['indexRoutNotFound'], array($this->indexRoute));
+		}
+		if (in_array($this->indexRoute, $this->disabledRouteNames)) {
+			new Error($this->errors['indexRouteDisabled'], array($this->indexRoute));
 		}
 	}
 
@@ -239,7 +285,10 @@ class RoutesCompiler
 		}
 		if (!preg_match('/^[A-Z]\w*/', $route)) {
 			new Error($this->errors['noPatternErrorRoute'], array($name, $route));
-		}		
+		}
+		if (in_array($route, $this->disabledRoutes)) {
+			new Error($this->errors['errorRouteDisabled'], array($name, $route));
+		}
 	}
 
 	private	function isRoute($routeName, $routes) {
