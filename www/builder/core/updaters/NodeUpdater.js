@@ -1,5 +1,5 @@
-function NodeUpdater(n, p) {
-	var a = isArray(p['n']) ? p['n'] : [p['n']];
+function NodeUpdater(n, p, pn) {
+	var a = isArray(pn) ? pn : [pn];
 	this.getKeys = function() {
 		return a;
 	};

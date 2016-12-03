@@ -1,4 +1,4 @@
 <div class="@outer-container">
 	<component class="DataTableTabPanel">
-	{$a + $::aaa}
+	{$::aaa}
 </div>

@@ -1,16 +1,16 @@
-function ElementUpdater(e, p) {
+function ElementUpdater(e, p, n) {
 	this.getKeys = function() {
 		var a = [];
-		for (k in p['n']) {
-			if (isString(p['n'][k])) a.push(p['n'][k]);
-			else a.push.apply(a, p['n'][k]);
+		for (k in n) {
+			if (isString(n[k])) a.push(n[k]);
+			else a.push.apply(a, n[k]);
 		}
 		return a;
 	};
 	this.react = function(d) {
-		var n, k, i, pn;
-		for (k in p['n']) {
-			pn = p['n'][k];			
+		var k, i, pn;
+		for (k in n) {
+			pn = n[k];
 			if (isString(pn)) pn = [pn];
 			for (i = 0; i < pn.length; i++) {
 				if (!isUndefined(d[pn[i]])) {

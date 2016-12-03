@@ -26,7 +26,7 @@ function State() {
 	this.get = function(name) {
 		return vars[name];
 	};
-	this.set = function(name, value) {alert(name)
+	this.set = function(name, value) {
 		var updated, data = name;
 		if (!isUndefined(value)) {
 			data = {};
@@ -40,7 +40,6 @@ function State() {
 			changed[k] = data[k];
 		}
 		if (isChanged) {
-			console.log(changed)
 			for (var k in changed) {
 				vars[k] = changed[k];
 				var s = subscribers[k];
@@ -87,8 +86,8 @@ function State() {
 			}
 		}
 	};
-	this.createUpdater = function(updater, component, obj, props) {
-		var u = new updater(obj, props);
+	this.createUpdater = function(updater, component, obj, props, names) {
+		var u = new updater(obj, props, names);
 		var keys = u.getKeys()
 		for (var i = 0; i < keys.length; i++) {
 			updaters[keys[i]] = updaters[keys[i]] || [];

@@ -260,7 +260,7 @@ var Core = new (function() {
 		return this.parentElement;
 	};
 	this.createUpdater = function(u, c, s, p, l) {
-		var updater = new u(s, p);
+		var updater = new u(s, p, p['n']);
 		this.addUpdater.call(c, updater, l);
 	};
 	this.addUpdater = function(u, l) {

@@ -228,9 +228,9 @@ class JSCompiler
 			}
 			$inClasses = '';
 			if (!isset($this->classes[$usedComponent])) {
-				if (is_array($data['classes'])) {
-					$ending = count($data['classes']) > 1 ? 'ов' : 'а';
-					$inClasses = implode(', ', $data['classes']);
+				if (is_array($data['classNames'])) {
+					$ending = count($data['classNames']) > 1 ? 'ов' : 'а';
+					$inClasses = implode(', ', $data['classNames']);
 				}
 				if (!empty($inClasses)) {
 					new Error($this->errors['usedClassNotFound'], array($usedComponent, $ending, $inClasses));

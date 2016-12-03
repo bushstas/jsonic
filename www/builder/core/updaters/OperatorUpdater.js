@@ -1,5 +1,4 @@
-function OperatorUpdater(o, p) {
-	var n = o instanceof Foreach ? p['n'] : p['p'];
+function OperatorUpdater(o, p, n) {
 	var a = isArray(n) ? n : [n];
 	this.getKeys = function() {
 		return a;

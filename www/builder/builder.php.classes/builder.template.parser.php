@@ -381,13 +381,6 @@ class TemplateParser
 						if (isset(self::$allowedInnerElements[$last]) && !in_array($tn, self::$allowedInnerElements[$last])) {
 							new Error(self::$errors['tagInsideTag'], array(strtoupper($tn), strtoupper($last), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
 						}
-
-						
-
-						
-						// if ( && in_array('p', $opened)) {
-						// 	new Error(self::$errors['blockElementInsideP'], array(self::$templateName, self::$class['name'], $openedTags[$tn], $item['content']));	
-						// }
 						$opened[] = $tn;
 						if (self::isHtmlTag($tn)) {
 							$openedHtml[] = $tn;
@@ -927,7 +920,7 @@ class TemplateParser
 		}
 		$switch .= ']';
 		if (!empty($data['reactNames'])) {
-			$child['p'] = self::getProperChildren($data['reactNames']);
+			$child['n'] = self::getProperChildren($data['reactNames']);
 			$child['sw'] = '<nq>function(){return'.$switch.'}<nq>';			
 		} else {
 			$child['sw'] = '<nq>'.$switch.'</nq>';
@@ -1029,7 +1022,7 @@ class TemplateParser
 			
 		$child['i'] = $ifCondition;
 		if (!empty($names)) {
-			$child['p'] = $names;
+			$child['n'] = $names;
 			if (empty($child['c'])) {
 				$child['c'] = "<nq>function(){return''}</nq>";			 
 			} else {

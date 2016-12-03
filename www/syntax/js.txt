@@ -7,8 +7,19 @@ file_extensions:
 scope: source.actionscript.2
 contexts:
   main:
-    - match: \b(try|catch|Math|this|dynamic|extends|prototype|import|implements|let|document|interface|public|delete|private|new|static|super|var|for|in|break|continue|while|do|return|if|else|case|switch|typeof)\b
+    - match: \b(try|catch|Math|this|dynamic|extends|prototype|import|implements|let|document|interface|public|delete|as|private|new|static|super|var|for|in|break|continue|while|do|return|if|else|case|switch|typeof)\b
       scope: keyword.control.actionscript.2
+
+    - match: '[;\s\r\n\t](get|delay|each)[\s\(]'
+      captures: 
+       1: keyword.control.actionscript.2
+
+    - match: '^(get|delay|each)[\s\(]'
+      captures: 
+       1: keyword.control.actionscript.2
+
+    - match: '@(?=\()'
+      scope: variable.parameter.function.actionscript.2
 
     - match: \b(test (after|before))\s+([a-zA-Z]\w*)
       captures: 

@@ -48,7 +48,8 @@
 				"name": "analytics", 
 				"view": "Analytics",
 				"accessLevel": 0,
-				"title": "Аналитика"
+				"title": "Аналитика",
+				"disabled": true
 			}
 		],
 		"menu": "TopMenu",
