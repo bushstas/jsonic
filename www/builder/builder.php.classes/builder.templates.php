@@ -26,6 +26,8 @@ class TemplateCompiler
 	}
 
 	public function run($templatesFiles, $includesFiles) {
+		$jsClasses = $this->jsCompiler->getClasses();
+		$jsInitials = $this->jsCompiler->getInitials();
 		$this->inheritance = $this->jsCompiler->getClassInheritance();
 		$views = $this->routesCompiler->getRouteViews();		
 
@@ -34,13 +36,13 @@ class TemplateCompiler
 			$this->filesByClassNames[$templateFile['name']] = $templateFile;
 		}
 		$namespaces = array_keys($this->filesByClassNames);
+		
 
 		foreach ($views as $viewClass) {
 			$list = array();
 			$this->parseUsedComponents($viewClass, $this->filesByClassNames[$viewClass]['content'], $list);
 			$this->components[$viewClass] = array_values(array_unique($list));
 		}
-
 		$disabledRoutes = $this->routesCompiler->getDisabledRoutes();
 		$components = array();
 		foreach ($this->components as $viewClass => $list) {
@@ -55,7 +57,7 @@ class TemplateCompiler
 			foreach ($templatesFiles as $templateFile) {
 				$content = $templateFile['content'];
 				$this->parseElementClasses($templateFile['name'], $content, $namespaces);
-				$this->templates[$templateFile['name']] = preg_replace("/<\!--.*?-->/", '', $content);
+				$this->templates[$templateFile['name']] = $content;
 				if (in_array($templateFile['name'], $components)) {
 					$this->initUsedComponents($templateFile['name'], $content);
 				}
@@ -73,6 +75,26 @@ class TemplateCompiler
 				$this->includedTemlates[$includesFile['filename']] = $content;
 			}
 		}
+		$diff1 = array_diff($namespaces, $this->allUsedComponents);
+		$diff2 = array_diff($this->allUsedComponents, $namespaces);
+		$notUsedClasses = array_merge($diff1, $diff2);
+
+
+		$addedJsCode = '';
+		foreach ($this->allUsedComponents as $className) {
+			$jsCode .= $jsClasses[$className]['content'];
+			$jsCode .= implode("\n", $jsInitials[$className]);
+		}
+		$stillNotUsed = array();
+		$addedClasses = array();
+		foreach ($notUsedClasses as $className) {
+			if ($jsClasses[$className]['type'] == 'application' || preg_match('/\b'.$className.'\b/', $jsCode)) {
+				$addedJsCode .= $jsClasses[$className]['content'];
+				$addedClasses[] = $className;
+			} else {
+				$stillNotUsed[] = $className;
+			}
+		}		
 	}
 
 	public function getAllUsedComponentsList() {

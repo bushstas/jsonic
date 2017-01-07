@@ -19,7 +19,7 @@ $includes = array(
 	'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser', 'js.checker', 'js.globals',
 	'data', 'tags', 'props', 'events', 'template.parser', 'css.obfuscator', 'printer', 'js.interpreter',
 	'splitter', 'template.code.parser', 'utils', 'controllers.parser', 'tag.classname.parser',
-	'template.callback.validator', 'states.manager.parser'
+	'template.callback.validator', 'states.manager.parser', 'class.analyzer'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
@@ -64,6 +64,7 @@ class Builder
 		$this->files = $this->gatherer->gatherFiles();
 		
 		$this->jsCompiler->init($this->files['js'], $this->files['core'], $this->files['scripts'], $this->files['data'], $this->files['utils']);
+		ClassAnalyzer::run($this->files, $this->jsCompiler, $this->routesCompiler, $this->config);
 
 		$this->htmlCompiler = new HTMLCompiler($this->config);
 		$this->htmlCompiler->init();

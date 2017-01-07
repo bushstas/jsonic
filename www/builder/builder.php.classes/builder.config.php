@@ -92,7 +92,6 @@ class Config
 			'router' => $this->getRoutesConfig(),
 			'routerMenu' => $this->getRouterMenu(),
 			'routerControllers' => $this->getRouterControllers(),
-			'tooltipClass' => $this->config['tooltipClass'],
 			'pathToDictionary' => $this->config['pathToDictionary'],
 			'viewContainer' => $this->config['container'],
 			'pathToApi' => $this->config['pathToApi'],
@@ -100,6 +99,14 @@ class Config
 			'user' => $this->config['user'],
 			'hasUser' => $this->hasUser()
 		);
+	}
+
+	public function getEntry() {
+		return $this->config['entry'];
+	}
+
+	public function getTooltipClass() {
+		return $this->config['tooltipClass'];
 	}
 
 	public function getHtmlConfig() {

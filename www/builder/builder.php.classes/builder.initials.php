@@ -34,6 +34,7 @@ class InitialsParser
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
 	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'args', 'helpers', 'followers', 'correctors', 'locals', 'listeners');
 	private $initials = array();
+	private $originalInitials = array();
 	private $regexp = '/\binitial\s+([\s\S]+?)(?=(initial|function|@EOF))/';
 	private $regexp2 = '/^([a-zA-Z]\w*)\s*=\s*([\s\S]+?)[;\s]*$/';
 	private $actionsCache = array();
@@ -43,6 +44,7 @@ class InitialsParser
 		$content .= '@EOF';
 		preg_match_all($this->regexp, $content, $matches);
 		$initials = $matches[1];
+		$this->originalInitials[$this->currentClassName] = $initials;
 		foreach ($initials as $initial) {
 			$initial = trim($initial);
 			preg_match_all($this->regexp2, $initial, $matches);
@@ -134,6 +136,10 @@ class InitialsParser
 
 	public function get() {
 		return $this->initials;
+	}
+
+	public function getOriginal() {
+		return $this->originalInitials;
 	}
 
 	public function getControllerActions($ctr) {

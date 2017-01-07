@@ -78,12 +78,13 @@ class Gatherer
 						$path_info = pathinfo($path);
 						$ext = strtolower($path_info['extension']);
     					if (array_search($ext, $this->extensions) !== false) {
+    						$content = file_get_contents($path);
 							$data = array(
 								'path' => $path,
 								'ext' => $ext,
 								'filename' => $file,
 								'name' => $path_info['filename'],
-								'content' => file_get_contents($path)
+								'content' => $this->correct($content, $ext)
 							);
 							$list[] = $data;
 						}
@@ -92,6 +93,18 @@ class Gatherer
 			}
 		}
 		return $list;
+	}
+
+	public function correct($content, $ext) {
+		if ($ext == 'js') {
+			$content = preg_replace("/\/\*[\S\s]*?\*\//", "", $content);
+			$content = preg_replace("/\/\*[\S\s]*/", "", $content);
+			$content = preg_replace("/\n\s*\/\/[^\n]*/", "\n", $content);
+		} elseif ($ext == 'template') {
+			$content = preg_replace("/<\!--[\S\s]*?-->/", '', $content);
+			$content = preg_replace("/<\!--[\S\s]*/", '', $content);
+		}
+		return $content;
 	}
 
 	public static function createFile($path, $content) {

@@ -169,6 +169,14 @@ class JSCompiler
 		$this->addScripts($scriptFiles);
 	}
 
+	public function getClasses() {
+		return $this->classes;
+	}
+
+	public function getInitials() {
+		return $this->initialsParser->getOriginal();
+	}
+
 	public function getClassInheritance() {
 		return $this->inheritance;
 	}
@@ -404,8 +412,6 @@ class JSCompiler
 
 	private function processJSFile(&$jsFile) {
 		$content = &$jsFile['content'];
-		$content = preg_replace("/\/\*[\S\s]*?\*\//", "", $content);
-		$content = preg_replace("/\n\s*\/\/[^\n]*/", "\n", $content);
 		if ($jsFile['name'] == 'config') {
 			if (is_string($this->apiConfig)) {
 				new Error($this->errors['configExists']);
@@ -907,7 +913,7 @@ class JSCompiler
 		$addedClasses = array_unique($addedClasses);
 		$usedClassesCount = count($usedClasses) + count($addedClasses);		
 		$inherited = array(
-			'Component' => array('Application', 'View', 'Form', 'Control', 'Menu'),
+			'Component' => array('Application', 'View', 'Control', 'Menu'),
 			'Foreach' => array('Switch', 'IfSwitch')
 		);
 		while (count($addedClasses) < $usedClassesCount) {
