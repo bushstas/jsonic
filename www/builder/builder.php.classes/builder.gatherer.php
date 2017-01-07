@@ -96,13 +96,21 @@ class Gatherer
 	}
 
 	public function correct($content, $ext) {
+		$encoded = false;
 		if ($ext == 'js') {
 			$content = preg_replace("/\/\*[\S\s]*?\*\//", "", $content);
+			if (preg_match('/\/\*/', $content)) {
+				$encoded = true;
+				TextParser::encode($content, 'gatherer');
+			}
 			$content = preg_replace("/\/\*[\S\s]*/", "", $content);
 			$content = preg_replace("/\n\s*\/\/[^\n]*/", "\n", $content);
 		} elseif ($ext == 'template') {
 			$content = preg_replace("/<\!--[\S\s]*?-->/", '', $content);
 			$content = preg_replace("/<\!--[\S\s]*/", '', $content);
+		}
+		if ($encoded) {
+			TextParser::decode($content, 'gatherer');
 		}
 		return $content;
 	}

@@ -49,7 +49,6 @@ class Builder
 
 		$this->jsCompiler = new JSCompiler($this->config);
 		$this->templateCompiler = new TemplateCompiler();
-		$this->templateCompiler->init($this->jsCompiler, $this->routesCompiler);
 
 		$this->textsCompiler = new TextsCompiler();
 		$this->dataCompiler = new DataCompiler();
@@ -64,7 +63,6 @@ class Builder
 		$this->files = $this->gatherer->gatherFiles();
 		
 		$this->jsCompiler->init($this->files['js'], $this->files['core'], $this->files['scripts'], $this->files['data'], $this->files['utils']);
-		ClassAnalyzer::run($this->files, $this->jsCompiler, $this->routesCompiler, $this->config);
 
 		$this->htmlCompiler = new HTMLCompiler($this->config);
 		$this->htmlCompiler->init();
@@ -75,6 +73,8 @@ class Builder
 	}
 
 	private function runCompilers() {
+		ClassAnalyzer::run($this->files, $this->jsCompiler, $this->routesCompiler, $this->config);
+		
 		$this->htmlCompiler     -> run ();
 		$this->cssCompiler      -> run ($this->files['css'], $this->files['cssconst']);
 		$this->utilsCompiler    -> run ($this->files['utils'], $this->coreValidator->getUtilsFunctionNames());

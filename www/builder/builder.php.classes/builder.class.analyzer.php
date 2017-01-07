@@ -22,6 +22,9 @@ class ClassAnalyzer
 		if (!empty($tooltipClass)) {
 			$defaultClasses[] = $tooltipClass;
 		}
+		foreach ($defaultClasses as $defaultClass) {
+			self::addUsedClassFor($defaultClass, $defaultClasses);
+		}
 
 		$usedClasses = array();
 		$views[] = $configProvider->getEntry();
@@ -44,6 +47,15 @@ class ClassAnalyzer
 		Printer::log($notUsedClasses);
 	}
 
+	public static function addClasses($classes) {
+		if (!is_array($classes)) {
+			$classes = array($classes);
+		}
+		foreach ($classes as $className) {
+			self::$usedClasses[] = $className;
+		}
+	}
+
 	public static function getUsedClasses() {
 		return self::$usedClasses;
 	}
@@ -64,6 +76,9 @@ class ClassAnalyzer
 			preg_match_all(self::$regexp, $file['content'], $matches);
 			$tagContents = $matches[2];
 			self::$matches[$file['name']] = array();
+			if (!in_array($file['name'], self::$allJsClasses)) {
+				self::$allJsClasses[] = $file['name'];
+			}
 			$classes = array();
 			foreach ($tagContents as $i => $tagContent) {
 				preg_match_all("/class=[\"'](\w+)[\"']/i", $tagContent, $matches);

@@ -150,7 +150,6 @@ class JSCompiler
 		$this->validateViews();
 		$this->validateSuperClasses();
 		$this->addClassesFromTemplates();
-		$this->unsetNotUsedClasses();
 		$this->validateUsedClasses();
 		$this->initialsParser->run($this->classes);
 		$this->parseClasses();
@@ -260,31 +259,6 @@ class JSCompiler
 		}
 	}
 
-	private function unsetNotUsedClasses() {
-		$used = array_keys($this->usedComponents);
-		$notUsedClasses = array();
-		$parentalClasses = array();
-		foreach ($this->classes as $className => $classData) {
-			if (is_array($classData['extends'])) {
-				$parentalClasses = array_merge($parentalClasses, $classData['extends']);
-			}
-			if ((empty($classData['type']) || in_array($classData['type'], $this->superClasses)) && !in_array($className, $used)) {
-				$notUsedClasses[] = $className;
-			}
-		}
-
-		$parentalClasses = array_unique($parentalClasses);
-		$properNotUsedComponents = array();
-		foreach ($notUsedClasses as $className) {
-			if (!in_array($className, $parentalClasses) && !$this->isClassNameInCode($className)) {
-				$properNotUsedComponents[] = $className;
-			}
-		}
-		foreach ($properNotUsedComponents as $className) {
-			$this->unsetNotUsedClass($className);
-		}
-	}
-
 	private function isClassNameInCode($className) {
 		$configJson = $this->configProvider->getConfigJson();
 		$modifiedJs = preg_replace('/(component|control|menu|form|dialog)\s+'.$className.'\b/', '', $this->jsCode);
@@ -292,27 +266,9 @@ class JSCompiler
 		return preg_match($regexp, $modifiedJs) || preg_match($regexp, $configJson);
 	}
 
-	private function unsetNotUsedClass($className) {
-		$used = $this->templateCompiler->getUsedComponents();
-		$classType = $this->classes[$className]['type'];
-		$extends = $this->classes[$className]['extends'];
-		unset($this->usedComponents[$className]);
-		unset($this->classes[$className]);
-		unset($this->classesByTypes[$classType][$className]);
-		if (is_array($extends)) {
-			foreach ($extends as $superClassName) {
-				if ($this->extendsCount[$superClassName] > 0) {
-					$this->extendsCount[$superClassName]--;
-					if ($this->extendsCount[$superClassName] == 0 && !$this->isClassNameInCode($superClassName) && !isset($used[$superClassName])) {
-						$this->unsetNotUsedClass($superClassName);
-					}
-				}
-			}
-		}
-	}
-
 	private function unsetNotUsedCorrectors() {
 		$usedCorrectors = JSParser::getUsedCorrectors();
+		ClassAnalyzer::addClasses($usedCorrectors);
 		if (is_array($this->classesByTypes['corrector'])) {
 			foreach ($this->classesByTypes['corrector'] as $className => $class) {
 				if (!in_array($className, $usedCorrectors)) {
@@ -326,14 +282,15 @@ class JSCompiler
 		$templateClasses = $this->templateCompiler->getTemplateClasses();
 		$jsClasses = array_keys($this->classes);
 		foreach ($templateClasses as $templateClass) {
-			if (!in_array($templateClass, $jsClasses)) {				
-				$this->classes[$templateClass] = array(
+			if (!in_array($templateClass, $jsClasses)) {
+				$data = array(
 					'name' => $templateClass,
 					'content' => '',
 					'type' => $this->usedComponents[$templateClass]['type'],
 					'extends' => array(ucfirst($this->usedComponents[$templateClass]['type'])),
 					'isSuper' => true
 				);
+				$this->classes[$templateClass] = $data;
 			}
 		}
 	}
@@ -687,8 +644,15 @@ class JSCompiler
 	}
 
 	private function decodeTexts() {
-		$keys = array_keys($this->classes);		
-		TextParser::decode($this->jsOutput, $keys);
+		$keys = array_keys($this->classes);
+		$usedClasses = ClassAnalyzer::getUsedClasses();
+		$properKeys = array();
+		foreach ($keys as $key) {
+			if (in_array($key, $usedClasses)) {
+				$properKeys[] = $key;
+			}
+		}
+		TextParser::decode($this->jsOutput, $properKeys);
 	}
 
 	private function finish() {
@@ -773,7 +737,7 @@ class JSCompiler
 
 	private function addClasses() {
 		$disabledRoutes = $this->routesCompiler->getDisabledRoutes();
-		$used = $this->templateCompiler->getAllUsedComponentsList();
+		$usedClasses = ClassAnalyzer::getUsedClasses();
 		$templates = $this->templateCompiler->getTemplates();
 		TemplateParser::init(
 			array(
@@ -790,7 +754,7 @@ class JSCompiler
 		$this->jsOutput[] = "\nvar p;";
 		foreach ($this->classes as $className => &$class) {			
 			$type = $class['type'];
-			if ($type == 'view' && in_array($className, $disabledRoutes) && !in_array($className, $used)) {
+			if (!in_array($className, $usedClasses)) {
 				continue;
 			}
 			if (is_array($class['functions'])) {
@@ -892,10 +856,11 @@ class JSCompiler
 	}
 
 	private function addInheritance() {
+		$used = ClassAnalyzer::getUsedClasses();
 		$this->bottomOutput = array();
 		$inheritance = array();		
 		foreach ($this->classes as $className => $class) {
-			if (is_array($class['extends']) && !empty($class['extends'])) {
+			if (in_array($className, $used) && is_array($class['extends']) && !empty($class['extends'])) {
 				$inheritance[$className] = $class['extends'];
 			}
 		}
@@ -910,6 +875,7 @@ class JSCompiler
 			}
 		}
 		$usedClasses = array_keys($inheritance);
+
 		$addedClasses = array_unique($addedClasses);
 		$usedClassesCount = count($usedClasses) + count($addedClasses);		
 		$inherited = array(
@@ -934,7 +900,6 @@ class JSCompiler
 		}
 		$inheritance = array();
 		$disabledRoutes = $this->routesCompiler->getDisabledRoutes();
-		$used = $this->templateCompiler->getAllUsedComponentsList();
 		foreach ($inherited as $parentClass => $childClasses) {
 			if ($parentClass == 'View' && !empty($disabledRoutes)) {
 				$enabledClasses = array();

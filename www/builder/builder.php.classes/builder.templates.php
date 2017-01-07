@@ -2,8 +2,7 @@
 
 class TemplateCompiler 
 {
-	private $configProvider, $routesCompiler, $jsCompiler;
-	private $inheritance = array();
+	private $configProvider;
 	private $regexp = '/<(component|control|form|menu)\s([^>]+)>/i';
 
 	private $errors = array(
@@ -16,52 +15,19 @@ class TemplateCompiler
 	private $templates = array();
 	private $includedTemlates = array();
 	private $usedComponents = array();
-	private $components = array();
-	private $foundComponents = array();
-	private $filesByClassNames = array();
 
-	public function init($jsCompiler, $routesCompiler) {
-		$this->jsCompiler = $jsCompiler;
-		$this->routesCompiler = $routesCompiler;
-	}
-
-	public function run($templatesFiles, $includesFiles) {
-		$jsClasses = $this->jsCompiler->getClasses();
-		$jsInitials = $this->jsCompiler->getInitials();
-		$this->inheritance = $this->jsCompiler->getClassInheritance();
-		$views = $this->routesCompiler->getRouteViews();		
-
-		$namespaces = array();
-		foreach ($templatesFiles as $templateFile) {
-			$this->filesByClassNames[$templateFile['name']] = $templateFile;
-		}
-		$namespaces = array_keys($this->filesByClassNames);
-		
-
-		foreach ($views as $viewClass) {
-			$list = array();
-			$this->parseUsedComponents($viewClass, $this->filesByClassNames[$viewClass]['content'], $list);
-			$this->components[$viewClass] = array_values(array_unique($list));
-		}
-		$disabledRoutes = $this->routesCompiler->getDisabledRoutes();
-		$components = array();
-		foreach ($this->components as $viewClass => $list) {
-			if (!in_array($viewClass, $disabledRoutes)) {
-				$components = array_merge($components, $list);
-				$components[] = $viewClass;
-			}
-		}
-		$this->allUsedComponents = $components;
-
+	public function run($templatesFiles, $includesFiles) {		
 		if (is_array($templatesFiles)) {
+			$namespaces = array();
+			foreach ($templatesFiles as $templateFile) {
+				$namespaces[] = $templateFile['name'];
+			}
 			foreach ($templatesFiles as $templateFile) {
 				$content = $templateFile['content'];
 				$this->parseElementClasses($templateFile['name'], $content, $namespaces);
-				$this->templates[$templateFile['name']] = $content;
-				if (in_array($templateFile['name'], $components)) {
-					$this->initUsedComponents($templateFile['name'], $content);
-				}
-			}			
+				$this->templates[$templateFile['name']] = preg_replace("/<\!--.*?-->/", '', $content);
+				$this->initUsedComponents($templateFile['name'], $content);
+			}
 		}
 		if (is_array($includesFiles)) {
 			foreach ($includesFiles as $includesFile) {
@@ -75,30 +41,6 @@ class TemplateCompiler
 				$this->includedTemlates[$includesFile['filename']] = $content;
 			}
 		}
-		$diff1 = array_diff($namespaces, $this->allUsedComponents);
-		$diff2 = array_diff($this->allUsedComponents, $namespaces);
-		$notUsedClasses = array_merge($diff1, $diff2);
-
-
-		$addedJsCode = '';
-		foreach ($this->allUsedComponents as $className) {
-			$jsCode .= $jsClasses[$className]['content'];
-			$jsCode .= implode("\n", $jsInitials[$className]);
-		}
-		$stillNotUsed = array();
-		$addedClasses = array();
-		foreach ($notUsedClasses as $className) {
-			if ($jsClasses[$className]['type'] == 'application' || preg_match('/\b'.$className.'\b/', $jsCode)) {
-				$addedJsCode .= $jsClasses[$className]['content'];
-				$addedClasses[] = $className;
-			} else {
-				$stillNotUsed[] = $className;
-			}
-		}		
-	}
-
-	public function getAllUsedComponentsList() {
-		return $this->allUsedComponents;
 	}
 
 	public function hasTemplate($className) {
@@ -121,46 +63,16 @@ class TemplateCompiler
 		return $this->usedComponents;
 	}
 
-	private function parseUsedComponents($className, $content, &$list) {		
-		if (!isset($this->foundComponents[$className])) {
-			$foundComponents[$className] = array();
-			preg_match_all($this->regexp, $content, $matches);
-			$tagContents = $matches[2];
-			foreach ($tagContents as $i => $tagContent) {
-				preg_match_all("/class=[\"'](\w+)[\"']/i", $tagContent, $matches);
-				$name = $matches[1][0];
-				if (empty($name)) continue;
-				$foundComponents[$className][] = $name;
-				$list[] = $name;
-				if (is_array($this->filesByClassNames[$name])) {
-					$this->parseUsedComponents($name, $this->filesByClassNames[$name]['content'], $list);
-				}
-				$this->parseSuperClass($name, $list);
-			}
-			$this->parseSuperClass($className, $list);
-		} else {
-			$list = array_merge($list, $this->foundComponents[$className]);
-		}
-	}
-
-	private function parseSuperClass($className, &$list) {
-		if (is_array($this->inheritance[$className])) {
-			foreach ($this->inheritance[$className] as $superClass) {
-				$list[] = $superClass;
-				$this->parseUsedComponents($superClass, $this->filesByClassNames[$superClass]['content'], $list);
-			}
-		}
-	}
-
 	private function initUsedComponents($className, $content) {
 		$used = &$this->usedComponents;
 		preg_match_all($this->regexp, $content, $matches);
 		$typeMatches = $matches[1];
 		$tagContents = $matches[2];
+		$usedClasses = ClassAnalyzer::getUsedClasses();
 		foreach ($tagContents as $i => $tagContent) {
 			preg_match_all("/class=[\"'](\w+)[\"']/i", $tagContent, $matches);
 			$name = $matches[1][0];
-			if (empty($name)) continue;
+			if (empty($name) || !in_array($name, $usedClasses)) continue;
 			if (!is_array($used[$name])) {
 				$used[$name] = array('classNames' => array());
 			}				
