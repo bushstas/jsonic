@@ -1,21 +1,21 @@
 {template .main}
 <div class="@" scope>
 	<div class="@container">
-		<template templ="topContent">
-		<template templ="input">
+		<:topContent/>
+		<:input/>
 		<div class="@content">
 			<div class="@placeholder">
 				{foreach $items as &item}
-					<template templ="tag" text="{&item}">
+					<:tag text="{&item}"/>
 				{/foreach}
 			</div>
 		</div>
 	</div>
-	<template templ="bottomContent">
+	<:bottomContent/>
 </div>
 
 {template .input}
-<component class="AutoComplete" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant">
+<component class="AutoComplete" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
 
 {template .tag}
 <div class="@item">

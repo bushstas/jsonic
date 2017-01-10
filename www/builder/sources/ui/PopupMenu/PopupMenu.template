@@ -3,7 +3,7 @@
 		{foreach $buttons as &idx => &button}
 			<div class="@button" data-value="{&button['value']}" data-index="{&idx}">
 				{&button['name']}
-				<template templ="content" item="{&button}">
+				<:content item="{&button}"/>
 			</div>
 		{/foreach}
 	</div>

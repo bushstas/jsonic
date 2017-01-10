@@ -1,5 +1,5 @@
 {namespace .SearchForm}
 
 <div class="@button {~className}" onClick="onClick">
-	<template templ="content">
+	<:content/>
 </div>

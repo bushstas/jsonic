@@ -5,7 +5,7 @@
 	</div>
 	<div class="@close-side" onClick="!expand"/>
 	<div class="@close" onClick="!expand"/>
-	<template templ="content">
+	<:content/>
 </div>
 
 {template .reset}

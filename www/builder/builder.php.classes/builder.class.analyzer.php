@@ -43,8 +43,8 @@ class ClassAnalyzer
 		self::$usedClasses = array_values(array_unique($allUsed));
 		$notUsedClasses = array_diff(self::$allJsClasses, $allUsed);
 		
-		Printer::log(self::$usedClasses);
-		Printer::log($notUsedClasses);
+		// Printer::log(self::$usedClasses);
+		// Printer::log($notUsedClasses);
 	}
 
 	public static function addClasses($classes) {

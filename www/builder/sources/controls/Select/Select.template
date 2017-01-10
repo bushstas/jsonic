@@ -1,13 +1,13 @@
 <div class="@ {~className?~className} {$active?'->>active'}" scope>
 	<div class="@value" onClick="onClick">
 		{$title}
-		<include templ="tooltip" if="{~tooltip}" className="question-tooltip" key="{$tooltip}">
+		<::tooltip if="{~tooltip}" className="question-tooltip" key="{$tooltip}"/>
 	</div>
 	<div class="@options" onClick="onOptionsClick">
 		{foreach $options as &option}
 			<div class="@option" data-value="{&option.value}">
 				{&option.title}
-				<include templ="tooltip" if="{&option.tooltip}" className="question-tooltip" key="{&option.tooltip}">
+				<::tooltip if="{&option.tooltip}" className="question-tooltip" key="{&option.tooltip}"/>
 			</div>
 		{/foreach}
 	</div>

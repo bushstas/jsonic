@@ -1,9 +1,9 @@
 {template .content}
-<component class="KeywordsPanel" cmpid="keywordsPanel">
-<template templ="reset">
+<component class="KeywordsPanel" cmpid="keywordsPanel"/>
+<:reset/>
 <div class="@" scope="1">
-	<component class="SearchFormFilters">
+	<component class="SearchFormFilters"/>
 	<div class="@content">
-		<component class="KeywordsButton" panel="{^keywordsPanel}">
+		<component class="KeywordsButton" panel="{^keywordsPanel}"/>
 	</div>
 </div>

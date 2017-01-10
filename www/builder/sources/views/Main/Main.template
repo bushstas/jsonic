@@ -6,23 +6,23 @@
 					<div class="mainpage-left-column-title">
 						{@personal}
 					</div>
-					<component class="UserInfo">
+					<component class="UserInfo"/>
 					<div class="mainpage-leftcolumn-title bold">
 						{@calendar}
-						<include templ="tooltip" args="{#calendarTooltip}">
+						<::tooltip args="{#calendarTooltip}"/>
 					</div>
-					<component class="FavoritesCalendar">
+					<component class="FavoritesCalendar"/>
 				</div>
 			</td>
 			<td class="mainpage-content-column">
-				<component class="TabPanel" args="{#mainPageTabs}">
+				<component class="TabPanel" args="{#mainPageTabs}"/>
 				<div class="mainpage-content">
 					<div class="tab-content">
-						<component class="FilterStatistics" args="{#mainPageFilterStat}">
+						<component class="FilterStatistics" args="{#mainPageFilterStat}"/>
 					</div>
 					<div class="tab-content">
-						<component class="FilterSubscriptionOptions">
-						<component class="FilterSubscription">
+						<component class="FilterSubscriptionOptions"/>
+						<component class="FilterSubscription"/>
 					</div>
 					<div class="tab-content">
 						11111111

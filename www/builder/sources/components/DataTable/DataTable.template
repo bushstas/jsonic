@@ -1,4 +1,9 @@
+{template .main}
 <div class="@outer-container">
-	<component class="DataTableTabPanel">
+	<component class="DataTableTabPanel" />
 	{$::aaa}
+	<:aaaa a="HELLO"/>
 </div>
+
+{template .aaaa}
+{~a}

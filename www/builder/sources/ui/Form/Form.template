@@ -1,9 +1,9 @@
 <forma class="app-form-controls{~className?' '+~className}" method="{~method}" action="{~action}" data-ajax="{~ajax?1}" data-iframe="{~iframe?1}" scope>
-	<template templ="content">
+	<:content/>
 	{foreach ~controls as &control}
-		<component class="FormField" args="{&control}">
+		<component class="FormField" args="{&control}"/>
 	{/foreach}
 	{if ~submit}
-		<component class="Submit" props="{~submit}" onSubmit="onSubmit">
+		<component class="Submit" props="{~submit}" onSubmit="onSubmit"/>
 	{/if}	
 </forma>

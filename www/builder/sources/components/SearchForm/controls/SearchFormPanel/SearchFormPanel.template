@@ -3,5 +3,5 @@
 	<div class="app-search-form-panel-title">
 		{~title}
 	</div>
-	<template templ="content">
+	<:content/>
 </div>

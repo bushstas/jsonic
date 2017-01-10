@@ -11,6 +11,6 @@
 		{$title}
 	</div>
 	<div class="@content" style="{$height?'max-height:'+$height+'px;'}">
-		<template templ="content">
+		<:content/>
 	</div>
 </div>

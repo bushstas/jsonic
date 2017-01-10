@@ -1,13 +1,12 @@
-<template templ="controls" if="{!~nocontrols}">
+<:controls if="{!~nocontrols}"/>
 <a class="@" href="#tender/{~Id}" target="_blank" data-id="{~Id}" scope>
-	<template templ="controls" if="{!~nocontrols}">
 	<div class="@top">
 		<div class="@top-item">
 			{getFzName(~type)}
 		</div>
 		{if ~multiregion}
 			<div class="@top-item tooltiped" txt="{~regionnames}" cap="{@regions}" del="1" cor="list" pos="left-top">
-				<template templ="count" count="{~multiregion}">
+				<:count count="{~multiregion}"/>
 				{~regionName}
 			</div>
 		{else}
@@ -17,7 +16,7 @@
 		{/if}
 		{if ~multicategory}
 			<div class="@top-item tooltiped" txt="{~subcategories}" cap="{@categories}" del="1" cor="list" pos="left-top">
-				<template templ="count" count="{~multicategory}">
+				<:count count="{~multicategory}"/>
 				{~subcategory}
 			</div>
 		{else}
@@ -26,7 +25,7 @@
 			</div>
 		{/if}
 		<div class="@top-item">
-			<include templ="unavailable" if="{~razm == 'N/A'}" else="{~razm}" tariff="{~isUnavailable}" width="66px">
+			<::unavailable if="{~razm == 'N/A'}" else="{~razm}" tariff="{~isUnavailable}" width="66px"/>
 		</div>
 	</div>
 	<div class="@price">
@@ -34,7 +33,7 @@
 	</div>
 	<div class="@name">
 		{if ~hot}
-			<template templ="hotMark">
+			<:hotMark/>
 		{/if}
 		{~name}	
 	</div>
@@ -42,6 +41,6 @@
 	
 	</div>
 	{if ~fragments}
-		<component class="DataTableFragmets" data="{~fragments}">
+		<component class="DataTableFragmets" data="{~fragments}"/>
 	{/if}
 </a>

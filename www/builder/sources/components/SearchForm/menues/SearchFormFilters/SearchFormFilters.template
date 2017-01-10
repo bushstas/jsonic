@@ -3,7 +3,7 @@
 		<span>
 			{@createFilter}
 		</span>
-		<component class="SearchFormCreateFilterMenu">
+		<component class="SearchFormCreateFilterMenu"/>
 	</div>
 	<div class="@button{!$quantity?' with-plus'}">
 		<div class="@button-inner">
@@ -15,7 +15,7 @@
 			</label>
 			<div class="@button-plus"></div>
 		</div>
-		<component class="SearchFormFilterMenu">
+		<component class="SearchFormFilterMenu"/>
 	</div>
 	<div class="@name" onClick="onSaveFilterClick">
 		{$filterName}

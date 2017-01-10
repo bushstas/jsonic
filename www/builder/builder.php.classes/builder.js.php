@@ -987,6 +987,10 @@ class JSCompiler
 				$let = "\t".$templateFunction['let'].";";
 			}
 			if (!empty($templateFunction['content'])) {
+				$fl = $templateFunction['content'][0];
+				if ($fl != '{' && $fl != '[' && $fl != '(') {
+					$templateFunction['content'] = ' '.$templateFunction['content'];
+				}
 				$content = $let."\n\treturn".$templateFunction['content'];
 			} else {
 				$content = $let."\n";

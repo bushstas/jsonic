@@ -4,5 +4,5 @@
 	<div class="@title">
 		{@editing}
 	</div>
-	<component class="AutoComplete" opts="{#keywordsAutoCompleteOptions}" active="{$withAutoComplete}" onEnter="onEnter">
+	<component class="AutoComplete" opts="{#keywordsAutoCompleteOptions}" active="{$withAutoComplete}" onEnter="onEnter"/>
 </div>

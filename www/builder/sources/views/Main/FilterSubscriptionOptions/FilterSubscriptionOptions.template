@@ -1,11 +1,11 @@
 <div class="@" scope>
 	<div class="@option">
-		<include templ="checkbox" name="tenderOfFavorite" checked="{$opts.tenderOfFavorite}"> {@notifyMe} <b>{@favTenderChange}</b>
+		<::checkbox name="tenderOfFavorite" checked="{$opts.tenderOfFavorite}"/> {@notifyMe} <b>{@favTenderChange}</b>
 	</div>
 	<div class="@option">
-		<include templ="checkbox" name="protocolOfFavorite" checked="{$opts.protocolOfFavorite}"> {@notifyMe} <b>{@protocolChange}</b>
+		<::checkbox name="protocolOfFavorite" checked="{$opts.protocolOfFavorite}"/> {@notifyMe} <b>{@protocolChange}</b>
 	</div>
 	<div class="@option">
-		<include templ="checkbox" name="protocolOfFilter" checked="{$opts.protocolOfFilter}"> {@notifyMe} <b>{@newProtocols}</b>
+		<::checkbox name="protocolOfFilter" checked="{$opts.protocolOfFilter}"/> {@notifyMe} <b>{@newProtocols}</b>
 	</div>
 </div>

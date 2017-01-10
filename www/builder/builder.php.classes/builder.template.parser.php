@@ -13,7 +13,7 @@ class TemplateParser
 	);
 
 	private static $singleTags = array(
-		'template', 'include', 'component', 'control', 'form', 'menu', 'else', 'ifempty'
+		'else', 'ifempty'
 	);
 	
 	private static $contexts = array(
@@ -516,7 +516,7 @@ class TemplateParser
 		$isIfempty = false;
 		$currentIf = null;
 
-		for ($i = 0; $i < count($list); $i++) {			
+		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
 
 			$tagName = trim($item['tagName']);
@@ -534,6 +534,9 @@ class TemplateParser
 				}
 			} else {
 				$child = self::getHtmlChild($item, $i, $list, $isElse, $isIfempty);
+				if ($child === null) {
+					continue;
+				}
 				if ($isElse) {
 					$elseChildren[] = $child;
 				} elseif ($isIfempty) {
@@ -566,17 +569,26 @@ class TemplateParser
 			$child = array('t' => self::getTagIndex($tagName));
 			self::getTagProperties($item, $child);
 		}
-		elseif ($tagName == 'template' || $tagName == 'include')
+		elseif ($tagName == 'template' || $tagName == 'include' || $tagName[0] == ':')
 		{
-			self::getTemplateProperties($item['content'], $child, $tagName == 'include');
+			if (!$item['isClosing']) {
+				self::getTemplateProperties($item['content'], $child, $tagName == 'include');
+				$childrenList = self::gatherChildren($list, $i, $tagName);
+				Printer::log($childrenList);
+			} else {
+				return null;
+			}
 		}
 		elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
 		{
-			self::getTagProperties($item, $child, true);
+			if (!$item['isClosing']) {
+				self::getTagProperties($item, $child, true);
+			} else {
+				return null;
+			}
 		}
 		else
-		{					
-			
+		{
 			
 			$toProper = false;
 
@@ -932,6 +944,13 @@ class TemplateParser
 
 	private static function getTemplateProperties($html, &$child, $isInclude = false) {
 		$tmpName = '';
+		if (preg_match('/^<:{1,2}(\w+)/', $html, $match)) {
+			$tmpName = $match[1];
+			$child['tmp'] = '<nq><this>getTemplate'.ucfirst($tmpName).'<nq>';
+			if ($html[2] == ':') {
+				$isInclude = true;
+			}
+		}
 		self::$parsedItem = $html;
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();

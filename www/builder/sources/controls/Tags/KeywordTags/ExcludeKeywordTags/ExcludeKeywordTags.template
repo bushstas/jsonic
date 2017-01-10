@@ -4,10 +4,10 @@
 <div class="@top">
 	<span class="@select-button" data-index="1">
 		{$opt1}
-		<component class="PopupSelect" cmpid="opt1" arg-options="{#wordExcludeOptions}" title="{@findExcludes}" onChange="onChangeOption">
+		<component class="PopupSelect" cmpid="opt1" arg-options="{#wordExcludeOptions}" title="{@findExcludes}" onChange="onChangeOption"/>
 	</span>
-	<template templ="topButtons">
+	<:topButtons/>
 </div>
 
 {template .input}
-<component class="AutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter">
+<component class="AutoComplete" arg-placeholder="{@enterKeywords}" onFocus="!focus" onEnter="onEnter"/>
