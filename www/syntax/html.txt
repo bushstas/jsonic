@@ -143,7 +143,7 @@ contexts:
             1: entity.name.sign.style.html
           pop: true
         - include: tag-stuff
-    - match: (</?)((?i:address|blockquote|dd|div|section|article|aside|header|footer|nav|menu|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|pre)\b)
+    - match: (</?)((?i:address|:*\w+|blockquote|dd|div|section|article|aside|header|footer|nav|menu|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|pre)\b)
       captures:
         1: entity.name.sign.style.html
         2: entity.name.tag.block.any.html

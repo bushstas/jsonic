@@ -32,7 +32,7 @@ $imgsrc = ../images/searchform
 
 
 .@close ==c {
-    $(rot180 block abs r t7 norep pointer z26 wh23 png = close bp100%_50%)
+    $(rot180 block abs r t7 norep pointer z26 wh23 png=close bp100%_50%)
     transition: all 0.2s ease-out;
 }
 .view-content.form-expanded ~c {
@@ -41,7 +41,7 @@ $imgsrc = ../images/searchform
 
 
 .@reset ==a {
-    $(abs r34 t5 pl22 lh16 h25 w0 fs14 bold norep pointer nowrap z10 png = clear c#5c606a bp100%_50%)
+    $(abs r34 t5 pl22 lh16 h25 w0 fs14 bold norep pointer nowrap z10 png=clear c#5c606a bp100%_50%)
 }
 ~a .hover-label {
     $(none abs white r lh36 t50% mt-18 bc#D35655 p0_10_0_11)

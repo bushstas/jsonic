@@ -240,9 +240,9 @@ class TemplateParser
 	private static function getParsedTemplate($content) {
 		$html = preg_replace(self::$regexp, '', $content);
 		$html = str_replace('->>', "#classobfus#", $html);
-		$html = preg_replace('/<(\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
+		$html = preg_replace('/<(:*\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
 		$html = str_replace('#classobfus#', '->>', $html);
-		$html = preg_replace('/<\/(img|br|hr|input|component|control|form|menu)>/', '', $html);
+		$html = preg_replace('/<\/(img|br|hr|input)>/', '', $html);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
 
@@ -260,7 +260,7 @@ class TemplateParser
 				$html .= $matches[$i];
 			}
 		}
-		$regexp = "/(<\/*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\})/i";
+		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
 		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
 		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
@@ -272,7 +272,7 @@ class TemplateParser
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
 			if (isset($tags[$j]) && !empty($tags[$j])) {
-				preg_match('/^[<\{]\s*\/*([a-z]\w*) */i', $tags[$j], $match);
+				preg_match('/^[<\{]\s*\/*(:*[a-z]\w*) */i', $tags[$j], $match);
 				$tagName = strtolower($match[1]);
 				$tagContent = $tags[$j];
 				$isClosing = self::isTagClosing($tagName, $tagContent);
@@ -360,7 +360,7 @@ class TemplateParser
 			if (!empty($tn)) {
 				if (!$item['isSingle']) {
 					if ($item['isClosing'] == 0) {
-						
+								
 						if (!isset($openedTags[$tn])) {
 							$openedTags[$tn] = 0;
 						}
