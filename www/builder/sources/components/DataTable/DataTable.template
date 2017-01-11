@@ -2,7 +2,11 @@
 <div class="@outer-container">
 	<component class="DataTableTabPanel" />
 	{$::aaa}
-	<:aaaa a="HELLO"/>
+	<:aaaa a="HELLO">
+		<div>234342</div>
+		<span>23213</span>
+		<component class="DataTableTabPanel" />
+	</:aaaa>
 </div>
 
 {template .aaaa}

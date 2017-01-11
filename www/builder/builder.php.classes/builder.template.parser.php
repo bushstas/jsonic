@@ -569,19 +569,10 @@ class TemplateParser
 			$child = array('t' => self::getTagIndex($tagName));
 			self::getTagProperties($item, $child);
 		}
-		elseif ($tagName == 'template' || $tagName == 'include' || $tagName[0] == ':')
-		{
-			if (!$item['isClosing']) {
-				self::getTemplateProperties($item['content'], $child, $tagName == 'include');
-				$childrenList = self::gatherChildren($list, $i, $tagName);
-				Printer::log($childrenList);
-			} else {
-				return null;
-			}
-		}
 		elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
 		{
 			if (!$item['isClosing']) {
+				$isComponent = true;
 				self::getTagProperties($item, $child, true);
 			} else {
 				return null;
@@ -589,9 +580,21 @@ class TemplateParser
 		}
 		else
 		{
+
+			$isTemplate = false;
+			$isComponent = false;
+			if ($tagName == 'template' || $tagName == 'include' || $tagName[0] == ':')
+			{
+				if (!$item['isClosing']) {
+					$isTemplate = true;
+					self::getTemplateProperties($item['content'], $child, $tagName == 'include');
+				} else {
+					return null;
+				}
+			}
+
 			
 			$toProper = false;
-
 			if ($tagName == 'if') {
 				preg_match("/^\{\s*if\b\s*([^\}]+)\}/i",  $item['content'], $match);
 				if (!is_string($match[1])) $match[1] = '';
@@ -659,7 +662,9 @@ class TemplateParser
 
 					default:
 						if ($tagName == 'forma') $tagName = 'form';
-						$child['t'] = self::getTagIndex($tagName);
+						if (!$isTemplate && !$isComponent) {
+							$child['t'] = self::getTagIndex($tagName);
+						}
 						self::getTagProperties($item, $child);
 				}
 			}
@@ -676,6 +681,10 @@ class TemplateParser
 			}
 		}
 		return $child;
+	}
+
+	private	static function addChildren() {
+
 	}
 
 	private	static function gatherChildren($list, &$i, $tagName) {
