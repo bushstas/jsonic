@@ -201,6 +201,10 @@ function Level() {
 			for (var k in args) tempArgs[k] = args[k];
 			args = tempArgs;
 		}
+		if (item['c']) {
+			args = args || {};
+			args['children'] = item['c'];
+		}
 		if (isString(item['tmp'])) item['tmp'] = Core.getTemplateById.call(component, item['tmp']);
 		if (isFunction(item['tmp'])) {		
 			var items = item['tmp'].call(component, args, component);
@@ -234,6 +238,10 @@ function Level() {
 				for (i = 0; i < item['w'].length; i += 2) {
 					Core.provideWithComponent.call(component, item['w'][i], item['w'][i + 1], cmp);
 				}
+			}
+			if (item['c']) {
+				args = args || {};
+				args['children'] = item['c'];
 			}
 			Core.initiate.call(cmp, props, args, opts);
 			cmp.render(pe);

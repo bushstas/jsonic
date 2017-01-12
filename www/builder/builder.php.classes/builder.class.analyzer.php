@@ -8,10 +8,14 @@ class ClassAnalyzer
 	private static $usedClasses = array();
 	private static $allJsClasses;
 	private static $jsClassesData;
+	private static $errors = array(
+		'unknownClass' => 'Вызываемый в одном из шаблонов класса {??} компонент {??} не найден<xmp>{?}</xmp>'
+	);
 
-	public static function run($files, $jsCompiler, $routesCompiler, $configProvider) {
+	public static function run(&$files, $jsCompiler, $routesCompiler, $configProvider) {
 		self::$jsClassesData = $jsCompiler->getClasses();
 		self::$allJsClasses = array_keys(self::$jsClassesData);
+		self::prepareTemplateClasses($files['template']);
 		self::findClassesInTemplates($files['template']);
 		self::findClassesInScripts($files['js']);
 		$views = $routesCompiler->getRouteViews();
@@ -69,6 +73,54 @@ class ClassAnalyzer
 				}
 			}
 		}
+	}
+
+	private function prepareTemplateClasses(&$files) {
+		foreach ($files as &$file) {
+			$html = $file['content'];
+			$regexp = "/\{[^\}]+\}/";
+			preg_match_all($regexp, $html, $matches);
+			$matches = $matches[0];
+			foreach ($matches as &$match) {
+				$match = str_replace('>', '_#_MORE_#_', $match);
+			}
+			$parts = preg_split($regexp, $html);
+			$html = '';
+			foreach ($parts as $i => $part) {
+				$html .= $part;
+				if (isset($matches[$i])) {
+					$html .= $matches[$i];
+				}
+			}
+			$data = Splitter::split('/<\/*([A-Z]\w*)([^>]*)>/', $html, 'all');
+			if (is_array($data) && !empty($data)) {
+				$items = $data['items'];
+				$dels = $data['delimiters'];
+				$html = '';
+				foreach ($items as $i => $item) {
+					$html .= $item;
+					if (isset($dels[1][$i])) {
+						$className = $dels[1][$i];
+						$tag = $dels[0][$i];
+						if (!in_array($className, self::$allJsClasses)) {
+							new Error(self::$errors['unknownClass'], array($file['name'], $className, $tag));
+				 		}
+				 		$classType = self::$jsClassesData[$className]['type'];
+				 		
+				 		if ($tag[1] != '/') {
+				 			$tag = preg_replace('/^<(\/*)(\w+)([^>]*)>$/', "<$1".$classType.' class="'.$className.'"'."$3>", $tag);
+				 		} else {
+				 			$tag = preg_replace('/^<(\/*)(\w+)([^>]*)>$/', "</".$classType.">", $tag);
+				 		}
+				 		Printer::log($tag);
+				 		$html .= $tag;
+					}
+				}
+
+				$file['content'] = $html;
+			}
+		}
+
 	}
 
 	private static function findClassesInTemplates($files) {

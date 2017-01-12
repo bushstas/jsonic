@@ -569,15 +569,6 @@ class TemplateParser
 			$child = array('t' => self::getTagIndex($tagName));
 			self::getTagProperties($item, $child);
 		}
-		elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
-		{
-			if (!$item['isClosing']) {
-				$isComponent = true;
-				self::getTagProperties($item, $child, true);
-			} else {
-				return null;
-			}
-		}
 		else
 		{
 
@@ -588,6 +579,15 @@ class TemplateParser
 				if (!$item['isClosing']) {
 					$isTemplate = true;
 					self::getTemplateProperties($item['content'], $child, $tagName == 'include');
+				} else {
+					return null;
+				}
+			} 
+			elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
+			{
+				if (!$item['isClosing']) {
+					$isComponent = true;
+					self::getTagProperties($item, $child, true);
 				} else {
 					return null;
 				}
@@ -664,8 +664,8 @@ class TemplateParser
 						if ($tagName == 'forma') $tagName = 'form';
 						if (!$isTemplate && !$isComponent) {
 							$child['t'] = self::getTagIndex($tagName);
-						}
-						self::getTagProperties($item, $child);
+							self::getTagProperties($item, $child);
+						}						
 				}
 			}
 		}
