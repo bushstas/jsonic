@@ -596,7 +596,7 @@ class TemplateParser
 					return null;
 				}
 			} 
-			elseif (in_array($tagName, $usedClasses))
+			elseif (in_array($tagName, $usedClasses) || $tagName == 'Component')
 			{
 				if (!$item['isClosing']) {
 					$isComponent = true;
@@ -674,7 +674,6 @@ class TemplateParser
 					break;
 
 					default:
-						if ($tagName == 'forma') $tagName = 'form';
 						if (!$isTemplate && !$isComponent) {
 							$child['t'] = self::getTagIndex($tagName);
 							self::getTagProperties($item, $child);
@@ -1181,9 +1180,14 @@ class TemplateParser
 	}
 
 	private static function getTagProperties($item, &$child, $isComponentTag = false) {
+		$tn = $item['tagName'];
 		if ($isComponentTag) {
-			$child['cmp'] = '<nq>'.$item['tagName'].'<nq>';
-			$cmpType = self::$classes[$item['tagName']]['type'];
+			if ($tn != 'Component') {
+				$child['cmp'] = '<nq>'.$tn.'<nq>';
+				$cmpType = self::$classes[$tn]['type'];
+			} else {
+				$isDinamycComponent = true;
+			}
 		}
 		self::$parsedItem = $item['content'];
 		$props = array();
@@ -1237,7 +1241,13 @@ class TemplateParser
 				$names[$propName] = array();
 				$parsedPlace = $isComponentTag ? 'componentAttribute' : 'elementAttribute';
 				$code = self::processCode($propValue, $parsedPlace, $names[$propName], $isObfClName);
-				$props[$propName] = self::correctTagAttributeText($propName, $code);
+				$propValue = self::correctTagAttributeText($propName, $code);
+				if ($isDinamycComponent && $propName == 'class') {
+					$child['cmp'] = $propValue;
+					unset($props[$propName]);
+				} else {
+					$props[$propName] = $propValue;
+				}
 				$names[$propName] = array_unique($names[$propName]);
 				sort($names[$propName]);
 				if (count($names[$propName]) == 1) {
@@ -1247,7 +1257,7 @@ class TemplateParser
 					unset($names[$propName]);
 				} else {
 					$hasNames = true;
-				}
+				}				
 			} else if ($isObfClName) {
 				self::getObfuscatedClassName($propValue);
 				$props[$propName] = $propValue;
