@@ -122,12 +122,12 @@ class TemplateParser
 		'operatorInInnerLevel' => 'ќбнаружен оператор {??} не на одном уровне с оператором {??} в шаблоне {??} класса {??}',
 		'doubleOperator' => 'ќбнаружен оператор {??} внутри другого оператора {??} в шаблоне {??} класса {??}',
 		'fewSameOperators' => 'ќбнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
-		'loadingOperatorWithoutLoader' => 'ќбнаружено использование одного из операторов <b>loading, loader</b> в шаблоне {??} класса {??}. ” данного класса отсутствует initial параметр <b>loader</b>'
+		'loadingOperatorWithoutLoader' => 'ќбнаружено использование одного из операторов <b>loading, loader</b> в шаблоне {??} класса {??}. ” данного класса отсутствует initial параметр <b>loader</b>',
+		'invalidTagName' => 'Ќекорректное им€ тега {??} в шаблоне {??} класса {??}<br><br>“еги элементов DOM должны иметь вид:<xmp><div>, <h1>, <table></xmp>“еги компонентов должны иметь вид:<xmp><Select>, <TableColumn></xmp>“еги вызова шаблона класса:<xmp><:content>, <:innerContent></xmp>“еги вызова свободного шаблона:<xmp><::checkbox>, <::userArea></xmp>'
 	);
 
 	public static function init($params) {
 		self::$initials = $params['initialsParser']->get();
-		self::$calledClasses = $params['classNames'];
 		self::$classes = $params['classes'];
 		self::$sources = $params['sources'];
 		self::$templates = $params['templates'];
@@ -145,7 +145,7 @@ class TemplateParser
 		return self::$textNodes;
 	}
 
-	public static function parse($template, &$class, $className = '', &$tmpids = '') {		
+	public static function parse($template, &$class, $className = '', &$tmpids = '') {
 		self::$class = &$class;
 		self::$className = $className;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
@@ -164,7 +164,7 @@ class TemplateParser
 			self::$class['templatesList'] = $templateNames;
 		}
 		if (!empty($templateNames)) {
-			if (!empty($className) && !preg_match("/\{template +\.main *\}/", $template) && !self::hasParentMainTemplate($class) && in_array($className, self::$calledClasses)) {
+			if (!empty($className) && !preg_match("/\{template +\.main *\}/", $template) && !self::hasParentMainTemplate($class)) {
 				new Error(self::$errors['noMainTemplate'], $className);
 			}
 			$templateContents = preg_split(self::$regexp, $template);
@@ -273,8 +273,11 @@ class TemplateParser
 			}
 			if (isset($tags[$j]) && !empty($tags[$j])) {
 				preg_match('/^[<\{]\s*\/*(:*[a-z]\w*) */i', $tags[$j], $match);
-				$tagName = strtolower($match[1]);
+				$tagName = $match[1];
 				$tagContent = $tags[$j];
+				if (self::invalidTagName($tagName)) {
+					new Error(self::$errors['invalidTagName'], array($tagName, self::$templateName, self::$class['name'], $tagContent));
+				}
 				$isClosing = self::isTagClosing($tagName, $tagContent);
 				$list[] = array(
 					'type' => 'tag',
@@ -319,6 +322,15 @@ class TemplateParser
 			}
 		}
 		return array('name' => self::$templateName, 'children' => $children, 'let' => $let);
+	}
+
+	private static function invalidTagName($tagName) {
+		if (strlen($tagName) > 1 && !preg_match('/[a-z]/', $tagName)) {
+			return true;
+		}
+		return !(preg_match('/^[a-z][a-z0-9]*$/', $tagName) ||
+			   preg_match('/^[A-Z][a-zA-Z0-9]*$/', $tagName) ||
+			   preg_match('/^:{1,2}\w+$/', $tagName));
 	}
 
 	private static function getLet($content) {
@@ -369,17 +381,17 @@ class TemplateParser
 
 						$openedTags[$tn]++;
 						if (in_array($tn, self::$forbiddenElements)) {
-							new Error(self::$errors['forbiddenTag'], array(strtoupper($tn), self::$templateName, self::$class['name'], $item['content']));
+							new Error(self::$errors['forbiddenTag'], array($tn, self::$templateName, self::$class['name'], $item['content']));
 						}
 						
 						if (isset(self::$forbiddenInnerElements[$last]) && in_array($tn, self::$forbiddenInnerElements[$last])) {
-							new Error(self::$errors['tagInsideTag'], array(strtoupper($tn), strtoupper($last), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
+							new Error(self::$errors['tagInsideTag'], array($tn, $last, self::$templateName, self::$class['name'], $openedTags[$tn], $tn, $item['content']));
 						}
 						if (isset(self::$onlyParentalElements[$tn]) && !in_array($last, self::$onlyParentalElements[$tn])) {
-							new Error(self::$errors['tagOutsideProperTag'], array(strtoupper($tn), count(self::$onlyParentalElements[$tn]) > 1 ? 'тегов' : 'тега', strtoupper(implode(', ', self::$onlyParentalElements[$tn])), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
+							new Error(self::$errors['tagOutsideProperTag'], array($tn, count(self::$onlyParentalElements[$tn]) > 1 ? 'тегов' : 'тега', implode(', ', self::$onlyParentalElements[$tn]), self::$templateName, self::$class['name'], $openedTags[$tn], $tn, $item['content']));
 						}
 						if (isset(self::$allowedInnerElements[$last]) && !in_array($tn, self::$allowedInnerElements[$last])) {
-							new Error(self::$errors['tagInsideTag'], array(strtoupper($tn), strtoupper($last), self::$templateName, self::$class['name'], $openedTags[$tn], strtoupper($tn), $item['content']));
+							new Error(self::$errors['tagInsideTag'], array($tn, $last, self::$templateName, self::$class['name'], $openedTags[$tn], $tn, $item['content']));
 						}
 						$opened[] = $tn;
 						if (self::isHtmlTag($tn)) {
@@ -413,7 +425,7 @@ class TemplateParser
 								new Error(
 									self::$errors['noClosingTag'], 
 									array(
-										$object, strtoupper($prev), self::$templateName, self::$class['name'], $object, $count, $object, strtoupper($prev), $list[$realIndex]['content']
+										$object, $prev, self::$templateName, self::$class['name'], $object, $count, $object, $prev, $list[$realIndex]['content']
 									)
 								);
 								
@@ -439,17 +451,17 @@ class TemplateParser
 									if (isset($content)) {
 										$object3 = self::getTagTypeName($tag);
 										new Error(
-											self::$errors['extraClosingTag'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2), $list[$aix - 1]['content'],
-											strtoupper($tag), $object3, $orderNumber, $object3, strtoupper($tag), $content
+											self::$errors['extraClosingTag'], array($object, $tn, self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, $prev2, $list[$aix - 1]['content'],
+											$tag, $object3, $orderNumber, $object3, $tag, $content
 										));
 									} else {
 										new Error(
-											self::$errors['extraClosingTag2'], array($object, strtoupper($tn), self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, strtoupper($prev2), $list[$aix - 1]['content']
+											self::$errors['extraClosingTag2'], array($object, $tn, self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, $prev2, $list[$aix - 1]['content']
 										));
 									}
 								} else {
 									new Error(
-										self::$errors['extraClosingTag3'], array($object, strtoupper($tn), self::$templateName, self::$class['name']
+										self::$errors['extraClosingTag3'], array($object, $tn, self::$templateName, self::$class['name']
 									));
 								}
 							}
@@ -574,6 +586,7 @@ class TemplateParser
 
 			$isTemplate = false;
 			$isComponent = false;
+			$usedClasses = ClassAnalyzer::getUsedClasses();
 			if ($tagName == 'template' || $tagName == 'include' || $tagName[0] == ':')
 			{
 				if (!$item['isClosing']) {
@@ -583,7 +596,7 @@ class TemplateParser
 					return null;
 				}
 			} 
-			elseif ($tagName == 'component' || $tagName == 'control' || $tagName == 'menu' || $tagName == 'form')
+			elseif (in_array($tagName, $usedClasses))
 			{
 				if (!$item['isClosing']) {
 					$isComponent = true;
@@ -1168,6 +1181,10 @@ class TemplateParser
 	}
 
 	private static function getTagProperties($item, &$child, $isComponentTag = false) {
+		if ($isComponentTag) {
+			$child['cmp'] = '<nq>'.$item['tagName'].'<nq>';
+			$cmpType = self::$classes[$item['tagName']]['type'];
+		}
 		self::$parsedItem = $item['content'];
 		$props = array();
 		$names = array();
@@ -1199,15 +1216,12 @@ class TemplateParser
 					continue;
 				}
 				
-				if ($isTag && isset(self::$propsShortcuts[$propName])) {
+				if ($isTag && !$isComponentTag && isset(self::$propsShortcuts[$propName])) {
 					$propName = self::$propsShortcuts[$propName];
 				} else {
 					$propName = preg_replace('/^data-/', '_', $propName);
 					if ($isComponentTag) {
-						if ($propName == 'class') {
-							$child['cmp'] = self::parseComponentClassName($propValue, $item['content']);
-							continue;
-						} elseif ($item['tagName'] == 'control' && $propName == 'name') {
+						if ($cmpType == 'control' && $propName == 'name') {
 							$child['nm'] = self::parseComponentClassName($propValue, $item['content'], true);
 							continue;
 						}
@@ -1241,18 +1255,18 @@ class TemplateParser
 		}
 	
 		if ($isComponentTag) {
-			$comp = '<component class="ComponentClassName">';
-			if ($item['tagName'] == 'control') {
-				$comp = '<control class="ControlClassName" name="controlName">';
-			} elseif ($item['tagName'] == 'menu') {
-				$comp = '<menu class="MenuClassName">';
-			} elseif ($item['tagName'] == 'form') {
-				$comp = '<form class="FormClassName">';
+			$comp = '<ComponentClassName/>';
+			if ($cmpType == 'control') {
+				$comp = '<ControlClassName name="controlName"/>';
+			} elseif ($cmpType == 'menu') {
+				$comp = '<MenuClassName/>';
+			} elseif ($cmpType == 'form') {
+				$comp = '<FormClassName/>';
 			}
 			if (empty($child['cmp'])) {
 				new Error(self::$errors['unknownComponent'], array(self::$templateName, self::$className, $item['content'], $comp));
 			}
-			if ($item['tagName'] == 'control' && empty($child['nm'])) {
+			if ($cmpType == 'control' && empty($child['nm'])) {
 				new Error(self::$errors['controlWithoutName'], array($child['cmp'], self::$templateName, self::$className, $item['content'], $comp));
 			}
 		}

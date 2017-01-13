@@ -1,20 +1,20 @@
 <div class="@options">
 	<span class="bold">{@tofind}</span>
-	<control class="Select" name="nonmorph" options="{#keywordsNonMorphOptions}" arg-className="frameless" arg-tooltip="true"/>
+	<Select name="nonmorph" options="{#keywordsNonMorphOptions}" arg-className="frameless" arg-tooltip="true"/>
 	<span class="bold">{@in}</span>
-	<control class="Checkbox" name="searchInDocumentation" args="{#docCheckboxOptions}"/>
-	<control class="Checkbox" name="registryContracts" args="{#contCheckboxOptions}"/>
-	<control class="Checkbox" name="registryProducts" args="{#prodCheckboxOptions}"/>
+	<Checkbox name="searchInDocumentation" args="{#docCheckboxOptions}"/>
+	<Checkbox name="registryContracts" args="{#contCheckboxOptions}"/>
+	<Checkbox name="registryProducts" args="{#prodCheckboxOptions}"/>
 	<div class="@add-request">
 		<span>{@addRequest}</span>
 		<::tooltip className="question-tooltip" key="keywordsNewReq"/>
 	</div>
 	<div class="tooltip keywords-hint"/>
 </div>
-<component class="Tabs" items="{$tabs}" activeTab="{$activeTab}" cmpid="tabs" onSelect="onSelectTab" onRemove="removeRequest"/>
+<Tabs items="{$tabs}" activeTab="{$activeTab}" cmpid="tabs" onSelect="onSelectTab" onRemove="removeRequest"/>
 <div class="@area {$keywordsCount>1?'->>multi'}" eid="area">
 	{foreach $keywords as &item}
-		<control class="KeywordsControl" name="tags" arg-items="{&item}" onEdit="onTagEdit" onChange="onChange"/>
+		<KeywordsControl name="tags" arg-items="{&item}" onEdit="onTagEdit" onChange="onChange"/>
 	{/foreach}
 </div>
-<component class="KeywordTagEditor" cmpid="editor" onHide="onTagEdited"/>
+<KeywordTagEditor cmpid="editor" onHide="onTagEdited"/>

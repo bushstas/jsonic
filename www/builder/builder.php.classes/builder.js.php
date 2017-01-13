@@ -37,8 +37,6 @@ class JSCompiler
 		'404NotFound' => 'Класс {??} с типом <b>view</b>, указанный для обработки ошибки 404, не найден',
 		'superClassNotFound' => 'Используемый в качестве супер-класса для {??}, класс {??} не найден',
 		'incorrectSuperClass' => 'Класс {??} не может быть унаследован от класса {??}. Они должны быть одинакового типа',
-		'usedClassNotFound' => 'Класс {??}, упомянутый в шаблоне класс{?} {??}, не найден',
-		'usedClassNotFound2' => 'Класс {??} не найден',
 		'duplicateMethod' => 'Обнаружено более одного метода с именем {??} в классе {??}',
 		'noSuperClasses' => '{?}У данного класса отсутствуют супер-классы',
 		'noSuperClassMethod' => '{?}Данный метод не найден у супер-классов',
@@ -55,7 +53,6 @@ class JSCompiler
 		'noRouterMenuClass' => "Класс {??}, указанный в параметре конфигурации <b>router['menu']</b>, не найден",
 		'incorrectRouterMenuClass' => "Класс {??}, указанный в параметре конфигурации <b>router['menu']</b>, должен иметь тип <b>menu</b>",
 		'diffClassType' => 'Класс {??} имеет тип {??}, однако вызывается с типом {??} в шаблоне класса {??}',
-		'dialogCalling' => 'Недопустимая попытка вызвать компонент с типом <b>dialog</b> из шаблона в классе {??}<br><br>Для диалога синглтона используйте код вида<xmp>Dialoger.show(CommentsDialog, options)</xmp>в противном случае используйте третий аргумент в качестве id параметра<xmp>Dialoger.show(ItemDialog, options, itemId)</xmp>',
 		'noRouteController' => 'Контроллер {??} упомянутый в конфигурации роутера не найден',
 		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден',
 		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
@@ -105,7 +102,6 @@ class JSCompiler
 	private $routesCompiler;
 	private $cssCompiler;
 	private $usedComponents;
-	private $usedComponentsNames;
 
 	public function __construct($configProvider) {
 		$this->configProvider = $configProvider;
@@ -150,7 +146,6 @@ class JSCompiler
 		$this->validateViews();
 		$this->validateSuperClasses();
 		$this->addClassesFromTemplates();
-		$this->validateUsedClasses();
 		$this->initialsParser->run($this->classes);
 		$this->parseClasses();
 		$this->unsetNotUsedCorrectors();
@@ -210,8 +205,7 @@ class JSCompiler
 	}
 
 	private function validateSuperClasses() {
-		$this->usedComponents = $this->templateCompiler->getUsedComponents();
-		$this->usedComponentsNames = array_reverse(array_unique(array_keys($this->usedComponents)));
+		$this->usedComponents = ClassAnalyzer::getUsedClasses();
 		foreach ($this->classes as $class) {
 			if (is_array($class['extends'])) {
 				foreach ($class['extends'] as $superClass) {
@@ -226,9 +220,6 @@ class JSCompiler
 						if ($this->classes[$superClass]['type'] != 'component' && $this->classes[$superClass]['type'] != $class['type']) {
 							new Error($this->errors['incorrectSuperClass'], array($class['name'], $superClass));
 						}
-						if (!isset($this->usedComponents[$superClass])) {
-							$this->usedComponents[$superClass] = array();
-						}
 					}
 				}
 			}
@@ -237,26 +228,6 @@ class JSCompiler
 
 	private function isValidClassName($name) {
 		return preg_match("/^[A-Z][a-zA-Z\d]*$/", $name);
-	}
-
-	private function validateUsedClasses() {
-		foreach ($this->usedComponents as $usedComponent => $data) {
-			if (!$this->isValidClassName($usedComponent)) {
-				new Error($this->errors['incorrectClassName'], array($usedComponent));
-			}
-			$inClasses = '';
-			if (!isset($this->classes[$usedComponent])) {
-				if (is_array($data['classNames'])) {
-					$ending = count($data['classNames']) > 1 ? 'ов' : 'а';
-					$inClasses = implode(', ', $data['classNames']);
-				}
-				if (!empty($inClasses)) {
-					new Error($this->errors['usedClassNotFound'], array($usedComponent, $ending, $inClasses));
-				} else {
-					new Error($this->errors['usedClassNotFound2'], array($usedComponent));
-				}
-			}
-		}
 	}
 
 	private function isClassNameInCode($className) {
@@ -268,7 +239,7 @@ class JSCompiler
 
 	private function unsetNotUsedCorrectors() {
 		$usedCorrectors = JSParser::getUsedCorrectors();
-		ClassAnalyzer::addClasses($usedCorrectors);
+		ClassAnalyzer::addCorrectors($usedCorrectors);
 		if (is_array($this->classesByTypes['corrector'])) {
 			foreach ($this->classesByTypes['corrector'] as $className => $class) {
 				if (!in_array($className, $usedCorrectors)) {
@@ -286,8 +257,8 @@ class JSCompiler
 				$data = array(
 					'name' => $templateClass,
 					'content' => '',
-					'type' => $this->usedComponents[$templateClass]['type'],
-					'extends' => array(ucfirst($this->usedComponents[$templateClass]['type'])),
+					'type' => 'component',
+					'extends' => array('Component'),
 					'isSuper' => true
 				);
 				$this->classes[$templateClass] = $data;
@@ -606,12 +577,6 @@ class JSCompiler
 			if ($class['type'] == 'corrector' && !in_array('correct', $class['functionList'])) {
 				new Error($this->errors['noCorrectMethod'], array($class['name']));
 			}
-			if (isset($this->usedComponents[$className]) && isset($this->usedComponents[$className]['type']) && $class['type'] != $this->usedComponents[$className]['type']) {
-				if ($class['type'] == 'dialog') {
-					new Error($this->errors['dialogCalling'], $this->usedComponents[$className]['classNames'][0]);
-				}
-				new Error($this->errors['diffClassType'], array($className, $class['type'], $this->usedComponents[$className]['type'], $this->usedComponents[$className]['classNames'][0]));
-			}
 			$class['extends'] = array_unique($this->getAllExtendClasses($class['extends']));
 		}
 	}
@@ -741,7 +706,6 @@ class JSCompiler
 		$templates = $this->templateCompiler->getTemplates();
 		TemplateParser::init(
 			array(
-				'classNames' => $this->usedComponentsNames,
 				'classes' => $this->classes,
 				'sources' => $this->sources,
 				'templates' => $templates,
@@ -800,7 +764,7 @@ class JSCompiler
 				foreach ($class['calledMethods'] as $callback => $callerFunc) {
 					if (!$this->hasComponentMethod($callback, $class)) {
 						$isError = true;
-						if (!isset($this->usedComponents[$className])) {
+						if (!in_array($className, $this->usedComponents)) {
 							$childClasses = array();
 							$this->getChildClasses($className, $childClasses);
 							foreach ($childClasses as $chcls) {
@@ -820,7 +784,8 @@ class JSCompiler
 				$this->jsOutput[] = $className.'=new '.$className.'();';
 			}
 		}
-		foreach ($this->usedComponentsNames as $className) {
+		$usedComponents = ClassAnalyzer::getUsedComponents();
+		foreach ($usedComponents as $className) {
 			if (!$this->hasMainTemplate($className)) {
 				new Error($this->errors['noMainTemplate'], $className);
 			}

@@ -9,12 +9,12 @@
 				<span class="@remove-request">{@removeRequest}</span>
 			</span>
 		</div>
-		<control class="ContainKeywordTags" name="containKeyword" items="{~items[0]}" onFocus="onFocus(false)" onEdit="!edit" onRecChange="onRecommendationsChange" onChange="!change"/>
+		<ContainKeywordTags name="containKeyword" items="{~items[0]}" onFocus="onFocus(false)" onEdit="!edit" onRecChange="onRecommendationsChange" onChange="!change"/>
 	</div>
 	<div class="@right">
 		<div class="@tags-title">
 			{@excludes}
 		</div>
-		<control class="ExcludeKeywordTags" name="notcontainKeyword" items="{~items[1]}" onFocus="onFocus(true)" onEdit="!edit" onChange="!change"/>
+		<ExcludeKeywordTags name="notcontainKeyword" items="{~items[1]}" onFocus="onFocus(true)" onEdit="!edit" onChange="!change"/>
 	</div>
 </div>

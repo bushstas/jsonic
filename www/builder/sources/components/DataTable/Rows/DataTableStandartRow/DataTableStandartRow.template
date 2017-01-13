@@ -41,6 +41,6 @@
 	
 	</div>
 	{if ~fragments}
-		<component class="DataTableFragmets" data="{~fragments}"/>
+		<DataTableFragmets data="{~fragments}"/>
 	{/if}
 </a>

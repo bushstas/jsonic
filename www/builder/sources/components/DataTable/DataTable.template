@@ -1,7 +1,5 @@
 {template .main}
 <div class="@outer-container">
-	<DataTableTabPanel aaa="222">
-		<i>333</i>
-	</DataTableTabPanel>
+	<DataTableTabPanel/>
 	{$::aaa}
 </div>

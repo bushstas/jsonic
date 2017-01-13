@@ -4,5 +4,5 @@
 			{~caption}
 		</div>
 	{/if}
-	<control class="{~controlClass}" name="{~controlProps['name']}" props="{~controlProps}"/>
+	<Component class="{~controlClass}" name="{~controlProps['name']}" props="{~controlProps}"/>
 </div>

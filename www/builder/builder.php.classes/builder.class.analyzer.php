@@ -3,19 +3,23 @@
 
 class ClassAnalyzer
 {
-	private static $regexp = '/<(component|control|form|menu)\s([^>]+)>/i';
 	private static $matches = array();
 	private static $usedClasses = array();
+	private static $usedControllers = array();
+	private static $usedCorrectors = array();
+	private static $usedComponents = array();
 	private static $allJsClasses;
 	private static $jsClassesData;
+
 	private static $errors = array(
-		'unknownClass' => 'Вызываемый в одном из шаблонов класса {??} компонент {??} не найден<xmp>{?}</xmp>'
+		'unknownClass' => 'Вызываемый в одном из шаблонов класса {??} компонент {??} не найден<xmp>{?}</xmp>',
+		'dialogCalling' => 'Недопустимая попытка вызвать компонент с типом <b>dialog</b> из шаблона в классе {??}<br><br>Для диалога синглтона используйте код вида<xmp>Dialoger.show(CommentsDialog, options)</xmp>в противном случае используйте третий аргумент в качестве id параметра<xmp>Dialoger.show(ItemDialog, options, itemId)</xmp>',
 	);
 
 	public static function run(&$files, $jsCompiler, $routesCompiler, $configProvider) {
 		self::$jsClassesData = $jsCompiler->getClasses();
+		
 		self::$allJsClasses = array_keys(self::$jsClassesData);
-		self::prepareTemplateClasses($files['template']);
 		self::findClassesInTemplates($files['template']);
 		self::findClassesInScripts($files['js']);
 		$views = $routesCompiler->getRouteViews();
@@ -44,24 +48,46 @@ class ClassAnalyzer
 		foreach ($usedClasses as $list) {
 			$allUsed = array_merge($allUsed, $list);
 		}
-		self::$usedClasses = array_values(array_unique($allUsed));
-		$notUsedClasses = array_diff(self::$allJsClasses, $allUsed);
-		
-		// Printer::log(self::$usedClasses);
-		// Printer::log($notUsedClasses);
+		$used = array_values(array_unique($allUsed));
+		foreach ($used as $className) {
+			$class = self::$jsClassesData[$className];
+			if ($class['type'] == 'controller') {
+				self::$usedControllers[] = $className;
+			} elseif ($class['type'] == 'corrector') {
+				self::$usedCorrectors[] = $className;
+			} else {
+				self::$usedComponents[] = $className;
+			}
+			self::$usedClasses[] = $className;
+		}	
+		//Printer::log(self::$usedControllers);
+		//Printer::log(self::$usedClasses);
 	}
 
-	public static function addClasses($classes) {
+	public static function addCorrectors($classes) {
 		if (!is_array($classes)) {
 			$classes = array($classes);
 		}
 		foreach ($classes as $className) {
+			self::$usedCorrectors[] = $className;
 			self::$usedClasses[] = $className;
 		}
 	}
 
 	public static function getUsedClasses() {
 		return self::$usedClasses;
+	}
+
+	public static function getUsedCorrectors() {
+		return self::$usedCorrectors;
+	}
+
+	public static function getUsedControllers() {
+		return self::$usedControllers;
+	}
+
+	public static function getUsedComponents() {
+		return self::$usedComponents;
 	}
 
 	private static function addUsedClassFor($className, &$list) {
@@ -75,14 +101,14 @@ class ClassAnalyzer
 		}
 	}
 
-	private function prepareTemplateClasses(&$files) {
-		foreach ($files as &$file) {
+	private static function findClassesInTemplates($files) {
+		foreach ($files as $file) {
 			$html = $file['content'];
 			$regexp = "/\{[^\}]+\}/";
 			preg_match_all($regexp, $html, $matches);
 			$matches = $matches[0];
 			foreach ($matches as &$match) {
-				$match = str_replace('>', '_#_MORE_#_', $match);
+				$match = str_replace('>', '', $match);
 			}
 			$parts = preg_split($regexp, $html);
 			$html = '';
@@ -92,53 +118,30 @@ class ClassAnalyzer
 					$html .= $matches[$i];
 				}
 			}
-			$data = Splitter::split('/<\/*([A-Z]\w*)([^>]*)>/', $html, 'all');
-			if (is_array($data) && !empty($data)) {
-				$items = $data['items'];
-				$dels = $data['delimiters'];
-				$html = '';
-				foreach ($items as $i => $item) {
-					$html .= $item;
-					if (isset($dels[1][$i])) {
-						$className = $dels[1][$i];
-						$tag = $dels[0][$i];
-						if (!in_array($className, self::$allJsClasses)) {
-							new Error(self::$errors['unknownClass'], array($file['name'], $className, $tag));
-				 		}
-				 		$classType = self::$jsClassesData[$className]['type'];
-				 		
-				 		if ($tag[1] != '/') {
-				 			$tag = preg_replace('/^<(\/*)(\w+)([^>]*)>$/', "<$1".$classType.' class="'.$className.'"'."$3>", $tag);
-				 		} else {
-				 			$tag = preg_replace('/^<(\/*)(\w+)([^>]*)>$/', "</".$classType.">", $tag);
-				 		}
-				 		Printer::log($tag);
-				 		$html .= $tag;
-					}
-				}
-
-				$file['content'] = $html;
-			}
-		}
-
-	}
-
-	private static function findClassesInTemplates($files) {
-		foreach ($files as $file) {
-			preg_match_all(self::$regexp, $file['content'], $matches);
-			$tagContents = $matches[2];
+			$regexp = '/<([A-Z]\w*)[^>]*>/';
+			preg_match_all($regexp, $html, $matches);
+			$matches = $matches[1];
 			self::$matches[$file['name']] = array();
 			if (!in_array($file['name'], self::$allJsClasses)) {
 				self::$allJsClasses[] = $file['name'];
 			}
 			$classes = array();
-			foreach ($tagContents as $i => $tagContent) {
-				preg_match_all("/class=[\"'](\w+)[\"']/i", $tagContent, $matches);
-				$name = $matches[1][0];
-				if (empty($name)) continue;
-				$classes[] = $name;
+			foreach ($matches as $className) {
+				if (self::$jsClassesData[$className]['type'] == 'dialog') {
+					new Error(self::$errors['dialogCalling'], $file['name']);
+				}
+				if ($className != 'Component') {
+					$classes[] = $className;
+				}
 			}
 			self::$matches[$file['name']] = array_unique($classes);
+		}
+		foreach (self::$matches as $class => $classNames) {
+			foreach ($classNames as $className) {
+				if (!in_array($className, self::$allJsClasses)) {
+					new Error(self::$errors['unknownClass'], array($file['name'], $className));
+				}
+			}
 		}
 	}
 

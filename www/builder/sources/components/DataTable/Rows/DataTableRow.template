@@ -1,3 +1,4 @@
+{template .main}
 {template .controls}
 <div class="app-datatable-color-mark datatable-control"></div>	
 <div class="app-datatable-checkbox-container datatable-control">

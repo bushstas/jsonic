@@ -1,4 +1,4 @@
 <div class="view-content{$expanded?' ->>form-expanded'}" scope>
-	<component class="TenderSearchForm" cmpid="form" onExpand="onFormExpand"/>
-	<component class="TenderDataTable" cmpid="datatable"/>
+	<TenderSearchForm cmpid="form" onExpand="onFormExpand"/>
+	<TenderDataTable cmpid="datatable"/>
 </div>

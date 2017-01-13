@@ -1,4 +1,4 @@
 {template .main}
 	<div class="view-content"></div>
-	<component class="CoolThing">
+	<CoolThing/>
 {/template}

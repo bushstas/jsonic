@@ -1,2 +1,2 @@
 {template .content}
-<control class="Keywords" name="keywords"/>
+<Keywords name="keywords"/>

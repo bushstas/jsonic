@@ -15,7 +15,7 @@
 </div>
 
 {template .input}
-<component class="AutoComplete" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
+<AutoComplete onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
 
 {template .tag}
 <div class="@item">
