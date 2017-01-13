@@ -596,7 +596,7 @@ class TemplateParser
 					return null;
 				}
 			} 
-			elseif (in_array($tagName, $usedClasses) || $tagName == 'Component')
+			elseif (in_array($tagName, $usedClasses) || $tagName == 'Component' || $tagName == 'Control')
 			{
 				if (!$item['isClosing']) {
 					$isComponent = true;
@@ -1182,7 +1182,7 @@ class TemplateParser
 	private static function getTagProperties($item, &$child, $isComponentTag = false) {
 		$tn = $item['tagName'];
 		if ($isComponentTag) {
-			if ($tn != 'Component') {
+			if ($tn != 'Component' && $tn != 'Control') {
 				$child['cmp'] = '<nq>'.$tn.'<nq>';
 				$cmpType = self::$classes[$tn]['type'];
 			} else {
@@ -1225,7 +1225,7 @@ class TemplateParser
 				} else {
 					$propName = preg_replace('/^data-/', '_', $propName);
 					if ($isComponentTag) {
-						if ($cmpType == 'control' && $propName == 'name') {
+						if (($cmpType == 'control' || $tn == 'Control') && $propName == 'name') {
 							$child['nm'] = self::parseComponentClassName($propValue, $item['content'], true);
 							continue;
 						}

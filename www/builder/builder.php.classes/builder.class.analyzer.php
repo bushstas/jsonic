@@ -130,7 +130,7 @@ class ClassAnalyzer
 				if (self::$jsClassesData[$className]['type'] == 'dialog') {
 					new Error(self::$errors['dialogCalling'], $file['name']);
 				}
-				if ($className != 'Component') {
+				if ($className != 'Component' && $className != 'Control') {
 					$classes[] = $className;
 				}
 			}
