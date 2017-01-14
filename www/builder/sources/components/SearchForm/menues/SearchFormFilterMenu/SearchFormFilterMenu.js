@@ -1,6 +1,6 @@
 component SearchFormFilterMenu extends PopupMenu
 
-initial args = {
+initial props = {
 	'className': '->> filters-menu',
 	'maxHeight': 400
 };

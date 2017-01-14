@@ -1,3 +1,2 @@
 {template .content}
-	<div class="app-authform-logo">LOGO</div>
-{/template}
+<div class="app-authform-logo">LOGO</div>

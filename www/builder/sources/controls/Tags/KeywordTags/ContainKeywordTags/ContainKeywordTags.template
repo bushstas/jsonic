@@ -4,17 +4,17 @@
 <div class="@top">
 	<span class="@select-button" data-index="1">
 		{$opt1}
-		<PopupSelect cmpid="opt1" arg-options="{#wordOrderOptions}" title="{@wordOrder}" onChange="onChangeOption"/>
+		<PopupSelect as="opt1" options="{#wordOrderOptions}" title="{@wordOrder}" onChange="onChangeOption"/>
 	</span>
 	<span class="@select-button" data-index="2">
 		{$opt2}
-		<PopupSelect cmpid="opt2" arg-options="{#wordDistanceOptions}" title="{@wordDistance}" onChange="onChangeOption"/>
+		<PopupSelect as="opt2" options="{#wordDistanceOptions}" title="{@wordDistance}" onChange="onChangeOption"/>
 	</span>
 	<:topButtons/>
 </div>
 
 {template .input}
-<KeywordsAutoComplete arg-placeholder="{@enterKeywords}" opts="{#keywordsAutoCompleteOptions}" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
+<KeywordsAutoComplete placeholder="{@enterKeywords}" opts="{#keywordsAutoCompleteOptions}" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
 
 {template .bottomContent}
-<Recommendations onPick="onPickRecommendation" cmpid="recommendations" onChange="!recchange"/>
+<Recommendations as="recommendations" onPick="onPickRecommendation" onChange="!recchange"/>

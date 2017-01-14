@@ -1,3 +1,2 @@
 {template .main}
-	<div class="view-content"></div>
-{/template}
+<div class="view-content"></div>

@@ -1,5 +1,4 @@
 {template .main}
-	<div class="app-auth-form-container">
-		<AuthForm/>
-	</div>
-{/template}
+<div class="app-auth-form-container">
+	<AuthForm/>
+</div>

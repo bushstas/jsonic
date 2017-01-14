@@ -126,9 +126,9 @@ function highlightVariant(step) {
 
 function onChangeCurrentVariant(index) {
 	var e = <.@variant.active>;
-	@(e).removeClass('active');
+	@(e).removeClass('->> active');
 	e = <.@variant[index]>;
-	@(e).addClass('active');
+	@(e).addClass('->> active');
 }
 
 function onChangeActive(isActive) {

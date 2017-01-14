@@ -907,10 +907,10 @@ class JSCompiler
 				if (is_array($this->classes[$parent]) && $this->hasComponentMethod($method, $this->classes[$parent])) {
 					return true;
 				}
-				if (is_array($this->sources[$parent]) && preg_match('/\b'.$parent.'\.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
+				if (is_array($this->sources[$parent]) && preg_match('/\bp\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
 					return true;	
 				}
-				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\bComponent.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
+				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\bp\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
 					return true;
 				}
 			}
@@ -963,7 +963,7 @@ class JSCompiler
 			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content);
 		}
 		if (!empty($tmpids)) {
-			foreach ($tmpids as $k => &$v) $v = '<nq>'.$className.'.prototype.getTemplate'.ucfirst($v).'<nq>';
+			foreach ($tmpids as $k => &$v) $v = '<nq>p.getTemplate'.ucfirst($v).'<nq>';
 			$this->jsOutput[] = 'p.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
 		}
 	}

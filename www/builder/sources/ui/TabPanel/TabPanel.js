@@ -11,12 +11,12 @@ initial helpers = [
 ]
 
 function onRendered() {
-	this.tabWidth = this.args['tabWidth'] || 200;
-	this.tabMargin = this.args['tabMargin'] || 4;
+	this.tabWidth = $tabWidth || 200;
+	this.tabMargin = $tabMargin || 4;
 }
 
 function onParentRendered() {
-	var tabs = this.args['tabs'];
+	get tabs;
 	if (isArray(tabs)) {
 		each (tabs as tab) {
 			this.activateTab(idx, !!tab['active']);

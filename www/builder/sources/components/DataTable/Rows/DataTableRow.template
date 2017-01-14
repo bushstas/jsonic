@@ -1,10 +1,10 @@
 {template .main}
 {template .controls}
-<div class="app-datatable-color-mark datatable-control"></div>	
+<div class="app-datatable-color-mark datatable-control"/>
 <div class="app-datatable-checkbox-container datatable-control">
 	<::checkbox/>
 </div>
-<div class="app-datatable-star datatable-control"></div>
+<div class="app-datatable-star datatable-control"/>
 
 
 {template .hotMark as .name}

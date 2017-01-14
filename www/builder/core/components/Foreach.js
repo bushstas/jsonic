@@ -121,8 +121,7 @@ Foreach.prototype.render = function(parentElement, parentLevel) {
 };
 
 Foreach.prototype.createLevel = function(items, isUpdating, index) {
-	var level = new Level();
-	level.setComponent(this.parentLevel.getComponent());
+	var level = new Level(this.parentLevel.getComponent());
 	var nextSiblingChild;
 	if (isNumber(index) && this.levels[index]) {
 		nextSiblingChild = this.levels[index].getFirstNodeChild();

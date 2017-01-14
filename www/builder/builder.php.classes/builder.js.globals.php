@@ -115,9 +115,17 @@ class JSGlobals
 
 	private static function add($key, $content) {
 		if (!in_array($key, self::$excluded)) {
-			self::$output[] = "var ".self::$varNames[$key]." = ".$content.';';
+			self::$output[] = self::normJsonStr("var ".self::$varNames[$key]." = ".$content.';');
 			return true;
 		}
+	}
+
+	private static function normJsonStr($str){
+		$str = preg_replace('/\\\\u00A0/i', '_nbsp_', $str);
+	    $str = preg_replace_callback('/\\\\u([a-f0-9]{4})/i', create_function('$m', 'return chr(hexdec($m[1])-1072+224);'), $str);
+	    $str = str_replace('_nbsp_', '\\u00A0', $str);
+    	return $str;
+    	//return iconv('cp1251', 'utf-8', $str);
 	}
 
 	private static function addTextNodes() {

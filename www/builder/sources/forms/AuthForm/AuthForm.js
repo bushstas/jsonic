@@ -1,6 +1,6 @@
 form AuthForm
 
-initial args = {
+initial props = {
 	'action': 'user/login.php',
 	'ajax': true,
 	'className': '->> app-authform-inputs',

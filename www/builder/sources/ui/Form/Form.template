@@ -1,7 +1,7 @@
 <form class="app-form-controls{~className?' '+~className}" method="{~method}" action="{~action}" data-ajax="{~ajax?1}" data-iframe="{~iframe?1}" scope>
 	<:content/>
 	{foreach ~controls as &control}
-		<FormField args="{&control}"/>
+		<FormField props="{&control}"/>
 	{/foreach}
 	{if ~submit}
 		<Submit props="{~submit}" onSubmit="onSubmit"/>

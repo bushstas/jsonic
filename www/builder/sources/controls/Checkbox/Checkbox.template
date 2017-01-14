@@ -1,4 +1,4 @@
-<span class="checkbox_label" onClick="onClick">
-	<span class="checkbox {$checked?'->>checked'}"></span>
+<span class="@label" onClick="onClick">
+	<span class="@ {$checked?'->>checked'}"></span>
 	{~text}
 </span>

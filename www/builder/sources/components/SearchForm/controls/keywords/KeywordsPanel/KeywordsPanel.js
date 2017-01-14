@@ -1,6 +1,6 @@
 component KeywordsPanel extends SearchFormPanel
 
-initial args = {
+initial props = {
 	'className': '->> keywords-panel',
 	'title': @searchByKeywords
 }

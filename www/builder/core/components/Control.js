@@ -3,37 +3,37 @@ function Control() {
 	var onChangeChildControl = function(e) {
 		this.dispatchChange();
 	};
+	var p = Control.prototype;
+	p.onChange = function(e) {};
 
-	Control.prototype.onChange = function(e) {};
-
-	Control.prototype.dispatchChange = function() {		
+	p.dispatchChange = function() {		
 		var params = this.getChangeEventParams();
 		this.onChange(params);
 		this.dispatchEvent('change', params);
 	};
 
-	Control.prototype.getChangeEventParams = function() {
+	p.getChangeEventParams = function() {
 		return {value: this.getValue()};
 	};
 
-	Control.prototype.getInitials = function() {
+	p.getInitials = function() {
 		return {'enabled': true};
 	};
 
-	Control.prototype.registerControl = function(control, name) {
+	p.registerControl = function(control, name) {
 		Component.prototype.registerControl.call(this, control, name);
 	 	this.addListener(control, 'change', onChangeChildControl.bind(this));
 	};
 
-	Control.prototype.setName = function(name) {
+	p.setName = function(name) {
 		this.name = name;
 	};
 
-	Control.prototype.getName = function() {
+	p.getName = function() {
 		return this.name;
 	};
 
-	Control.prototype.getValue = function() {
+	p.getValue = function() {
 		var value;
 		if (this.hasControls()) {
 			value = {};
@@ -47,15 +47,15 @@ function Control() {
 		return value;
 	};
 
-	Control.prototype.getControlValue = function() {
+	p.getControlValue = function() {
 		return this.get('value');
 	};
 
-	Control.prototype.getProperValue = function(value) {
+	p.getProperValue = function(value) {
 		return value;
 	};
 
-	Control.prototype.setValue = function(value, fireChange) {
+	p.setValue = function(value, fireChange) {
 		if (this.hasControls()) {
 			this.setControlsData(value);
 		} 
@@ -63,28 +63,28 @@ function Control() {
 		if (fireChange) this.dispatchChange();
 	};
 
-	Control.prototype.setControlValue = function(value) {
+	p.setControlValue = function(value) {
 		this.set('value', value);
 	};
 
-	Control.prototype.isEnabled = function() {
+	p.isEnabled = function() {
 		return !!this.get('enabled');
 	};
 
-	Control.prototype.setEnabled = function(isEnabled) {
+	p.setEnabled = function(isEnabled) {
 		this.set('enabled', isEnabled);
 	};
 
-	Control.prototype.clear = function(fireChange) {
+	p.clear = function(fireChange) {
 		this.clearControl();
 		if (fireChange) this.dispatchChange();
 	};
 
-	Control.prototype.clearControl = function() {
+	p.clearControl = function() {
 		this.setControlValue('');
 	};
 	
-	Control.prototype.disposeInternal = function() {
+	p.disposeInternal = function() {
 		this.controls = null;
 		this.options = null;
 	};

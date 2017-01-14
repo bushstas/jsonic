@@ -46,6 +46,14 @@
 		position: absolute;
 		left: 145px;
 	}
+	.searchform {
+		position: absolute;
+		left: 265px;
+	}
+	.searchform input[type="text"] {
+		padding: 4px 4px 5px 4px;
+		width: 150px;
+	}
 </style>
 </head>
 <body>
@@ -61,8 +69,13 @@
 			<option value="attr">зарезерв. атрибуты тегов</option>
 			<option value="helper">классам хелперам</option>
 			<option value="corrector">классам корректорам</option>
-			<option value="corrector">css файлам</option>
+			<option value="css">css файлам</option>
+			<option value="events">событиям</option>
 		</select>
+	</form>
+	<form class="searchform" metod="GET" target="iframe" action="search.php">
+		<input type="text" name="search"/>
+		<input name="submit" type="submit" value="Искать" style="padding: 5px 10px;">
 	</form>
 	<form class="testform" metod="GET" target="iframe" action="build.php">
 		<input type="hidden" name="istest" value="1"/>

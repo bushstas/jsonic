@@ -45,13 +45,9 @@ function Component() {
 	};
 
 	var doRendering = function() {
-		this.level = new Level();
-		this.args = getCombinedArgs.call(this);
-		var content = this.getTemplateMain(this.args, this);
-		if (content) {
-			this.level.setComponent(this);
-			this.level.render(content, this.parentElement, this, this.tempPlaceholder);
-		}
+		this.level = new Level(this);
+		var content = this.getTemplateMain(this.props, this);
+		if (content) this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 		this.rendered = true;
 		this.onRendered();
 		this.onRenderComplete();
@@ -59,10 +55,6 @@ function Component() {
 			if (isFunction(child.onParentRendered)) child.onParentRendered.call(child);
 		});
 		delete this.waiting;
-	};
-
-	var getCombinedArgs = function() {
-		return Objects.merge(Objects.get(this.initials, 'args'), this.getArgs(), this.args); 
 	};
 
 	var propagatePropertyChange = function(changedProps) {
@@ -114,34 +106,34 @@ function Component() {
 		this.level.dispose();
 		this.level = this.listeners = null;
 	};
-
-	Component.prototype.render = function(parentElement) {
+	var p = Component.prototype;
+	p.render = function(parentElement) {
 		this.parentElement = parentElement;
 		load.call(this);
 	};
 
-	Component.prototype.isDisabled = function() {
+	p.isDisabled = function() {
 		return !!this.disabled;
 	};
 
-	Component.prototype.isRendered = function() {
+	p.isRendered = function() {
 		return !!this.rendered;
 	};
 
-	Component.prototype.isDisposed = function() {
+	p.isDisposed = function() {
 		return !!this.disposed;
 	};
 
-	Component.prototype.instanceOf = function(classFunc) {
+	p.instanceOf = function(classFunc) {
 		return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 	};
 
-	Component.prototype.disable = function(isDisabled) {
+	p.disable = function(isDisabled) {
 		this.disabled = isDisabled;
 		this.addClass('->> disabled', !isDisabled);
 	};
 
-	Component.prototype.dispatchEvent = function(eventType) {
+	p.dispatchEvent = function(eventType) {
 		var args = Array.prototype.slice.call(arguments);
 		args.splice(0, 1);
 		if (isArray(this.listeners)) {
@@ -154,19 +146,19 @@ function Component() {
 		}
 	};
 
-	Component.prototype.addListener = function(target, eventType, handler) {
+	p.addListener = function(target, eventType, handler) {
  		if (isElement(target)) {
  			this.eventHandler = this.eventHandler || new EventHandler();
  			this.eventHandler.listen(target, eventType, handler.bind(this));
  		} else target.subscribe(eventType, handler, this);
  	};
 
-	Component.prototype.removeValueFrom = function(propName, value) {
+	p.removeValueFrom = function(propName, value) {
 		var prop = this.get(propName);
 		if (isArray(prop)) this.removeByIndexFrom(propName, prop.indexOf(value));
 	};
 
-	Component.prototype.removeByIndexFrom = function(propName, index) {
+	p.removeByIndexFrom = function(propName, index) {
 		var prop = this.get(propName);
 		if (isString(index) && isNumeric(index)) index = ~~index;
 		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
@@ -176,7 +168,7 @@ function Component() {
 		}
 	};
 
-	Component.prototype.plusTo = function(propName, add, sign) {
+	p.plusTo = function(propName, add, sign) {
 		var prop = this.get(propName);
 		if (!sign || sign == '+') {
 			if (isNumber(prop) || isString(prop)) this.set(propName, prop + add);
@@ -190,11 +182,11 @@ function Component() {
 		}
 	};
 
-	Component.prototype.addOneTo = function(propName, item, index) {
+	p.addOneTo = function(propName, item, index) {
 		this.addTo(propName, [item], index);
 	};
 
-	Component.prototype.addTo = function(propName, items, index) {
+	p.addTo = function(propName, items, index) {
 		var prop = this.get(propName);
 		if (!isArray(items)) items = [items];
 		if (isArray(prop)) {
@@ -209,7 +201,7 @@ function Component() {
 		}
 	};
 
-	Component.prototype.get = function(propName) {
+	p.get = function(propName) {
 		var prop = this.props[propName];
 		if (isUndefined(arguments[1]) || !isArrayLike(prop)) return prop;
 		var end;
@@ -222,31 +214,31 @@ function Component() {
 		return end ? prop || '' : '';
 	};
 
-	Component.prototype.showElement = function(element, isShown) {
+	p.showElement = function(element, isShown) {
 		if (isString(element)) element = this.findElement(element);
 		if (isElement(element)) element.show(isShown);
 	};
 
-	Component.prototype.setStyle = function(styles) {
+	p.setStyle = function(styles) {
 		if (this.isRendered()) this.getElement().css(styles);
 	};
 
-	Component.prototype.setPosition = function(x, y) {
+	p.setPosition = function(x, y) {
 		this.setStyle({'top': y + 'px', 'left': x + 'px'});
 	};
 
-	Component.prototype.setVisible = function(isVisible) {
+	p.setVisible = function(isVisible) {
 		if (this.isRendered() && !this.isDisposed()) this.getElement().show(isVisible);
 	};
 
-	Component.prototype.addClass = function(className, isAdding) {
+	p.addClass = function(className, isAdding) {
 		if (this.isRendered()) {
 			if (isAdding || isUndefined(isAdding)) this.getElement().addClass(className);
 			else this.getElement().removeClass(className);
 		}
 	};
 
-	Component.prototype.each = function(propName, callback) {
+	p.each = function(propName, callback) {
 		var ar = this.get(propName);
 		if (isArrayLike(ar) && isFunction(callback)) {
 			if (isArray(ar)) for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
@@ -254,11 +246,11 @@ function Component() {
 		}
 	};
 
-	Component.prototype.toggle = function(propName) {
+	p.toggle = function(propName) {
 		this.set(propName, !this.get(propName));
 	};
 
-	Component.prototype.set = function(propName, propValue) {
+	p.set = function(propName, propValue) {
 		this.props = this.props || {};
 		var props;
 		if (!isUndefined(propValue)) {
@@ -286,20 +278,20 @@ function Component() {
 		changedProps = null;
 	};
 
-	Component.prototype.preset = function(propName, propValue) {
+	p.preset = function(propName, propValue) {
 		this.props[propName] = propValue;
 	};
 
-	Component.prototype.delay = function(f, n, p) {
+	p.delay = function(f, n, p) {
 		window.clearTimeout(this.timeout);
 		if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this, p), n || 200);
 	};
 
-	Component.prototype.addChild = function(child, parentElement) {
+	p.addChild = function(child, parentElement) {
 		this.level.renderComponent(child, parentElement);
 	};
 
-	Component.prototype.removeChild = function(child) {
+	p.removeChild = function(child) {
 		if (!child) return;
 		var childId = child;
 		if (isString(child)) child = this.getChild(child);
@@ -311,7 +303,7 @@ function Component() {
 		}
 	 };
 
-	Component.prototype.forEachChild = function(callback) {
+	p.forEachChild = function(callback) {
 		if (isArrayLike(this.children)) {
 			var result;
 			for (var k in this.children) {
@@ -323,7 +315,7 @@ function Component() {
 		}
 	};
 	
-	Component.prototype.forChildren = function(classFunc, callback) {
+	p.forChildren = function(classFunc, callback) {
 		var children = this.getChildren(classFunc), result;
 		for (var i = 0; i < children.length; i++) {
 			result = callback.call(this, children[i], i);
@@ -331,31 +323,31 @@ function Component() {
 		}
 	};
 
-	Component.prototype.getControl = function(name) {
+	p.getControl = function(name) {
 		return Objects.get(this.controls, name) || this.forEachChild(function(child) {
 			return child.getControl(name);
 		});
 	};
 
-	Component.prototype.setControlValue = function(name, value) {
+	p.setControlValue = function(name, value) {
 		var control = this.getControl(name);
 		if (control) control.setValue(value);
 	};
 
-	Component.prototype.enableControl = function(name, isEnabled) {
+	p.enableControl = function(name, isEnabled) {
 		var control = this.getControl(name);
 		if (control) control.setEnabled(isEnabled);
 	};
 
-	Component.prototype.forEachControl = function(callback) {
+	p.forEachControl = function(callback) {
 		if (isObject(this.controls)) Objects.each(this.controls, callback, this);
 	};
 
-	Component.prototype.hasControls = function() {
+	p.hasControls = function() {
 		return !Objects.empty(this.controls);
 	};
 
-	Component.prototype.getControlsData = function(data) {
+	p.getControlsData = function(data) {
 		data = data || {};
 		this.forEachChild(function(child) {
 			if (!isControl(child)) child.getControlsData(data);
@@ -364,7 +356,7 @@ function Component() {
 		return data;
 	};
 
-	Component.prototype.setControlsData = function(data) {
+	p.setControlsData = function(data) {
 		this.forEachChild(function(child) {
 			if (!isControl(child)) child.setControlsData(data);
 			else child.setValue(data[child.getName()]);
@@ -372,11 +364,11 @@ function Component() {
 		return data;
 	};
 
-	Component.prototype.getChildAt = function(index) {
+	p.getChildAt = function(index) {
 		return Objects.getByIndex(this.children, index);
 	};
 
-	Component.prototype.getChildIndex = function(child, same) {
+	p.getChildIndex = function(child, same) {
 		var idx = -1;
 		this.forEachChild(function(ch) {
 			if (!same || (same && ch.constructor == child.constructor)) idx++;
@@ -385,7 +377,7 @@ function Component() {
 		return idx;
 	};
 
-	Component.prototype.getChildren = function(classFunc) {
+	p.getChildren = function(classFunc) {
 		if (!isFunction(classFunc)) return this.children;
 		var children = [];
 		this.forEachChild(function(child) {
@@ -394,32 +386,32 @@ function Component() {
 		return children;
 	};
 
-	Component.prototype.getChild = function(id) {
+	p.getChild = function(id) {
 		return Objects.get(this.children, id);
 	};
 
-	Component.prototype.setId = function(id) {
+	p.setId = function(id) {
 		this.componentId = id;
 	};
 
-	Component.prototype.getId = function() {
+	p.getId = function() {
 		return this.componentId;
 	};
 
-	Component.prototype.getElement = function(id) {
+	p.getElement = function(id) {
 		if (isString(id)) return Objects.get(this.elements, id);
 		else return this.scope || this.parentElement;
 	};
 
-	Component.prototype.findElement = function(selector, scopeElement) {
+	p.findElement = function(selector, scopeElement) {
 		return (scopeElement || this.getElement()).querySelector(selector);
 	};
 
-	Component.prototype.findElements = function(selector, scopeElement) {
+	p.findElements = function(selector, scopeElement) {
 		return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
 	};
 
-	Component.prototype.fill = function(element, data) {
+	p.fill = function(element, data) {
 		if (isString(element)) element = this.findElement(element);
 		if (isElement(element)) {
 			var callback = function(el) {
@@ -435,32 +427,32 @@ function Component() {
 		}
 	};
 
-	Component.prototype.setAppended = function(isAppended) {
+	p.setAppended = function(isAppended) {
 		if (this.level) this.level.setAppended(isAppended);
 	};
 
-	Component.prototype.placeTo = function(element) {
+	p.placeTo = function(element) {
 		if (this.level) this.level.placeTo(element);
 	};
 
-	Component.prototype.placeBack = function() {
+	p.placeBack = function() {
 		this.setAppended(true);
 	};
 
-	Component.prototype.appendChild = function(child, isAppended) {
+	p.appendChild = function(child, isAppended) {
 		if (isString(child)) child = this.getChild(child);
 		if (isComponentLike(child)) child.setAppended(isAppended);
 	};
 
-	Component.prototype.setScope = function(scope) {
+	p.setScope = function(scope) {
 		this.scope = scope;
 	};
 
-	Component.prototype.getUniqueId = function() {
+	p.getUniqueId = function() {
 		return this.uniqueId = this.uniqueId || generateRandomKey();
 	};
 
-	Component.prototype.dispose = function() {
+	p.dispose = function() {
 		unrender.call(this);
 		this.updaters = null;
 		this.parentElement = null;
@@ -474,18 +466,17 @@ function Component() {
 		this.correctors = null;
 		this.controls = null;
 	};
-	Component.prototype.a = function(n, g) {
+	p.a = function(n, g) {
 		return StateManager.get(this, g, n);
 	};
 	var f = function(){return};
-	Component.prototype.initOptions=f;
-	Component.prototype.onRendered=f;
-	Component.prototype.onRenderComplete=f;
-	Component.prototype.onLoaded=f;
-	Component.prototype.getTemplateMain=f;
-	Component.prototype.disposeInternal=f;
-	Component.prototype.getArgs=f;	
-	Component.prototype.g=Component.prototype.get;
-	Component.prototype.d=Component.prototype.dispatchEvent;
+	p.initOptions=f;
+	p.onRendered=f;
+	p.onRenderComplete=f;
+	p.onLoaded=f;
+	p.getTemplateMain=f;
+	p.disposeInternal=f;
+	p.g=p.get;
+	p.d=p.dispatchEvent;
 }
 Component();

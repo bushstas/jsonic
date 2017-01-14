@@ -9,16 +9,16 @@
 					<UserInfo/>
 					<div class="mainpage-leftcolumn-title bold">
 						{@calendar}
-						<::tooltip args="{#calendarTooltip}"/>
+						<::tooltip props="{#calendarTooltip}"/>
 					</div>
 					<FavoritesCalendar/>
 				</div>
 			</td>
 			<td class="mainpage-content-column">
-				<TabPanel args="{#mainPageTabs}"/>
+				<TabPanel props="{#mainPageTabs}"/>
 				<div class="mainpage-content">
 					<div class="tab-content">
-						<FilterStatistics args="{#mainPageFilterStat}"/>
+						<FilterStatistics props="{#mainPageFilterStat}"/>
 					</div>
 					<div class="tab-content">
 						<FilterSubscriptionOptions/>

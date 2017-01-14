@@ -1,6 +1,6 @@
 component TenderSearchForm extends SearchForm
 
-initial args = {
+initial props = {
 	'title': @searchFormTitle
 }
 

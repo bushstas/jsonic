@@ -162,25 +162,32 @@ class JSInterpreter
 				}
 				$tag = preg_replace('/[^\.\#:\-\w@]/', '', $tag);
 				preg_match_all('/([\.\#:]*)([@\w\-\.\#]+)/', $tag, $ms);
+				$className = $ms[2][0];
 				if ($ms[1][0] == ':') {
-					$content .= " this.getElement('".$ms[2][0]."')";
+					$content .= " this.getElement('".$className."')";
 				} elseif ($ms[1][0] == '::') {
-					$content .= " this.getChild('".$ms[2][0]."')";
+					$content .= " this.getChild('".$className."')";
 				} else {					
-					if ($ms[2][0][0] == '@') {
-						if ($ms[2][0] != '@') { 
-							$ms[2][0] = self::getTagClassName().'_'.ltrim($ms[2][0], '@');
+					if ($className[0] == '@') {
+						if ($className != '@') { 
+							$className = self::getTagClassName().'_'.ltrim($className, '@');
 						} else {
-							$ms[2][0] = self::getTagClassName();
+							$className = self::getTagClassName();
 						}
 					}
+
 					$selector = !empty($ms[1][0]) ? $ms[1][0].'->>' : '';
+					$parts = explode('.', $className);
+					$className = $parts[0];
+					for ($j = 1; $j < count($parts); $j++) {
+						$className .= '.->>'.$parts[$j];
+					}
 					if ($index === null) {
-						$content .= " this.findElement('".$selector.$ms[2][0].$scope."')";
+						$content .= " this.findElement('".$selector.$className.$scope."')";
 					} elseif(empty($index)) {
-						$content .= " this.findElements('".$selector.$ms[2][0].$scope."')";
+						$content .= " this.findElements('".$selector.$className.$scope."')";
 					} else {
-						$content .= " this.findElements('".$selector.$ms[2][0].$scope."')[".$index."]";
+						$content .= " this.findElements('".$selector.$className.$scope."')[".$index."]";
 					}
 				}
 			}

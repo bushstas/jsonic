@@ -1231,7 +1231,7 @@ class TemplateParser
 						}
 					}
 				}
-				if (preg_match("/\bon(\w{3,})/i", $propName, $match)) {
+				if (preg_match("/^on([A-Z]\w+)$/i", $propName, $match)) {
 					self::parseEventAttribute($match[1], $propValue, $child, $item, $isComponentTag);
 					continue;
 				}
@@ -1337,6 +1337,10 @@ class TemplateParser
 		}
 		$parts = explode('(', $propValue);
 		$propValue = $parts[0];
+		if (preg_match('/^this\./', $propValue)) {
+			$propValue = preg_replace('/^this\./', '', $propValue);
+			$binding = true;
+		}
 		$eventArgs = '';
 		if (isset($parts[1])) {
 			if ($isSpecial) {
@@ -1379,13 +1383,12 @@ class TemplateParser
 		if (is_numeric($propValue)) {
 			new Error(self::$errors['numericEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
 		}
-
 		if (!preg_match('/^[:\!]*[_a-z]\w+$/i', $propValue)) {
 			new Error(self::$errors['incorrectEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
 		}
 		$once      = false;
 		$eventType = strtolower($match);
-		$parts     = preg_split('/once/i', $eventType);		
+		$parts     = preg_split('/once/i', $eventType);
 		
 		if (!is_array($child['e'])) {
 			$child['e']	= array();
@@ -1415,6 +1418,8 @@ class TemplateParser
 		} elseif (!$isSpecial) {
 			if (!empty($eventArgs)) {
 				$callback .= '.b($,'.$eventArgs.')';
+			} elseif ($binding) {
+				$callback .= '.b($)';
 			}
 		}
 		$child['e'][] = '<nq>'.(!$isSpecial ? '$.'.$callback : self::$globalVarNames[$callback]).'<nq>';
@@ -1431,32 +1436,18 @@ class TemplateParser
 		} else {
 			$properData['p'] = array();
 		}
-		if (!empty($props['args'])) {
-			$properData['aa'] = array();	
-		} else {
-			$properData['a'] = array();
-		}
 		foreach ($props as $k => $v) {
 			if ($k == 'opts') {
 				$properData['op'] = $v;
-			} else if ($k == 'cmpid') {
+			} else if ($k == 'as') {
 				$properData['i'] = $v;
-			} elseif ($k == 'props' || $k == 'args') {
-				$properData[$k == 'props' ? 'p' : 'a'] = $v;
+			} elseif ($k == 'props') {
+				$properData['p'] = $v;
 			} else {
-				if (preg_match('/^arg-/', $k)) {
-					$k = preg_replace('/^arg-/', '', $k);
-					if (is_array($properData['aa'])) {
-						$properData['aa'][$k] = $v;
-					} else {
-						$properData['a'][$k] = $v;
-					}
+				if (is_array($properData['ap'])) {
+					$properData['ap'][$k] = $v;
 				} else {
-					if (is_array($properData['ap'])) {
-						$properData['ap'][$k] = $v;
-					} else {
-						$properData['p'][$k] = $v;
-					}
+					$properData['p'][$k] = $v;
 				}
 			}
 		}
@@ -1466,20 +1457,9 @@ class TemplateParser
 		if (empty($properData['p'])) {
 			unset($properData['p']);
 		}
-		if (empty($properData['aa'])) {
-			unset($properData['aa']);
-		}
-		if (empty($properData['a'])) {
-			unset($properData['a']);
-		}
 		$child['p'] = $properData;
-		if (is_array($child['n']) && !empty($child['n'])) {
-			foreach ($child['n'] as $k => $v) {
-				if ($k == 'args' || preg_match('/^arg-/', $k)) {
-					unset($child['n'][$k]);
-				}
-			}
-			if (empty($child['n'])) unset($child['n']);
+		if (is_array($child['n']) && empty($child['n'])) {
+			unset($child['n']);
 		}
 	}
 
@@ -1499,7 +1479,7 @@ class TemplateParser
 		$parents = $class['extends'];
 		if (is_array($parents)) {
 			foreach ($parents as $parent) {
-				if (is_array(self::$sources[$parent]) && preg_match('/\b'.$parent.'.prototype\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
+				if (is_array(self::$sources[$parent]) && preg_match('/\bp\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
 					return true;
 				}
 				if (self::hasComponentMethod($method, self::$classes[$parent])) {

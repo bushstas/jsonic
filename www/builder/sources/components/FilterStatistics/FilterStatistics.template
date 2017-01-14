@@ -1,7 +1,7 @@
 <div class="@ {~className}" scope>
 	<div class="@title">
 		{~title}
-		<div class="@refresh" eid="rb">
+		<div as="rb" class="@refresh">
 			{@refresh}
 		</div>
 	</div>	

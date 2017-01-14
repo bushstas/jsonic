@@ -1,16 +1,13 @@
 component Dialog
 
-initial args = {
-	'closable': true
+initial props = {
+	'closable': true,
+	'width': 600
 }
 
 initial followers = {
 	'width': this.reposition,
 	'height': this.reposition
-}
-
-initial props = {
-	'width': 600
 }
 
 function show() {

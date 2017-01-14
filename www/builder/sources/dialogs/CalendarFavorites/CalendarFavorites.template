@@ -1,6 +1,6 @@
 {template .content}
 <div class="simple-datatable calendar-favorites-datatable">
 	{foreach $tenders as &tender}
-		<DataTableStandartRow args="{&tender}" arg-nocontrols="1"/>
+		<DataTableStandartRow props="{&tender}" nocontrols="1"/>
 	{/foreach}
 </div>

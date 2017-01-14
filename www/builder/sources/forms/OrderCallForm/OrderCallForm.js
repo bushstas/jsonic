@@ -1,6 +1,6 @@
 form OrderCallForm
 
-initial args = {
+initial props = {
 	'action': CONFIG.orderCall.send,
 	'method': 'POST',
 	'className': '->> app-order-call',

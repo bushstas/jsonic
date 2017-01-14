@@ -1,11 +1,11 @@
-function Level() {
+function Level(component) {
 	var tagsList = {{TAGS}};
 	var attrNames = {{ATTRIBUTES}};
 	var eventTypes = {{EVENTTYPES}};
 
 	var self = this, parentElement, realParentElement, parentLevel,
 		nextSiblingChild, children = [], detached = false,
-		prevChild, firstChild, component, updaters,
+		prevChild, firstChild, updaters,
 		eventHandler, firstNodeChild, lastNodeChild;
 
 	var renderItems = function(items) {
@@ -36,8 +36,7 @@ function Level() {
 	};
 
 	var createLevel = function(items, pe) {
-		var level = new Level();
-		level.setComponent(component);
+		var level = new Level(component);
 		level.render(items, pe, self);
 		children.push(level);
 	};
@@ -73,7 +72,7 @@ function Level() {
 			for (var k in pr) {
 				a = attrNames[k] || k;
 				if (a == 'scope') component.setScope(element);
-				else if (a == 'eid') Core.registerElement.call(component, element, pr[k]);
+				else if (a == 'as') Core.registerElement.call(component, element, pr[k]);
 				else if (isPrimitive(pr[k]) && pr[k] !== '') {
 					element.attr(a, pr[k]);
 				}
@@ -194,20 +193,20 @@ function Level() {
 	};
 
 	var includeTemplate = function(item) {
-		var args = item['p'];
-		if (isObject(args) && isObject(args['args'])) {
-			tempArgs = args['args'];
-			delete args['args'];
-			for (var k in args) tempArgs[k] = args[k];
-			args = tempArgs;
+		var props = item['p'];
+		if (isObject(props) && isObject(props['props'])) {
+			var tempProps = props['props'];
+			delete props['props'];
+			for (var k in props) tempProps[k] = props[k];
+			props = tempProps;
 		}
 		if (item['c']) {
-			args = args || {};
-			args['children'] = item['c'];
+			props = props || {};
+			props['children'] = item['c'];
 		}
 		if (isString(item['tmp'])) item['tmp'] = Core.getTemplateById.call(component, item['tmp']);
 		if (isFunction(item['tmp'])) {		
-			var items = item['tmp'].call(component, args, component);
+			var items = item['tmp'].call(component, props, component);
 			renderItems(items);
 		}
 	};
@@ -218,10 +217,9 @@ function Level() {
 			var cmp = new item['cmp']();
 			var ir = isFunction(item['p']);
 			var i, k, p = ir ? item['p']() : item['p'];
-			var props, args, opts, data;
+			var props, opts, data;
 			if (isObject(p)) {
 				if (p['p'] || p['ap']) props = initComponentProps(p['p'], p['ap']);
-				if (p['a'] || p['aa']) args = initComponentProps(p['a'], p['aa']);
 				opts = p['op'];
 				if (isString(p['i'])) {
 					cmp.setId(p['i']);
@@ -240,10 +238,10 @@ function Level() {
 				}
 			}
 			if (item['c']) {
-				args = args || {};
-				args['children'] = item['c'];
+				props = props || {};
+				props['children'] = item['c'];
 			}
-			Core.initiate.call(cmp, props, args, opts);
+			Core.initiate.call(cmp, props, opts);
 			cmp.render(pe);
 			registerChild(cmp, true);
 			if (isArray(item['e'])) {
@@ -311,10 +309,6 @@ function Level() {
 			return Core.getFirstNodeChild.call(firstLevel);
 		}
 		return null;
-	};
-
-	this.setComponent = function(c) {
-		component = c;
 	};
 
 	this.getComponent = function() {

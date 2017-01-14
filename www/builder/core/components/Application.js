@@ -130,10 +130,11 @@ function Application() {
 		this.viewContainer.appendChild(element);
 		return element;
 	};
-	Application.prototype.initiate = function() {
+	var p = Application.prototype;
+	p.initiate = function() {
 		this.views = {};
 	};
-	Application.prototype.run = function() {
+	p.run = function() {
 		this.element = document.createElement('div');
 		document.body.appendChild(this.element);
 		this.render(this.element);
@@ -141,7 +142,7 @@ function Application() {
 		defineViews.call(this);
 		initRouter.call(this);
 	};
-	Application.prototype.setPageTitle = function(title) {
+	p.setPageTitle = function(title) {
 		var titleElement = document.getElementsByTagName('title')[0];
 		if (!isElement(titleElement)) {
 			var headElement = document.getElementsByTagName('head')[0];
@@ -153,16 +154,16 @@ function Application() {
 		}
 		titleElement.innerHTML = title;
 	};
-	Application.prototype.getView = function(viewName) {
+	p.getView = function(viewName) {
 		return this.views[viewName];
 	};
-	Application.prototype.disposeView = function(viewName) {
+	p.disposeView = function(viewName) {
 		if (isObject(this.views[viewName])) {
 			this.views[viewName].dispose();
 			this.views[viewName] = null;
 		}
 	};
-	Application.prototype.onNoErrors=function(){};
-	Application.prototype.onError=function(){};
+	p.onNoErrors=function(){};
+	p.onError=function(){};
 }
 Application();

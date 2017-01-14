@@ -1,10 +1,7 @@
 component SearchFormCreateFilterMenu extends PopupMenu
 
-initial args = {
-	'className': '->> create-filters-menu'
-};
-
 initial props = {
+	'className': '->> create-filters-menu',
 	'buttons': [
 		{
 			'name': @createNew,

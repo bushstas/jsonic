@@ -239,9 +239,7 @@ class TemplateCodeParser
 					if (!self::isLatinTextExpected($part, $code)) {
 						self::error('unexpectedLat', array($code, $part, ' ...}', self::getExpected()));
 					}
-
-
-					
+				
 					//adding
 					if (!empty(self::$open['method']))
 					{

@@ -124,7 +124,7 @@ var Core = new (function() {
 			}
 		}
 	};
-	this.initiate = function(props, args, opts) {
+	this.initiate = function(props, opts) {
 		var initials = null;
 		var proto = this.constructor.prototype;
 		if (isFunction(proto.getInitials)) {
@@ -157,7 +157,6 @@ var Core = new (function() {
 			proto.initiate.call(this);
 		}
 		this.initials = initials;
-		this.args = args;
 		if (opts) this.options = opts;
 		Core.processInitials.call(this);
 	};

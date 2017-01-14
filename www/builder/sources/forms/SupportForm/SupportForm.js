@@ -1,6 +1,6 @@
 form SupportForm extends OrderCallForm
 
-initial args = {
+initial props = {
 	'action': CONFIG.support.send,
 	'className': '->> app-order-call',
 	'controls': [

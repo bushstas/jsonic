@@ -2,21 +2,18 @@ function Condition(params) {
 	this.params = params;
 	this.isTrue = !!this.params['i']();
 }
-
-Condition.prototype.render = function(parentElement, parentLevel) {
+var p = Condition.prototype;
+p.render = function(parentElement, parentLevel) {
 	this.parentElement = parentElement;
 	this.parentLevel = parentLevel;
 	this.createLevel(false);
 };
-
-Condition.prototype.createLevel = function(isUpdating) {
-	this.level = new Level();
-	this.level.setComponent(this.parentLevel.getComponent());
+p.createLevel = function(isUpdating) {
+	this.level = new Level(this.parentLevel.getComponent());
 	var nextSiblingChild = isUpdating ? Core.getNextSiblingChild.call(this) : null;
 	this.level.render(this.getChildren(), this.parentElement, this.parentLevel, nextSiblingChild);
 };
-
-Condition.prototype.update = function() {
+p.update = function() {
 	var isTrue = !!this.params['i']();
 	if (isTrue != this.isTrue) {
 		this.isTrue = isTrue;
@@ -24,20 +21,17 @@ Condition.prototype.update = function() {
 		this.createLevel(true);
 	}
 };
-
-Condition.prototype.getChildren = function() {
+p.getChildren = function() {
 	if (this.isTrue) return isFunction(this.params['c']) ? this.params['c']() : this.params['c'];
 	return isFunction(this.params['e']) ? this.params['e']() : this.params['e'];
 };
-
-Condition.prototype.disposeLevel = function() {
+p.disposeLevel = function() {
 	if (this.level) {
 		this.level.dispose();
 		this.level = null;
 	}
 };
-
-Condition.prototype.dispose = function() {
+p.dispose = function() {
 	Core.disposeLinks.call(this);
 	this.disposeLevel();
 	this.parentElement = null;

@@ -1,5 +1,5 @@
 component KeywordsButton extends SearchFormPanelButton
 
-initial args = {
+initial props = {
 	'className': '->> search-keywords'
 }

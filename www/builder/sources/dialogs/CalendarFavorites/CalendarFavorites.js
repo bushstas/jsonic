@@ -1,9 +1,6 @@
 dialog CalendarFavorites;
 
-initial args = {
-	'expandable': true
-};
-
 initial props = {
+	'expandable': true,
 	'width': 1000
 };

@@ -1,2 +1,2 @@
-<TopMenu cmpid="menu"/>
+<TopMenu as="menu"/>
 <div class="app-view-container"/>

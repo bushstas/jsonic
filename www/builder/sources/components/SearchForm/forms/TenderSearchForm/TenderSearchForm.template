@@ -1,7 +1,7 @@
 {template .content}
-<KeywordsPanel cmpid="keywordsPanel"/>
+<KeywordsPanel as="keywordsPanel"/>
 <:reset/>
-<div class="@" scope="1">
+<div class="@" scope>
 	<SearchFormFilters/>
 	<div class="@content">
 		<KeywordsButton panel="{^keywordsPanel}"/>

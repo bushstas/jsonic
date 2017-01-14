@@ -313,7 +313,7 @@ class CSSCompiler
 		preg_match_all($regexp, $css, $matches);
 		$urls = $matches[0];
 		$css = preg_replace($regexp, '__URL__', $css);
-		preg_match_all('/\.([a-z][\w\-]{3,})/i', $css, $matches);
+		preg_match_all('/\.([a-z][\w\-]*)/i', $css, $matches);
 		$classes = array_unique($matches[1]);
 		foreach ($classes as $class) {
 			self::$cssClassIndex[$class] = CSSObfuscator::generate();

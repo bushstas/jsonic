@@ -101,6 +101,7 @@ class JSParser
 				if (isset($matches[1][$i])) {
 					$vars = explode(',', $matches[1][$i]);
 					foreach ($vars as $var) {
+						$var = trim($var);
 						$code .= 'var '.$var."=this.get('".$var."');\n";
 					}
 				}

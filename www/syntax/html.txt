@@ -215,6 +215,9 @@ contexts:
           pop: true
         - include: entities
   tag-generic-attribute:
+    - match: '\s\$'
+      captures:
+        0: entity.other.attribute-name.html
     - match: '(?<=[^=])\b([a-zA-Z0-9:-]+)\s*(=?)'
       captures:
         1: entity.other.attribute-name.html

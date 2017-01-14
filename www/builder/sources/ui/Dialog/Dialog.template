@@ -1,12 +1,8 @@
 {template .main}
 <div class="@mask {$shown?'->>shown'}" onClick="close"/>
 <div class="@ {$expanded?'->>expanded'} {$shown?'->>shown'}" style="width:{$width}px;margin-left:{$marginLeft};margin-top:{$marginTop};" scope>
-	{if ~closable}
-		<div class="@close" onClick="close"/>
-	{/if}
-	{if ~expandable}
-		<div class="@expand" onClick="expand"/>
-	{/if}
+	<div if="{~closable}" class="@close" onClick="close"/>	
+	<div if="{~expandable}" class="@expand" onClick="expand"/>
 	<div class="@title">
 		{$title}
 	</div>
