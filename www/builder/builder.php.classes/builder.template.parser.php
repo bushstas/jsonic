@@ -146,6 +146,7 @@ class TemplateParser
 	}
 
 	public static function parse($template, &$class, $className = '', &$tmpids = '') {
+		JSObfuscator::obfuscate($template);
 		self::$class = &$class;
 		self::$className = $className;
 		$template = preg_replace('/[\t\r\n]/', '', $template);
@@ -241,7 +242,6 @@ class TemplateParser
 		$html = preg_replace(self::$regexp, '', $content);
 		$html = str_replace('->>', "#classobfus#", $html);
 		$html = preg_replace('/<(:*\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
-		$html = str_replace('#classobfus#', '->>', $html);
 		$html = preg_replace('/<\/(img|br|hr|input)>/', '', $html);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
@@ -279,6 +279,7 @@ class TemplateParser
 					new Error(self::$errors['invalidTagName'], array($tagName, self::$templateName, self::$class['name'], $tagContent));
 				}
 				$isClosing = self::isTagClosing($tagName, $tagContent);
+				$tagContent = str_replace('#classobfus#', '->>', $tagContent);
 				$list[] = array(
 					'type' => 'tag',
 					'content' => $tagContent,
@@ -1003,6 +1004,8 @@ class TemplateParser
 			}
 			if ($hasCode) {
 				$propValue = self::processCode($propValue, 'templateAttribute');
+			} else {
+				self::checkPropertyForObfuscation($propValue);
 			}
 			$props[$propName] = $propValue;
 		}
@@ -1199,6 +1202,7 @@ class TemplateParser
 		for ($i = 0; $i < count($propNames); $i++) {		
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
+
 			$hasCode = self::hasCode($propValue);
 			$fullPropName = $propName;
 			$isObfClName = self::$obfuscate === true && $fullPropName == 'class';
@@ -1261,6 +1265,8 @@ class TemplateParser
 			} else if ($isObfClName) {
 				self::getObfuscatedClassName($propValue);
 				$props[$propName] = $propValue;
+			} else {
+				self::checkPropertyForObfuscation($propValue);
 			}
 		}
 	
@@ -1313,6 +1319,22 @@ class TemplateParser
 		}
 		if (!empty($ifCondition) || !empty($else)) {
 			self::addIfConditionToChild(trim($ifCondition), trim($else), $child);
+		}
+	}
+
+	private static function checkPropertyForObfuscation(&$value) {
+		if (preg_match('/->>/', $value)) {
+			$data = Splitter::split('/->>\s*[\w\-]+/', $value);
+			$value = '';
+			foreach ($data['items'] as $i => $part) {
+				$value .= $part;
+				$d = $data['delimiters'][$i];
+				if (!empty($d)) {
+					$d = preg_replace('/->>\s*/', '', $d);
+					self::getObfuscatedClassName($d);
+					$value .= $d;
+				}
+			}
 		}
 	}
 

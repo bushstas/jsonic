@@ -134,13 +134,14 @@ function Component() {
 	};
 
 	p.dispatchEvent = function(eventType) {
-		var args = Array.prototype.slice.call(arguments);
+		var args = Array.prototype.slice.call(arguments), l;
 		args.splice(0, 1);
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
-				if (isNumber(this.listeners[i]['type'])) this.listeners[i]['type'] = eventTypes[this.listeners[i]['type']];
-				if (this.listeners[i]['type'] == eventType) {
-					this.listeners[i]['handler'].apply(this.listeners[i]['subscriber'] || null, args);
+				l = this.listeners[i];
+				if (isNumber(l['type'])) l['type'] = eventTypes[l['type']];
+				if (l['type'] == eventType) {
+					l['handler'].apply(l['subscriber'], args);
 				}
 			}
 		}

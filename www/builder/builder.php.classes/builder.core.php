@@ -19,7 +19,7 @@ $includes = array(
 	'tests', 'texts', 'decl', 'text.parser', 'initials', 'js.parser', 'js.checker', 'js.globals',
 	'data', 'tags', 'props', 'events', 'template.parser', 'css.obfuscator', 'printer', 'js.interpreter',
 	'splitter', 'template.code.parser', 'utils', 'controllers.parser', 'tag.classname.parser',
-	'template.callback.validator', 'states.manager.parser', 'class.analyzer'
+	'template.callback.validator', 'states.manager.parser', 'class.analyzer', 'js.obfuscator'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
@@ -41,6 +41,7 @@ class Builder
 		$this->coreValidator->validate($this->config->getPathToCore());
 		
 		CSSObfuscator::init();
+		JSObfuscator::init();
 		$this->cssCompiler = new CSSCompiler($this->config);
 		$this->utilsCompiler = new UtilsCompiler($this->config);
 
@@ -82,6 +83,10 @@ class Builder
 		$this->declCompiler     -> run ($this->files['decl']);
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
 		$this->jsCompiler       -> run ();
+
+		if ($this->config->needJsObfuscation()) {
+			JSObfuscator::saveData();
+		}
 	}
 
 	public function getCompiler($compilerName) {

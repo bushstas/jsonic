@@ -34,9 +34,9 @@ function onCheckboxChange(e) {
 
 function getButtonData(item) {
 	return {
-		'value': item['filterId'],
-		'name': item['header'],
-		'isAutoOpen': item['isAutoOpen']
+		'value': item['filterId <<-'],
+		'name': item['header <<-'],
+		'isAutoOpen': item['isAutoOpen <<-']
 	};
 };
 

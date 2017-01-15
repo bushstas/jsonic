@@ -22,7 +22,8 @@ class JSParser
 	}
 
 	public static function parse(&$class) {
-		$code = 'function __constructor(){}'.trim($class['content']);
+		$code = $class['content'];
+		$code = 'function __constructor(){}'.trim($code);
 		$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);	
 
 
@@ -147,7 +148,7 @@ class JSParser
 			$code = preg_replace('/\$(\w+)\.each\(/', "this.each('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.add\(/', "this.addTo('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.addOne\(/', "this.addOneTo('$1', ", $code);
-			$code = preg_replace('/\$(\w+)=>/', "this.set('$1', $1);", $code);
+			$code = preg_replace('/\$(\w+)\s*=>/', "this.set('$1', $1);", $code);
 
 			if (!empty($varsToSet)) {
 				$items = array();

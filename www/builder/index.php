@@ -67,10 +67,12 @@
 			<option value="tmp">шаблонам</option>
 			<option value="tmpcode">коду в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>
+			<option value="events">событиям</option>
 			<option value="helper">классам хелперам</option>
 			<option value="corrector">классам корректорам</option>
 			<option value="css">css файлам</option>
-			<option value="events">событиям</option>
+			<option value="jsobfus">js обфускации</option>
+			<option value="cssobfus">css обфускации</option>
 		</select>
 	</form>
 	<form class="searchform" metod="GET" target="iframe" action="search.php">
@@ -97,9 +99,13 @@
 				Усиленная обфускация
 			</label>
 			<label>
+				<input type="checkbox" vlaue="1" name="js_obfuscate"> 
+				Обфускация js кода
+			</label>
+			<label>
 				<input type="checkbox" vlaue="1" name="obfuscate"> 
 				Обфускация css классов
-			</label>
+			</label>			
 		</div>
 	</form>
 </body>

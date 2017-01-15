@@ -330,4 +330,28 @@ class CSSCompiler
 			}
 		}
 	}
+
+	public function obfuscateJs(&$jsOutput) {
+		$jsOutput = preg_replace('/\.\s+->>/', '.->>', $jsOutput);
+		$regexp = '/->>\s*([a-z][\w\-]+)/';
+		preg_match_all($regexp, $jsOutput, $matches);
+
+		$cssClasses = $matches[1];
+		$parts = preg_split($regexp, $jsOutput);
+		$jsOutput = '';
+		foreach ($parts as $i => $part) {
+			$jsOutput .= $part;
+			if (isset($cssClasses[$i])) {
+				if (!isset(self::$cssClassIndex[$cssClasses[$i]])) {
+					self::$cssClassIndex[$cssClasses[$i]] = CSSObfuscator::generate();
+				}
+				$jsOutput .= self::$cssClassIndex[$cssClasses[$i]];
+			}
+		}
+		$this->removeMarks($jsOutput);
+	}
+
+	public function removeMarks(&$jsOutput) {
+		$jsOutput = preg_replace('/->> */', '', $jsOutput);
+	}
 }

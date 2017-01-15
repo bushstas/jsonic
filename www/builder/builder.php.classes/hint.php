@@ -319,22 +319,22 @@
 			<xmp>var scope = <>;</xmp><xmp>var scope = this.getElement();</xmp>
 			<xmp>var r = <>.getRect();</xmp><xmp>var r = this.getElement().getRect();</xmp>';
 
-			$items[] = '<b>&lt;input&gt;</b> - Возвращает первый элемент в переделах компонента с тегом input
+			$items[] = '<b>&lt;input&gt;</b> - Возвращает первый элемент в пределах компонента с тегом input
 			<xmp>var input = <input>;</xmp><xmp>var input = this.findElement(\'input\');</xmp>
 			<xmp>var v = <input>.value;</xmp><xmp>var v = this.findElement(\'input\').value;</xmp>
 			<xmp><input>.clear();</xmp><xmp>this.findElement(\'input\').clear();</xmp>';
 
-			$items[] = '<b>&lt;#container&gt;</b> - Возвращает первый элемент в переделах компонента, имеющий id = container
+			$items[] = '<b>&lt;#container&gt;</b> - Возвращает первый элемент в пределах компонента, имеющий id = container
 			<xmp>var cnt = <#container>;</xmp><xmp>var cnt = this.findElement(\'#container\');</xmp>
 			<xmp>var h = <#container>.innerHTML;</xmp><xmp>var h = this.findElement(\'#container\').innerHTML;</xmp>
 			<xmp><#container>.hide();</xmp><xmp>this.findElement(\'#container\').hide();</xmp>';
 
-			$items[] = '<b>&lt;.item&gt;</b> - Возвращает первый элемент в переделах компонента, имеющий class = item
+			$items[] = '<b>&lt;.item&gt;</b> - Возвращает первый элемент в пределах компонента, имеющий class = item
 			<xmp>var i = <.item>;</xmp><xmp>var i = this.findElement(\'.item\');</xmp>
 			<xmp>var h = <.item>.innerHTML;</xmp><xmp>var h = this.findElement(\'.item\').innerHTML;</xmp>
 			<xmp><.item>.show();</xmp><xmp>this.findElement(\'.item\').show();</xmp>';
 
-			$items[] = "<b>&lt;.@name&gt;</b> - Возвращает первый элемент в переделах компонента, имеющий сокращенный class = @name<br>
+			$items[] = "<b>&lt;.@name&gt;</b> - Возвращает первый элемент в пределах компонента, имеющий сокращенный class = @name<br>
 			Сокращенное имя класса состоит из имени класса компонента и дополнительного слова (в данном случае <b>name</b>)<br>
 			Сокращения имен классов элементов подменяются на полные имена до парсинга самого кода шаблона<br><br>
 			Элементы с сокращенными именами класса в шаблоне компонента <b>CatalogItem</b>:
@@ -346,37 +346,34 @@
 			<xmp><.@name></xmp>
 			<xmp><.@price></xmp>";
 
-			$items[] = '<b>&lt;.block[]&gt;</b> - Возвращает все элементы в переделах компонента, имеющие class = block
+			$items[] = '<b>&lt;.block[]&gt;</b> - Возвращает все элементы в пределах компонента, имеющие class = block
 			<xmp>var blocks = <.block[]>;</xmp><xmp>var blocks = this.findElements(\'.block\');</xmp>
 			<xmp>var firstBlock = <.block[]>[0];</xmp><xmp>var firstBlock = this.findElements(\'.block\')[0];</xmp>';
 
-			$items[] = '<b>&lt;.item[2]&gt;</b> - Возвращает элемент с заданным индексом в переделах компонента, имеющий class = item
+			$items[] = '<b>&lt;.item[2]&gt;</b> - Возвращает элемент с заданным индексом в пределах компонента, имеющий class = item
 			<xmp>var i = <.item[2]>;</xmp><xmp>var i = this.findElements(\'.item\')[2];</xmp>
 			<xmp>var h = <.item[2]>.innerHTML;</xmp><xmp>var h = this.findElements(\'.item\')[2].innerHTML;</xmp>
 			<xmp><.item[2]>.show();</xmp><xmp>this.findElements(\'.item\')[2].show();</xmp>';
 
-			$items[] = '<b>&lt;.item[idx]&gt;</b> - Возвращает элемент с индексом из переменной в переделах компонента, имеющий class = item
+			$items[] = '<b>&lt;.item[idx]&gt;</b> - Возвращает элемент с индексом из переменной в пределах компонента, имеющий class = item
 			<xmp>var i = <.item[idx]>;</xmp><xmp>var i = this.findElements(\'.item\')[idx];</xmp>
 			<xmp>var h = <.item[idx]>.innerHTML;</xmp><xmp>var h = this.findElements(\'.item\')[idx].innerHTML;</xmp>
 			<xmp><.item[idx]>.show();</xmp><xmp>this.findElements(\'.item\')[idx].show();</xmp>';
 
-			$items[] = '<b>&lt;:list&gt;</b> - Возвращает уже закешированный элемент в переделах компонента, имеющий eid = list
-			<xmp><ul class="items-list" eid="list">'."\n\t<li>list item</li>\n".'</ul></xmp>
+			$items[] = '<b>&lt;:list&gt;</b> - Возвращает уже закешированный элемент в пределах компонента, имеющий атрибут as = list
+			<xmp><ul class="items-list" as="list">'."\n\t<li>list item</li>\n".'</ul></xmp>
 			<xmp>var l = <:list>;</xmp><xmp>var l = this.getElement(\'list\');</xmp>
 			<xmp>var h = <:list>.innerHTML;</xmp><xmp>var h = this.getElement(\'list\').innerHTML;</xmp>
 			<xmp><:list>.show();</xmp><xmp>this.getElement(\'list\').show();</xmp>';
 
-			$items[] = '<b>&lt;::userInfo&gt;</b> - Возвращает уже закешированный дочерний компонент, имеющий cmpid = userInfo
-			<xmp><component class="UserInfo" cmpid="userInfo"></xmp>
+			$items[] = '<b>&lt;::userInfo&gt;</b> - Возвращает уже закешированный дочерний компонент, имеющий атрибут as = userInfo
+			<xmp><component class="UserInfo" as="userInfo"></xmp>
 			<xmp>var ui = <::userInfo>;</xmp><xmp>var ui = this.getChild(\'userInfo\');</xmp>
 			<xmp>var uie = <::userInfo>.getElement();</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>';
 
-			$items[] = '<b>&lt;::userInfo&gt;&lt;&gt;</b> - Возвращает главный элемент дочернего компонента, имеющего cmpid = userInfo
-			<xmp><component class="UserInfo" cmpid="userInfo"></xmp>
-			<xmp>var uie = <::userInfo><>;</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>
-
-			<br><b>Во всех вышеуказанных записях пробелы не допускаются</b>
-			<br><b>Далее они могут иметь место</b>';
+			$items[] = '<b>&lt;::userInfo&gt;&lt;&gt;</b> - Возвращает главный элемент дочернего компонента, имеющего атрибут as = userInfo
+			<xmp><component class="UserInfo" as="userInfo"></xmp>
+			<xmp>var uie = <::userInfo><>;</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>';
 
 
 			$items[] = true;
@@ -385,15 +382,15 @@
 
 			$items[] = '<b>--> change</b> - Инициирует событие (в пределах компонента) change 
 			<xmp>--> change;</xmp><xmp>this.dispatchEvent(\'change\');</xmp>
-			<xmp>-->change(params);</xmp><xmp>this.dispatchEvent(\'change\', params);</xmp>';
+			<xmp>-->change(param, ...);</xmp><xmp>this.dispatchEvent(\'change\', param, ...);</xmp>';
 			
 			$items[] = '<b>==> everythingReady</b> - Инициирует локальное (в пределах текущего маршрута) событие everythingReady 
 			<xmp>==> everythingReady;</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\');</xmp>
-			<xmp>==> everythingReady (params);</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\', params);</xmp>';
+			<xmp>==> everythingReady (param, ...);</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
 
-			$items[] = '<b>===> everythingReady</b> - Инициирует глобальное (в пределах всего приложения) событие everythingReady<br>Доступно только для одностраничных приложений
+			$items[] = '<b>===> everythingReady</b> - Инициирует глобальное (в пределах всего приложения) событие everythingReady
 			<xmp>===> everythingReady;</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\');</xmp>
-			<xmp>===> everythingReady (params);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', params);</xmp>';
+			<xmp>===> everythingReady (param, ...);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
 
 			$items[] = true;
 			$items[] = 'Диалоговые окна';
@@ -477,7 +474,7 @@
 			$items[] = true;
 			$items[] = 'Атрибуты элементов';
 			$items[] = false;
-			$items[] = '<b>scope</b> - говорит о том, что элемент является главным контейнером, и поиск по компоненту будет производиться в его переделах';
+			$items[] = '<b>scope</b> - говорит о том, что элемент является главным контейнером, и поиск по компоненту будет производиться в его пределах';
 			$items[] = '<b>test</b> - содержит список событий через запятую, которые нужно воссоздать при тестировании приложения. Игнорируется в продакшн-версии<xmp><button test="click,mouseover,mouseout"></xmp>';
 			$items[] = true;
 			$items[] = 'Атрибуты шаблонов';
@@ -487,8 +484,8 @@
 			$items[] = true;
 			$items[] = 'Атрибуты компонетов';
 			$items[] = false;
-			$items[] = '<b>сmpid</b> - задает компоненту его id, чтобы его можно было найти<xmp><component cmpid="mainMenu"></xmp><xmp>this.getChild(\'mainMenu\');</xmp>';
-			$items[] = '<b>class</b> - обязательный атрибут, который использует компилятор, показывает к какому классу принадлежит компонент<xmp><component class="Tooltip" cmpid="tooltip"></xmp>';
+			$items[] = '<b>сmpid</b> - задает компоненту его id, чтобы его можно было найти<xmp><component as="mainMenu"></xmp><xmp>this.getChild(\'mainMenu\');</xmp>';
+			$items[] = '<b>class</b> - обязательный атрибут, который использует компилятор, показывает к какому классу принадлежит компонент<xmp><component class="Tooltip" as="tooltip"></xmp>';
 			$items[] = '<b>name</b> - обязательный атрибут для компонентов с типом control, нужен для поиска контролов, сборки данных форм или просто вложенных контролов<xmp><control class="Select" name="color"></xmp><xmp>this.getControl(\'color\');</xmp>';
 
 		break;
@@ -508,6 +505,19 @@
 			$items[] = "В этом случае вложенность компонетов не имеет значения, событие будет инициировано у текущего компонента";
 			$items[] = "Чтобы просто вызвать у события <b>stopPropagation</b> и не создавать при этом отдельный метод, используйте ключевое слово <b>stop</b><xmp><div onClick=\":stop\"></xmp>";
 			$items[] = "Для вызова <b>preventDefault</b>, используйте ключевое слово <b>prevent</b><xmp><div onClick=\":prevent\"></xmp>";
+		break;
+
+		case 'jsobfus':
+			$items[] = "JS обфускация необходима для обфусцирования названий переменных, полей, функций";
+			$items[] = "Обфусцировав данные, компилятор создает карту соответствий";
+			$items[] = "Специальный PHP класс, используя карту, обфусцирует входящие и исходящие данные на сервере";
+			$items[] = "Для того, чтобы название было обфусцировано, используйте специальный маркер <b><<-</b><xmp>var name = data.userLastName <<-</xmp><xmp>var key = data['key<<-'] <<-</xmp><xmp>var n = data <<- .numbers <<- .first <<-</xmp>";
+			$items[] = "После обфускации строка будет выглядеть на подобие этого:<xmp>var name = data.r</xmp><xmp>var key = data['df']</xmp><xmp>var n = a.t.j</xmp>";
+			$items[] = "Между названием, которое должно быть обфусцировано, и маркером допускается наличие пробелов";
+			$items[] = "После маркера также допускаются пробелы, как в третьем примере выше";
+			$items[] = "Каждую компиляцию названиям присваиваются случайные сокращения. Для избежания проблем с кешированием на стороне клиента, используйте опцию случайного имени скомпилированного файла";
+			$items[] = "Будьте внимательны, следите, чтобы маркеры были добавлены везде, например в коде шаблонов<xmp>\$filters <<- = data['filters <<-'];</xmp>В шаблоне код будет выглядеть примерно так:<xmp><div class=\"filter-items\">\n\t{foreach \$filters <<- as &filter}\n\t\t<div class=\"filter-item\">\n\t\t\t{&filter.name <<-}\n\t\t</div>\n\t{/foreach}\n</div></xmp>";
+
 		break;
 	}
 	include_once 'header.php';

@@ -441,6 +441,11 @@ class JSCompiler
 			'isSuper' => in_array($type, $this->superClasses)
 		);
 		$this->initialsParser->fetch($content, $this->classes[$className]);
+		if ($this->configProvider->needJsObfuscation()) {
+			JSObfuscator::obfuscate($content);
+		} else {
+			JSObfuscator::removeMarks($content);
+		}
 		$this->parseSpecialJSCode($content, $className);
 		if (!is_array($this->classesByTypes[$classType])) {
 			$this->classesByTypes[$classType] = array();
@@ -633,29 +638,12 @@ class JSCompiler
 		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
 		$this->jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", JSGlobals::getVarName('nullFunction'), $this->jsOutput);
 
-
 		if ($this->configProvider->needCssObfuscation()) {
-			$cssClassIndex = &$this->cssCompiler->getCssClassIndex();
-			$this->jsOutput = preg_replace('/\.\s+->>/', '.->>', $this->jsOutput);
-			$regexp = '/->>\s*([a-z][\w\-]+)/';
-			preg_match_all($regexp, $this->jsOutput, $matches);
-
-			$cssClasses = $matches[1];
-			$parts = preg_split($regexp, $this->jsOutput);
-			$this->jsOutput = '';
-			foreach ($parts as $i => $part) {
-				$this->jsOutput .= $part;
-				if (isset($cssClasses[$i])) {
-					if (!isset($cssClassIndex[$cssClasses[$i]])) {
-						$cssClassIndex[$cssClasses[$i]] = CSSObfuscator::generate();
-					}
-					$this->jsOutput .= $cssClassIndex[$cssClasses[$i]];
-				}
-			}
-		}		
-		$this->jsOutput = preg_replace('/->> */', '', $this->jsOutput);
+			$this->cssCompiler->obfuscateJs($this->jsOutput);
+		} else {
+			$this->cssCompiler->removeMarks($this->jsOutput);
+		}
 		$this->jsOutput = preg_replace('/\{\s+\}/', '{}', $this->jsOutput);
-
 		$this->jsOutput .= "\n".implode("\n", $this->bottomOutput);
 
 		$pathToCompiledJs = DEFAULT_PATH.$this->config['path'].'.js';

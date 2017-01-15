@@ -20,7 +20,7 @@ initial helpers = [
 		'helper': ClickHandler,
 		'options': {
 			'->> @refresh': this.onRefreshButtonClick,
-			'->> @name': this.onFilterClick
+			'->> @row-name': this.onFilterClick
 		}
 	}
 ]
@@ -31,14 +31,14 @@ function onRendered() {
 
 function onRefreshButtonClick() {
 	var a = <.@>;
-	$filters.each(function(filter) {
-		StoreKeeper.remove('filterStat_' + filter['filterId']);
+	$filters <<- .each(function(filter) {
+		StoreKeeper.remove('filterStat_' + filter.filterId <<-);
 	});
 	this.refresh();
 }
 
 function onFilterClick() {
-	alert('filter')
+	
 }
 
 function refresh() {
@@ -47,20 +47,20 @@ function refresh() {
 	this.getCountForFilterWithIndex(0);	
 }
 
-function onLoaded(filters) {
-	$filters=>
+function onLoaded(filters <<-) {
+	$filters <<- =>
 }
 
 function updateFilterCount(data) {
-	this.fill('.->> row' + data['filterId'], data['numbers']);
+	this.fill('.->> row' + data.filterId <<-, data.numbers <<-);
 	this.currentFilterIndex++;
 	this.getCountForFilterWithIndex(this.currentFilterIndex);
 }
 
 function getCountForFilterWithIndex(index) {
-	var filter = $filters{ index };
+	var filter = $filters <<- { index };
 	if (isObject(filter)) {
-		FiltersStat.load({'filterId': filter['filterId']});
+		FiltersStat.load({'filterId <<-': filter.filterId <<-});
 	} else {
 		<:rb>.show();
 	}

@@ -4,10 +4,10 @@
 	</div>
 	<div class="@head">
 		<div class="@head-total">
-			{$total}
+			{$total <<-}
 		</div>
 		<div class="@head-subscribed">
-			{$subscribed}
+			{$subscribed <<-}
 		</div>
 	</div>
 	<table class="@table" cellpadding="0px" cellspacing="0px">
@@ -20,16 +20,16 @@
 			</tr>
 		</thead>
 		<tbody>
-			{foreach $filters as &filter}
-				<tr data-filterid="{&filter['filterId']}" class="@filter-row">
+			{foreach $filters <<- as &filter}
+				<tr data-filterid="{&filter.filterId <<-}" class="@filter-row">
 					<td>
-						<span class="@filter">{&filter['header']}</span>
+						<span class="@filter">{&filter.header <<-}</span>
 					</td>
 					<td>
-						<Select name="freqSubs" options="{#subscrFreqOptions}" value="{&filter['freqSubs']}" onChange="onFreqChange"/>
+						<Select name="freqSubs" options="{#subscrFreqOptions}" value="{&filter.freqSubs <<-}" onChange="onFreqChange"/>
 					</td>
 					<td>
-						<div class="@button {&filter['isSubs']==1?@greenButton+' ->>subscribed':@whiteButton}"></div>
+						<div class="@button {&filter.isSubs <<- ==1?@greenButton+' ->>subscribed':@whiteButton}"></div>
 					</td>
 					<td>
 						Delete

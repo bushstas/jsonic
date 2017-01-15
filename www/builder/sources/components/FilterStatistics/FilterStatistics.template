@@ -18,17 +18,17 @@
 		</tr>
 	</table>
 	<div class="@content">
-		{foreach $filters as &filter}
-			<div class="@row row{&filter['filterId']}">
+		{foreach $filters <<- as &filter}
+			<div class="@row row{&filter.filterId <<-}">
 				<span class="@row-name">
-					{&filter['header']}
+					{&filter.header <<-}
 				</span>
-				<span>+{::today=0}</span>
-				<span>+{::yesterday=0}</span>
-				<span>{::current=0}</span>
+				<span>+{::today <<- =0}</span>
+				<span>+{::yesterday <<- =0}</span>
+				<span>{::current <<- =0}</span>
 				{if ~extended}
-					<span>{::week=0}</span>
-					<span>{::month=0}</span>
+					<span>{::week <<- =0}</span>
+					<span>{::month <<- =0}</span>
 				{/if}
 			</div>
 		{/foreach}

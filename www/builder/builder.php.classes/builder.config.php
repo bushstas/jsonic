@@ -206,6 +206,10 @@ class Config
 		return !empty($_GET['obfuscate']);
 	}
 
+	public function needJsObfuscation() {
+		return !empty($_GET['js_obfuscate']);
+	}
+
 	public function needToCreateEnvironment() {
 		return !empty($_GET['create']);
 	}

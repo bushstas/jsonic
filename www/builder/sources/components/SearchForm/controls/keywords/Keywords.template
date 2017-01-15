@@ -1,6 +1,6 @@
 <div class="@options">
 	<span class="bold">{@tofind}</span>
-	<Select name="nonmorph" options="{#keywordsNonMorphOptions}" className="frameless" tooltip="true"/>
+	<Select name="nonmorph" options="{#keywordsNonMorphOptions}" className="->> frameless" tooltip="true"/>
 	<span class="bold">{@in}</span>
 	
 	<Checkbox name="searchInDocumentation" props="{#docCheckboxOptions}"/>
@@ -9,7 +9,7 @@
 	
 	<div class="@add-request">
 		<span>{@addRequest}</span>
-		<::tooltip className="question-tooltip" key="keywordsNewReq"/>
+		<::tooltip className="->> question-tooltip" key="keywordsNewReq"/>
 	</div>
 	<div class="tooltip keywords-hint"/>
 </div>

@@ -14,18 +14,18 @@ initial helpers = [
 ];
 
 function onLoaded(filters) {
-	$filters = filters;
-	$total = this.getTotalCount(),
-	$subscribed = this.getSubscribedCount();	
+	$filters <<- = filters;
+	$total <<- = this.getTotalCount(),
+	$subscribed <<- = this.getSubscribedCount();	
 }
 
 function getTotalCount() {
-	return Decliner.getCount('filter', $filters);
+	return Decliner.getCount('filter', $filters <<-);
 }
 
 function getSubscribedCount() {
 	var subscribedCount = 0;
-	$filters.each(function(filter) {
+	$filters <<- .each(function(filter) {
 		if (filter['isSubs'] == 1) subscribedCount++;
 	});
 	return Decliner.getCount('subscr', subscribedCount);
@@ -39,8 +39,8 @@ function onSubscribeButtonClick(target, e) {
 	var filterId = e.getTargetData('.->> @filter-row', 'filterId');
 	if (filterId) {
 		Filters.subscribe({
-			'filterId': filterId,
-			'value': target.hasClass('->> subscribed') ? '0' : '1'
+			'filterId <<-': filterId,
+			'value <<-': target.hasClass('->> subscribed') ? '0' : '1'
 		});
 	}
 }

@@ -95,7 +95,7 @@ function clear() {
 }
 
 function onVariantPick(target) {
-	--> pick (target.getData('value'))
+	--> pick (target->value)
 	this.clear();
 }
 
