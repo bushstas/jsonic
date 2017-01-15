@@ -933,6 +933,11 @@ class JSCompiler
 
 	private	function addTemplateFunction($className, $templateContent, &$class) {
 		$tmpids = array();
+		if ($this->configProvider->needJsObfuscation()) {
+			JSObfuscator::obfuscate($templateContent);
+		} else {
+			JSObfuscator::removeMarks($templateContent);
+		}
 		$templateFunctions = TemplateParser::parse($templateContent, $class, $className, $tmpids);
 		foreach ($templateFunctions as $templateFunction) {
 			$let = '';

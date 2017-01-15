@@ -84,9 +84,7 @@ class Builder
 		$this->templateCompiler -> run ($this->files['template'], $this->files['include']);
 		$this->jsCompiler       -> run ();
 
-		if ($this->config->needJsObfuscation()) {
-			JSObfuscator::saveData();
-		}
+		JSObfuscator::saveData($this->config->needJsObfuscation());
 	}
 
 	public function getCompiler($compilerName) {

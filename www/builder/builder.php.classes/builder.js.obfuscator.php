@@ -27,7 +27,7 @@ class JSObfuscator
 				$jsOutput .= self::$map[$names[$i]];
 			}
 		}
-		self::removeMarks($jsOutput);
+		$jsOutput = preg_replace('/ *<<-/', '', $jsOutput);
 	}
 	
 
@@ -56,16 +56,19 @@ class JSObfuscator
 		return $name;
 	}
 
-	public static function saveData() {
+	public static function saveData($needObfuscation = false) {
 		$data = "<?php \n\n\$map = array(\n";
-		foreach (self::$map as $k => $v) {
-			$data .= "\t'".$k."' => '".$v."',\n";
+		if ($needObfuscation) {
+			foreach (self::$map as $k => $v) {
+				$data .= "\t'".$k."' => '".$v."',\n";
+			}
 		}
 		$data .= ");\n\n?>";
 		file_put_contents('builder.php.classes/data/js.map.php', $data);
 	}
 
 	public static function removeMarks(&$jsOutput) {
+		$jsOutput = preg_replace('/<<-\s+(?=[\.\[])/', '<<-', $jsOutput);
 		$jsOutput = preg_replace('/ *<<-/', '', $jsOutput);
 	}
 }

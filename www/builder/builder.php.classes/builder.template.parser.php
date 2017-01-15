@@ -146,7 +146,6 @@ class TemplateParser
 	}
 
 	public static function parse($template, &$class, $className = '', &$tmpids = '') {
-		JSObfuscator::obfuscate($template);
 		self::$class = &$class;
 		self::$className = $className;
 		$template = preg_replace('/[\t\r\n]/', '', $template);

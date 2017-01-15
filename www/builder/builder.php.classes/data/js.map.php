@@ -1,21 +1,21 @@
 <?php 
 
 $map = array(
-	'filters' => 'm',
-	'filterId' => 'q',
+	'filters' => 'b',
+	'filterId' => 'k',
 	'numbers' => 'j',
-	'header' => 'h',
-	'isAutoOpen' => 'p',
-	'total' => 'f',
-	'subscribed' => 'r',
-	'value' => 'k',
-	'today' => 'y',
-	'yesterday' => 'g',
-	'current' => 'o',
-	'week' => 'x',
-	'month' => 'u',
-	'freqSubs' => 'n',
-	'isSubs' => 'v',
+	'header' => 'i',
+	'isAutoOpen' => 'y',
+	'total' => 'c',
+	'subscribed' => 'v',
+	'value' => 'f',
+	'today' => 'l',
+	'yesterday' => 'a',
+	'current' => 'q',
+	'week' => 'g',
+	'month' => 'h',
+	'freqSubs' => 'p',
+	'isSubs' => 'w',
 );
 
 ?>
