@@ -587,11 +587,11 @@ class TemplateParser
 			$isTemplate = false;
 			$isComponent = false;
 			$usedClasses = ClassAnalyzer::getUsedClasses();
-			if ($tagName == 'template' || $tagName == 'include' || $tagName[0] == ':')
+			if ($tagName[0] == ':')
 			{
 				if (!$item['isClosing']) {
 					$isTemplate = true;
-					self::getTemplateProperties($item['content'], $child, $tagName == 'include');
+					self::getTemplateProperties($item['content'], $child);
 				} else {
 					return null;
 				}
@@ -963,7 +963,7 @@ class TemplateParser
 		unset($child['is']);
 	}
 
-	private static function getTemplateProperties($html, &$child, $isInclude = false) {
+	private static function getTemplateProperties($html, &$child) {
 		$tmpName = '';
 		if (preg_match('/^<:{1,2}(\w+)/', $html, $match)) {
 			$tmpName = $match[1];
