@@ -40,7 +40,7 @@ function onLoad(data) {
 }
 
 function onAdd(data) {
-	
+
 }
 
 function onSubscribe() {

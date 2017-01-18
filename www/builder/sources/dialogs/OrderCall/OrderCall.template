@@ -1,5 +1,7 @@
 {template .content}
 <OrderCallForm/>
+
+{template .buttons}
 <div class="standart-button order-support" onClick="onSupportButtonClick">
 	{@toSupport}
 </div>

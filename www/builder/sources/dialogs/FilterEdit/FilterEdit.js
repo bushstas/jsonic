@@ -1,4 +1,4 @@
-dialog FilterEdit;
+dialog FilterEdit
 
 initial props = {
 	'title': @filterSaving

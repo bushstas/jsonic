@@ -13,7 +13,6 @@ class JSInterpreter
 		self::parseArrayPushOperators($content);
 		self::parseGetDataShortcuts($content);
 		self::parseObjectGets($content);
-		self::parseDialogShortcuts($content);
 		self::parseDispatchEventShortcuts($content);
 		self::parseTagShortcuts($content);		
 		self::cleanCode($content);
@@ -120,12 +119,6 @@ class JSInterpreter
 				}
 			}
 		}
-	}
-
-	private static function parseDialogShortcuts(&$content) {
-		$content = preg_replace('/\+\+> *(\w+) *(\((.*)\))* */', "Dialoger.show($1,$3)", $content);
-		$content = preg_replace('/<\+\+ *(\w+) *(\((.*)\))* */', "Dialoger.hide($1,$3)", $content);
-		$content = preg_replace('/\+> *(\w+) *(\((.*)\))*/', " Dialoger.get($1,$3)", $content);
 	}
 
 	private static function parseDispatchEventShortcuts(&$content) {

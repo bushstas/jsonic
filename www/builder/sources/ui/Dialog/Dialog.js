@@ -31,8 +31,12 @@ function close() {
 	this.onHide();
 }
 
-function expand() {
-	$expanded!;
+function expand(isExpanded) {
+	if (isBool(isExpanded)) {
+		$expanded = isExpanded;
+	} else {
+		$expanded!;
+	}
 }
 
 function onShow() {}

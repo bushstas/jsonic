@@ -18,5 +18,5 @@ function onLoadFilters(filters) {
 }
 
 function onSaveFilterClick() {
-	++>FilterEdit ({'filterId': GlobalState.get('filterId')});
+	FilterEdit.show({'filterId': GlobalState.get('filterId')});
 }

@@ -1,12 +1,15 @@
 {template .main}
 <div class="@mask {$shown?'->>shown'}" onClick="close"/>
 <div class="@ {$expanded?'->>expanded'} {$shown?'->>shown'}" style="width:{$width}px;margin-left:{$marginLeft};margin-top:{$marginTop};" scope>
-	<div if="{~closable}" class="@close" onClick="close"/>	
-	<div if="{~expandable}" class="@expand" onClick="expand"/>
+	<div if="{$closable}" class="@close" onClick="close"/>	
+	<div if="{$expandable}" class="@expand" onClick="expand"/>
 	<div class="@title">
 		{$title}
 	</div>
 	<div class="@content" style="{$height?'max-height:'+$height+'px;'}">
 		<:content/>
 	</div>
+	<div class="@buttons">
+		<:buttons/>
+	</div>	
 </div>

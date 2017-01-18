@@ -393,22 +393,6 @@
 			<xmp>===> everythingReady (param, ...);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
 
 			$items[] = true;
-			$items[] = 'Диалоговые окна';
-			$items[] = false;
-
-			$items[] = '<b>+> OrderFormDialog</b> - Возвращает диалоговое окно с классом OrderFormDialog 
-			<xmp>var dialog = +> OrderFormDialog;</xmp><xmp>var dialog = Dialoger.get(OrderFormDialog);</xmp>
-			<xmp>+>OrderFormDialog(\'someUniqueId\').doSomeMethod();</xmp><xmp>Dialoger.get(OrderFormDialog, \'someUniqueId\').doSomeMethod();</xmp>';
-
-			$items[] = '<b>++> OrderFormDialog</b> - Показывает диалоговое окно с классом OrderFormDialog 
-			<xmp>++> OrderFormDialog;</xmp><xmp>Dialoger.show(OrderFormDialog);</xmp>
-			<xmp>++>OrderFormDialog(\'someUniqueId\');</xmp><xmp>Dialoger.show(OrderFormDialog, \'someUniqueId\');</xmp>';
-
-			$items[] = '<b><++ OrderFormDialog</b> - Скрывает диалоговое окно с классом OrderFormDialog 
-			<xmp><++ OrderFormDialog;</xmp><xmp>Dialoger.hide(OrderFormDialog);</xmp>
-			<xmp><++OrderFormDialog(\'someUniqueId\');</xmp><xmp>Dialoger.hide(OrderFormDialog, \'someUniqueId\');</xmp>';
-
-			$items[] = true;
 			$items[] = 'Утилиты';
 			$items[] = false;
 			$items[] = '<b>object{ \'key\' }</b> - Не вызывая ошибок возвращает поле объекта или массива, если переменная определена и имеет один из этих типов 
@@ -519,7 +503,34 @@
 			$items[] = "Будьте внимательны, следите, чтобы маркеры были добавлены везде, например в коде шаблонов<xmp>\$filters <<- = data['filters <<-'];</xmp>В шаблоне код будет выглядеть примерно так:<xmp><div class=\"filter-items\">\n\t{foreach \$filters <<- as &filter}\n\t\t<div class=\"filter-item\">\n\t\t\t{&filter.name <<-}\n\t\t</div>\n\t{/foreach}\n</div></xmp>";
 
 		break;
+
+		case 'dialogs':
+			$items[] = "Для диалоговых окон заведите отдельную папку, например под названием <b>dialogs</b>";
+			$items[] = "Классы диалоговых окон имеют свой собственный тип и следующий вид:<xmp>dialog Confirm extends Alert, CustomDialog\n\nfunction initiate() {\n\n}</xmp>";
+			$items[] = "Данный тип классов автоматически наследуется от класса <b>Dialog</b>, который должен обязательно присутствовать, иначе приложение не будет скомпилировано";
+			$items[] = "Так что запись dialog A extends Dialog необязательна, достаточно просто dialog A";
+			$items[] = "Для задания диалоговому окну необходимых параметров используйте initial параметр <b>props</b><xmp>initial props = {\n\t'title': 'Заголовок',\n\t'closable': true,\n\t'shown': false,\n\t'expandable': true,\n\t'expanded': false,\n\t'width': 1000,\n\t'height': 400\n}</xmp>";
+			$items[] = "Файл с шаблонами диалогового окна не должен содержать шаблона с именем <b>main</b>, главный шаблон наследуется от класса <b>Dialog</b>. Вместо него создайте шаблон <b>content</b>, в котором опишите содержание диалогового окна<xmp>{template .content}\n<div class=\"dialog-confirm-content\">\n\t...\n</div></xmp>";
+			$items[] = "Для добавления кнопок диалоговому окну создайте шаблон <b>buttons</b>, в котором опишите нужные кнопки<xmp>{template .buttons}\n<div class=\"dialog-button send\" onClick=\"handleSending\">\n\tОтправить\n</div></xmp>";
+			$items[] = "Диалоговые окна могут быть включены в шаблоны других компонентов, они могут рендерится как обычные компоненты:<xmp><Button>\n\t<Confirm title=\"Подтвердите удаление\" shown=\"{\$dialogShown}\" onConfirm=\"this.handleConfirm\"/>\n</Button></xmp>";
+			$items[] = "Или же можно использовать класс-хелпер <b>Dialoger</b>, который позволяет рендерить окна налету";
+			$items[] = "Показать окно (отрендерить, если его не существует):<xmp>Dialoger.show(Confirm, {'text': ...});</xmp>";
+			$items[] = "Второй аргумент передает объект параметров, которые автоматически преобразуются в <b>props</b>";
+			$items[] = "Чтобы хелпер мог различать окна, например когда есть несколько окон одного класса, передайте в параметрах поле <b>did</b><xmp>Dialoger.show(ItemInfo, {'data': data['89363547'], 'did': 89363547});\nDialoger.show(ItemInfo, {'data': data['93654893'], 'did': 93654893});</xmp>Укороченная версия, преобразуется в код представленный выше:<xmp>Confirm.show();\nConfirm.show({'text': ...});\nItemInfo.show({'data': data['93654893'], 'did': 93654893});</xmp>";
+			$items[] = "Закрыть окно:<xmp>Dialoger.hide(Confirm);\nConfirm.hide();</xmp>";
+			$items[] = "Закрыть окно с определенным идентификатором:<xmp>Dialoger.hide(ItemInfo, 89363547);\nItemInfo.hide(89363547);</xmp>";
+			$items[] = "Получить окно:<xmp>var confirmDialog = Dialoger.get(Confirm);\nConfirm.get();</xmp>";
+			$items[] = "Получить окно с определенным идентификатором:<xmp>var itemInfoDialog = Dialoger.get(ItemInfo, 89363547);\nItemInfo.get(89363547);</xmp>";
+			$items[] = "Максимизировать окно:<xmp>Dialoger.expand(WriteLetter);\nWriteLetter.expand();</xmp>";
+			$items[] = "Максимизировать окно с определенным идентификатором:<xmp>Dialoger.expand(ItemInfo, 89363547);\nItemInfo.expand(89363547);</xmp>";
+			$items[] = "Минимизировать окно:<xmp>Dialoger.minimize(WriteLetter);\nWriteLetter.minimize();</xmp>";
+			$items[] = "Минимизировать окно с определенным идентификатором:<xmp>Dialoger.minimize(ItemInfo, 89363547);\nItemInfo.minimize(89363547);</xmp>";
+			$items[] = "Уничтожить окно:<xmp>Dialoger.dispose(Confirm);\nConfirm.dispose();</xmp>";
+			$items[] = "Уничтожить окно с определенным идентификатором:<xmp>Dialoger.dispose(ItemInfo, 89363547);\nItemInfo.dispose(89363547);</xmp>";
+		break;
 	}
+
+
 	include_once 'header.php';
 	$start = 0;
 	if ($items[0] === true && $items[2] === false) {

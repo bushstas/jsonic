@@ -1,46 +1,64 @@
 function Dialoger() {
-	var dialogs = {};
-	var currentDialogId, currentDialogClass, currentDialog,
-		currentDialogOptions;
-	this.show = function(dialogClass, options, dialogId) {
-		if (isFunction(dialogClass)) {
-			currentDialogOptions = options;
-			defineDialogId(dialogClass, dialogId);
+	var ds = {};
+	var cid, dc, d, opts;
+	this.show = function(c, options) {
+		if (isFunction(c)) {
+			var id;
+			if (isObject(options)) {
+				id = options['did'];
+			}
+			opts = options;
+			defineId(c, id);
 			defineDialog();
 			showDialog();
 		}
 	};
-	this.hide = function(dialogClass, dialogId) {
-		defineDialogId(dialogClass, dialogId);
-		if (dialogs[currentDialogId]) dialogs[currentDialogId].close();
+	this.hide = function(c, id) {
+		defineId(c, id);
+		if (ds[cid]) ds[cid].close();
 	};
-	this.get = function(dialogClass, dialogId) {
-		defineDialogId(dialogClass, dialogId);
-		return dialogs[currentDialogId];
+	this.get = function(c, id) {
+		defineId(c, id);
+		return ds[cid];
 	};
-	var defineDialogId = function(dialogClass, dialogId) {
-		currentDialogClass = dialogClass;
-		currentDialogId = currentDialogClass.name + (isString(dialogId) ? '_' + dialogId : '');
+	this.expand = function(c, id) {
+		defineId(c, id);
+		if (ds[cid]) ds[cid].expand(true);
+	};
+	this.minimize = function(c, id) {
+		defineId(c, id);
+		if (ds[cid]) ds[cid].expand(false);
+	};
+	this.dispose = function(c, id) {
+		defineId(c, id);
+		if (ds[cid]) ds[cid].dispose();
+		delete ds[cid];
+	};
+	var defineId = function(c, id) {
+		dc = c;
+		if (!isFunction(c)) return '_';
+		cid = c.name + (isPrimitive(id) ? '_' + id : '');
 	};
 	var defineDialog = function() {
-		if (isUndefined(dialogs[currentDialogId])) {
-			dialogs[currentDialogId] = new currentDialogClass();
-			Core.initiate.call(dialogs[currentDialogId]);
-			dialogs[currentDialogId].render(document.body);
+		if (isUndefined(ds[cid])) {
+			ds[cid] = new dc();
+			Core.initiate.call(ds[cid]);
+			ds[cid].render(document.body);
 		}
-		currentDialog = dialogs[currentDialogId];
+		d = ds[cid];
 	};
 	var showDialog = function() {
-		if (isObject(currentDialogOptions)) {
-			currentDialog.set(currentDialogOptions);
+		if (isObject(opts)) {
+			d.set(opts);
 		}
-		currentDialog.show();
+		d.show();
 	};
 	var closeAll = function() {
-		for (var k in dialogs) {
-			dialogs[k].hide();
+		for (var k in ds) {
+			ds[k].hide();
 		}
 	};
 	window.addEventListener('popstate', closeAll);
 }
 Dialoger = new Dialoger();
+var {{DIALOGER}} = Dialoger;

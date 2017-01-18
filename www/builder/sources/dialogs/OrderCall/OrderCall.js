@@ -6,7 +6,7 @@ initial props = {
 
 function onSupportButtonClick() {
 	this.hide();
-	++> Support
+	Support.show();
 }
 
 function onShow() {

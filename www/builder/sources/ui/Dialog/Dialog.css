@@ -41,3 +41,9 @@ $imgsrc = ../images/ui/
 ~c:hover {
     $opac10
 }
+.@buttons ==b {
+
+}
+~b:empty {
+    $none
+}

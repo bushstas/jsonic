@@ -1009,6 +1009,7 @@ class JSCompiler
 
 	private function parseClasses() {
 		ControllersParser::init($this->classes, $this->sources, $this->classesByTypes['controller'], $this->initialsParser);
+		DialogsParser::init($this->classes, $this->sources, $this->classesByTypes['dialog'], $this->initialsParser);
 		$globals = JSGlobals::getVarNames();
 		$classNames = array_keys($this->classes);
 		$coreClassNames = $this->reservedNames;
@@ -1060,6 +1061,7 @@ class JSCompiler
 			JSParser::parse($class);
 			JSChecker::check($class);
 			ControllersParser::parse($class);
+			DialogsParser::parse($class);
 
 			$this->checkSuperClassesCallings($class);
 

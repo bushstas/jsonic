@@ -31,7 +31,8 @@ class JSGlobals
 		'controllers'      => '__CTR',
 		'controller'       => '__C',
 		'stop'             => '__SP',
-		'prevent'          => '__PD'
+		'prevent'          => '__PD',
+		'dialoger'         => '__DI'
 	);
 
 	private static $errors = array(
@@ -97,7 +98,8 @@ class JSGlobals
 			'TEXTS'           => self::$varNames['textNodes'],
 			'CONSTANTS'       => self::$varNames['textConstants'],
 			'CONTROLLERS'     => self::$varNames['controllers'],
-			'CONTROLLER'      => self::$varNames['controller']
+			'CONTROLLER'      => self::$varNames['controller'],
+			'DIALOGER'        => self::$varNames['dialoger']
 		);
 	}
 

@@ -15,5 +15,5 @@ function onLoaded(data) {
 }
 
 function onOrderCallButtonClick() {
-	++> OrderCall
+	OrderCall.show();
 }

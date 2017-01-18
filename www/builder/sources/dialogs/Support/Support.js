@@ -6,5 +6,5 @@ initial props = {
 
 function onOrderCallButtonClick() {
 	this.hide();
-	++> OrderCall
+	OrderCall.show();
 }
