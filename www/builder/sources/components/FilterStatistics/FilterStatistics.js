@@ -58,7 +58,7 @@ function updateFilterCount(data) {
 }
 
 function getCountForFilterWithIndex(index) {
-	var filter = $filters <<- { index };
+	var filter = $($filters <<-, index);
 	if (isObject(filter)) {
 		FiltersStat.load({'filterId <<-': filter.filterId <<-});
 	} else {

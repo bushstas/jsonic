@@ -129,6 +129,7 @@ class JSCompiler
 		$this->validateJsFolder();
 		$this->validateTooltipHelper();
 
+		JSInterpreter::init();
 		foreach ($jsFiles as $jsFile) {
 			$this->processJSFile($jsFile);
 		}
@@ -464,7 +465,6 @@ class JSCompiler
 		if (!empty($texts) && TagClassNameParser::parseTexts($texts, $className)) {
 			TextParser::setTexts($texts, $className);
 		}
-		JSInterpreter::parse($content, $className);
 	}
 	
 	private function validateEntry() {

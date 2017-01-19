@@ -1,14 +1,11 @@
 <?php
-
 	$topic = $_GET['topic'];
-
 	$items = array();
 	switch ($topic) {
 		case 'config':
 			$items[] = true;
 			$items[] = 'Приложение';
 			$items[] = false;
-
 			$items[] = "<b>indexPage</b> - Название индексного файла страниц приложения. Компилятор автоматически генерирует индексные файлы
 			<xmp>\"indexPage\": \"index.html\"</xmp>";
 			$items[] = "<b>title</b> - Заголовок страницы. Компилятор автоматически вставляет это значение в HTML код страницы
@@ -29,12 +26,9 @@
 			<xmp>\"pathToApi\": \"api\"</xmp>";
 			$items[] = "<b>container</b> - Класс DOM элемента, куда будут отрендерены классы с типом view. Сам элемент должен присутстовать в шаблоне класса указанного в параметре <b>entry</b>. При его отсутствии, будет сгенерирован пустой элемент в самом низу DOM
 			<xmp>\"container\": \"app-view-container\"</xmp>";
-
-
 			$items[] = true;
 			$items[] = 'Исходные коды';
 			$items[] = false;
-
 			$items[] = "<b>entry</b> - Название класса точки входа с типом application. Располагайте в одноименной директории
 			<xmp>\"entry\": \"App\"</xmp>";
 			$items[] = "<b>scope</b> - Путь к директории, в пределах которой будет производиться поиск файлов источников, относительно директории builder
@@ -53,7 +47,6 @@
 			$items[] = true;
 			$items[] = 'Роутер';
 			$items[] = false;
-
 			$items[] = "<b>router</b> - Описание классов с типом view, символизирующих страницы приложения, и путей к ним
 			<xmp>\"router\": \"{ ... }\"</xmp>
 			<ul>
@@ -134,7 +127,6 @@
 				</li>
 				
 			</ul>";
-
 			$items[] = true;
 			$items[] = 'Пользователь';
 			$items[] = false;
@@ -149,22 +141,16 @@
 			<xmp>\"fullAccess\": 50</xmp>";
 			$items[] = "<b>adminAccess</b> - минимальный уровень доступа пользователя, который может считаться админом. Необходим для работы метода <b>User.isAdmin</b>
 			<xmp>\"adminAccess\": 100</xmp>";
-
-
 			$items[] = true;
 			$items[] = 'Прочее';
 			$items[] = false;
-
 			$items[] = "<b>pathToDictionary</b> - путь к api получения словаря относительно директории указанной в параметре <b>pathToApi</b>
 			<xmp>\"pathToDictionary\": \"dictionary/get.php\"</xmp>";
 			$items[] = "<b>tooltipApi</b> - путь к api получения текстов всплывающих подсказок относительно директории указанной в параметре <b>pathToApi</b>
 			<xmp>\"tooltipApi\": \"tooltip/get.php\"</xmp>";
 			$items[] = "<b>tooltipClass</b> - Класс для показа всплывающих подсказок. Смотрите документацию по хелперам, а именно <b>Tooltiper</b>
 			<xmp>\"tooltipClass\": \"TooltipPopup\"</xmp>";
-
 		break;
-
-
 		case 'user':
 			$items[] = 'Для настройки авторизации смотрите подсказки по <b>конфигу приложения</b>. Без указанных в конфиге путей к api авторизации, ее не будет как таковой';
 			$items[] = 'Если пути прописаны верно, то данные пользователя автоматичеки загрузятся в качестве первого шага работы приложения';
@@ -195,11 +181,9 @@
 		$items[] = '<b>setAttribute</b> - Устанавливает указанный атрибут пользователя, если третий аргумент == TRUE и в конфиге пользователя (смотрите подсказку по <b>конфигу приложения</b>) задан параметр <b>save</b> атрибут будет сохранен в БД<xmp>User.setAttribute(\'type\', \'usual\', true);</xmp>';
 		$items[] = '<b>setAttributes</b> - То же самое, только первым аргументом передается объект с полями атрибутами, а второй метка сохранять или нет в БД
 		<xmp>User.setAttributes({\'type\': \'usual\', ... });</xmp>';
-
 		$items[] = '<b>getSettings</b> - Возвращает все персональные настройки пользователя<xmp>var userSettings = User.getSettings();</xmp>';
 		$items[] = '<b>getSetting</b> - Возвращает указанную персональную настройку пользователя<xmp>var myFontSize = User.getSetting(\'fontSize\');</xmp>';
 		$items[] = '<b>setSetting</b> - Сохраняет указанную настройку локально и на сервере (если указан корректный параметр в конфиге <b>save</b>)<xmp>User.setSetting(\'fontSize\', 18);</xmp>';
-
 		$items[] = true;
 		$items[] = 'Login API';
 		$items[] = false;
@@ -227,15 +211,10 @@
 			</ul>";
 		$items[] = "<b>attributes</b> - Здесь содержатся данные пользователя: имя, телефон, email и т.д. Данный список атрибутов свободный
 		<xmp>\"attributes\": \"{ ... }\"</xmp>";
-
 		$items[] = "<b>settings</b> - Здесь содержатся персональные настройки пользователя относящиеся к работе клиента, например цвет фона сайта или размер шрифта.
 		<xmp>\"settings\": \"{ ... }\"</xmp>";
-
 		
-
-
 		break;
-
 		case 'shortcut':
 			$items[] = true;
 			$items[] = 'Функции';
@@ -243,97 +222,70 @@
 			$items[] = "<b>super(ParentClass)</b> - Вызов одноименного метода супер-класса с заданными параметрами или без, где первый аргумент имя родительского класса без кавычек
 			<xmp>function doSome() {\n\tsuper(ParentClass, arg1, arg2);\n}</xmp>преобразуется в:
 			<xmp>ChildClass.prototype.doSome = function() {\n\tParentClass.prototype.doSome.call(this, arg1, arg2);\n}</xmp>";
-
 			$items[] = "<b>super(ParentClass.doSomeOther)</b> - Вызов другого метода супер-класса с заданными параметрами или без, где первый аргумент имя родительского класса без кавычек
 			<xmp>function doSome() {\n\tsuper(ParentClass.doSomeOther, arg1, arg2);\n}</xmp>преобразуется в:
 			<xmp>ChildClass.prototype.doSome = function() {\n\tParentClass.prototype.doSomeOther.call(this, arg1, arg2);\n}</xmp>";
-
 			$items[] = "<b>function a(b:Corrector) {</b> - Применение корректора к аргументу функции, в данному случае корректора <b>DigitFilter</b>
 			<xmp>function setParams(data:DigitFilter) {\n\t...\n}</xmp>преобразуется в:
 			<xmp>Component.prototype.setParams = function(data) {\n\tdata = Corrector.correct('DigitFilter', data);\n\t...\n}</xmp>Подробнее о корректорах смотрите подсказку по классам корректорам";
-
 			$items[] = true;
 			$items[] = 'Реактивные переменные';
 			$items[] = false;
-
 			$items[] = '<b>$value = countedValue</b> - Устанавливает значение реактивной переменной
 			<xmp>this.set(\'value\', countedValue);</xmp>';
-
 			$items[] = '<b>var countedValue = $value</b> - Присваивает переменной значение реактивной переменной
 			<xmp>var countedValue = this.get(\'value\');</xmp>';
-
 			$items[] = '<b>$value=></b> - Устанавливает значение реактивной переменной из одноименной переменной
 			<xmp>this.set(\'value\', value);</xmp>';
-
 			$items[] = '<b>$isActive!</b> - Меняет значение (boolean) реактивной переменной на противоположное
 			<xmp>this.toggle(\'isActive\');</xmp>';
-
 			$items[] = '<b>get options, value</b> - Обычно используется в начале функции. Автоматически получает значения реактивных переменных и записывает их в одноименные переменные.
 			<xmp>var options = this.get(\'options\');</xmp><xmp>var value = this.get(\'value\');</xmp>';
-
 			$items[] = '<b>var *$items = []</b> - Означает, что данная переменная должна установить значение одноименной реактивной переменной в конце функции
 			<xmp>var *$items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp>Реальный код будет выглядеть так:
 			<xmp>var items = [];</xmp><xmp>items.push(1);</xmp><xmp>items.push(2);</xmp><xmp>this.set(\'items\', items);</xmp>';
-
 			$items[] = '<b>$value++</b> - Изменяет значение реактивной переменной на 1
 			<xmp>this.plusTo(\'value\', 1);</xmp>';
-
 			$items[] = '<b>$value--</b> - Изменяет значение реактивной переменной на -1
 			<xmp>this.plusTo(\'value\', -1);</xmp>';
-
 			$items[] = '<b>$value *= 5</b> - Умножает значение реактивной переменной на 5
 			<xmp>this.plusTo(\'value\', 5, \'*\');</xmp>';
-
 			$items[] = '<b>$value /= 10</b> - Делит значение реактивной переменной на 10
 			<xmp>this.plusTo(\'value\', 10, \'/\');</xmp>';
-
 			$items[] = '<b>$value %= 2</b> - Присваивает реактивной переменной значение равное остатку от деления его на 2
 			<xmp>this.plusTo(\'value\', 2, \'%\');</xmp>';
-
 			$items[] = '<b>$items.add([\'apple\', \'banana\'])</b> - Добавляет элемент или несколько элементов в конец реактивной переменной и вызывает обновление компонента
 			<xmp>this.addTo(\'items\', [\'apple\', \'banana\']);</xmp>';
-
 			$items[] = '<b>$items.add(\'apple\', 0)</b> - Вставляет элемент или несколько элементов в реактивную переменную в заданную позицию и вызывает обновление компонента
 			<xmp>this.addTo(\'items\', \'apple\', 0);</xmp>';
-
 			$items[] = '<b>$items.addOne([\'apple\'])</b> - Добавляет элемент в конец реактивной переменной и вызывает обновление компонента. Даже если переданный аргумент является массивом будет добавлен только один элемент - сам массив
 			<xmp>this.addOneTo(\'items\', [\'apple\']);</xmp>';
-
 			$items[] = '<b>$items.addOne(\'apple\', 0)</b> - Вставляет элемент в реактивную переменную в заданную позицию и вызывает обновление компонента. Даже если переданный аргумент является массивом будет добавлен только один элемент - сам массив
 			<xmp>this.addOneTo(\'items\', \'apple\', 0);</xmp>';
-
 			$items[] = '<b>$items.removeAt(2)</b> - Удаляет элемент с индексом 2 из реактивной переменной и вызывает обновление компонента
 			<xmp>this.removeByIndexFrom(\'items\', 2);</xmp>';
-
 			$items[] = '<b>$items.remove(\'apple\')</b> - Удаляет элемент с заданным значением из реактивной переменной и вызывает обновление компонента
 			<xmp>this.removeValueFrom(\'items\', \'apple\');</xmp>';
-
 			$items[] = '<b>$items.each(function() {})</b> - Вызывает функцию обработчик для каждого элемента реактивной переменной
 			<xmp>this.each(\'items\', function() {});</xmp>';
-
 			$items[] = true;
 			$items[] = 'Объекты DOM';
 			$items[] = false;
-
 			$items[] = '<b>&lt;&gt;</b> - Возвращает элемент компонента помеченный как scope или элемент, в котором компонент отредерен
 			<xmp>var scope = <>;</xmp><xmp>var scope = this.getElement();</xmp>
 			<xmp>var r = <>.getRect();</xmp><xmp>var r = this.getElement().getRect();</xmp>';
-
 			$items[] = '<b>&lt;input&gt;</b> - Возвращает первый элемент в пределах компонента с тегом input
 			<xmp>var input = <input>;</xmp><xmp>var input = this.findElement(\'input\');</xmp>
 			<xmp>var v = <input>.value;</xmp><xmp>var v = this.findElement(\'input\').value;</xmp>
 			<xmp><input>.clear();</xmp><xmp>this.findElement(\'input\').clear();</xmp>';
-
 			$items[] = '<b>&lt;#container&gt;</b> - Возвращает первый элемент в пределах компонента, имеющий id = container
 			<xmp>var cnt = <#container>;</xmp><xmp>var cnt = this.findElement(\'#container\');</xmp>
 			<xmp>var h = <#container>.innerHTML;</xmp><xmp>var h = this.findElement(\'#container\').innerHTML;</xmp>
 			<xmp><#container>.hide();</xmp><xmp>this.findElement(\'#container\').hide();</xmp>';
-
 			$items[] = '<b>&lt;.item&gt;</b> - Возвращает первый элемент в пределах компонента, имеющий class = item
 			<xmp>var i = <.item>;</xmp><xmp>var i = this.findElement(\'.item\');</xmp>
 			<xmp>var h = <.item>.innerHTML;</xmp><xmp>var h = this.findElement(\'.item\').innerHTML;</xmp>
 			<xmp><.item>.show();</xmp><xmp>this.findElement(\'.item\').show();</xmp>';
-
 			$items[] = "<b>&lt;.@name&gt;</b> - Возвращает первый элемент в пределах компонента, имеющий сокращенный class = @name<br>
 			Сокращенное имя класса состоит из имени класса компонента и дополнительного слова (в данном случае <b>name</b>)<br>
 			Сокращения имен классов элементов подменяются на полные имена до парсинга самого кода шаблона<br><br>
@@ -345,41 +297,32 @@
 			<xmp><.@></xmp>
 			<xmp><.@name></xmp>
 			<xmp><.@price></xmp>";
-
 			$items[] = '<b>&lt;.block[]&gt;</b> - Возвращает все элементы в пределах компонента, имеющие class = block
 			<xmp>var blocks = <.block[]>;</xmp><xmp>var blocks = this.findElements(\'.block\');</xmp>
 			<xmp>var firstBlock = <.block[]>[0];</xmp><xmp>var firstBlock = this.findElements(\'.block\')[0];</xmp>';
-
 			$items[] = '<b>&lt;.item[2]&gt;</b> - Возвращает элемент с заданным индексом в пределах компонента, имеющий class = item
 			<xmp>var i = <.item[2]>;</xmp><xmp>var i = this.findElements(\'.item\')[2];</xmp>
 			<xmp>var h = <.item[2]>.innerHTML;</xmp><xmp>var h = this.findElements(\'.item\')[2].innerHTML;</xmp>
 			<xmp><.item[2]>.show();</xmp><xmp>this.findElements(\'.item\')[2].show();</xmp>';
-
 			$items[] = '<b>&lt;.item[idx]&gt;</b> - Возвращает элемент с индексом из переменной в пределах компонента, имеющий class = item
 			<xmp>var i = <.item[idx]>;</xmp><xmp>var i = this.findElements(\'.item\')[idx];</xmp>
 			<xmp>var h = <.item[idx]>.innerHTML;</xmp><xmp>var h = this.findElements(\'.item\')[idx].innerHTML;</xmp>
 			<xmp><.item[idx]>.show();</xmp><xmp>this.findElements(\'.item\')[idx].show();</xmp>';
-
 			$items[] = '<b>&lt;:list&gt;</b> - Возвращает уже закешированный элемент в пределах компонента, имеющий атрибут as = list
 			<xmp><ul class="items-list" as="list">'."\n\t<li>list item</li>\n".'</ul></xmp>
 			<xmp>var l = <:list>;</xmp><xmp>var l = this.getElement(\'list\');</xmp>
 			<xmp>var h = <:list>.innerHTML;</xmp><xmp>var h = this.getElement(\'list\').innerHTML;</xmp>
 			<xmp><:list>.show();</xmp><xmp>this.getElement(\'list\').show();</xmp>';
-
 			$items[] = '<b>&lt;::userInfo&gt;</b> - Возвращает уже закешированный дочерний компонент, имеющий атрибут as = userInfo
 			<xmp><component class="UserInfo" as="userInfo"></xmp>
 			<xmp>var ui = <::userInfo>;</xmp><xmp>var ui = this.getChild(\'userInfo\');</xmp>
 			<xmp>var uie = <::userInfo>.getElement();</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>';
-
 			$items[] = '<b>&lt;::userInfo&gt;&lt;&gt;</b> - Возвращает главный элемент дочернего компонента, имеющего атрибут as = userInfo
 			<xmp><component class="UserInfo" as="userInfo"></xmp>
 			<xmp>var uie = <::userInfo><>;</xmp><xmp>var uie = this.getChild(\'userInfo\').getElement();</xmp>';
-
-
 			$items[] = true;
 			$items[] = 'События';
 			$items[] = false;
-
 			$items[] = '<b>--> change</b> - Инициирует событие (в пределах компонента) change 
 			<xmp>--> change;</xmp><xmp>this.dispatchEvent(\'change\');</xmp>
 			<xmp>-->change(param, ...);</xmp><xmp>this.dispatchEvent(\'change\', param, ...);</xmp>';
@@ -387,23 +330,17 @@
 			$items[] = '<b>==> everythingReady</b> - Инициирует локальное (в пределах текущего маршрута) событие everythingReady 
 			<xmp>==> everythingReady;</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\');</xmp>
 			<xmp>==> everythingReady (param, ...);</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
-
 			$items[] = '<b>===> everythingReady</b> - Инициирует глобальное (в пределах всего приложения) событие everythingReady
 			<xmp>===> everythingReady;</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\');</xmp>
 			<xmp>===> everythingReady (param, ...);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
-
 			$items[] = true;
 			$items[] = 'Утилиты';
 			$items[] = false;
-			$items[] = '<b>object{ \'key\' }</b> - Не вызывая ошибок возвращает поле объекта или массива, если переменная определена и имеет один из этих типов 
-			<xmp>var item = object{ \'key\' }</xmp><xmp>var item = Objects.get(object, \'key\');</xmp>';
-
-			$items[] = '<b>list{ 45, defaultValue }</b> - Не вызывая ошибок пытается получить элемент массива с индексом 45, если переменная list не массив или она не имеет указанного индекса, возвращается второй аргумент defaultValue
-			<xmp>var item = list{ 45, defaultValue }</xmp><xmp>var item = Objects.get(list, 45, defaultValue);</xmp>';
-
+			$items[] = '<b>$(data, \'key\')</b> - Не вызывая ошибок возвращает поле объекта или массива, если переменная определена и имеет один из этих типов 
+			<xmp>var item = $(data, \'key\');</xmp><xmp>var item = Objects.get(data, \'key\');</xmp>';
+			$items[] = '<b>$(list, 45, defaultValue)</b> - Не вызывая ошибок пытается получить элемент массива с индексом 45, если переменная list не массив или она не имеет указанного индекса, возвращается второй аргумент defaultValue
+			<xmp>var item = $(list, 45, defaultValue);</xmp><xmp>var item = Objects.get(list, 45, defaultValue);</xmp>';
 		break;
-
-
 		case 'tmp':
 			$items[] = 'Место расположения не важно, но лучше располагайте шаблоны в тех же папках, что и JS файлы классов (далее компоненты)';
 			$items[] = 'Имя важно, обязательно называйте их так же, как и JS файлы, например <b>UICheckbox</b>';
@@ -425,7 +362,6 @@
 			$items[] = "Вызов такого шаблона будет выглядеть так:<xmp><template tmpid=\"name\" value=\"1\" text=\"some text\"></xmp>";
 			$items[] = "Тогда динамический вызов будет иметь вид:<xmp>{foreach ~columns as &column}\n\t<template tmpid=\"{&column['name']}\" data=\"{&column['data']}\">\n{/foreach}</xmp>";
 		break;
-
 		case 'tmpcode':
 			$items[] = "Вывод входящих аргументов<xmp>{template .example1}\n\t<div class=\"container\">{~text}</div>\n{/template}</xmp>";
 			$items[] = "Вывод реактивных переменных класса<xmp>{template .example2}\n\t<div class=\"container\">{\$content}</div>\n{/template}</xmp>";
@@ -444,11 +380,8 @@
 							<xmp>{template .example10}\n\t<div class=\"container\" data-value=\"{\$value?\$value:'none'}\"></div>\n{/template}</xmp>
 							<xmp>{template .example11}\n\t<div class=\"container\" text=\"{\$text?\$text}\"></div>\n{/template}</xmp>
 						";
-
 						
 		break;
-
-
 		case 'attr':
 			$items[] = true;
 			$items[] = 'Общие атрибуты';
@@ -464,16 +397,13 @@
 			$items[] = 'Атрибуты шаблонов';
 			$items[] = false;
 			$items[] = '<b>tmpid</b> - говорит, что шаблон будет включен по его id, например динамически<xmp><template tmpid="{&tmpid}"></xmp>';
-
 			$items[] = true;
 			$items[] = 'Атрибуты компонетов';
 			$items[] = false;
 			$items[] = '<b>сmpid</b> - задает компоненту его id, чтобы его можно было найти<xmp><component as="mainMenu"></xmp><xmp>this.getChild(\'mainMenu\');</xmp>';
 			$items[] = '<b>class</b> - обязательный атрибут, который использует компилятор, показывает к какому классу принадлежит компонент<xmp><component class="Tooltip" as="tooltip"></xmp>';
 			$items[] = '<b>name</b> - обязательный атрибут для компонентов с типом control, нужен для поиска контролов, сборки данных форм или просто вложенных контролов<xmp><control class="Select" name="color"></xmp><xmp>this.getControl(\'color\');</xmp>';
-
 		break;
-
 		case 'events':
 			$items[] = "События применимы как в элементам DOM так и к компонентам";
 			$items[] = "Чтобы добавить событие к элементу добавьте соответствующий атрибут в его тег<xmp><div onClick=\"handleClick\"></xmp>";
@@ -490,7 +420,6 @@
 			$items[] = "Чтобы просто вызвать у события <b>stopPropagation</b> и не создавать при этом отдельный метод, используйте ключевое слово <b>stop</b><xmp><div onClick=\":stop\"></xmp>";
 			$items[] = "Для вызова <b>preventDefault</b>, используйте ключевое слово <b>prevent</b><xmp><div onClick=\":prevent\"></xmp>";
 		break;
-
 		case 'jsobfus':
 			$items[] = "JS обфускация необходима для обфусцирования названий переменных, полей, функций";
 			$items[] = "Обфусцировав данные, компилятор создает карту соответствий";
@@ -501,9 +430,7 @@
 			$items[] = "После маркера также допускаются пробелы, как в третьем примере выше";
 			$items[] = "Каждую компиляцию названиям присваиваются случайные сокращения. Для избежания проблем с кешированием на стороне клиента, используйте опцию случайного имени скомпилированного файла";
 			$items[] = "Будьте внимательны, следите, чтобы маркеры были добавлены везде, например в коде шаблонов<xmp>\$filters <<- = data['filters <<-'];</xmp>В шаблоне код будет выглядеть примерно так:<xmp><div class=\"filter-items\">\n\t{foreach \$filters <<- as &filter}\n\t\t<div class=\"filter-item\">\n\t\t\t{&filter.name <<-}\n\t\t</div>\n\t{/foreach}\n</div></xmp>";
-
 		break;
-
 		case 'dialogs':
 			$items[] = "Для диалоговых окон заведите отдельную папку, например под названием <b>dialogs</b>";
 			$items[] = "Классы диалоговых окон имеют свой собственный тип и следующий вид:<xmp>dialog Confirm extends Alert, CustomDialog\n\nfunction initiate() {\n\n}</xmp>";
@@ -529,15 +456,12 @@
 			$items[] = "Уничтожить окно с определенным идентификатором:<xmp>Dialoger.dispose(ItemInfo, 89363547);\nItemInfo.dispose(89363547);</xmp>";
 		break;
 	}
-
-
 	include_once 'header.php';
 	$start = 0;
 	if ($items[0] === true && $items[2] === false) {
 		echo '<h3>'.$items[1].'</h3>';
 		$start = 3;
 	}
-
 	echo '<ul style="margin-top: 20px;">';
 	$caption = false;
 	for ($i = $start; $i < count($items); $i++) {

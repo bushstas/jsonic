@@ -24,10 +24,10 @@ function onShowButtonClick() {
 	this.show();
 }
 
-function show() {
+function show() { 
 	var innerElement = <.@inner-container>;
 	var rect = innerElement.getRect();
-	var height = Math.min(rect.height, this.options{ 'maxHeight', 400 });
+	var height = Math.min(rect.height, $(this.options, 'maxHeight', 400));
 	this.setStyle({maxHeight: height + 'px', height: height + 'px'});
     this.button.addClass('active');
     Popuper.watch(this);

@@ -65,7 +65,7 @@ class Gatherer
 				foreach ($files as $file) {
 					if ($file == '..' || $file == '.') continue;
 					$path = $dir."/".$file;
-					if (is_dir($path)) {						
+					if (is_dir($path)) {
 						$cleanPath = preg_replace('/^\.\//', '', $path);
 						if ($cleanPath == $testsPath) {
 							new Error($this->errors['testDirInScope'], array($testsPath, $this->config['pathToSrc']));
@@ -113,6 +113,27 @@ class Gatherer
 			TextParser::decode($content, 'gatherer');
 		}
 		return $content;
+	}
+
+	public static function getFiles($dir, $ext = '', $recursive = false) {
+		$files = array();
+		if (is_dir($dir)) {
+			$fs = scandir($dir);
+			if (is_array($fs)) {
+				foreach ($fs as $file) {
+					if ($file == '..' || $file == '.' || (!empty($ext) && !preg_match('/\.'.$ext.'$/i', $file))) continue;
+					$path = $dir."/".$file;
+					if (is_dir($path)) {
+						if ($recursive === true) {
+							$files = array_merge($files, self::getFiles($path, $ext, true));
+						}
+					} else {
+						$files[] = $path;
+					}
+				}
+			}
+		}
+		return $files;
 	}
 
 	public static function createFile($path, $content) {

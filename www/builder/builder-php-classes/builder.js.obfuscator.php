@@ -1,4 +1,5 @@
 <?php
+
 class JSObfuscator
 {
 	private static $map = array();
@@ -64,7 +65,7 @@ class JSObfuscator
 			}
 		}
 		$data .= ");\n\n?>";
-		file_put_contents('builder.php.classes/data/js.map.php', $data);
+		file_put_contents(PATH_TO_JS_MAP, $data);
 	}
 
 	public static function removeMarks(&$jsOutput) {

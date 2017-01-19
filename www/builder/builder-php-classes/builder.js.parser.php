@@ -23,9 +23,7 @@ class JSParser
 
 	public static function parse(&$class) {
 		$code = $class['content'];
-		$code = 'function __constructor(){}'.trim($code);
-		$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);	
-
+		$code = 'function __constructor(){}'.trim($code);		
 
 		$data = Splitter::split('/\bfunction +(\w+) *\(([^\)]*)\) *\{/', $code, 'all');		
 		$functions = array();
@@ -58,7 +56,8 @@ class JSParser
 				}
 				$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
 				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
-				JSInterpreter::parseFunction($code, $class['name']);
+				JSInterpreter::parse($code, $class['name']);
+				$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);	
 				$functions[] = array(
 					'name' => $functionName, 
 					'args' => $arguments,
@@ -78,7 +77,6 @@ class JSParser
 				}
 			}
 		}
-
 		$class['functions'] = $functions;
 		$class['functionList'] = $functionList;		
 		unset($class['content']);

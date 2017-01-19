@@ -57,7 +57,7 @@
 </style>
 </head>
 <body>
-	<form class="hint-form" method="GET" target="iframe" action="builder.php.classes/hint.php">
+	<form class="hint-form" method="GET" target="iframe" action="builder-php-classes/hint.php">
 		<input type="submit" value="Подсказка по" style="padding: 5px 10px;">
 		<select class="topic-select" name="topic">
 			<option value="config">конфигу приложения</option>

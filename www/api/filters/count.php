@@ -1,6 +1,6 @@
 <?php
 	
-	include '../../builder/builder.php.classes/obfuscator/obfuscator.php';	
+	include '../init.php';	
 	Obfuscator::obfuscate($_GET, true);
 	$filterId = $_GET['filterId'];
 

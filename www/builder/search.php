@@ -1,7 +1,7 @@
 <?php
 
-
-include 'builder.php.classes/builder.printer.php';
+include_once __DIR__.'/init.php';
+include FOLDER.'/builder.printer.php';
 
 $search = $_REQUEST['search'];
 if (empty($search)) {
@@ -33,6 +33,7 @@ $config = json_decode(file_get_contents('config.json'), true);
 $scope = $config['scope'];
 $tests = $config['tests'];
 $scripts = $config['scripts'];
+$apis = 'builder-php-classes';
 
 $files = array();
 if (!empty($scope) && is_dir($scope)) {
@@ -44,13 +45,16 @@ if (!empty($tests) && is_dir($tests)) {
 if (!empty($scripts) && is_dir($scripts)) {
     $files = array_merge($files, getDirContents($scripts));
 }
+if (!empty($apis) && is_dir($apis)) {
+    $files = array_merge($files, getDirContents($apis));
+}
 
 
 $found = array();
 foreach ($files as $file) {
     $content = file_get_contents($file);
     if ($isRegex) {
-        $parts = preg_split('/'.$search.'/', $content);
+        $parts = @preg_split('/'.$search.'/', $content);
     } else {
         $parts = explode($search, $content);
     }

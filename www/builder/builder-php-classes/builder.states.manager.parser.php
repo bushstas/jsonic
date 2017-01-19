@@ -32,7 +32,6 @@ class StatesManagerParser
 		self::parseLocalStates($code);
 		self::parseGlobalStates($code);
 		self::parseGetShortcuts($code);
-		self::parseDispatchShortcuts($code);
 	}
 
 	private static function validate($code) {
@@ -54,11 +53,6 @@ class StatesManagerParser
 		if (preg_match('/\bStateManager\b/', $code)) {
 			new Error(self::$errors['stateManagerUsing'], array(self::$functionName, self::$className));
 		}
-	}
-
-	private static function parseDispatchShortcuts(&$code) {
-		$code = preg_replace('/===> *(\w+) *(\((.*)\))* *;*/', "StateManager.dispatchEvent(this,1,'$1',$3);", $code);
-		$code = preg_replace('/==> *(\w+) *(\((.*)\))* *;*/', "StateManager.dispatchEvent(this,0,'$1',$3);", $code);
 	}
 
 	private static function parseLocalStates(&$code) {
