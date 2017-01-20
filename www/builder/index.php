@@ -64,6 +64,7 @@
 			<option value="user">авторизации пользователя</option>
 			<option value="chain">жизненному циклу</option>
 			<option value="shortcut">сокращениям</option>
+			<option value="initials">initial параметрам</option>
 			<option value="tmp">шаблонам</option>
 			<option value="tmpcode">коду в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>

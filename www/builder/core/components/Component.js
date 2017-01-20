@@ -5,15 +5,14 @@ function Component() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
 			this.preset('__loading', true);
-			this.loader = loader['controller'];
 			var isAsync = !!loader['async'];
 			var options = loader['options'];
 			if (isFunction(options)) options = options();
-			this.loader.addSubscriber('load', {
+			loader['controller'].addSubscriber('load', {
 				'initiator': this,
 				'callback': onDataLoad.bind(this, isAsync)
 			}, !!loader['private']);			
-			this.loader.doAction(this, 'load', options);
+			loader['controller'].doAction(this, 'load', options);
 			if (!isAsync) {
 				renderTempPlaceholder.call(this);
 				return;
@@ -30,6 +29,10 @@ function Component() {
 	var onDataLoad = function(isAsync, data) {
 		this.toggle('__loading');
 		this.onLoaded(data);
+		var loader = this.initials['loader'];
+		if (isFunction(loader['callback'])) {
+			loader['callback'].call(this);
+		}
 		if (!isAsync) onReadyToRender.call(this);
 	};
 
@@ -461,7 +464,6 @@ function Component() {
 		this.provider = null;
 		this.children = null;
 		this.disposed = true;
-		this.loader = null;
 		this.initials = null;
 		this.followers = null;
 		this.correctors = null;

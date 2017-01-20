@@ -431,6 +431,20 @@
 			$items[] = "Каждую компиляцию названиям присваиваются случайные сокращения. Для избежания проблем с кешированием на стороне клиента, используйте опцию случайного имени скомпилированного файла";
 			$items[] = "Будьте внимательны, следите, чтобы маркеры были добавлены везде, например в коде шаблонов<xmp>\$filters <<- = data['filters <<-'];</xmp>В шаблоне код будет выглядеть примерно так:<xmp><div class=\"filter-items\">\n\t{foreach \$filters <<- as &filter}\n\t\t<div class=\"filter-item\">\n\t\t\t{&filter.name <<-}\n\t\t</div>\n\t{/foreach}\n</div></xmp>";
 		break;
+
+		case 'initials':
+			$items[] = "Initial параметры помогают описать начальное состояние класса и настроить его";
+			$items[] = "Далее приводится список всех возможных параметров";
+			$items[] = "<b>props</b> - содержит объект параметров класса props<xmp>initial props = {\n\t'width': 1000\n}</xmp>";
+			$items[] = "<b>loader</b> - контроллер, который будет загружать компонент и, при необходимости, вызывать указанный callback.<br>Данный контроллер обязательно должен иметь в параметре initial actions поле <b>load</b><xmp>initial loader = {\n\t'controller': CustomLoader,\n\t'callback': this.onLoad,\n\t'async': true,\n\t'options': {...}\n}</xmp>";
+			$items[] = "controller - Имя класса контроллера";
+			$items[] = "callback - Имя метода, который будет вызван сразу после загрузки с загруженными данными в качестве аргумента.<br>Необязательное поле, вместо него можно описать все действия в методе <b>onLoaded</b>, который наследуется от класса Component";
+			$items[] = "async - Если true, компонент рендерится не дожидаясь загрузки, иначе ждет пока не загрузятся данные";
+			$items[] = "options - объект параметров, которые будут использованы в качестве GET параметров";
+			$items[] = "<b>controllers</b> - список контроллеров, на которые следует подписаться<xmp>initial controllers = [\n\t{\n\t\t'controller': ItemLoader,\n\t\t'on': {\n\t\t\t'load': this.handleItemsLoad,\n\t\t\t'remove': this.handleItemRemove\n\t\t},\n\t\t'private': true,\n\t\t'options': {\n\t\t\t'load': {...},\n\t\t\t'remove': {...}\n\t\t}\n\t}\n]</xmp>";
+		break;
+
+
 		case 'dialogs':
 			$items[] = "Для диалоговых окон заведите отдельную папку, например под названием <b>dialogs</b>";
 			$items[] = "Классы диалоговых окон имеют свой собственный тип и следующий вид:<xmp>dialog Confirm extends Alert, CustomDialog\n\nfunction initiate() {\n\n}</xmp>";

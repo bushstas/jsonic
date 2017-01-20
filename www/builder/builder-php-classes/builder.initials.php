@@ -32,7 +32,7 @@ class InitialsParser
 	);
 
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
-	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'args', 'helpers', 'followers', 'correctors', 'locals', 'listeners');
+	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'helpers', 'followers', 'correctors', 'locals', 'listeners');
 	private $initials = array();
 	private $originalInitials = array();
 	private $regexp = '/\binitial\s+([\s\S]+?)(?=(initial|function|@EOF))/';
@@ -175,7 +175,7 @@ class InitialsParser
 			case 'listeners':
 				return "<xmp>initial listeners = {\n\t'local': {\n\t\t'localEventName': this.onEventHandler\n\t},\n\t'global': {\n\t\t'globalEventName': this.onEventHandler2\n\t}\n}</xmp>";
 			case 'loader':
-				return "<xmp>initial loader = {\n\t'controller': ControllerClass,\n\t'async': true,\n\t'options': {\n\t\t'key': 'value'\n\t}\n}</xmp>";
+				return "<xmp>initial loader = {\n\t'controller': ControllerClass,\n\t'async': true,\n\t'callback': this.handleLoad,\n\t'options': {\n\t\t'key': 'value'\n\t}\n}</xmp>";
 			case 'options':
 				return "<xmp>initial options = {\n\t'key': 'id',\n\t'store': true,\n\t'storeAs': 'items',\n\t'storePeriod': '1day',\n\t'clone': true\n}</xmp>";
 			case 'args':
@@ -321,6 +321,7 @@ class InitialsParser
 		if (isset($initials['options']) && !$this->isAssocArray($initials['options'])) {
 			new Error($this->errors['incorrectOptions'], array($type, $this->currentClassName, $type, $value, $this->getInitialParamExample($type)));
 		}
+		$this->validateCallback($initials['callback'], $value, $type, 'callback');
 		$this->addControllerToClass($initials['controller']);
 	}
 
