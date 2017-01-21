@@ -345,6 +345,10 @@ contexts:
           captures:
             0: comment2.block.actionscript.2 
 
+        - match: \$:{1,2}\w+
+          captures:
+            0: support.class.actionscript.2
+
         - match: ::\w+
           captures:
             0: support.class.actionscript.2    

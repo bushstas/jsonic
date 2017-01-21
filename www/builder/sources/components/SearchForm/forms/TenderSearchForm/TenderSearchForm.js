@@ -5,10 +5,8 @@ initial props = {
 }
 
 initial listeners = {
-	'local': {
-		'TenderSearchFormChanged': this.onChange,
-		'TenderSearchFormGotParams': this.setParams
-	}
+	'TenderSearchFormChanged': this.onChange,
+	'TenderSearchFormGotParams': this.setParams
 }
 
 function onRendered() {
@@ -17,7 +15,8 @@ function onRendered() {
 	});
 
 	delay(6000) {
-		$::aaa = 'super-puper-class'
+		$:aaa = 'super-puper-class'
+		State.dispatchEvent('aaa');
 	}
 }
 

@@ -1,6 +1,5 @@
 function Component() {	
 	if (this !== window) return;
-	var eventTypes = {{EVENTTYPES}};
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
@@ -142,7 +141,7 @@ function Component() {
 		if (isArray(this.listeners)) {
 			for (var i = 0; i < this.listeners.length; i++) {
 				l = this.listeners[i];
-				if (isNumber(l['type'])) l['type'] = eventTypes[l['type']];
+				if (isNumber(l['type'])) l['type'] = {{EVENTTYPES}}[l['type']];
 				if (l['type'] == eventType) {
 					l['handler'].apply(l['subscriber'], args);
 				}
@@ -457,6 +456,7 @@ function Component() {
 	};
 
 	p.dispose = function() {
+		State.dispose(this);
 		unrender.call(this);
 		this.updaters = null;
 		this.parentElement = null;
@@ -469,8 +469,8 @@ function Component() {
 		this.correctors = null;
 		this.controls = null;
 	};
-	p.a = function(n, g) {
-		return StateManager.get(this, g, n);
+	p.a = function(n) {
+		return State.get(n);
 	};
 	var f = function(){return};
 	p.initOptions=f;

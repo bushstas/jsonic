@@ -49,16 +49,14 @@ function Level(component) {
 	var createUpdater = function(u, s, p) {
 		updaters = updaters || [];
 		if (p['n']) Core.createUpdater(u, component, s, p, updaters);
-		if (p['lc']) StateManager.createUpdater(u, component, s, p, false);
-		if (p['gl']) StateManager.createUpdater(u, component, s, p, true);
+		if (p['g']) State.createUpdater(u, component, s, p);
 	};
 
 	var createPropertyNode = function(props) {
-		var v = '', isFunc, node, names, data;
-		if (!isUndefined(props['v'])) {
-			v = isFunction(props['v']) ? props['v']() : props['v'];
-		}
-		node = document.createTextNode(v);		
+		var v = '', pv = props['v'];
+		if (isFunction(pv)) pv = pv();
+		if (!isUndefined(pv)) v = pv;
+		var node = document.createTextNode(v);		
 		appendChild(node);
 		createUpdater(NodeUpdater, node, props);
 	};
@@ -77,7 +75,7 @@ function Level(component) {
 					element.attr(a, pr[k]);
 				}
 			}
-			if (props['n'] || props['lc'] || props['gl']) {
+			if (props['n'] || props['g']) {
 				createUpdater(ElementUpdater, element, props);
 			}
 		}
@@ -120,7 +118,7 @@ function Level(component) {
 	};
 
 	var createForeach = function(props) {
-		if (props['n'] || props['lc'] || props['gl']) {
+		if (props['n'] || props['g']) {
 			var foreach = new Foreach(props);
 			foreach.render(parentElement, self);
 			registerChild(foreach);
@@ -135,7 +133,7 @@ function Level(component) {
 	};
 
 	var createIfSwitch = function(props) {
-		if (props['p'] || props['lc'] || props['gl']) {
+		if (props['p'] || props['g']) {
 			var swtch = new IfSwitch(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);
@@ -152,7 +150,7 @@ function Level(component) {
 	};
 
 	var createSwitch = function(props) {
-		if (props['p'] || props['lc'] || props['gl']) {
+		if (props['p'] || props['g']) {
 			var swtch = new Switch(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);

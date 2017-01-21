@@ -64,3 +64,12 @@ p.shuffle = function() {
 		this[j] = tmp;
 	}
 };
+p.addUnique = function(item) {
+	if (!this.has(item)) this.push(item);
+};
+p.addRemove = function(item, add, addUnique) {
+	if (add) {
+		if (addUnique) this.addUnique(item);
+		else this.push(item);
+	} else this.removeItem(item);
+};

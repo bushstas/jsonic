@@ -327,12 +327,9 @@
 			<xmp>--> change;</xmp><xmp>this.dispatchEvent(\'change\');</xmp>
 			<xmp>-->change(param, ...);</xmp><xmp>this.dispatchEvent(\'change\', param, ...);</xmp>';
 			
-			$items[] = '<b>==> everythingReady</b> - Инициирует локальное (в пределах текущего маршрута) событие everythingReady 
-			<xmp>==> everythingReady;</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\');</xmp>
-			<xmp>==> everythingReady (param, ...);</xmp><xmp>LocalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
-			$items[] = '<b>===> everythingReady</b> - Инициирует глобальное (в пределах всего приложения) событие everythingReady
-			<xmp>===> everythingReady;</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\');</xmp>
-			<xmp>===> everythingReady (param, ...);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
+			$items[] = '<b>==> everythingReady</b> - Инициирует глобальное (в пределах всего приложения) событие everythingReady
+			<xmp>==> everythingReady;</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\');</xmp>
+			<xmp>==> everythingReady (param, ...);</xmp><xmp>GlobalState.dispatchEvent(\'everythingReady\', param, ...);</xmp>';
 			$items[] = true;
 			$items[] = 'Утилиты';
 			$items[] = false;

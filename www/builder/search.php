@@ -34,6 +34,7 @@ $scope = $config['scope'];
 $tests = $config['tests'];
 $scripts = $config['scripts'];
 $apis = 'builder-php-classes';
+$core = $config['core'];
 
 $files = array();
 if (!empty($scope) && is_dir($scope)) {
@@ -48,6 +49,13 @@ if (!empty($scripts) && is_dir($scripts)) {
 if (!empty($apis) && is_dir($apis)) {
     $files = array_merge($files, getDirContents($apis));
 }
+if (!empty($apis) && is_dir($apis)) {
+    $files = array_merge($files, getDirContents($apis));
+}
+if (!empty($core) && is_dir($core)) {
+    $files = array_merge($files, getDirContents($core));
+}
+
 
 
 $found = array();

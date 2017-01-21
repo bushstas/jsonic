@@ -77,21 +77,33 @@ function State() {
 			listeners[name].removeIndexes(indexes);
 		}
 	};
-	this.dispatchEvent = function(name, params) {
+	this.dispatchEvent = function(name, args) {
 		if (isArray(listeners[name])) {
 			for (var i = 0; i < listeners[name].length; i++) {
 				if (isFunction(listeners[name][i][0])) {
-					listeners[name][i][0].call(listeners[name][i][1] || null, params);
+					listeners[name][i][0].apply(listeners[name][i][1] || null, args);
 				}
 			}
 		}
 	};
-	this.createUpdater = function(updater, component, obj, props, names) {
-		var u = new updater(obj, props, names);
+	this.createUpdater = function(updater, component, obj, props) {
+		var u = new updater(obj, props, props['g']);
 		var keys = u.getKeys()
 		for (var i = 0; i < keys.length; i++) {
 			updaters[keys[i]] = updaters[keys[i]] || [];
 			updaters[keys[i]].push(u);
 		}
 	};
+	this.dispose = function(subscriber) {
+		var k, i, s;
+		for (k in subscribers) {
+			s = [];
+			for (i = 0; i < subscribers[k].length; i++) {
+				if (subscribers[k][i] != subscriber) s.push(subscribers[k][i]);
+				else alert(111222)
+			}
+			subscribers[k] = s;
+		}
+	};
 }
+State = new State();

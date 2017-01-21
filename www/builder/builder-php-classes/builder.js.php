@@ -298,7 +298,7 @@ class JSCompiler
 				$isMissing = true;
 				if ($helper == 'Tooltiper') {
 					$isMissing = empty($this->config['tooltipClass']);
-				} elseif ($helper == 'State' || $helper == 'StateManager') {
+				} elseif ($helper == 'State') {
 					$isMissing = !$isStatesUsed;
 				} elseif ($helper == 'StoreKeeper') {
 					$isMissing = !preg_match('/\bstoreAs\b/', ' '.$this->jsCode);

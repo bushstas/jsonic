@@ -26,13 +26,11 @@ class InitialsParser
 		'typeError' => ' ласс {??} с типом {??} не может содержать initial параметр {??}',
 		'noActions' => '” контроллера {??} отсутствуют initial параметр <b>actions</b>.<br><br><b>ѕараметр должен иметь вид:</b> {?}',
 		'privateParamNotBool' => 'Initial параметр {??} в классе {??} имеет поле <b>private</b>, которое не €вл€етс€ true или false<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
-		'controllerMustBePrivate' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но его поле <b>private</b> отсутствует или не €вл€етс€ true<br>“олько работа€ с компонентом приватно, контрорллер может использовать параметр <b>options</b><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
-		'incorrectListenersKey' => "Initial параметр {??} в классе {??} имеет недопустимое поле {??} со значением {??}<br>—писок допустимых полей:<xmp>local\nglobal</xmp><b>ѕараметр должен иметь вид:</b> {?}",
-		'incorrectListenersObj' => "Initial параметр {??} в классе {??} имеет поле {??} со значением {??}<br>ƒанное поле должно быть ассоциативным массивом<br><br><b>ѕараметр должен иметь вид:</b> {?}"
+		'controllerMustBePrivate' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но его поле <b>private</b> отсутствует или не €вл€етс€ true<br>“олько работа€ с компонентом приватно, контрорллер может использовать параметр <b>options</b><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}'
 	);
 
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
-	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'helpers', 'followers', 'correctors', 'locals', 'listeners');
+	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'helpers', 'followers', 'correctors', 'listeners');
 	private $initials = array();
 	private $originalInitials = array();
 	private $regexp = '/\binitial\s+([\s\S]+?)(?=(initial|function|@EOF))/';
@@ -107,7 +105,6 @@ class InitialsParser
 				$this->validateLoaderInitials($value, $type);
 			break;
 
-			case 'locals':
 			case 'globals':
 				$this->validateGlobalsInitials($value, $type);
 			break;
@@ -173,7 +170,7 @@ class InitialsParser
 			case 'actions':
 				return "<xmp>initial actions = {\n\t'load': {\n\t\t'url': './path',\n\t\t'method': 'GET',\n\t\t'callback': this.onLoad\n\t}\n}</xmp><b>или</b><xmp>initial actions = {\n\t'load': {\n\t\t'url': './path',\n\t\t'method': 'POST',\n\t\t'callback': this.onLoad.bind(this, ...args)\n\t}\n}</xmp>";
 			case 'listeners':
-				return "<xmp>initial listeners = {\n\t'local': {\n\t\t'localEventName': this.onEventHandler\n\t},\n\t'global': {\n\t\t'globalEventName': this.onEventHandler2\n\t}\n}</xmp>";
+				return "<xmp>initial listeners = {\n\t'globalEventName': this.handleGlobalEvent\n}</xmp>";
 			case 'loader':
 				return "<xmp>initial loader = {\n\t'controller': ControllerClass,\n\t'async': true,\n\t'callback': this.handleLoad,\n\t'options': {\n\t\t'key': 'value'\n\t}\n}</xmp>";
 			case 'options':
@@ -354,16 +351,7 @@ class InitialsParser
 		}
 		$this->validateObjectFields($initials, $value, $type);
 		foreach ($initials as $key => $val) {
-			if ($key != 'local' && $key != 'global') {
-				new Error($this->errors['incorrectListenersKey'], array($type, $this->currentClassName, $key, $val, $this->getInitialParamExample($type)));
-			}
-			if (!$this->isAssocArray($initials[$key], $val)) {
-				new Error($this->errors['incorrectListenersObj'], array($type, $this->currentClassName, $key, $val, $this->getInitialParamExample($type)));
-			}
-			$this->validateObjectFields($initials[$key], $val, $type);
-			foreach ($initials[$key] as $key2 => $val2) {
-				$this->validateCallback($val2, $value, $type, $key2, '', $val2);
-			}
+			$this->validateCallback($val, $value, $type, $key, '', $val);
 		}
 	}
 

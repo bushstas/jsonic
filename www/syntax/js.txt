@@ -27,7 +27,7 @@ contexts:
        2: keyword.control.actionscript.2
        3: entity.other.inherited-class.actionscript.2
 
-    - match: \b(initial)\s+(loader|props|controllers|dialogs|globals|actions|options|followers|args|helpers|correctors|listeners|locals)\s*(=)
+    - match: \b(initial)\s+(loader|props|controllers|globals|actions|options|followers|helpers|correctors|listeners|locals)\s*(=)
       captures: 
        1: keyword.control.actionscript.2
        2: storage.type.class.actionscript.2

@@ -1564,11 +1564,8 @@ class TemplateParser
 						if (!empty($data['reactNames'])) {
 							$child['n'] = self::getProperChildren($data['reactNames']);
 						}
-						if (!empty($data['localNames'])) {
-							$child['lc'] = self::getProperChildren($data['localNames']);
-						}
 						if (!empty($data['globalNames'])) {
-							$child['gl'] = self::getProperChildren($data['globalNames']);
+							$child['g'] = self::getProperChildren($data['globalNames']);
 						}
 						$code = '<nq>'.json_encode($child).'<nq>';
 					} else {

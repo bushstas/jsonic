@@ -72,22 +72,13 @@ var Core = new (function() {
 			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
 		}
 		var listeners = getInitial.call(this, 'listeners');
-		var s = StateManager;
-		if (isObject(listeners)) {
-			if (isObject(listeners['global'])) {
-				for (var j in listeners['global']) s.listen(this, 1, j, listeners['global'][j]);
-			}
-			if (isObject(listeners['local'])) {
-				for (var j in listeners['local']) s.listen(this, 0, j, listeners['local'][j]);
-			}
+		var s = State;
+		if (isObject(listeners)) {			
+			for (var j in listeners) s.listen(this, j, listeners[j]);
 		} 
 		var globals = getInitial.call(this, 'globals');
 		if (isObject(globals)) {
-			for (var j in globals) s.subscribe(this, 1, j, globals[j]);
-		}
-		var locals = getInitial.call(this, 'locals');
-		if (isObject(locals)) {
-			for (var j in locals) s.subscribe(this, 0, j, locals[j]);
+			for (var j in globals) s.subscribe(this, j, globals[j]);
 		}
 	};
 	var subscribeToHelper = function(options) {

@@ -68,6 +68,7 @@
 			<option value="tmp">шаблонам</option>
 			<option value="tmpcode">коду в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>
+			<option value="globals">глобальному состоянию</option>
 			<option value="events">событиям</option>
 			<option value="dialogs">диалоговым окнам</option>
 			<option value="helper">классам хелперам</option>
