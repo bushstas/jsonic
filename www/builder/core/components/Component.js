@@ -458,6 +458,10 @@ function Component() {
 	p.dispose = function() {
 		State.dispose(this);
 		unrender.call(this);
+		if (this.mouseEvents) {
+			this.mouseEvents.dispose();
+			this.mouseEvents = null;
+		}
 		this.updaters = null;
 		this.parentElement = null;
 		this.props = null;

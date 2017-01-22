@@ -1,4 +1,4 @@
-function ClickHandler() {
+function MouseHandler() {
 	var subscribers = [];
 	var options = [];
 	var eventHandler = new EventHandler();
@@ -36,4 +36,5 @@ function ClickHandler() {
 		}
 	};
 }
-ClickHandler = new ClickHandler();
+var ClickHandler = new MouseHandler();
+var MouseHandler = ClickHandler;

@@ -23,7 +23,17 @@ var Core = new (function() {
 	};
 	this.processInitials = function() {
 		var initials = this.initials;
+		console.log(initials)
+		console.log(this)
 		if (isObject(initials)) {
+			var opts = getInitial.call(this, 'options');
+			if (isController(this)) {
+				var opts = getInitial.call(this, 'options');
+				if (opts) {
+					if (isObject(this.options)) Objects.merge(this.options, opts);
+					else this.options = opts;
+				}
+			}
 			for (var k in initials) {
 				if (isArrayLike(initials[k])) {
 					if (k == 'correctors') {
@@ -35,8 +45,7 @@ var Core = new (function() {
 					} else if (k == 'props') {
 						addProps.call(this, initials[k]);
 					} else if (k == 'options') {
-						if (isObject(this.options)) Objects.merge(this.options, initials[k]);
-						else this.options = initials[k];
+						
 					}
 				}
 			}
@@ -67,6 +76,10 @@ var Core = new (function() {
 		}
 	};
 	this.processPostRenderInitials = function() {
+		var events = getInitial.call(this, 'events');
+		if (isObject(events)) {
+			this.mouseHandler = new MouseEvents(this, events);
+		}
 		var helpers = getInitial.call(this, 'helpers');
 		if (isArray(helpers)) {
 			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);

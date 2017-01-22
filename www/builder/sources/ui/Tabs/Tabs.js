@@ -1,23 +1,28 @@
 component Tabs
 
+//initial events = {
+	//'click': {
+
+//	}
+//}
+
 initial helpers = [
 	{
-		'helper': ClickHandler,
+		'helper': MouseHandler,
 		'options': {
-			'->> app-tabs-item': this.onSelect,
-			'->> app-tabs-remove': this.onRemove
+			'->> @item': this.onSelect,
+			'->> @remove': this.onRemove
 		}
 	}
 ]
 
 function onSelect(target) {
-	var index = target.getData('index');
+	var index = target->index;
 	$activeTab = index;
 	--> select (index)
 }
 
 function onRemove(target) {
-	var tab = target.getParent();
-	var index = tab.getData('index');
+	var index = target.getParent()->index;
 	--> remove (index)
 }
