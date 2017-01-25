@@ -85,6 +85,7 @@ class TemplateParser
 	private static $errors = array(
 		'noMainTemplate' => 'Ўаблон <b>main</b> класса {??} не найден среди прочих',
 		'forbiddenTag' => 'ќбнаружен недопустимый тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>',
+		'closingSimpleTag' => 'ќбнаружен закрывающийс€ тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>',
 		'noClosingTag' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
 		'tagInsideTag' => 'ќбнаружена недопустима€ вложенность: тег {??} внутри тега {??} в шаблоне {??} класса {??}<br>ƒанный тег {?}-й по счету открывающийс€ тег {??}<xmp>{?}</xmp>',
 		'tagOutsideProperTag' => 'ќбнаружена недопустима€ вложенность: тег {??} вне {?} {??} в шаблоне {??} класса {??}<br>ƒанный тег {?}-й по счету открывающийс€ тег {??}<xmp>{?}</xmp>',
@@ -240,8 +241,9 @@ class TemplateParser
 	private static function getParsedTemplate($content) {
 		$html = preg_replace(self::$regexp, '', $content);
 		$html = str_replace('->>', "#classobfus#", $html);
+		$html = preg_replace('/<('.implode('|', self::$simpleTags).') ([^\/>]*)\/>/', "<=$1 $2/>", $html);
 		$html = preg_replace('/<(:*\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
-		$html = preg_replace('/<\/(img|br|hr|input)>/', '', $html);
+		$html = preg_replace('/<=(\w+) ([^\/>]*)\/>/', "<$1 $2/>", $html);
 		$parts = preg_split('/\{\/template\}/', $html);
 		$html = $parts[0];
 
@@ -340,7 +342,6 @@ class TemplateParser
 	}
 
 	private static function isTagClosing($tagName, $tagContent) {
-		if (self::isSimpleTag($tagName)) return false;
 		return preg_match("/^[<\{]\//", $tagContent) ? 1 : 0;
 	}
 
@@ -371,14 +372,11 @@ class TemplateParser
 			$tn = $item['tagName'];
 			if (!empty($tn)) {
 				if (!$item['isSingle']) {
-					if ($item['isClosing'] == 0) {
-								
+					if ($item['isClosing'] == 0) {								
 						if (!isset($openedTags[$tn])) {
 							$openedTags[$tn] = 0;
 						}
-
-						$last = $openedHtml[count($openedHtml) - 1];					
-
+						$last = $openedHtml[count($openedHtml) - 1];
 						$openedTags[$tn]++;
 						if (in_array($tn, self::$forbiddenElements)) {
 							new Error(self::$errors['forbiddenTag'], array($tn, self::$templateName, self::$class['name'], $item['content']));
@@ -482,6 +480,9 @@ class TemplateParser
 						$allTypes[] = 'closed';
 					}
 				} else {
+					if (self::isSimpleTag($tn) && $item['isClosing']) {
+						new Error(self::$errors['closingSimpleTag'], array($tn, self::$templateName, self::$className, $item['content']));
+					}
 					if ($tn == 'ifempty' && !in_array('foreach', $opened)) {
 						new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className));
 					} elseif ($tn == 'else' && !in_array('if', $opened)) {
@@ -1458,9 +1459,7 @@ class TemplateParser
 			$properData['p'] = array();
 		}
 		foreach ($props as $k => $v) {
-			if ($k == 'opts') {
-				$properData['op'] = $v;
-			} else if ($k == 'as') {
+			if ($k == 'as') {
 				$properData['i'] = $v;
 			} elseif ($k == 'props') {
 				$properData['p'] = $v;

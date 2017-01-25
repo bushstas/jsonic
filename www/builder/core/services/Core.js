@@ -4,12 +4,9 @@ var Core = new (function() {
 			initials1 = initials2;
 		} else {
 			for (var k in initials2) {
-				if (isUndefined(initials1[k])) {
-					initials1[k] = initials2[k];
-				} else {
-					if (isObject(initials1[k]) || isObject(initials2[k])) Objects.merge(initials1[k], initials2[k]);
-					else if (isArray(initials1[k]) || isArray(initials2[k])) Objects.concat(initials1[k], initials2[k]);
-				}
+				if (isUndefined(initials1[k])) initials1[k] = initials2[k];
+				else if (isObject(initials1[k]) || isObject(initials2[k])) Objects.merge(initials1[k], initials2[k]);
+				else if (isArray(initials1[k]) || isArray(initials2[k])) Objects.concat(initials1[k], initials2[k]);				
 			}
 		}
 		return initials1;
@@ -24,15 +21,9 @@ var Core = new (function() {
 	this.processInitials = function() {
 		var initials = this.initials;
 		console.log(initials)
-		console.log(this)
 		if (isObject(initials)) {
-			var opts = getInitial.call(this, 'options');
 			if (isController(this)) {
-				var opts = getInitial.call(this, 'options');
-				if (opts) {
-					if (isObject(this.options)) Objects.merge(this.options, opts);
-					else this.options = opts;
-				}
+				this.options = initials['options'];
 			}
 			for (var k in initials) {
 				if (isArrayLike(initials[k])) {
@@ -44,8 +35,6 @@ var Core = new (function() {
 						for (var i = 0; i < initials[k].length; i++) attachController.call(this, initials[k][i]);
 					} else if (k == 'props') {
 						addProps.call(this, initials[k]);
-					} else if (k == 'options') {
-						
 					}
 				}
 			}
@@ -128,7 +117,7 @@ var Core = new (function() {
 			}
 		}
 	};
-	this.initiate = function(props, opts) {
+	this.initiate = function(props) {
 		var initials = null;
 		var proto = this.constructor.prototype;
 		if (isFunction(proto.getInitials)) {
@@ -161,7 +150,6 @@ var Core = new (function() {
 			proto.initiate.call(this);
 		}
 		this.initials = initials;
-		if (opts) this.options = opts;
 		Core.processInitials.call(this);
 	};
 	this.getNextSiblingChild = function() {

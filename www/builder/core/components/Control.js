@@ -16,8 +16,8 @@ function Control() {
 		return {value: this.getValue()};
 	};
 
-	p.getInitials = function() {
-		return {'enabled': true};
+	p.initiate = function() {
+		this.preset('enabled', true);
 	};
 
 	p.registerControl = function(control, name) {

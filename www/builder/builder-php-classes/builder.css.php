@@ -7,6 +7,7 @@ class CSSCompiler
 	private $hasCssConstFiles = false;
 	private $cssConstants = array();
 	public static $cssClassIndex = array();
+	private $selectors = array();
 
 	private $numericShortcuts = array(
 		'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
@@ -62,6 +63,27 @@ class CSSCompiler
 		}
 	}
 
+	private function saveSelectors($selectors, $css) {
+		if (!preg_match('/[^\s]/', $css)) return;
+		$css = trim($css);
+		$css = preg_replace('/[\r\n\t]/', '', $css);
+		$css = preg_replace('/\s+;|;\s+/', ';', $css);		
+		$css = trim($css, ';');
+		$css = explode(';', $css);
+		foreach ($selectors as $s) {
+			$s = trim($s);
+			if (!isset($this->selectors[$s])) {
+				$this->selectors[$s] = array();
+			}
+
+			$this->selectors[$s] = array_merge($this->selectors[$s], $css);
+		}
+	}
+
+	private function clearSelectors() {
+		$this->selectors = array();
+	}
+
 	private function validateFolderName($folderName, $errorName) {
 		preg_match_all('/([^\w\-])/', $folderName, $matches);
 		if (!empty($matches[0])) {
@@ -89,9 +111,52 @@ class CSSCompiler
 			$this->initCssConstants($cssConstFiles);
 			$content = array();
 			foreach ($cssFiles as $file) {
-				$css = '/* '.$file['name']." */\n".preg_replace('/\/\*[^\*]*\*\//', '', $file['content']);
+				$this->clearSelectors();
+				$cnt = $file['content'];				
+				$data = Splitter::split('/\$imgsrc\d*\s*=\s*[^;\r\n]+[;\r\n]/', $cnt);
+				$imgsrcs = '';
+				if (!empty($data['items'])) {
+					$cnt = '';
+					foreach ($data['items'] as $i => $item) {
+						$cnt .= $item;
+						if (isset($data['delimiters'][$i])) {
+							$imgsrcs .= $data['delimiters'][$i];
+						}
+					}
+				}
+				
+				$data = Splitter::split('/[^;\}\{]*\{|\}/', trim($cnt));
+				$items = $data['items'];
+				if (!empty($items)) {
+					$dels = $data['delimiters'];
+					$styles = array();
+					$selectors = array();
+					foreach ($items as $i => $item) {
+						if (!empty($item)) {
+							$selectorList = $this->getSelectors($selectors);
+							$this->saveSelectors($selectorList, $item);
+						}
+						$d = $dels[$i];
+						if (!empty($d)) {
+							if ($d != '}') {							
+								$d = preg_replace('/\s*\{/', '', $d);
+								$selectors[] = $d;
+							} else {
+								if (empty($selectors)) {
+									die('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+								}
+								array_pop($selectors);
+							}
+						}
+					}
+				}
+
+				$css = '/* '.$file['name']." */\n";
+				foreach ($this->selectors as $selector => $style) {
+					$css .= $selector.'{'.implode(';', $style)."}\n";
+				}
 				$this->parseVariables($css, $file['name']);
-				$this->parseBackgroundImages($css, $file['name']);
+				$this->parseBackgroundImages($css, $imgsrcs);
 				$content[] = $css;
 			}
 			$css = implode("\n", $content);
@@ -133,7 +198,30 @@ class CSSCompiler
 		}
 	}
 
-	private function parseClasses($className, &$content) {
+	private function getSelectors($selectors) {
+		if (empty($selectors)) return array('');
+		$list = array();
+		$first = $selectors[0];
+		if (!empty($first)) {
+			array_splice($selectors, 0, 1);
+		}
+		$parts = explode(',', $first);
+		foreach ($parts as $s) {
+			$adds = $this->getSelectors($selectors);
+			foreach ($adds as $a) {
+				$a = trim($a);
+				$between = $a[0] == '&' ? '' : ' ';
+				if (empty($between)) {
+					$a = trim($a, '&');
+				}
+				$list[] = trim($s).$between.$a;
+			}
+		}
+		
+		return $list;
+	}
+
+	private function parseClasses($className, &$content) {		
 		$data = Splitter::split('/[A-Z]/', $className);
 		$className = '';
 		foreach ($data['items'] as $i => $item) {
@@ -167,9 +255,9 @@ class CSSCompiler
 		}
 	}
 
-	private function parseBackgroundImages(&$css, $filename) {
+	private function parseBackgroundImages(&$css, $imgsrcs) {
 		$regexp = '/\$imgsrc\s*=\s*([^\s]+)/';
-		preg_match_all($regexp, $css, $matches);
+		preg_match_all($regexp, $imgsrcs, $matches);
 		$pathsToImages = array();
 		if (count($matches[1]) > 0) {
 			if (!$this->imagesFolderDefined) {
@@ -178,7 +266,7 @@ class CSSCompiler
 			for ($i = 0; $i < count($matches[1]); $i++) {
 				$pathsToImages[] = $matches[1][$i];
 				$css = preg_replace($regexp, '', $css);
-				$css = preg_replace('/\$*(png|jpg|jpeg|gif)(\d*)\s*=\s*([^\s\)]+)/i', "background-image:url<obr><pathtoimg$2>$3.$1<cbr>;", $css);
+				$css = preg_replace('/\$*(png|jpg|jpeg|gif)(\d*)\s*=\s*([^\s\)\}]+)/i', "background-image:url<obr><pathtoimg$2>$3.$1<cbr>;", $css);
 			}
 			$len = count($pathsToImages);
 			$this->makeProperPathsToImages($pathsToImages);

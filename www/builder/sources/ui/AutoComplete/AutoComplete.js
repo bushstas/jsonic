@@ -31,9 +31,10 @@ initial followers = {
 }
 
 function onInput(value) {
+	get options;
 	var len = value.length;
-	var minLength = $(this.options, 'minLength', 3);
-	if (isString($(this.options, 'url')) && len >= minLength) {
+	var minLength = $(options, 'minLength', 3);
+	if (isString($(options, 'url')) && len >= minLength) {
 		this.delay(this.load, 1000, value);
 	} else if (len == 0) {
 		this.delay();
@@ -42,7 +43,7 @@ function onInput(value) {
 }
 
 function load(value) {
-	Loader.get($(this.options, 'url'), {'token': value}, this.onLoad, this);
+	Loader.get($($options, 'url'), {'token': value}, this.onLoad, this);
 }
 
 function onLoad(data) {

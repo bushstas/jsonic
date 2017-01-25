@@ -282,6 +282,7 @@ function Component() {
 	};
 
 	p.preset = function(propName, propValue) {
+		this.props = this.props || {};
 		this.props[propName] = propValue;
 	};
 

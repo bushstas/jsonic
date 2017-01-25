@@ -215,10 +215,9 @@ function Level(component) {
 			var cmp = new item['cmp']();
 			var ir = isFunction(item['p']);
 			var i, k, p = ir ? item['p']() : item['p'];
-			var props, opts, data;
+			var props, data;
 			if (isObject(p)) {
 				if (p['p'] || p['ap']) props = initComponentProps(p['p'], p['ap']);
-				opts = p['op'];
 				if (isString(p['i'])) {
 					cmp.setId(p['i']);
 					var waiting = Core.getWaitingChild.call(component, p['i']);
@@ -239,7 +238,7 @@ function Level(component) {
 				props = props || {};
 				props['children'] = item['c'];
 			}
-			Core.initiate.call(cmp, props, opts);
+			Core.initiate.call(cmp, props);
 			cmp.render(pe);
 			registerChild(cmp, true);
 			if (isArray(item['e'])) {

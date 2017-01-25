@@ -14,7 +14,7 @@
 </div>
 
 {template .input}
-<KeywordsAutoComplete placeholder="{@enterKeywords}" opts="{#keywordsAutoCompleteOptions}" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
+<KeywordsAutoComplete placeholder="{@enterKeywords}" options="{#keywordsAutoCompleteOptions}" onFocus="!focus" onEnter="onEnter" onPick="onPickVariant"/>
 
 {template .bottomContent}
 <Recommendations as="recommendations" onPick="onPickRecommendation" onChange="!recchange"/>
