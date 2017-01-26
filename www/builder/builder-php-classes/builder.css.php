@@ -8,6 +8,7 @@ class CSSCompiler
 	private $cssConstants = array();
 	public static $cssClassIndex = array();
 	private $selectors = array();
+	private $specialSelectors = array();
 
 	private $numericShortcuts = array(
 		'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
@@ -72,11 +73,14 @@ class CSSCompiler
 		$css = explode(';', $css);
 		foreach ($selectors as $s) {
 			$s = trim($s);
-			if (!isset($this->selectors[$s])) {
-				$this->selectors[$s] = array();
+			if ($s[0] == '@') {
+				$this->specialSelectors[] = array('name' => $s, 'value' => $css);
+			} else {
+				if (!isset($this->selectors[$s])) {
+					$this->selectors[$s] = array();
+				}
+				$this->selectors[$s] = array_merge($this->selectors[$s], $css);
 			}
-
-			$this->selectors[$s] = array_merge($this->selectors[$s], $css);
 		}
 	}
 
@@ -112,7 +116,8 @@ class CSSCompiler
 			$content = array();
 			foreach ($cssFiles as $file) {
 				$this->clearSelectors();
-				$cnt = $file['content'];				
+				$cnt = $file['content'];
+				$cnt = preg_replace('/\$\(([^\)]+)\)\s*(?!;)/', "\$($1);", $cnt);
 				$data = Splitter::split('/\$imgsrc\d*\s*=\s*[^;\r\n]+[;\r\n]/', $cnt);
 				$imgsrcs = '';
 				if (!empty($data['items'])) {
@@ -159,7 +164,11 @@ class CSSCompiler
 				$this->parseBackgroundImages($css, $imgsrcs);
 				$content[] = $css;
 			}
-			$css = implode("\n", $content);
+			$specialCss = '';
+			foreach ($this->specialSelectors as $s) {
+				$specialCss .= $s['name'].'{'.implode(';', $s['value'])."}\n";
+			}
+			$css = $specialCss.implode("\n", $content);
 			$this->parseShadowShortcuts($css);
 			
 			$this->parseShortcutSets($css);
@@ -256,7 +265,7 @@ class CSSCompiler
 	}
 
 	private function parseBackgroundImages(&$css, $imgsrcs) {
-		$regexp = '/\$imgsrc\s*=\s*([^\s]+)/';
+		$regexp = '/\$imgsrc\s*=\s*["\']*([^\s;\'"]+)["\']*/';
 		preg_match_all($regexp, $imgsrcs, $matches);
 		$pathsToImages = array();
 		if (count($matches[1]) > 0) {

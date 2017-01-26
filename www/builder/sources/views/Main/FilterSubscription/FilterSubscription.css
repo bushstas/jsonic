@@ -1,5 +1,18 @@
-.@ ==s {
+$imgsrc = 'buttons';
 
+.@ {
+	.@button:after {
+	    content: 'Подписаться';
+	}
+	.@button.green-button:after {
+	    content: 'Подписка оформлена';
+	}
+	.@button.green-button:hover {
+		$(bc#b65f5f png=red)
+	}
+	.@button.green-button:hover:after {
+	    content: 'Отписаться';
+	}
 }
 .@title {
 	$(rel fs16 c#4c546b p10_5)
@@ -13,48 +26,36 @@
 .@head-subscribed {
 	$(fright bob#38986a_2 mr45)
 }
-.@table ==t {
-	$w100%
-}
-~t th {
-    $(normal c#8b8e97 p10_0 fs14 center box bob#e4e4e4)
-}
-~t td {
-	$(vmid p6 bob#E0E6F3 lh14 box)
-}
-~t th:first-child,
-~t td:first-child {
-	$(left wa pl6)
-}
-~t th:nth-child(2),
-~t td:nth-child(2) {
-	$w160
-}
-~t th:nth-child(3),
-~t td:nth-child(3) {
-	$w180
-}
-~t th:nth-child(4),
-~t td:nth-child(4) {
-	$(w30 pl0 pr0)
-}
-~t td:first-child span {
-	$(c#384767 fs16 pointer)
-}
-~t td:first-child span:hover {
-	$c#6484ca
-}
+.@table {
+	$w100%;
 
-~s .@button:after {
-    content: 'Подписаться';
-}
-~s .@button.green-button:after {
-    content: 'Подписка оформлена';
-}
-~s .@button.green-button:hover {
-	$bc#b65f5f
-  	background-image: url(../images/buttons/red.png);
-}
-~s .@button.green-button:hover:after {
-    content: 'Отписаться';
+	th {
+    	$(normal c#8b8e97 p10_0 fs14 center box bob#e4e4e4)
+	}
+	td {
+		$(vmid p6 bob#E0E6F3 lh14 box)
+	}
+	th:first-child,
+	td:first-child {
+		$(left wa pl6)
+	}
+	th:nth-child(2),
+	td:nth-child(2) {
+		$w160
+	}
+	th:nth-child(3),
+	td:nth-child(3) {
+		$w180
+	}
+	th:nth-child(4),
+	td:nth-child(4) {
+		$(w30 pl0 pr0)
+	}
+	td:first-child span {
+		$(c#384767 fs16 pointer)
+
+		&:hover {
+			$c#6484ca	
+		}
+	}
 }

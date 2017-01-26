@@ -1,4 +1,4 @@
-$imgsrc = ../images/filterstat
+$imgsrc = filterstat
 
 .@title {
     $(bc#f1f4f9 p10_15 br3 mb10 rel fs16 c#4c546b bold)
@@ -9,35 +9,45 @@ $imgsrc = ../images/filterstat
 .@refresh:hover {
 	$c#5c6ea0
 }
-.@row ==r {
+.@row {
 	$(nowrap p12_0 bob#E0E6F3)
+
+	span {
+		$(inb w12% box bold)
+
+		&:nth-child(1) {
+			$(pointer regular pl19 pr20 w40% wrap)
+
+			&:hover {
+				$c#6484ca
+			}
+		}
+		&:nth-child(2),
+		&:nth-child(3) {
+			$c#3EB562
+		}
+		&:nth-child(4) {
+			$pl10
+		}
+	}
 }
-.@head ==h th {
-	$(c#4c546b fs14 normal left p10_0 bob#E0E6F3 w12% box)
+.@head {
+	th {
+		$(c#4c546b fs14 normal left p10_0 bob#E0E6F3 w12% box)
+		
+		&:nth-child(1) {
+    		$(pl19 pr20 w40% wrap)
+		}
+		&:nth-child(2),
+		&:nth-child(3) {
+		    $c#3EB562
+		}
+		&:nth-child(4) {
+			$pl10
+		}
+	}
 }
-~r span:nth-child(1),
-~h th:nth-child(1) {
-    $(pl19 pr20 w40% wrap)
-}
-~r span:nth-child(2),
-~r span:nth-child(3),
-~h th:nth-child(2),
-~h th:nth-child(3) {
-    $c#3EB562
-}
-~r span:nth-child(4),
-.@head th:nth-child(4) {
-	$pl10
-}
-~r span {
-	$(inb w12% box bold)
-}
-~r span:nth-child(1) {
-	$(pointer regular)
-}
-~r span:nth-child(1):hover {
-	$c#6484ca
-}
+
 .@content {
 	$(abs t100 b60 l15 r5 ova)
 }

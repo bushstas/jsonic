@@ -1,6 +1,3 @@
-$imgsrc = 'lalala';
-$imgsrc2 = 'lalala2';
-
 .@outer-container {
 	position: absolute;
     top: 8px;
@@ -15,13 +12,4 @@ $imgsrc2 = 'lalala2';
 }
 .view-content.form-expanded .@outer-container {
 	left: 336px;
-}
-.@ {
-    width: 1px;
-    .@name {
-        height: 1px;
-        &.@lastname {
-            color: black;
-        }
-    }
 }
