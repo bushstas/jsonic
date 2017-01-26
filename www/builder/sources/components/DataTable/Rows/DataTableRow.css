@@ -1,37 +1,44 @@
 $imgsrc = ../images/datatable
-.app-datatable-row {
+
+.@ {
 	$(block rel pl40 pb1 pointer c#333A52)
+	
+	&:after {
+		$(cnt abs l r b h1 bc#c3cdd8 z2)
+	}
 }
-.app-datatable-row:after {
-	$(cnt abs l r b h1 bc#c3cdd8 z2)
+.simple-datatable {
+	.@ {
+		$(pl5 pr5)
+	}
+	.datatable-control {
+		display: none !important;
+	}
 }
-.simple-datatable .app-datatable-row {
-	$(pl5 pr5)
-}
-.simple-datatable .datatable-control {
-	display: none !important;
-}
-.app-datatable-color-mark {
+.@color-mark {
 	$(abs z2 none l t b w9)
 }
-.app-datatable-star,
-.app-datatable-checkbox-container {
+.@star,
+.@checkbox-container {
 	$(abs l w40 z1)
 }
-.app-datatable-star {
-	$(t35 b png=star norep)
-	background-position: 50% 5px;
+.@star {
+	& {
+		$(t35 b png=star norep bp_50%_5)
+	}
+	&.active {
+		$(t30 png=star2)
+	}
 }
-.app-datatable-star.active {
-	$(t30 png=star2)
-}
-.app-datatable-checkbox-container {
+
+.@checkbox-container {
 	$(t h35)
+
+	.app-ui-checkbox {
+		$(ma mt7)
+		float: none;
+	}
 }
-.app-datatable-checkbox-container .app-ui-checkbox {
-	$(ma mt7)
-	float: none;
-}
-.app-datatable-standart-row-count {
+.@count {
 	$(block fleft mr5 miw10 h12 c#4B5569 bo#4B5569 br2 center lh12 fs13 pl2 pr2 mt3)
 }

@@ -12,16 +12,17 @@
 }
 .@top-item {
 	$(inb pr10 pl10 rel vtop)
-}
-.@top-item:first-child {
-	$(bold pl0 pr4)
-}
-.@top-item:after {
-	$(cnt abs r t4 b2 w1 bc#8D9AB1)
-}
-.@top-item:first-child:after,
-.@top-item:last-child:after {
-	$none
+
+	&:first-child {
+		$(bold pl0 pr4)
+	}
+	&:after {
+		$(cnt abs r t4 b2 w1 bc#8D9AB1)
+	}
+	&:first-child:after,
+	&:last-child:after {
+		$none
+	}
 }
 .@bottom {
 	$(mt10 nowrap h18 pb6)
