@@ -11,6 +11,7 @@ class CSSCompiler
 	private $specialSelectors = array();
 	private $charsets = array();
 	private $charsetFiles = array();
+	private $defaultCssConsts;
 
 	private $numericShortcuts = array(
 		'l' => 'left', 'r' => 'right', 't' => 'top', 'b' => 'bottom', 'w' => 'width', 'h' => 'height', 'z' => 'z-index',
@@ -20,77 +21,7 @@ class CSSCompiler
 		'maw' => 'max-width', 'miw' => 'min-width', 'bp' => 'background-position'
 	);
 
-	private $defaultCssConsts = array(
-		'l' => 'left: 0;',
-		'r' => 'right: 0;',
-		't' => 'top: 0;',
-		'b' => 'bottom: 0;',
-		'rel' => 'position: relative;',
-		'abs' => 'position: absolute;',
-		'fix' => 'position: fixed;',
-		'rubber' => 'left: 0;right: 0;top: 0;bottom: 0;',
-		'incenter' => 'left: 50%; top: 50%;',
-		'bg' => 'background-position:center center;background-repeat:no-repeat;',
-		'repx' => 'background-repeat: repeat-x;',
-		'repy' => 'background-repeat: repeat-y;',
-		'norep' => 'background-repeat:no-repeat;',
-		'block' => 'display: block;',
-		'inb' => 'display: inline-block;',
-		'none' => 'display: none;',
-		'round' => 'border-radius: 50%;',
-		'normal' => 'font-weight: normal;',
-		'regular' => 'font-family: ptsans;',
-		'bold' => 'font-family: ptsansbold;',
-		'pointer' => 'cursor: pointer;',
-		'center' => 'text-align: center;',
-		'box' => 'box-sizing: border-box;',
-		'white' => 'color: #fff;',
-		'bgwhite' => 'background-color: #fff;',
-		'noimg' => 'background-image: none !important;',
-		'left' => 'text-align: left;',
-		'right' => 'text-align: right;',
-		'fleft' => 'float: left;',
-		'fright' => 'float: right;',
-		'nowrap' => 'white-space: nowrap;',
-		'wrap' => 'white-space: normal;',
-		'nosize' => 'width: auto !important; height: auto !important;',
-		'nomargin' => 'margin-left: 0 !important; margin-top: 0 !important;',
-		'opac10' => 'opacity: 1;',
-		'opac9' => 'opacity: 0.9;',
-		'opac8' => 'opacity: 0.8;',
-		'opac7' => 'opacity: 0.7;',
-		'opac6' => 'opacity: 0.6;',
-		'opac65' => 'opacity: 0.65;',
-		'opac5' => 'opacity: 0.5;',
-		'opac4' => 'opacity: 0.4;',
-		'opac0' => 'opacity: 0;',
-		'cnt' => 'content: \'\';',
-		'ovh' => 'overflow: hidden;',
-		'ova' => 'overflow: auto;',
-		'ma' => 'margin: auto;',
-		'i' => '!important',
-		'vtop' => 'vertical-align: top;',
-		'vmid' => 'vertical-align: middle;',
-		'tran' => 'background-color: transparent;',
-		'ell' => 'text-overflow: ellipsis;',
-		'tovh' => 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;',
-		'ba' => 'bottom: auto;',
-		'la' => 'left: auto;',
-		'ra' => 'right: auto;',
-		'ta' => 'top: auto;',
-		'wa' => 'width: auto;',
-		'ha' => 'height: auto;',
-		'hid' => 'visibility: hidden;',
-		'vis' => 'visibility: visible;',
-		'nob' => 'border: 0;',
-		'nobt' => 'border-top: 0;',
-		'nobb' => 'border-bottom: 0;',
-		'nobl' => 'border-left: 0;',
-		'nobr' => 'border-right: 0;',
-		'nosh' => 'box-shadow: none;',
-		'nomaxh' => 'max-height: none;',
-		'nomaxw' => 'max-width: none;'
-	);
+	
 
 	private $colorShortcuts = array(
 		'c' => 'color', 'bc' => 'background-color', 'boc' => 'border-color'
@@ -109,7 +40,6 @@ class CSSCompiler
 		'imagesFolderNameIsInvalid' => 'Значение параметра конфигурации <b>imagesFolder</b> содержит запрещенные символы {??}',
 		'cssConstDouble' => 'Обнаружена повторяющаяся css константа {??} с разными значениями в файлах {??} и {??}',
 		'cssConstDouble2' => 'Обнаружена повторяющаяся css константа {??} с разными значениями в файле {??}',
-		'cssConstOverride' => 'Обнаружено переопределение предустановленной css константы {??} другим значением в файле {??}',
 		'variableParse' => 'Ошибка при парсинге CSS файла {??}. Переменная {??} содержит неопределенную переменную {??}, которая должна быть определена выше',
 		'noCssConstFiles' => 'Обнаружено использование css констант, но не найден ни один файл <b>.cssconst</b> для их описания<br>Разместите файл с любым именем и данным расширением в любой директории вашего приложения<br><br><b>Содержание файла должно иметь вид:</b><br><br>$white: #FFFFFF<br>$block: display: block;<br>$area: position: relative; margin: auto; background-color: #fff;<br><br><b>Использование:</b><br><br>.selector {<br>&nbsp;&nbsp;&nbsp;&nbsp;color: $white;<br>&nbsp;&nbsp;&nbsp;&nbsp;$block<br>&nbsp;&nbsp;&nbsp;&nbsp;$area<br>}',
 		'noCssConst' => 'Обнаружена неизвестная css константа {??}',
@@ -140,6 +70,12 @@ class CSSCompiler
 				new Error($this->errors['imagesFolderNotFound']);
 			}
 			$this->imagesFolderDefined = true;
+		}
+		if (file_exists(PATH_TO_CSS_CONSTS)) {
+			include PATH_TO_CSS_CONSTS;
+			if (is_array($defaultCssConsts)) {
+				$this->defaultCssConsts = $defaultCssConsts;
+			}
 		}
 	}
 
@@ -483,6 +419,7 @@ class CSSCompiler
 	}
 
 	private function initCssConstants($files) {
+		$this->cssConstants = $this->defaultCssConsts;
 		if (is_array($files)) {
 			$this->hasCssConstFiles = !empty($files);
 			$regexp = '/\$(\w+)\s*:\s*/';
@@ -495,23 +432,19 @@ class CSSCompiler
 					array_shift($parts);
 					foreach ($parts as $i => $part) {
 						$part = trim($part);
-						if (isset($this->defaultCssConsts[$varNames[$i]])) {
-							new Error($this->errors['cssConstOverride'], array($varNames[$i], $file['path']));
-						}
-						if (isset($this->cssConstants[$varNames[$i]]) && $this->cssConstants[$varNames[$i]] != $part) {
-							if ($file['filename'] != $fileNames[$varNames[$i]]) {
-								new Error($this->errors['cssConstDouble'], array($varNames[$i], $fileNames[$varNames[$i]], $file['filename']));
+						if (isset($this->cssConstants[$varNames[$i]]) && $this->cssConstants[$varNames[$i]] != $part && !empty($fileNames[$varNames[$i]])) {
+							if ($file['path'] != $fileNames[$varNames[$i]]) {
+								new Error($this->errors['cssConstDouble'], array($varNames[$i], $fileNames[$varNames[$i]], $file['path']));
 							} else {
-								new Error($this->errors['cssConstDouble2'], array($varNames[$i], $file['filename']));
+								new Error($this->errors['cssConstDouble2'], array($varNames[$i], $file['path']));
 							}
 						}
 						$this->cssConstants[$varNames[$i]] = $part;
-						$fileNames[$varNames[$i]] = $file['filename'];
+						$fileNames[$varNames[$i]] = $file['path'];
 					}
 				}
 			}
 		}
-		Printer::log($this->cssConstants);
 	}
 
 	private function obfuscate(&$css) {

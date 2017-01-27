@@ -3,5 +3,6 @@ $width      : width: 1350px;
 $semibold   : font-family: segoesemibold;
 $segoebold  : font-family: segoesemibold;
 $segoe      : font-family: Segoe UI;
-
-$block: 1111;
+$bold       : font-family: ptsansbold;
+$nosize     : width: auto !important; height: auto !important;
+$nomargin   : margin-left: 0 !important; margin-top: 0 !important;
