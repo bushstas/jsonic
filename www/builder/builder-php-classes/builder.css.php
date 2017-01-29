@@ -46,7 +46,9 @@ class CSSCompiler
 		'extraClosing' => 'Лишняя фигурная скобка в файле стилей {??}',
 		'extraOpening' => 'Незакрытая фигурная скобка в файле стилей {??}',
 		'fewCharsets' => 'Найдено несколько правил <b>@charset</b> в файле стилей {??}',
-		'hasDiffCharsets' => 'Найдены разные кодировки в правилах <b>@charset</b> в файлах стилей<br><br>{?}'
+		'hasDiffCharsets' => 'Найдены разные кодировки в правилах <b>@charset</b> в файлах стилей<br><br>{?}',
+		'incorrectFontFace' => "Некорректное описание правила <b>@font-face</b> в файле стилей {??}<xmp>{?}</xmp>Пример использования переменных для описания шрифтов:<xmp>@font-face {\n\t\$fontName1 = fontFileName1;\n\t\$fontName2 = fontFileName2;\n\t\$fontName2 = fontFileName2;\n}</xmp>",
+		'fontsFolderUnknown' => "В файле стилей {??} обнаружено правило @font-face, в котором использованы переменные. Для их обработки требуется указать в параметре конфигурации <b>fontsFolder</b> название директории, где хранятся шрифты. Директория должна располагаться в корневои каталоге"
 	);
 
 	public function __construct($configProvider) {
@@ -122,18 +124,25 @@ class CSSCompiler
 
 	public function run($cssFiles, $cssConstFiles) {
 		if (is_array($cssFiles) && !empty($cssFiles)) {
+			$notUsedClasses = ClassAnalyzer::getNotUsedClasses();
 			$this->init();
-			foreach ($cssFiles as &$file) {
-				$this->parseClasses($file['name'], $file['content']);
-				$this->parseCharset($file);
+			foreach ($cssFiles as &$f) {
+				if (!in_array($f['name'], $notUsedClasses)) {
+					$f['content'] = preg_replace('/\$\s+\(/', '$(', $f['content']);
+					$this->parseFonts($f['path'], $f['content']);
+					$this->parseClasses($f['name'], $f['content']);
+					$this->parseCharset($f);
+				}
 			}
 			if (count($this->charsets) > 1) {
 				new Error($this->errors['hasDiffCharsets'], $this->getCharsetFiles());
 			}
 
 			$this->initCssConstants($cssConstFiles);
+		
 			$content = array();
 			foreach ($cssFiles as $file) {
+				if (in_array($file['name'], $notUsedClasses)) continue;
 				$this->clearSelectors();
 				$cnt = $file['content'];
 				$cnt = preg_replace('/\$\(([^\)]+)\)\s*(?!;)/', "\$($1);", $cnt);
@@ -162,7 +171,7 @@ class CSSCompiler
 						}
 						$d = $dels[$i];
 						if (!empty($d)) {
-							if ($d != '}') {							
+							if ($d != '}') {
 								$d = preg_replace('/\s*\{/', '', $d);
 								$selectors[] = $d;
 							} else {
@@ -177,12 +186,10 @@ class CSSCompiler
 						new Error($this->errors['extraOpening'], array($file['path']));
 					}
 				}
-
 				$css = '/* '.$file['name']." */\n";
 				foreach ($this->selectors as $selector => $style) {
 					$css .= $selector.'{'.implode(';', $style)."}\n";
 				}
-				$this->parseVariables($css, $file['name']);
 				$this->parseBackgroundImages($css, $imgsrcs);
 				$content[] = $css;
 			}
@@ -208,7 +215,6 @@ class CSSCompiler
 			$css = str_replace('%px', '%', $css);
 			$css = preg_replace('/\s0(px|%)/', " 0", $css);
 			$css = preg_replace('/:0(px|%)/', ":0", $css);
-			$css = preg_replace('/;{2,}/', ';', $css);
 			$css = preg_replace('/==\w+/', '', $css);
 			$css = preg_replace('/ {2,}/', ' ', $css);
 			
@@ -225,7 +231,53 @@ class CSSCompiler
 			$css = preg_replace("/([:\{;,]) {1,}/", "$1", $css);
 			$css = preg_replace("/\*\/[ \t]*([^\r\n])/", "*/\n$1", $css);
 			$css = str_replace(";}", "}", $css);
+			$css = preg_replace('/;{2,}/', ';', $css);
 			Gatherer::createFile(DEFAULT_PATH.$this->config['path'].'.css', $css);
+		}
+	}
+
+	private function parseFonts($file, &$content) {
+		$fontsFolder = $this->configProvider->getFontsFolder();
+		$pathToFonts = DEFAULT_PATH.$fontsFolder;
+		$regexp = '/@font-face\s*\{/';
+		if (preg_match($regexp, $content)) {
+			if (is_dir($pathToFonts)) {
+
+			}
+			$parts = preg_split($regexp, $content);
+			for ($i = 1; $i < count($parts); $i++) {
+				$part = $parts[$i];
+				$ps = explode('}', $part);
+				if (isset($ps[1])) {
+					$css = $ps[0];
+					$ps[0] = '';
+					$ps = implode('}', $ps);
+					preg_match_all('/\$\w/', $css, $matches);
+					$varsCount = count($matches[0]);
+					if ($varsCount > 0) {
+						if (empty($fontsFolder) || !is_dir($pathToFonts)) {
+							new Error($this->errors['fontsFolderUnknown'], $file);
+						}
+						preg_match_all('/\$(\w+)\s*=\s*([\w\-а-я\.]+)\s*;/si', $css, $matches);
+						if ($varsCount != count($matches[0])) {
+							new Error($this->errors['incorrectFontFace'], array($file, $css));
+						}
+						$fontFaces = '';
+						foreach ($matches as $j => $match) {
+							
+						}
+						$parts[$i] = "font-family: 'ptsans';
+src: url('../fonts/ptsans.woff2') format('woff2'),
+     url('../fonts/ptsans.woff') format('woff');
+font-weight: normal;
+font-style: normal;";
+					$parts[$i] .= $ps;
+
+					}
+				}
+			}
+			$parts = implode("\n", $parts);
+			Printer::log($parts);
 		}
 	}
 
@@ -281,28 +333,7 @@ class CSSCompiler
 			if (!in_array($m, $this->charsets)) {
 				$this->charsets[] = $m;
 			}
-		}
-		
-	}
-
-	private function parseVariables(&$css, $filename) {
-		$keys = array();
-		preg_match_all('/([~\.\#a-z_\- \*:]+) *==(\w+)/i', $css, $matches);
-		for ($i = 0; $i < count($matches[1]); $i++) {
-			if (preg_match_all('/~(\w+)/', $matches[1][$i], $ms)) {
-				foreach ($ms[1] as $m) {
-					if (isset($keys[$m])) {
-						$matches[1][$i] = preg_replace('/~'.$m.'\b/', trim($keys[$m]), $matches[1][$i]);
-					} else {
-						new Error($this->errors['variableParse'], array($filename, $matches[2][$i], $m));
-					}
-				}
-			}
-			$keys[$matches[2][$i]] = $matches[1][$i];
 		}		
-		foreach ($keys as $k => $v) {
-			$css = preg_replace('/~'.$k.'\b/', trim($v), $css);
-		}
 	}
 
 	private function parseBackgroundImages(&$css, $imgsrcs) {

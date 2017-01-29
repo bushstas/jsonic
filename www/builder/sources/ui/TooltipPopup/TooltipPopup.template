@@ -1,12 +1,12 @@
-<div class="app-tooltip-popup{$className?' '+$className}{$shown?' ->>shown'}" style="left:{$left}px;top:{$top}px;" scope>
-	<div class="app-tooltip-popup-caption">
+<div class="@{$className?' '+$className}{$shown?' ->>shown'}" style="left:{$left}px;top:{$top}px;" scope>
+	<div class="@caption">
 		{$caption}
 	</div>
-	<div class="app-tooltip-popup-text">
+	<div class="@text">
 		{switch $corrector}
 			{case 'list'}
 				{foreach $text as &item}
-					<div class="app-tooltip-list-item">
+					<div class="@item">
 						{&item}
 					</div>
 				{/foreach}

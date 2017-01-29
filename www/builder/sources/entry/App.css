@@ -1,4 +1,9 @@
 @charset "utf-8";
+@font-face {
+  $ptsans = ptsans;
+  $ptsansbold = ptsansbold;
+  $segoesemibold = seguisb;
+}
 
 *::-webkit-scrollbar { $wh10 } 
 *::-webkit-scrollbar-button { $none } 
@@ -9,27 +14,6 @@
 *::-webkit-scrollbar-corner { $bc#bec5cf }
 *::-webkit-resizer { $bc#bec5cf }
 
-@font-face {
-    font-family: 'ptsans';
-    src: url('../fonts/ptsans.woff2') format('woff2'),
-         url('../fonts/ptsans.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-  font-family: 'ptsansbold';
-  src: url('../fonts/ptsansbold.woff2') format('woff2'),
-       url('../fonts/ptsansbold.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-    font-family: 'segoesemibold';
-    src: url('../fonts/seguisb.woff2') format('woff2'),
-         url('../fonts/seguisb.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
 html {
   $h100%
 }

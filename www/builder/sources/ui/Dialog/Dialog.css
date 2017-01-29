@@ -1,49 +1,48 @@
 $imgsrc = ../images/ui/
 
-.@mask ==m {
+.@mask {
 	$(none fix rubber z699 bc#212D42 opac65)
+    &.shown {
+        $block
+    }
 }
-~m.shown {
-	$block
-}
-.@ ==d {
+
+.@ {
 	$(fix incenter br5 bgwhite none z700)
+    &.shown {
+        $block
+    }
+    &.expanded {
+        $(rubber br0 nosize nomargin)
+        .@title {
+            $br0
+        }
+        .@expand {
+           $png=minimize-dialog
+        }
+    }
 }
-~d.shown {
-	$block
-}
-~d.expanded {
-    $(rubber br0 nosize nomargin)
-}
-.@title ==t {
+.@title {
     $(rel p12 c#4a5b6f z100 bob#e5e9f3 bc#f6f7f9 lh22 fs16 bold center br5_5_0_0)
-}
-~t:empty {
-    $none
-}
-~d.expanded ~t {
-    $br0
+    &:empty {
+        $none
+    }
 }
 .@content {
 	$(rel z2 p15_20)
 }
-.@close ==c,
-.@expand ==e {
-    $ (abs z102 r t10 mr8 wh23 bg pointer opac7 png=close-dialog)
+.@close,
+.@expand {
+    $(abs z102 r t10 mr8 wh23 bg pointer opac7 png=close-dialog)
+    &:hover {
+        $opac10    
+    }
 }
-~e {
+.@expand {
     $(r20 png=expand-dialog opac65)
 }
-~d.expanded ~e {
-    $png=minimize-dialog
-}
-~e:hover,
-~c:hover {
-    $opac10
-}
-.@buttons ==b {
-
-}
-~b:empty {
-    $none
+.@buttons {
+    &:empty {
+        $none
+    }
 }

@@ -1,71 +1,88 @@
 $imgsrc = ../images/searchform
 
-.@options ==o {
+.@options {
 	$(nowrap pl5 bob#e0e4eb h34 rel)
+	.bold {
+		$(inb vmid)
+	}
+	.select {
+		$(w200 inb vmid regular ml12)
+	}
+	.checkbox_label {
+		$(vmid ml10 pr10)
+	}
+	.checkbox {
+		$(mt2)
+	}
+	.keywords-hint {
+		$(abs r2 t8)
+	}
 }
-~o .bold {
-	$(inb vmid)
+.@add-request {
+	& {
+		$(abs r35 t7)
+	}
+	span {
+		$(inb pl14 png=plusreq bp0_50% norep pointer c#5e79a3)
+		&:hover {
+			$c#49658f
+		}
+	}
 }
-~o .select {
-	$(w200 inb vmid regular ml12)
-}
-~o .checkbox_label {
-	$(vmid ml10 pr10)
-}
-~o .checkbox {
-	$(mt2)
-}
-~o .keywords-hint {
-	$(abs r2 t8)
-}
-.@add-request ==r {
-	$(abs r35 t7)
-}
-~r span {
-	$(inb pl14 png=plusreq bp0_50% norep pointer c#5e79a3)
-}
-~r span:hover {
-	$c#49658f
-}
-.@area ==a {
+.@area {
 	$(abs t100 l r b4 ova p0_15 z1)
+	&.multi {
+		$t132;
+
+		.@index {
+			$inb
+		}
+	}
+	.tags_container {
+		$(abs mih0 nomaxh ha t22 l r b)
+	}
+	.tags_content {
+		$t75
+	}
+	.@block.with-recommendations:not(.switched) .tags_container {
+		$b50%
+	}
 }
-~a.multi {
-	$t132
-}
-.@block ==b {
+.@block {
 	$(rel z1 mt20 h97% mih500)
-}
-~b:first-child {
-	$mt0
+	&:first-child {
+		$mt0
+	}
+	&.switched {
+		.@left {
+			$r68.5%
+		}
+		.@right {
+			$l33%
+		}
+		.recommendations {
+			display: none !important;
+		}
+	}
+	&.switched .@left .tags_top-buttons,
+	&:not(.switched) .@right .tags_top-buttons {
+		$none
+	}
+	.recommendations {
+		$(abs l r-327 t50% b none)
+	}
+	&.with-recommendations .recommendations {
+		$block
+	}
 }
 .@left {
 	$(abs t l b r33% z2)
 }
-~b.switched .@left {
-	$r68.5%
-}
 .@right {
 	$(abs t l68.5% b r z1)	
 }
-~b.switched .@right {
-	$l33%
-}
 .@tags-title {
 	$(bold c#3B4452 fs16 lh16)
-}
-~a .tags_container {
-	$(abs mih0 nomaxh ha t22 l r b)
-}
-~a ~b.with-recommendations:not(.switched) .tags_container {
-	$b50%
-}
-~a .tags_content {
-	$t75
-}
-~b.switched .@left .tags_top-buttons,
-~b:not(.switched) .@right .tags_top-buttons {
-	$none
 }
 .app-search-form-panel.keywords-panel .tabs {
 	$mt4
@@ -73,21 +90,9 @@ $imgsrc = ../images/searchform
 .@index {
 	$(c#a1a1a1 fs14 regular none ml10)
 }
-~a.multi .@index {
-	$inb
-}
 .@remove-request {
 	$(pointer c#a66666 inb ml10 fs12)
 }
 .@remove-request:hover {
 	$c#6c3a3a
-}
-~b .recommendations {
-	$(abs l r-327 t50% b none)
-}
-~b.with-recommendations .recommendations {
-	$block
-}
-~b.switched .recommendations {
-	display: none !important;
 }

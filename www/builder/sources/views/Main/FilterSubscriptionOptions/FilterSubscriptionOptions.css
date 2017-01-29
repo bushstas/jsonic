@@ -1,6 +1,6 @@
-.@option ==o {
+.@option {
 	$(mb12 br3 bo#E0E6F3 p10 pointer)
-}
-~o .checkbox {
-	$(mt2)
+	.checkbox {
+		$(mt2)
+	}
 }

@@ -1,35 +1,36 @@
 $imgsrc = ../images/topmenu
 
-.app-top-menu {
+.@ {
 	$(fix t l r z2 h42 lh42 bgwhite bob#B6BFCE bsh_0_1_6_#D1D8E2)
 }
-.app-top-menu-inner {
+.@inner {
     $rel
 }
-body.main-page .app-top-menu-inner {
+body.main-page .@inner {
     $(width ma)
 }
-.app-top-menu a ==a {
+.@ a {
 	$(rel block fleft h38 pl35 pr20 norep c#4c546b fs14 bp10_54% bob#ffffff_4)
-}
-~a.app-top-menu-logo {
-    $(w148 h42 box png = logo bp50%_64%)
-}
-~a:nth-child(2) {
-	$png = main
-}
-~a:nth-child(3) {
-	$png = search
-}
-~a:nth-child(4) {
-	$png = favorite
-}
-~a:nth-child(5) {
-	$png = planzakupok
-}
-~a:nth-child(6) {
-	$png = analytics
-}
-~a.active {
-    $(c#4C546B bold bob#4C546B_4)
+
+	&.@logo {
+	    $(w148 h42 box png = logo bp50%_64%)
+	}
+	&:nth-child(2) {
+		$png = main
+	}
+	&:nth-child(3) {
+		$png = search
+	}
+	&:nth-child(4) {
+		$png = favorite
+	}
+	&:nth-child(5) {
+		$png = planzakupok
+	}
+	&:nth-child(6) {
+		$png = analytics
+	}
+	&.active {
+	    $(c#4C546B bold bob#4C546B_4)
+	}
 }

@@ -7,7 +7,6 @@ class Config
 	private $errors = array(
 		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
 		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
-		'noBlanksDir' => 'Директория с шаблонами файлов {??}, указанная в параметре конфигурации <b>blanks</b> не найдена',
 		'noIndexBlank' => 'Шаблон индексного файла <b>index.html</b> в директории {??} не найден',
 		'invalidPathToApi' => 'Параметр конфигурации <b>pathToApi</b> существует, но пуст или не является строкой',
 		'noApiDir' => 'Директория {??}, указанная в параметре конфигурации <b>pathToApi</b>, не найдена в корневом каталоге',
@@ -15,7 +14,12 @@ class Config
 		'userLogoutNotString' => "Параметр конфигурации <b>user['logout']</b> должен быть строкой",
 		'userSaveNotString' => "Параметр конфигурации <b>user['save']</b> должен быть строкой",
 		'userLoginEmpty1' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['logout']</b> задан",
-		'userLoginEmpty2' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['save']</b> задан"
+		'userLoginEmpty2' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['save']</b> задан",
+		'coreNotFound' => "Директория {??} не найдена в папке <b>builder</b>",
+		'incorrectValue' => "Некорректоное значение параметра конфигурации {??}<br><br> Текущее значение: {??}<br><br>Корректное значение должно содержать имя директории и соответствовать паттерну <b>^[\w-]+$</b>",
+		'folderNotFound' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в папке <b>builder</b>",
+		'folderNotFound2' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в корневом каталоге",
+		'defaultFolderNotFound' => "Параметр конфигурации {??} не заполнен, директория по умолчанию {??} также не найдена"
 	);
 
 	public function init($builder) {
@@ -38,6 +42,7 @@ class Config
 				new Error($this->errors['noApiDir'], array($this->pathToApiDir));
 			}
 		}
+		$this->validatePathNames();
 		$this->validateUserConfig();
 	}
 
@@ -47,7 +52,7 @@ class Config
 
 	public function getGathererConfig() {
 		return array(
-			'pathToSrc' => $this->getPathToScope(),
+			'pathToSrc' => $this->config['scope'],
 			'pathToCore' => $this->getPathToCore(),
 			'pathToTests' => $this->getPathToTests(),
 			'pathToScripts' => $this->getPathToScripts()
@@ -115,10 +120,7 @@ class Config
 			$pathToIndexFile = DEFAULT_PAGE;
 		}
 
-		$pathToBlanks = $this->getPathToBlanks();
-		if (!is_dir($pathToBlanks)) {
-			new Error($this->errors['noBlanksDir'], array($pathToBlanks));
-		}
+		$pathToBlanks = PATH_TO_BLANKS;
 		$pathToBlankIndexFile = rtrim($pathToBlanks, '/').'/index.html';		
 		if (!file_exists($pathToBlankIndexFile)) {
 			new Error($this->errors['noIndexBlank'], array($pathToBlanks));
@@ -171,35 +173,19 @@ class Config
 	}
 
 	public function getPathToCore() {
-		$pathToCore = $this->config['core'];
-		if (empty($pathToCore)) {
-			$pathToCore = PATH_TO_SOURCES;
-		}
-		return $pathToCore;
-	}
-
-	public function getPathToScope() {
-		$pathToSrc = $this->config['scope'];
-		if (empty($pathToSrc)) {
-			$pathToSrc = DEFAULT_SCOPE;
-		}
-		return $pathToSrc;
+		return PATH_TO_SOURCES;
 	}
 
 	public function getPathToTests() {
 		return $this->config['tests'];
 	}
 
-	public function getPathToScripts() {
-		return $this->config['scripts'];
+	public function getFontsFolder() {
+		return $this->config['fontsFolder'];
 	}
 
-	public function getPathToBlanks() {
-		$pathToBlanks = $this->config['blanks'];
-		if (empty($pathToBlanks)) {
-			$pathToBlanks = PATH_TO_BLANKS;
-		}
-		return $pathToBlanks;
+	public function getPathToScripts() {
+		return $this->config['scripts'];
 	}
 
 	public function needCssObfuscation() {
@@ -228,6 +214,41 @@ class Config
 
 	public function hasUser() {
 		return $this->isUser;
+	}
+
+	private function validatePathNames() {
+		$regexp = '/^[\w\-]+$/';
+		if (!is_dir(PATH_TO_SOURCES)) {
+			new Error($this->errors['coreNotFound'], array(PATH_TO_SOURCES));
+		}
+		if (!is_dir(PATH_TO_BLANKS)) {
+			new Error($this->errors['coreNotFound'], array(PATH_TO_BLANKS));
+		}
+		$folders = array(
+			'scope', 'tests', 'imagesFolder', 'fontsFolder'
+		);
+		$paths = array(
+			'imagesFolder' => '../',
+			'fontsFolder' => '../'
+		);
+		foreach ($folders as $k) {
+			$path = $this->config[$k];
+			if (!empty($path)) {
+				if (!preg_match($regexp, $path)) {
+					new Error($this->errors['incorrectValue'], array($k, $path));
+				}
+				if (!is_dir($paths[$k].$path)) {
+					if (empty($paths[$k])) {
+						new Error($this->errors['folderNotFound'], array($path, $k));
+					}
+					new Error($this->errors['folderNotFound2'], array($path, $k));
+				}
+			} else {
+				if (!is_dir($paths[$k].$v)) {
+					new Error($this->errors['defaultFolderNotFound'], array($k, $v));
+				}
+			}
+		}
 	}
 
 	private function validateUserConfig() {

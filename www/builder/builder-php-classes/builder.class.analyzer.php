@@ -8,6 +8,7 @@ class ClassAnalyzer
 	private static $usedControllers = array();
 	private static $usedCorrectors = array();
 	private static $usedComponents = array();
+	private static $notUsedClasses = array();
 	private static $allJsClasses;
 	private static $jsClassesData;
 
@@ -59,7 +60,8 @@ class ClassAnalyzer
 				self::$usedComponents[] = $className;
 			}
 			self::$usedClasses[] = $className;
-		}	
+		}
+		self::$notUsedClasses = array_diff(self::$allJsClasses, self::$usedClasses);
 		//Printer::log(self::$usedControllers);
 		//Printer::log(self::$usedClasses);
 	}
@@ -72,6 +74,10 @@ class ClassAnalyzer
 			self::$usedCorrectors[] = $className;
 			self::$usedClasses[] = $className;
 		}
+	}
+
+	public static function getNotUsedClasses() {
+		return self::$notUsedClasses;
 	}
 
 	public static function getUsedClasses() {

@@ -1,22 +1,22 @@
 $imgsrc = ../images/tooltips
-.app-tooltip-popup ==tp {
+.@ {
 	$(fix bgwhite box none z750 br3 bo#C1C7D2 fs14 c#47536c lh20 miw200 maw400)
+	&.shown {
+		$block
+	}
 }
-~tp.shown {
-	$block
-}
-.app-tooltip-popup-caption ==tc {
+.@caption {
     $(h35 lh36 bob#e5e9f3 pl43 norep c#4a5b6f fs16 bc#f7f8f9 bold png = info bp10_50%)
+    &:empty {
+		$none
+	}
 }
-~tc:empty {
-	$none
-}
-.app-tooltip-popup-text {
+.@text {
 	$p15_18
 }
-.app-tooltip-list-item ==ti {
+.@item {
 	$(rel lh16 p4_0_4_12)
-}
-~ti:before {
-	$(cnt wh5 round abs l t10 bc#47536c)
+	&:before {
+		$(cnt wh5 round abs l t10 bc#47536c)
+	}
 }

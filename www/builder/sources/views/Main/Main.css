@@ -1,19 +1,23 @@
 $imgsrc = ../images/mainpage
 
-.main-view-content ==c {
-	$(rel width ma)
+.main-view-content {
+	& {
+        $(rel width ma)
+    }
+    table {
+        $w100%
+    }
 }
-~c table {
-	$w100%
-}
-.mainpage-table ==tb > tr > td {
-	$vtop
-}
-~tb .mainpage-left-column {
-	$(w354 p12)
-}
-~tb .mainpage-content-column {
-    $(pt12 rel)
+.mainpage-table {
+    & > tr > td {
+	   $vtop
+    }
+    .mainpage-left-column {
+        $(w354 p12)
+    }
+    .mainpage-content-column {
+        $(pt12 rel)
+    }
 }
 .mainpage-left-column-area {
 	$(rel mih180 br3 fs14 p49_20_12_20)
@@ -26,11 +30,11 @@ $imgsrc = ../images/mainpage
     $(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
-.mainpage-leftcolumn-title ==t {
+.mainpage-leftcolumn-title {
     $(mt27 fs16 c#4c546b pb7)
-}
-~t .tooltip {
-    $fright
+    .tooltip {
+       $fright
+    }
 }
 .mainpage-content {
     $(abs b12 t46 l r12 br3 ova p12_15 box)
