@@ -8,7 +8,7 @@ define('DEFAULT_CSS_COMPILED', 'styles');
 define('DEFAULT_JS_COMPILED', 'base');
 define('DEFAULT_PAGE', 'index.html');
 define('PATH_TO_SOURCES', 'core');
-define('PATH_TO_BLANKS', 'blanks');
+define('PATH_TO_BLANKS', FOLDER.'/blanks');
 define('DEFAULT_CONTAINER', 'app-view-container');
 define('DEFAULT_PAGETITLE', 'Page title');
 define('DEFAULT_CHARSET', 'windows-1251');

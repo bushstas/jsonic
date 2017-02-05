@@ -43,6 +43,31 @@ class Splitter
 		return $text;
 	}
 
+	public static function getInners($text, $regexp, $closing = '}', $opening = '{') {
+		$parts = preg_split($regexp, $text);
+		if (count($parts) > 1) {
+			preg_match_all($regexp, $text, $matches);
+			$outers = array($parts[0]);
+			$inners = array();
+			$openings = array();
+			for ($i = 1; $i < count($parts); $i++) {
+				$data = Splitter::getInner($parts[$i], $closing, $opening);
+				$outers[] = $data['outer'];
+				$inners[] = $data['inner'];
+			}
+			return array(
+				'outers' => $outers,
+				'inners' => $inners,
+				'openings' => $matches[0]
+			);
+		} else {
+			return array(
+				'outers' => array($text),
+				'inners' => array()
+			);
+		}
+	}
+
 	public static function getInner($text, $closing = '}', $opening = '{') {
 		$inner = '';
 		$outer = '';

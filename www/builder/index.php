@@ -94,21 +94,34 @@
 		<iframe name="iframe" id="iframe" width="70%" height="940"></iframe>
 		<div class="options">
 			<label>
-				<input type="checkbox" vlaue="1" name="create"> 
+				<input type="checkbox" value="1" name="create"> 
 				Создать окружение
 			</label>
 			<label>
-				<input type="checkbox" vlaue="1" name="advanced"> 
+				<input type="checkbox" value="1" name="advanced"> 
 				Усиленная обфускация
 			</label>
 			<label>
-				<input type="checkbox" vlaue="1" name="js_obfuscate"> 
+				<input type="checkbox" value="1" name="js_obfuscate"> 
 				Обфускация js кода
 			</label>
 			<label>
-				<input type="checkbox" vlaue="1" name="obfuscate"> 
+				<input type="checkbox" value="1" name="obfuscate"> 
 				Обфускация css классов
-			</label>			
+			</label>
+
+			<label>
+				<input type="radio" checked value="1" name="split"> 
+				Не разбивать на файлы
+			</label>
+			<label>
+				<input type="radio" value="2" name="split"> 
+				Отдельно, каждая часть включает ядро
+			</label>
+			<label>
+				<input type="radio" value="3" name="split"> 
+				Отдельно компоненты, ядро также отдельно
+			</label>
 		</div>
 	</form>
 </body>

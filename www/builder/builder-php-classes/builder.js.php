@@ -627,8 +627,9 @@ class JSCompiler
 
 	private function finish() {
 		$this->decodeTexts();
-
-		$this->jsOutput = ";(function() {\n".$this->jsOutput;
+		if ($this->configProvider->getSplitMode() == 1) {
+			$this->jsOutput = ";(function() {\n".$this->jsOutput;
+		}
 		$this->jsOutput = preg_replace("/, *\)/", ')', $this->jsOutput);
 		$this->jsOutput = preg_replace("/'<nq>/", '', $this->jsOutput);
 		$this->jsOutput = preg_replace("/<nq>'/", '', $this->jsOutput);
@@ -884,7 +885,9 @@ class JSCompiler
 		} else {
 			$this->bottomOutput[] = $entry.".run();";
 		}
-		$this->bottomOutput[] = "})();";
+		if ($this->configProvider->getSplitMode() == 1) {
+			$this->bottomOutput[] = "})();";
+		}
 	}
 
 	private function hasComponentMethod($method, $class) {

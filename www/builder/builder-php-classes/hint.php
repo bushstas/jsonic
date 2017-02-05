@@ -35,15 +35,11 @@
 			<xmp>\"entry\": \"App\"</xmp>";
 			$items[] = "<b>scope</b> - Путь к директории, в пределах которой будет производиться поиск файлов источников, относительно директории builder
 			<xmp>\"scope\": \"./sources\"</xmp>";
-			$items[] = "<b>core</b> - Путь к директории, где располагается ядро приложения, относительно директории builder
-			<xmp>\"core\": \"./core\"</xmp>";
 			$items[] = "<b>tests</b> - Путь к директории, где располагаются описания тестов приложения, относительно директории builder
 			<xmp>\"tests\": \"./tests\"</xmp>";
-			$items[] = "<b>blanks</b> - Путь к директории, где располагаются заготовки для гененрации HTML и JS кода, относительно директории builder. Там вы можете настроить, как будет выглядеть ваш индексный файл
-			<xmp>\"blanks\": \"./blanks\"</xmp>";
 			$items[] = "<b>scripts</b> - Путь к директории, где располагаются сторонние JS скрипты, которые нужно включить в приложение, относительно директории builder
 			<xmp>\"scripts\": \"./scripts\"</xmp>";
-			$items[] = "<b>views</b> - Название директории, в которой будут сгенерированы классы с типом view. Генерация производится для быстрого создания нужной инфраструктуры с нуля, активируется специальным чекбоксом справа. Для генерации используются данные указанные в поле <b>routes</b> параметра <b>router</b>. Директория будет также сгенерирована, если ее нет, в папке определенной в параметре <b>scope</b>. Сгенерированы будут только те классы, которых еще нет, существующие не будут затронуты. Для настройки заготовки классов с типом view, смотрите параметр <b>blanks</b>
+			$items[] = "<b>views</b> - Название директории, в которой будут сгенерированы классы с типом view. Генерация производится для быстрого создания нужной инфраструктуры с нуля, активируется специальным чекбоксом справа. Для генерации используются данные указанные в поле <b>routes</b> параметра <b>router</b>. Директория будет также сгенерирована, если ее нет, в папке определенной в параметре <b>scope</b>. Сгенерированы будут только те классы, которых еще нет, существующие не будут затронуты.
 			<xmp>\"views\": \"views\"</xmp>";
 			
 			$items[] = true;
@@ -481,19 +477,56 @@
 			$items[] = "Также доступна вложенность селекторов друг в друга, например:<xmp>.parent {\n\twidth: 100px;\n\n\t.child {\n\t\twidth: 50px;\n\t}\n\n\t&:empty {\n\t\tdisplay: none;\n\t}\n}</xmp>";
 			$items[] = "Внутри стилей доступны пользовательские переменные, которые имеют вид:<xmp>.container {\n\t\$container\n}</xmp><xmp>.title {\n\tcolor: \$red;\n\twidth: \$standartWidth;\n}</xmp>";
 			$items[] = "Переменные не могут включать в себя названия селекторов с фигурными скобками";
-			$items[] = "Существуют предустановленные константы, список которых будет представлен в самом низу";
-			$items[] = "Пример использования данных констант:<xmp>.container {\n\t\$block \$abs \$z20\n}</xmp>";
+			$items[] = "Существуют предустановленные переменные, список которых будет представлен в самом низу";
+			$items[] = "Пример использования данных переменных:<xmp>.container {\n\t\$block \$abs \$z20\n}</xmp>";
 			$items[] = "Для удобства переменные можно объединять внутри круглых скобок:<xmp>.container {\n\t\$(block abs z20)\n}</xmp>";
 			$items[] = "Данные примеры соотвествуют записи:<xmp>.container {\n\tdisplay: block;\n\tposition: absolute;\n\tz-index: 20;\n}</xmp>";
 			$items[] = "Для описания своих переменных используйте файлы с расширением <b>.cssconst</b>, которые могут иметь любые имена и располагаться где угодно";
 			$items[] = "Пример содержимого такого файла:<xmp>\$red: #b65f5f\n\$width: 1350px\n\$semibold: font-family: segoesemibold</xmp>";
 			$items[] = "При обнаружении одинаковых имен переменных в пользовательских .cssconst файлах произойдет ошибка";
-			$items[] = "Переопределение предустановленной константы разрешается и не приведет к ошибке";
-			$items[] = "Далее представлен список предопределенных css констант";
+			$items[] = "Переопределение предустановленной переменные разрешается и не приведет к ошибке";
+			$items[] = "Далее представлен список предопределенных css переменных";
 			foreach ($defaultCssConsts as $k => $v) {
 				$items[] = '<b>'.$k.'</b> = '.$v;
 			}
-			
+			$items[] = "Также существуют переменные с динамическими значениями";
+			$items[] = '<b>z999</b> = z-index: 999;';
+			$items[] = '<b>w500</b> | <b>w50%</b> = width: 500px; | width: 50%;';
+			$items[] = '<b>wh20</b> = width: 20px; height: 20px;';
+			$items[] = '<b>h500</b> | <b>h50%</b> = height: 500px; | height: 50%;';
+			$items[] = '<b>l20</b> | <b>l10%</b> = left: 20px; | left: 10%;';
+			$items[] = '<b>r20</b> | <b>r10%</b> = right: 20px; | right: 10%;';
+			$items[] = '<b>t20</b> | <b>t10%</b> = top: 20px; | top: 10%;';
+			$items[] = '<b>b20</b> | <b>b10%</b> = bottom: 20px; | bottom: 10%;';
+			$items[] = '<b>m10</b> = margin: 10px;';
+			$items[] = '<b>m5_15</b> = margin: 5px 15px;';
+			$items[] = '<b>m5_15_12_10</b> = margin: 5px 15px 12px 10px;';
+			$items[] = '<b>ml10</b> = margin-left: 10px;';
+			$items[] = '<b>mr10</b> = margin-right: 10px;';
+			$items[] = '<b>mt10</b> = margin-top: 10px;';
+			$items[] = '<b>mb10</b> = margin-bottom: 10px;';
+			$items[] = '<b>p10</b> = padding: 10px;';
+			$items[] = '<b>p5_15</b> = padding: 5px 15px;';
+			$items[] = '<b>p5_15_12_10</b> = padding: 5px 15px 12px 10px;';
+			$items[] = '<b>pl10</b> = padding-left: 10px;';
+			$items[] = '<b>pr10</b> = padding-right: 10px;';
+			$items[] = '<b>pt10</b> = padding-top: 10px;';
+			$items[] = '<b>pb10</b> = padding-bottom: 10px;';
+			$items[] = '<b>br5</b> = border-radius: 5px;';
+			$items[] = '<b>br5_0_5_0</b> = border-radius: 5px 0 5px 0;';
+			$items[] = '<b>fs18</b> = font-size: 18px;';
+			$items[] = '<b>lh22</b> = line-height: 22px;';
+			$items[] = '<b>c#DDDDDD</b> = color: #DDDDDD;';
+			$items[] = '<b>bc#000000</b> = background-color: #000000;';
+			$items[] = '<b>bp10_50%</b> = background-position: 10px 50%;';
+			$items[] = '<b>bo#FFFFFF</b> = border: 1px solid #FFFFFF;';
+			$items[] = '<b>bo#FFFFFF_5</b> = border: 5px solid #FFFFFF;';
+			$items[] = '<b>bol#AAAAAA</b> = border-left: 1px solid #AAAAAA;';
+			$items[] = '<b>bor#AAAAAA</b> = border-right: 1px solid #AAAAAA;';
+			$items[] = '<b>bot#AAAAAA</b> = border-top: 1px solid #AAAAAA;';
+			$items[] = '<b>bob#AAAAAA</b> = border-bottom: 1px solid #AAAAAA;';
+			$items[] = '<b>gr_top_#AAA_#DDD</b> = background-image: linear-gradient(to top, #AAA, #DDD);';
+			$items[] = '<b>rot-90</b> = transform: rotate(-90deg);';
 		break;
 
 		default:

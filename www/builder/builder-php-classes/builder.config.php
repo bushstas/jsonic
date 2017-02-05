@@ -196,6 +196,10 @@ class Config
 		return !empty($_GET['js_obfuscate']);
 	}
 
+	public function getSplitMode() {
+		return $_GET['split'];
+	}
+
 	public function needToCreateEnvironment() {
 		return !empty($_GET['create']);
 	}
