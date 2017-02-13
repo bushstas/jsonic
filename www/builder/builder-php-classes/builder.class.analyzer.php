@@ -5,6 +5,7 @@ class ClassAnalyzer
 {
 	private static $matches = array();
 	private static $usedClasses = array();
+	private static $usedClassesByViews = array();
 	private static $usedControllers = array();
 	private static $usedCorrectors = array();
 	private static $usedComponents = array();
@@ -44,6 +45,7 @@ class ClassAnalyzer
 				self::addUsedClassFor($viewClass, $usedClasses[$viewClass]);
 			}
 		}
+		self::$usedClassesByViews = $usedClasses;
 
 		$allUsed = array();
 		foreach ($usedClasses as $list) {
@@ -80,8 +82,11 @@ class ClassAnalyzer
 		return self::$notUsedClasses;
 	}
 
-	public static function getUsedClasses() {
-		return self::$usedClasses;
+	public static function getUsedClasses($routeName = null) {
+		if (empty($routeName)) {
+			return self::$usedClasses;
+		}
+		return self::$usedClassesByViews[$routeName];
 	}
 
 	public static function getUsedCorrectors() {
@@ -92,8 +97,19 @@ class ClassAnalyzer
 		return self::$usedControllers;
 	}
 
-	public static function getUsedComponents() {
-		return self::$usedComponents;
+	public static function getUsedComponents($routeName = null) {
+		if (empty($routeName)) {
+			return self::$usedComponents;
+		}
+		$used = self::$usedClassesByViews[$routeName];
+		$components = array();
+		foreach ($used as $className) {
+			$class = self::$jsClassesData[$className];
+			if (!in_array($class['type'], array('controller', 'corrector'))) {
+				$components[] = $className;
+			}
+		}
+		return $components;
 	}
 
 	private static function addUsedClassFor($className, &$list) {

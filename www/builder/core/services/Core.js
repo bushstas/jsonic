@@ -20,7 +20,6 @@ var Core = new (function() {
 	};
 	this.processInitials = function() {
 		var initials = this.initials;
-		console.log(initials)
 		if (isObject(initials)) {
 			if (isController(this)) {
 				this.options = initials['options'];

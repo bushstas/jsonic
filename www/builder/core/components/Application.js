@@ -8,10 +8,10 @@ function Application() {
 	
 	var getViewParams = function(route, allParams) {
 		var params;
-		if (isObject(route['dinamicParams'])) {
+		if (isObject(route['dynamicParams'])) {
 			params = {};
-			for (var k in route['dinamicParams']) {
-				params[k] = Router.getPathPartAt(route['dinamicParams'][k]);
+			for (var k in route['dynamicParams']) {
+				params[k] = Router.getPathPartAt(route['dynamicParams'][k]);
 			}
 		}
 		if (allParams) {
@@ -37,9 +37,14 @@ function Application() {
 			activateView.call(this, this.currentView, false);
 		}
 		this.currentView = view;
-		if (!isUndefined(view) && isFunction(route['view'])) {
+		if (!isUndefined(view) && !isUndefined(route['view'])) {
 			if (!view) {
 				var viewParams = getViewParams.call(this, route, true);
+				if (isString(route['view'])) {
+					if (isFunction(window[route['view']])) {
+						route['view'] = window[route['view']];
+					}
+				}
 				view = this.currentView = this.views[route['name']] = new route['view']();
 				Core.initiate.call(view, viewParams);
 				view.setOnReadyHandler(onViewReady.bind(this));

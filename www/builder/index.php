@@ -111,16 +111,8 @@
 			</label>
 
 			<label>
-				<input type="radio" checked value="1" name="split"> 
-				Не разбивать на файлы
-			</label>
-			<label>
-				<input type="radio" value="2" name="split"> 
-				Отдельно, каждая часть включает ядро
-			</label>
-			<label>
-				<input type="radio" value="3" name="split"> 
-				Отдельно компоненты, ядро также отдельно
+				<input type="checkbox" value="1" name="split"> 
+				Разбивать на js на отдельные файлы
 			</label>
 		</div>
 	</form>
