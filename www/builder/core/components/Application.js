@@ -28,6 +28,23 @@ function Application() {
 			Controllers.load(route['load']);
 		}
 	};
+	var loadView = function(route) {
+		var script = document.createElement('script');
+		script.src = '/js/base_' + route['name'] + '.js';
+		document.body.appendChild(script);
+		script.onload = onViewLoaded.bind(this, route);
+	};
+	var onViewLoaded = function(route) {
+		console.log(window[route['view']])
+	};
+	var renderView = function(route) {
+		var view = this.currentView = this.views[route['name']] = new route['view']();
+		var viewParams = getViewParams.call(this, route, true);
+		Core.initiate.call(view, viewParams);
+		view.setOnReadyHandler(onViewReady.bind(this));
+		var viewContentElement = createViewContentElement.call(this, route['name']);
+		view.render(viewContentElement);
+	};
 	var handleNavigation = function(route, changeTitle) {
 		this.isChangeTitle = changeTitle;
 		this.currentRoute = route;
@@ -39,12 +56,8 @@ function Application() {
 		this.currentView = view;
 		if (!isUndefined(view) && isFunction(route['view'])) {
 			if (!view) {
-				var viewParams = getViewParams.call(this, route, true);
-				view = this.currentView = this.views[route['name']] = new route['view']();
-				Core.initiate.call(view, viewParams);
-				view.setOnReadyHandler(onViewReady.bind(this));
-				var viewContentElement = createViewContentElement.call(this, route['name']);
-				view.render(viewContentElement);
+				loadView.call(this, route);
+				//renderView.call(this, route);
 				loadControllers(route);
 				if (typeof Dictionary != 'undefined') {
 					Dictionary.load(route['name']);

@@ -41,7 +41,7 @@ class HTMLCompiler
 	}
 
 	private function createEnvironment() {
-		$pathToBlanks = $this->configProvider->getPathToBlanks();
+		$pathToBlanks = PATH_TO_BLANKS;
 		if (file_exists($pathToBlanks.'/view.js')) {
 			$this->defaultViewCode = file_get_contents($pathToBlanks.'/view.js');
 		}
@@ -95,7 +95,7 @@ class HTMLCompiler
 	}
 
 	private function createErrorViewDirs($errorViews, $pathToViews) {
-		$pathToBlanks = $this->configProvider->getPathToBlanks();
+		$pathToBlanks = PATH_TO_BLANKS;
 		if (is_array($errorViews)) {
 			foreach ($errorViews as $errorCode => $errorViewName) {
 				$defaultTemplateContent = '';

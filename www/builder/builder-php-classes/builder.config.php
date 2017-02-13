@@ -52,11 +52,15 @@ class Config
 
 	public function getGathererConfig() {
 		return array(
-			'pathToSrc' => $this->config['scope'],
+			'pathToSrc' => $this->getPathToScope(),
 			'pathToCore' => $this->getPathToCore(),
 			'pathToTests' => $this->getPathToTests(),
 			'pathToScripts' => $this->getPathToScripts()
 		);
+	}
+
+	public function getPathToScope() {
+		return $this->config['scope'];
 	}
 
 	public function getCssConfig() {
