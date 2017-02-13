@@ -92,10 +92,10 @@ _c = new (function() {
 	this.inherits = function(list) {
 		var children, parent, child, initials, sc;
 		for (var k = 0; k < list.length; k++) {
-			parent = list[k];
+			parent = {{GLOBAL}}.get(list[k]);
 			children = list[++k];
 			for (var i = 0; i < children.length; i++) {
-				child = children[i];
+				child = {{GLOBAL}}.get(children[i]);
 				if (!child.prototype.inheritedSuperClasses) {
 					child.prototype.inheritedSuperClasses = [];
 				}

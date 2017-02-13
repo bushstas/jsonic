@@ -260,7 +260,7 @@ class JSParser
 				if (!in_array($crrName, self::$correctors)) {
 					new Error(self::$errors['unknownCorr'], array($crr, $name, $class));
 				}
-				$code = $k."=".$crr."Crr.correct(".$k.");\n".$code;
+				$code = $k."=".self::$globals['GLOBAL'].".get('".$crr."Crr').correct(".$k.");\n".$code;
 				if (!in_array($crrName, self::$usedCorrectors)) {
 					self::$usedCorrectors[] = $crrName;
 				}

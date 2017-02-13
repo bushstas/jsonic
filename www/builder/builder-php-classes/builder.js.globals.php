@@ -242,7 +242,7 @@ class JSGlobals
 	}
 
 	private static function addRoutes($routes, $controllers) {
-		TextParser::createObjectString($routes, array('/view":"([^"]+)"/', "view':$1"));
+		TextParser::createObjectString($routes);
 		foreach ($controllers as $i => $ctr) {
 			$routes = preg_replace('/\''.$ctr.'\'/', $i, $routes);
 		}
@@ -250,7 +250,7 @@ class JSGlobals
 	}
 
 	private static function addErrorRoutes($routes) {
-		TextParser::createObjectString($routes, array('/":"([^"]+)"/', "':$1"));
+		TextParser::createObjectString($routes);
 		self::add('errorRoutes', $routes);
 	}
 
@@ -272,7 +272,7 @@ class JSGlobals
 	}
 
 	private static function addTooltipClass($tooltipClass) {
-		self::add('tooltipClass', !empty($tooltipClass) ? $tooltipClass : 'null');
+		self::add('tooltipClass', !empty($tooltipClass) ? "'".$tooltipClass."'" : 'null');
 	}
 
 	private static function addTooltipApi($tooltipApi) {
@@ -297,7 +297,7 @@ class JSGlobals
 	}
 
 	private static function addControllers($controllers) {
-		self::add('controllers', str_replace('"', '<nq>', json_encode($controllers)));
+		self::add('controllers', str_replace('"', "'", json_encode($controllers)));
 	}
 
 	private static function addStopPropagationFunction() {

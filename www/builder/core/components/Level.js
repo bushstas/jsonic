@@ -211,6 +211,7 @@ _c = function(component) {
 
 	var renderComponent = function(item, pe) {
 		pe = pe || parentElement;
+		item['cmp'] = {{GLOBAL}}.get(item['cmp']);
 		if (isFunction(item['cmp'])) {
 			var cmp = new item['cmp']();
 			var ir = isFunction(item['p']);

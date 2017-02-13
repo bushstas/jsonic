@@ -129,7 +129,7 @@ _c = function() {
 	var load = function() {
 		if (isString(tooltipApi)) {
 			if (isUndefined(request)) {
-				request = new AjaxRequest(tooltipApi, onLoad);
+				request = new {{GLOBAL}}.get('AjaxRequest')(tooltipApi, onLoad);
 			}
 			request.execute({'name': key});
 		}

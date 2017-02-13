@@ -98,9 +98,6 @@ class TextParser
 			if (!empty($part) && $parts != 'null' && $part != 'false' && $part != 'true' && !is_numeric($part)) {
 				$isNotQuoted = !preg_match('/^["\']/', $part);
 				$part = trim(trim($part, '"'), "'");
-				if ($addNQs && $isNotQuoted && self::inDictionary($part)) {
-					$part = '<nq>'.$part.'<nq>';
-				}
 				$part = '"'.str_replace('"', "'", $part).'"';
 			}
 		}

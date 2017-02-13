@@ -1186,7 +1186,7 @@ class TemplateParser
 		$tn = $item['tagName'];
 		if ($isComponentTag) {
 			if ($tn != 'Component' && $tn != 'Control') {
-				$child['cmp'] = '<nq>'.$tn.'<nq>';
+				$child['cmp'] = $tn;
 				$cmpType = self::$classes[$tn]['type'];
 			} else {
 				$isDinamycComponent = true;

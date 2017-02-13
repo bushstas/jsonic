@@ -648,7 +648,7 @@ class JSCompiler
 	private function finish() {
 		$this->decodeTexts();
 		if (!$this->configProvider->isSplitMode()) {
-			$this->jsOutput = "'use strict';\nnew (function() {\nvar _G_=this,_cs_={};\nthis.get=function(k,i){if(i){var c=new _cs_[k]();this.set(c,k);return c}return _cs_[k]}\nthis.set=function(c,k) {_cs_[k]=c}\n;(function(){var _c,_p;\n".
+			$this->jsOutput = "'use strict';\nnew (function() {\nvar _G_=this,_cs_={};\nthis.get=function(k,i){if(i){var c=new _cs_[k]();this.set(c,k);return c}return _cs_[k]}\nthis.set=function(c,k,i) {if(i){c=new c()}_cs_[k]=c}\n;(function(){var _c,_p;\n".
 			$this->jsOutput;
 		}
 		$this->jsOutput = preg_replace("/, *\)/", ')', $this->jsOutput);
@@ -658,7 +658,9 @@ class JSCompiler
 		$this->jsOutput = preg_replace("/;{2,}/", ';', $this->jsOutput);
 		$this->jsOutput = preg_replace("/ {2,}/", ' ', $this->jsOutput);
 		$this->jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $this->jsOutput);
+		$this->jsOutput = preg_replace("/_c\s*=\s*function/", '_c=fnc_', $this->jsOutput);
 		$this->jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", JSGlobals::getVarName('nullFunction'), $this->jsOutput);
+		$this->jsOutput = str_replace("_c=fnc_", '_c=function', $this->jsOutput);
 
 		if ($this->configProvider->needCssObfuscation()) {
 			$this->cssCompiler->obfuscateJs($this->jsOutput);
@@ -759,11 +761,11 @@ class JSCompiler
 					if ($func['name'] != '__constructor') {
 						$this->addPrototypeFunction($className, $func['name'], $args, $func['code']);
 					} else {
-						$this->addConstructorFunction($className, in_array($type, $this->componentLikeClassTypes));
+						$this->addConstructorFunction($className, in_array($type, $this->componentLikeClassTypes), $type);
 						if ($type == 'application' && $isSplitted) {
-							$this->jsOutput[] = "\np=".$className.'.prototype;';
+							$this->jsOutput[] = "\n_p=_c.prototype;";
 						} else {
-							$output[] = "\np=".$className.'.prototype;';
+							$output[] = "\n_p=_c.prototype;";
 						}
 					}						
 				}
@@ -781,6 +783,7 @@ class JSCompiler
 			if (!empty($class['initials'])) {
 				$this->addGetInitialsFunction($className, $class['initials']);
 			}
+
 			if (is_array($class['callbacks'])) {
 				foreach ($class['callbacks'] as $callback) {
 					if (!$this->hasComponentMethod($callback, $class)) {
@@ -814,9 +817,6 @@ class JSCompiler
 						}
 					}
 				}
-			}
-			if ($class['type'] == 'corrector') {
-				$output[] = $className.'=new '.$className.'();';
 			}
 			if ($type == 'application' && $isFirstTime) {
 				$this->currentRoute = $route;
@@ -930,14 +930,14 @@ class JSCompiler
 				$childClasses = $enabledClasses;
 			}
 			if (!empty($childClasses)) {
-				$inheritance[] = $parentClass;
-				$inheritance[] = '['.implode(',', $childClasses).']';
+				$inheritance[] = "'".$parentClass."'";
+				$inheritance[] = "['".implode("','", $childClasses)."']";
 			}
 		}		
 		if (empty($route)) {
 			$core = $globals['global'];
 			$this->bottomOutput[] = "var core=".$core.".get('Core');";
-			$this->bottomOutput[] = "core.inherits(['".implode("','", $inheritance)."']);";
+			$this->bottomOutput[] = "core.inherits([".implode(",", $inheritance)."]);";
 			$controllers = array('Router', 'User');
 			if (!empty($controllers)) {
 				foreach ($controllers as $controller) {
@@ -946,7 +946,7 @@ class JSCompiler
 				
 			}		
 			$entry = $this->config['entry'];
-			$this->bottomOutput[] = $entry." = new ".$entry."();";
+			$this->bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
 			$this->bottomOutput[] = "core.initiate.call(".$entry.");";
 			if ($this->config['hasUser']) {
 				$this->bottomOutput[] = "User.load(".$entry.");";
@@ -987,19 +987,25 @@ class JSCompiler
 		}
 	}
 
-	private function addConstructorFunction($className, $isComponent) {
+	private function addConstructorFunction($className, $isComponent, $type) {
+		$gs = JSGlobals::getVarNames();
+		$g = $gs['global'];
 		if (empty($this->currentRoute)) {
 			$output = &$this->jsOutput;
 		} else {
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
 		$routerMenuClasses = $this->config['routerMenu'];
-		$output[] = 'function '.$className.'(){';
+		$output[] = '_c=function(){';
 		if ($isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses)) {
 			$output[] = "\tRouter.addMenu(this);";
 			$output[] = "\tthis.isRouteMenu=true;";
-		}		
-		$output[] = '};';
+		}
+		$isSingleton = '';
+		if ($type == 'corrector') {
+			$isSingleton = ',1';
+		}
+		$output[] = "};\n".$g.".set(_c,'".$className."'".$isSingleton.");";
 	}
 
 	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
@@ -1008,7 +1014,7 @@ class JSCompiler
 		} else {
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
-		$output[] = 'p.'.$method.'=function('.$args.'){';
+		$output[] = '_p.'.$method.'=function('.$args.'){';
 		$output[] = $code;
 		$output[] = '};';
 	}
@@ -1043,8 +1049,8 @@ class JSCompiler
 			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content);
 		}
 		if (!empty($tmpids)) {
-			foreach ($tmpids as $k => &$v) $v = '<nq>p.getTemplate'.ucfirst($v).'<nq>';
-			$output[] = 'p.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
+			foreach ($tmpids as $k => &$v) $v = '<nq>_p.getTemplate'.ucfirst($v).'<nq>';
+			$output[] = '_p.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
 		}
 	}
 
@@ -1079,7 +1085,7 @@ class JSCompiler
 		$objCode = implode(",\n", $objCode);
 		ControllersParser::parseInitialsCode($objCode);
 		if (!empty($objCode)) {
-			$output[] = "p.getInitials=function(){";
+			$output[] = "_p.getInitials=function(){";
 			$output[] = "\n\treturn {\n";
 			$output[] = $objCode;
 			$output[] = "\t};\n};";
