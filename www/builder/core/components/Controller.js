@@ -1,4 +1,4 @@
-function Controller() {	
+_c = function() {	
 	if (this !== window) return;
 	var makeUrl = function(url, options) {
 		var regExp, tmpUrl;
@@ -125,7 +125,7 @@ function Controller() {
 		return null;
 	};
 	var getRequest = function(action) {
-		return this.requests[action['name']] = this.requests[action['name']] || new AjaxRequest();
+		return this.requests[action['name']] = this.requests[action['name']] || new {{GLOBAL}}.get('AjaxRequest')();
 	};
 	var getOptions = function(options, action, initiator) {
 		if (!isObject(options)) options = {};
@@ -146,7 +146,7 @@ function Controller() {
 		this.activeRequests.push(action['name']);		
 	};
 
-	Controller.prototype.initiate = function() {
+	_p.initiate = function() {
 		this.subscribers = {};
 		this.requests = {};
 		this.activeRequests = [];
@@ -154,7 +154,7 @@ function Controller() {
 		this.privateOptions = {};
 	};
 
-	Controller.prototype.addSubscriber = function(actionName, data, isPriv, options) {
+	_p.addSubscriber = function(actionName, data, isPriv, options) {
 		this.subscribers[actionName] = this.subscribers[actionName] || [];
 		this.subscribers[actionName].push(data);
 		if (isPriv) {
@@ -164,7 +164,7 @@ function Controller() {
 		}
 	};
 
-	Controller.prototype.removeSubscriber = function(initiator) {
+	_p.removeSubscriber = function(initiator) {
 		this.privateSubscribers.removeItem(initiator.getUniqueId());
 		var done = false;
 		for (var actionName in this.subscribers) {
@@ -177,7 +177,7 @@ function Controller() {
 		}
 	};
 
-	Controller.prototype.dispatchEvent = function(actionName, data, initiator) {
+	_p.dispatchEvent = function(actionName, data, initiator) {
 		var dataToDispatch = data;
 		if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
 		var s = this.subscribers[actionName], i, p;
@@ -191,15 +191,15 @@ function Controller() {
 		}
 	};
 
-	Controller.prototype.instanceOf = function(classFunc) {
+	_p.instanceOf = function(classFunc) {
 		return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 	};
 
-	Controller.prototype.getData = function(actionName) {
+	_p.getData = function(actionName) {
 		return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
 	};
 
-	Controller.prototype.getItemById = function(id) {
+	_p.getItemById = function(id) {
 		var primaryKey = getPrimaryKey.call(this);
 		var data = this.data['load'];
 		if (isArray(data)) {
@@ -210,13 +210,13 @@ function Controller() {
 		return null;
 	};
 
-	Controller.prototype.getItem = function(nameOrIndex, actionName) {
+	_p.getItem = function(nameOrIndex, actionName) {
 		actionName = actionName || 'load';
 		return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
 	};
 
 
-	Controller.prototype.doAction = function(initiator, actionName, options) {
+	_p.doAction = function(initiator, actionName, options) {
 		if (this.activeRequests.has(actionName)) return;
 		var action = getAction.call(this, actionName);
 		if (isObject(action) && !gotFromStore.call(this, actionName, options, initiator)) {
@@ -225,14 +225,14 @@ function Controller() {
 		}
 	};
 
-	Controller.prototype.handleRouteOptionsChange = function(routeOptions) {
+	_p.handleRouteOptionsChange = function(routeOptions) {
 		if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
 			setCurrentRouteOptions.call(this, routeOptions, getAction.call(this, 'load'));
 			this.doAction(null, 'load');
 		}
 	};
 
-	Controller.prototype.dispose = function() {
+	_p.dispose = function() {
 		this.subscribers = null;
 		for (var k in this.requests) this.requests[k].dispose();
 		this.options = null;
@@ -246,4 +246,4 @@ function Controller() {
 		this.privateOptions = null;
 	};
 }
-Controller();
+_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Controller');

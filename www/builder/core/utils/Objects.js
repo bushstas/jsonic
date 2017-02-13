@@ -1,4 +1,4 @@
-function Objects() {
+var Objects = new (function() {
 	this.each = function(obj, callback, thisObj) {
 		if (isArrayLike(obj)) {
 			if (thisObj) callback = callback.bind(thisObj);
@@ -122,5 +122,5 @@ function Objects() {
 		if (top) transformed = null;
 		return flattened;
 	};
-}
-Objects = new Objects();
+})();
+{{GLOBAL}}.set(Objects, 'Objects');

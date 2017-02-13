@@ -1,4 +1,4 @@
-function ResizeHandler() {
+_c = function() {
 	var subscribers = [], timer;	
 	this.subscribe = function(subscriber, options) {
 		subscribers.push([subscriber, options]);
@@ -14,4 +14,4 @@ function ResizeHandler() {
 	};
 	window.addEventListener('resize', onResize, false);
 }
-ResizeHandler = new ResizeHandler();
+{{GLOBAL}}.set(_c, 'ResizeHandler');

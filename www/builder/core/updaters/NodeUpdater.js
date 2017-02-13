@@ -1,4 +1,4 @@
-function NodeUpdater(n, p, pn) {
+_c = function(n, p, pn) {
 	var a = isArray(pn) ? pn : [pn];
 	this.getKeys = function() {
 		return a;
@@ -13,3 +13,4 @@ function NodeUpdater(n, p, pn) {
 		n = p = a = null;
 	};
 }
+{{GLOBAL}}.set(_c, 'NodeUpdater');

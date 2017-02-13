@@ -1,4 +1,4 @@
-function StoreKeeper() {
+var StoreKeeper = new (function() {
 	var x = 'stored_';
 	var s = {
 		'month': 2592000,
@@ -52,5 +52,5 @@ function StoreKeeper() {
 	var g = function(k) {
 		return x + k;
 	};
-}
-StoreKeeper = new StoreKeeper();
+})();
+{{GLOBAL}}.set(StoreKeeper, 'StoreKeeper');

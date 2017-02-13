@@ -1,4 +1,4 @@
-function Tooltiper() {
+_c = function() {
 	var target, eventHandler, event;
 	var request, tooltipElement, timer;
 	var tooltip = {{TOOLTIPCLASS}},
@@ -152,4 +152,4 @@ function Tooltiper() {
 		body.addEventListener('mouseover', onBodyMouseOver, false);
 	}
 }
-Tooltiper = new Tooltiper();
+{{GLOBAL}}.set(_c, 'Tooltiper');

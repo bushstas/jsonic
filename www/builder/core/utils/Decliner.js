@@ -1,4 +1,4 @@
-function Decliner() {
+var Decliner = new (function() {
 	var words = {{WORDS}};
 	this.getCount = function(key, num) {
 		if (isArray(num)) num = num.length;
@@ -22,5 +22,5 @@ function Decliner() {
 			else return 2;
 		}
 	};
-}
-Decliner = new Decliner();
+})();
+{{GLOBAL}}.set(Decliner, 'Decliner');

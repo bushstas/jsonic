@@ -1,4 +1,4 @@
-var Core = new (function() {
+_c = new (function() {
 	var extendInitials = function(initials1, initials2) {
 		if (isNull(initials1)) {
 			initials1 = initials2;
@@ -66,14 +66,14 @@ var Core = new (function() {
 	this.processPostRenderInitials = function() {
 		var events = getInitial.call(this, 'events');
 		if (isObject(events)) {
-			this.mouseHandler = new MouseEvents(this, events);
+			this.mouseHandler = new {{GLOBAL}}.get('MouseHandler')(this, events);
 		}
 		var helpers = getInitial.call(this, 'helpers');
 		if (isArray(helpers)) {
 			for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
 		}
 		var listeners = getInitial.call(this, 'listeners');
-		var s = State;
+		var s = {{GLOBAL}}.get('State');
 		if (isObject(listeners)) {			
 			for (var j in listeners) s.listen(this, j, listeners[j]);
 		} 
@@ -149,24 +149,24 @@ var Core = new (function() {
 			proto.initiate.call(this);
 		}
 		this.initials = initials;
-		Core.processInitials.call(this);
+		{{GLOBAL}}.get('Core').processInitials.call(this);
 	};
 	this.getNextSiblingChild = function() {
 		if (!this.nextSiblingChild) return null;
 		if (this.nextSiblingChild instanceof Node) return this.nextSiblingChild;
-		var firstNodeChild = Core.getFirstNodeChild.call(this.nextSiblingChild);
+		var firstNodeChild = {{GLOBAL}}.get('Core').getFirstNodeChild.call(this.nextSiblingChild);
 		if (firstNodeChild) return firstNodeChild;
-		return Core.getNextSiblingChild.call(this.nextSiblingChild, this);	
+		return {{GLOBAL}}.get('Core').getNextSiblingChild.call(this.nextSiblingChild, this);	
 	};
 	this.setNextSiblingChild = function(nextSiblingChild) {
 		this.nextSiblingChild = nextSiblingChild;
-		if (!(nextSiblingChild instanceof Node)) Core.setPrevSiblingChild.call(this.nextSiblingChild, this);
+		if (!(nextSiblingChild instanceof Node)) {{GLOBAL}}.get('Core').setPrevSiblingChild.call(this.nextSiblingChild, this);
 	};
 	this.setPrevSiblingChild = function(prevSiblingChild) {
 		this.prevSiblingChild = prevSiblingChild;
 	};
 	this.disposeLinks = function() {
-		if (this.prevSiblingChild) Core.setNextSiblingChild.call(this.prevSiblingChild, this.nextSiblingChild);
+		if (this.prevSiblingChild) {{GLOBAL}}.get('Core').setNextSiblingChild.call(this.prevSiblingChild, this.nextSiblingChild);
 		this.prevSiblingChild = null;
 		this.nextSiblingChild = null;
 	};
@@ -204,7 +204,7 @@ var Core = new (function() {
 		this.childrenCount++;
 	};
 	this.unregisterChildComponent = function(child) {
-		if (isControl(child)) Core.unregisterControl.call(this, child);
+		if (isControl(child)) {{GLOBAL}}.get('Core').unregisterControl.call(this, child);
 		var id = child.getId();		
 		if (!id) {
 			for (var k in this.children) {
@@ -271,4 +271,5 @@ var Core = new (function() {
 			}
 		}
 	};
-});
+})();
+{{GLOBAL}}.set(_c, 'Core');

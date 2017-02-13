@@ -1,4 +1,4 @@
-function Popuper() {
+_c = function() {
 	var components, elements, skippedAll;
 	var reset = function() {
 		components = [];
@@ -29,4 +29,4 @@ function Popuper() {
 	var body = document.documentElement;
 	body.addEventListener('mousedown', onBodyMouseDown, false);
 }
-Popuper = new Popuper();
+{{GLOBAL}}.set(_c, 'Popuper');

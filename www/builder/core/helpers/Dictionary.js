@@ -1,10 +1,10 @@
-function Dictionary() {
+var Dictionary = new (function() {
 	var dictionaryUrl = {{DICTURL}};
 	var items = {}, callbacks, loaded = {};
 	this.load = function(routeName) {
 		if (loaded[routeName]) return;
 		if (!isNone(dictionaryUrl)) {
-			Loader.get(dictionaryUrl, {'route': routeName}, onLoad, this);
+			{{GLOBAL}}.get('Loader').get(dictionaryUrl, {'route': routeName}, onLoad, this);
 		} else onLoad();
 		loaded[routeName] = true;
 	};
@@ -31,6 +31,6 @@ function Dictionary() {
 			callbacks = null;
 		}
 	};
-}
-Dictionary = new Dictionary();
+})();
 var {{DICTIONARY}} = Dictionary;
+{{GLOBAL}}.set(Dictionary, 'Dictionary');

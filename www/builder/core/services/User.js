@@ -1,4 +1,4 @@
-function User() {
+_c = function() {
 	var userOptions = {{USEROPTIONS}};
 	var app, status = {},
 	attributes = {}, settings = {}, loaded = false, 
@@ -99,3 +99,4 @@ function User() {
 		};
 	};
 }
+{{GLOBAL}}.set(_c, 'User');

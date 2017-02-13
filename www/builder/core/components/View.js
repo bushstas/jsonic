@@ -1,20 +1,22 @@
-function View() {}
-View.prototype.onRenderComplete = function() {
+_c = function() {};
+_p=_c.prototype;
+_p.onRenderComplete = function() {
 	this.dispatchReadyEvent();
 };
-View.prototype.setOnReadyHandler = function(handler) {
+_p.setOnReadyHandler = function(handler) {
 	this.onReadyHandler = handler;
 };
-View.prototype.dispatchReadyEvent = function() {
+_p.dispatchReadyEvent = function() {
 	if (isFunction(this.onReadyHandler)) {
 		this.onReadyHandler();
 	}
 	this.onReady();
 };
-View.prototype.activate = function(isActivated) {
+_p.activate = function(isActivated) {
 	if (isActivated) {
 		this.dispatchReadyEvent();
 	}
 };
-View.prototype.getTitleParams=function(){};
-View.prototype.onReady=function(){};
+_p.getTitleParams=function(){};
+_p.onReady=function(){};
+{{GLOBAL}}.set(_c, 'View');

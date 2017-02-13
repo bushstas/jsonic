@@ -1,4 +1,4 @@
-function Component() {	
+_c = function() {	
 	if (this !== window) return;
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
@@ -42,12 +42,12 @@ function Component() {
 				this.parentElement.removeChild(this.tempPlaceholder);
 				this.tempPlaceholder = null;
 			}
-			Core.processPostRenderInitials.call(this);
+			{{GLOBAL}}.get('Core').processPostRenderInitials.call(this);
 		}
 	};
 
 	var doRendering = function() {
-		this.level = new Level(this);
+		this.level = new {{GLOBAL}}.get('Level')(this);
 		var content = this.getTemplateMain(this.props, this);
 		if (content) this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 		this.rendered = true;
@@ -90,9 +90,9 @@ function Component() {
 		var updaters = this.updaters[propName], o;
 		if (isArray(updaters)) {
 			for (i = 0; i < updaters.length; i++) {
-				if (updaters[i] instanceof OperatorUpdater) {
+				if (updaters[i] instanceof {{GLOBAL}}.get('OperatorUpdater')) {
 					o = updaters[i].getOperator();
-					if (o instanceof Foreach) {
+					if (o instanceof {{GLOBAL}}.get('Foreach')) {
 						if (!isUndefined(item)) o.add(item, index);
 						else o.remove(index);
 					}
@@ -103,39 +103,38 @@ function Component() {
 
 	var unrender = function() {
 		this.elements = null;
-		Core.disposeLinks.call(this);
+		{{GLOBAL}}.get('Core').disposeLinks.call(this);
 		this.disposeInternal();
 		this.level.dispose();
 		this.level = this.listeners = null;
 	};
-	var p = Component.prototype;
-	p.render = function(parentElement) {
+	_p.render = function(parentElement) {
 		this.parentElement = parentElement;
 		load.call(this);
 	};
 
-	p.isDisabled = function() {
+	_p.isDisabled = function() {
 		return !!this.disabled;
 	};
 
-	p.isRendered = function() {
+	_p.isRendered = function() {
 		return !!this.rendered;
 	};
 
-	p.isDisposed = function() {
+	_p.isDisposed = function() {
 		return !!this.disposed;
 	};
 
-	p.instanceOf = function(classFunc) {
+	_p.instanceOf = function(classFunc) {
 		return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 	};
 
-	p.disable = function(isDisabled) {
+	_p.disable = function(isDisabled) {
 		this.disabled = isDisabled;
 		this.addClass('->> disabled', !isDisabled);
 	};
 
-	p.dispatchEvent = function(eventType) {
+	_p.dispatchEvent = function(eventType) {
 		var args = Array.prototype.slice.call(arguments), l;
 		args.splice(0, 1);
 		if (isArray(this.listeners)) {
@@ -149,19 +148,19 @@ function Component() {
 		}
 	};
 
-	p.addListener = function(target, eventType, handler) {
+	_p.addListener = function(target, eventType, handler) {
  		if (isElement(target)) {
- 			this.eventHandler = this.eventHandler || new EventHandler();
+ 			this.eventHandler = this.eventHandler || new {{GLOBAL}}.get('EventHandler')();
  			this.eventHandler.listen(target, eventType, handler.bind(this));
  		} else target.subscribe(eventType, handler, this);
  	};
 
-	p.removeValueFrom = function(propName, value) {
+	_p.removeValueFrom = function(propName, value) {
 		var prop = this.get(propName);
 		if (isArray(prop)) this.removeByIndexFrom(propName, prop.indexOf(value));
 	};
 
-	p.removeByIndexFrom = function(propName, index) {
+	_p.removeByIndexFrom = function(propName, index) {
 		var prop = this.get(propName);
 		if (isString(index) && isNumeric(index)) index = ~~index;
 		if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
@@ -171,7 +170,7 @@ function Component() {
 		}
 	};
 
-	p.plusTo = function(propName, add, sign) {
+	_p.plusTo = function(propName, add, sign) {
 		var prop = this.get(propName);
 		if (!sign || sign == '+') {
 			if (isNumber(prop) || isString(prop)) this.set(propName, prop + add);
@@ -185,11 +184,11 @@ function Component() {
 		}
 	};
 
-	p.addOneTo = function(propName, item, index) {
+	_p.addOneTo = function(propName, item, index) {
 		this.addTo(propName, [item], index);
 	};
 
-	p.addTo = function(propName, items, index) {
+	_p.addTo = function(propName, items, index) {
 		var prop = this.get(propName);
 		if (!isArray(items)) items = [items];
 		if (isArray(prop)) {
@@ -204,7 +203,7 @@ function Component() {
 		}
 	};
 
-	p.get = function(propName) {
+	_p.get = function(propName) {
 		var prop = this.props[propName];
 		if (isUndefined(arguments[1]) || !isArrayLike(prop)) return prop;
 		var end;
@@ -217,31 +216,31 @@ function Component() {
 		return end ? prop || '' : '';
 	};
 
-	p.showElement = function(element, isShown) {
+	_p.showElement = function(element, isShown) {
 		if (isString(element)) element = this.findElement(element);
 		if (isElement(element)) element.show(isShown);
 	};
 
-	p.setStyle = function(styles) {
+	_p.setStyle = function(styles) {
 		if (this.isRendered()) this.getElement().css(styles);
 	};
 
-	p.setPosition = function(x, y) {
+	_p.setPosition = function(x, y) {
 		this.setStyle({'top': y + 'px', 'left': x + 'px'});
 	};
 
-	p.setVisible = function(isVisible) {
+	_p.setVisible = function(isVisible) {
 		if (this.isRendered() && !this.isDisposed()) this.getElement().show(isVisible);
 	};
 
-	p.addClass = function(className, isAdding) {
+	_p.addClass = function(className, isAdding) {
 		if (this.isRendered()) {
 			if (isAdding || isUndefined(isAdding)) this.getElement().addClass(className);
 			else this.getElement().removeClass(className);
 		}
 	};
 
-	p.each = function(propName, callback) {
+	_p.each = function(propName, callback) {
 		var ar = this.get(propName);
 		if (isArrayLike(ar) && isFunction(callback)) {
 			if (isArray(ar)) for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
@@ -249,11 +248,11 @@ function Component() {
 		}
 	};
 
-	p.toggle = function(propName) {
+	_p.toggle = function(propName) {
 		this.set(propName, !this.get(propName));
 	};
 
-	p.set = function(propName, propValue) {
+	_p.set = function(propName, propValue) {
 		this.props = this.props || {};
 		var props;
 		if (!isUndefined(propValue)) {
@@ -281,21 +280,21 @@ function Component() {
 		changedProps = null;
 	};
 
-	p.preset = function(propName, propValue) {
+	_p.preset = function(propName, propValue) {
 		this.props = this.props || {};
 		this.props[propName] = propValue;
 	};
 
-	p.delay = function(f, n, p) {
+	_p.delay = function(f, n, p) {
 		window.clearTimeout(this.timeout);
 		if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this, p), n || 200);
 	};
 
-	p.addChild = function(child, parentElement) {
+	_p.addChild = function(child, parentElement) {
 		this.level.renderComponent(child, parentElement);
 	};
 
-	p.removeChild = function(child) {
+	_p.removeChild = function(child) {
 		if (!child) return;
 		var childId = child;
 		if (isString(child)) child = this.getChild(child);
@@ -307,7 +306,7 @@ function Component() {
 		}
 	 };
 
-	p.forEachChild = function(callback) {
+	_p.forEachChild = function(callback) {
 		if (isArrayLike(this.children)) {
 			var result;
 			for (var k in this.children) {
@@ -319,7 +318,7 @@ function Component() {
 		}
 	};
 	
-	p.forChildren = function(classFunc, callback) {
+	_p.forChildren = function(classFunc, callback) {
 		var children = this.getChildren(classFunc), result;
 		for (var i = 0; i < children.length; i++) {
 			result = callback.call(this, children[i], i);
@@ -327,31 +326,31 @@ function Component() {
 		}
 	};
 
-	p.getControl = function(name) {
+	_p.getControl = function(name) {
 		return Objects.get(this.controls, name) || this.forEachChild(function(child) {
 			return child.getControl(name);
 		});
 	};
 
-	p.setControlValue = function(name, value) {
+	_p.setControlValue = function(name, value) {
 		var control = this.getControl(name);
 		if (control) control.setValue(value);
 	};
 
-	p.enableControl = function(name, isEnabled) {
+	_p.enableControl = function(name, isEnabled) {
 		var control = this.getControl(name);
 		if (control) control.setEnabled(isEnabled);
 	};
 
-	p.forEachControl = function(callback) {
+	_p.forEachControl = function(callback) {
 		if (isObject(this.controls)) Objects.each(this.controls, callback, this);
 	};
 
-	p.hasControls = function() {
+	_p.hasControls = function() {
 		return !Objects.empty(this.controls);
 	};
 
-	p.getControlsData = function(data) {
+	_p.getControlsData = function(data) {
 		data = data || {};
 		this.forEachChild(function(child) {
 			if (!isControl(child)) child.getControlsData(data);
@@ -360,7 +359,7 @@ function Component() {
 		return data;
 	};
 
-	p.setControlsData = function(data) {
+	_p.setControlsData = function(data) {
 		this.forEachChild(function(child) {
 			if (!isControl(child)) child.setControlsData(data);
 			else child.setValue(data[child.getName()]);
@@ -368,11 +367,11 @@ function Component() {
 		return data;
 	};
 
-	p.getChildAt = function(index) {
+	_p.getChildAt = function(index) {
 		return Objects.getByIndex(this.children, index);
 	};
 
-	p.getChildIndex = function(child, same) {
+	_p.getChildIndex = function(child, same) {
 		var idx = -1;
 		this.forEachChild(function(ch) {
 			if (!same || (same && ch.constructor == child.constructor)) idx++;
@@ -381,7 +380,7 @@ function Component() {
 		return idx;
 	};
 
-	p.getChildren = function(classFunc) {
+	_p.getChildren = function(classFunc) {
 		if (!isFunction(classFunc)) return this.children;
 		var children = [];
 		this.forEachChild(function(child) {
@@ -390,32 +389,32 @@ function Component() {
 		return children;
 	};
 
-	p.getChild = function(id) {
+	_p.getChild = function(id) {
 		return Objects.get(this.children, id);
 	};
 
-	p.setId = function(id) {
+	_p.setId = function(id) {
 		this.componentId = id;
 	};
 
-	p.getId = function() {
+	_p.getId = function() {
 		return this.componentId;
 	};
 
-	p.getElement = function(id) {
+	_p.getElement = function(id) {
 		if (isString(id)) return Objects.get(this.elements, id);
 		else return this.scope || this.parentElement;
 	};
 
-	p.findElement = function(selector, scopeElement) {
+	_p.findElement = function(selector, scopeElement) {
 		return (scopeElement || this.getElement()).querySelector(selector);
 	};
 
-	p.findElements = function(selector, scopeElement) {
+	_p.findElements = function(selector, scopeElement) {
 		return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
 	};
 
-	p.fill = function(element, data) {
+	_p.fill = function(element, data) {
 		if (isString(element)) element = this.findElement(element);
 		if (isElement(element)) {
 			var callback = function(el) {
@@ -431,33 +430,33 @@ function Component() {
 		}
 	};
 
-	p.setAppended = function(isAppended) {
+	_p.setAppended = function(isAppended) {
 		if (this.level) this.level.setAppended(isAppended);
 	};
 
-	p.placeTo = function(element) {
+	_p.placeTo = function(element) {
 		if (this.level) this.level.placeTo(element);
 	};
 
-	p.placeBack = function() {
+	_p.placeBack = function() {
 		this.setAppended(true);
 	};
 
-	p.appendChild = function(child, isAppended) {
+	_p.appendChild = function(child, isAppended) {
 		if (isString(child)) child = this.getChild(child);
 		if (isComponentLike(child)) child.setAppended(isAppended);
 	};
 
-	p.setScope = function(scope) {
+	_p.setScope = function(scope) {
 		this.scope = scope;
 	};
 
-	p.getUniqueId = function() {
+	_p.getUniqueId = function() {
 		return this.uniqueId = this.uniqueId || generateRandomKey();
 	};
 
-	p.dispose = function() {
-		State.dispose(this);
+	_p.dispose = function() {
+		{{GLOBAL}}.get('State').dispose(this);
 		unrender.call(this);
 		if (this.mouseEvents) {
 			this.mouseEvents.dispose();
@@ -474,17 +473,17 @@ function Component() {
 		this.correctors = null;
 		this.controls = null;
 	};
-	p.a = function(n) {
-		return State.get(n);
+	_p.a = function(n) {
+		return {{GLOBAL}}.get('State').get(n);
 	};
 	var f = function(){return};
-	p.initOptions=f;
-	p.onRendered=f;
-	p.onRenderComplete=f;
-	p.onLoaded=f;
-	p.getTemplateMain=f;
-	p.disposeInternal=f;
-	p.g=p.get;
-	p.d=p.dispatchEvent;
+	_p.initOptions=f;
+	_p.onRendered=f;
+	_p.onRenderComplete=f;
+	_p.onLoaded=f;
+	_p.getTemplateMain=f;
+	_p.disposeInternal=f;
+	_p.g=_p.get;
+	_p.d=_p.dispatchEvent;
 }
-Component();
+_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Component');

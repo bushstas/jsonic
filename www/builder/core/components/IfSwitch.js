@@ -1,4 +1,4 @@
-function IfSwitch(params) {
+_c = function(params) {
 	this.values = params['is'];
 	this.default = params['d'];
 	this.handler = params['c'];
@@ -35,9 +35,10 @@ function IfSwitch(params) {
 		this.prevSiblingChild = null;
 	};
 }
-
-IfSwitch.prototype.update = function(value) {
+_p=_c.prototype;
+_p.update = function(value) {
 	this.value = value;
 	this.disposeLevels();
 	this.createLevels(true);
 };
+{{GLOBAL}}.set(_c, 'IfSwitch');

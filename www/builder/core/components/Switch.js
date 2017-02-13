@@ -1,4 +1,4 @@
-function Switch(params) {
+_c = function(params) {
 	this.params = params;
 	this.levels = [];
 
@@ -28,10 +28,11 @@ function Switch(params) {
 		this.prevSiblingChild = null;
 	};
 }
-
-Switch.prototype.update = function(value) {
+_p=_c.prototype;
+_p.update = function(value) {
 	this.value = value;
 	this.disposeLevels();
 	this.createLevels(true);
 };
+{{GLOBAL}}.set(_c, 'Switch');
 

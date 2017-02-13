@@ -32,7 +32,8 @@ class JSGlobals
 		'controller'       => '__C',
 		'stop'             => '__SP',
 		'prevent'          => '__PD',
-		'dialoger'         => '__DI'
+		'dialoger'         => '__DI',
+		'global'           => '_G_'
 	);
 
 	private static $errors = array(
@@ -77,6 +78,7 @@ class JSGlobals
 
 	public static function getUsedNames() {
 		return array(
+			'GLOBAL'          => self::$varNames['global'],
 			'ATTRIBUTES'      => self::$varNames['props'],
 			'EVENTTYPES'      => self::$varNames['events'],
 			'TAGS'            => self::$varNames['tags'],

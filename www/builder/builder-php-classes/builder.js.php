@@ -648,7 +648,8 @@ class JSCompiler
 	private function finish() {
 		$this->decodeTexts();
 		if (!$this->configProvider->isSplitMode()) {
-			$this->jsOutput = ";(function() {\n".$this->jsOutput;
+			$this->jsOutput = "'use strict';\nnew (function() {\nvar _G_=this,_cs_={};\nthis.get=function(k,i){if(i){var c=new _cs_[k]();this.set(c,k);return c}return _cs_[k]}\nthis.set=function(c,k) {_cs_[k]=c}\n;(function(){var _c,_p;\n".
+			$this->jsOutput;
 		}
 		$this->jsOutput = preg_replace("/, *\)/", ')', $this->jsOutput);
 		$this->jsOutput = preg_replace("/'<nq>/", '', $this->jsOutput);
@@ -862,6 +863,7 @@ class JSCompiler
 	}
 
 	private function addInheritance($route = null) {
+		$globals = JSGlobals::getVarNames();
 		$isSplitted = $this->configProvider->isSplitMode();
 		if (empty($route)) {
 			$this->bottomOutput = array();
@@ -933,24 +935,26 @@ class JSCompiler
 			}
 		}		
 		if (empty($route)) {
-			$this->bottomOutput[] = "Core.inherits([".implode(',', $inheritance).']);';
+			$core = $globals['global'];
+			$this->bottomOutput[] = "var core=".$core.".get('Core');";
+			$this->bottomOutput[] = "core.inherits(['".implode("','", $inheritance)."']);";
 			$controllers = array('Router', 'User');
 			if (!empty($controllers)) {
 				foreach ($controllers as $controller) {
-					$this->bottomOutput[] = $controller." = new ".$controller."();";
+					$this->bottomOutput[] = "var ".$controller."=".$core.".get('".$controller."',1);";
 				}
 				
 			}		
 			$entry = $this->config['entry'];
 			$this->bottomOutput[] = $entry." = new ".$entry."();";
-			$this->bottomOutput[] = "Core.initiate.call(".$entry.");";
+			$this->bottomOutput[] = "core.initiate.call(".$entry.");";
 			if ($this->config['hasUser']) {
 				$this->bottomOutput[] = "User.load(".$entry.");";
 			} else {
 				$this->bottomOutput[] = $entry.".run();";
 			}
 			if (!$this->configProvider->isSplitMode()) {
-				$this->bottomOutput[] = "})();";
+				$this->bottomOutput[] = "})();\n});";
 			}
 		}
 	}
@@ -963,10 +967,10 @@ class JSCompiler
 				if (is_array($this->classes[$parent]) && $this->hasComponentMethod($method, $this->classes[$parent])) {
 					return true;
 				}
-				if (is_array($this->sources[$parent]) && preg_match('/\bp\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
+				if (is_array($this->sources[$parent]) && preg_match('/\b_p\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
 					return true;	
 				}
-				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\bp\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
+				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\b_p\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
 					return true;
 				}
 			}

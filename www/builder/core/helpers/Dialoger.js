@@ -1,4 +1,4 @@
-function Dialoger() {
+_c = function() {
 	var ds = {};
 	var cid, dc, d, opts;
 	this.show = function(c, options) {
@@ -42,7 +42,7 @@ function Dialoger() {
 	var defineDialog = function() {
 		if (isUndefined(ds[cid])) {
 			ds[cid] = new dc();
-			Core.initiate.call(ds[cid]);
+			{{GLOBAL}}.get('Core').initiate.call(ds[cid]);
 			ds[cid].render(document.body);
 		}
 		d = ds[cid];
@@ -60,5 +60,4 @@ function Dialoger() {
 	};
 	window.addEventListener('popstate', closeAll);
 }
-Dialoger = new Dialoger();
-var {{DIALOGER}} = Dialoger;
+{{GLOBAL}}.set(_c, 'Dialoger');
