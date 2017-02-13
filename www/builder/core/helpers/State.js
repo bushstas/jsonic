@@ -1,4 +1,4 @@
-function State() {
+var State = new (function() {
 	var listeners = {};
 	var subscribers = {};
 	var updaters = {};
@@ -105,5 +105,5 @@ function State() {
 			subscribers[k] = s;
 		}
 	};
-}
-State = new State();
+})();
+{{GLOBAL}}.set(State, 'State');

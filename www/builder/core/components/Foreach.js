@@ -1,4 +1,4 @@
-function Foreach(params) {
+_c = function(params) {
 	var handler = params['h'];
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
@@ -102,7 +102,7 @@ function Foreach(params) {
 	};
 
 	this.dispose = function() {
-		Core.disposeLinks.call(this);
+		{{GLOBAL}}.get('Core').disposeLinks.call(this);
 		this.disposeLevels();
 		this.levels = null;
 		this.parentElement = null;
@@ -113,28 +113,27 @@ function Foreach(params) {
 		params = null;
 	};
 }
-
-Foreach.prototype.render = function(parentElement, parentLevel) {
+_p=_c.prototype;
+_p.render = function(parentElement, parentLevel) {
 	this.parentElement = parentElement;
 	this.parentLevel = parentLevel;
 	this.createLevels(false);
 };
-
-Foreach.prototype.createLevel = function(items, isUpdating, index) {
-	var level = new Level(this.parentLevel.getComponent());
+_p.createLevel = function(items, isUpdating, index) {
+	var level = new {{GLOBAL}}.get('Level')(this.parentLevel.getComponent());
 	var nextSiblingChild;
 	if (isNumber(index) && this.levels[index]) {
 		nextSiblingChild = this.levels[index].getFirstNodeChild();
 	} else {
-		nextSiblingChild = isUpdating ? Core.getNextSiblingChild.call(this) : null;
+		nextSiblingChild = isUpdating ? {{GLOBAL}}.get('Core').getNextSiblingChild.call(this) : null;
 	}
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
 	this.levels.insertAt(level, index);
 };
-
-Foreach.prototype.disposeLevels = function() {
+_p.disposeLevels = function() {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].dispose();
 	}
 	this.levels = [];
 };
+{{GLOBAL}}.set(_c, 'Foreach');

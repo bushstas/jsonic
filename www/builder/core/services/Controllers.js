@@ -1,9 +1,9 @@
-function Controllers() {
+_c = function() {
 	var ctrlist = {{CONTROLLERS}};
 	this.get = function(id) {
 		if (isFunction(ctrlist[id])) {
 			ctrlist[id] = new ctrlist[id]();
-			Core.initiate.call(ctrlist[id]);
+			{{GLOBAL}}.get('Core').initiate.call(ctrlist[id]);
 		}
 		return ctrlist[id];
 	};
@@ -18,5 +18,4 @@ function Controllers() {
 		}
 	};
 }
-Controllers = new Controllers();
-var {{CONTROLLER}} = Controllers;
+{{GLOBAL}}.set(_c, 'Controllers');

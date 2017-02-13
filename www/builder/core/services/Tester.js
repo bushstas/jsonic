@@ -1,4 +1,4 @@
-function Tester() {
+_c = function() {
 	var log = [];
 	var views = [];
 	this.assert = function(t, a, k, e, c, m) {
@@ -50,4 +50,4 @@ function Tester() {
 
 	};
 }
-Tester = new Tester();
+{{GLOBAL}}.set(_c, 'Tester');

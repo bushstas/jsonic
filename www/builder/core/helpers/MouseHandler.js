@@ -1,7 +1,7 @@
-function MouseHandler() {
+_c = function() {
 	var subscribers = [];
 	var options = [];
-	var eventHandler = new EventHandler();
+	var eventHandler = new {{GLOBAL}}.get('EventHandler')();
 	var extendOptions = function(index, opts) {
 		Objects.merge(options[index], opts);
 	};
@@ -36,5 +36,4 @@ function MouseHandler() {
 		}
 	};
 }
-var ClickHandler = new MouseHandler();
-var MouseHandler = ClickHandler;
+{{GLOBAL}}.set(_c, 'MouseHandler');

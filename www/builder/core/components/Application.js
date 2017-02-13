@@ -1,4 +1,4 @@
-function Application() {
+_c = function() {
 	if (this !== window) return;
 	var routes = {{ROUTES}};
 	var errorRoutes = {{ERRORROUTES}};
@@ -8,10 +8,10 @@ function Application() {
 	
 	var getViewParams = function(route, allParams) {
 		var params;
-		if (isObject(route['dinamicParams'])) {
+		if (isObject(route['dynamicParams'])) {
 			params = {};
-			for (var k in route['dinamicParams']) {
-				params[k] = Router.getPathPartAt(route['dinamicParams'][k]);
+			for (var k in route['dynamicParams']) {
+				params[k] = {{GLOBAL}}.get('Router').getPathPartAt(route['dynamicParams'][k]);
 			}
 		}
 		if (allParams) {
@@ -25,7 +25,7 @@ function Application() {
 	};
 	var loadControllers = function(route) {
 		if (isArray(route['load']) || isNumber(route['load'])) {
-			Controllers.load(route['load']);
+			{{GLOBAL}}.get('Controllers').load(route['load']);
 		}
 	};
 	var loadView = function(route) {
@@ -40,7 +40,7 @@ function Application() {
 	var renderView = function(route) {
 		var view = this.currentView = this.views[route['name']] = new route['view']();
 		var viewParams = getViewParams.call(this, route, true);
-		Core.initiate.call(view, viewParams);
+		{{GLOBAL}}.get('Core').initiate.call(view, viewParams);
 		view.setOnReadyHandler(onViewReady.bind(this));
 		var viewContentElement = createViewContentElement.call(this, route['name']);
 		view.render(viewContentElement);
@@ -54,13 +54,13 @@ function Application() {
 			activateView.call(this, this.currentView, false);
 		}
 		this.currentView = view;
-		if (!isUndefined(view) && isFunction(route['view'])) {
+		if (!isUndefined(view) && !isUndefined(route['view'])) {
 			if (!view) {
 				loadView.call(this, route);
 				//renderView.call(this, route);
 				loadControllers(route);
-				if (typeof Dictionary != 'undefined') {
-					Dictionary.load(route['name']);
+				if (typeof {{GLOBAL}}.get('Dictionary') != 'undefined') {
+					{{GLOBAL}}.get('Dictionary').load(route['name']);
 				}
 			} else {
 				activateView.call(this, view, true, isSameView);
@@ -75,8 +75,8 @@ function Application() {
 		}
 	};
 	var initRouter = function() {
-		Router.setNavigationHandler(handleNavigation.bind(this));
-		Router.init();
+		{{GLOBAL}}.get('Router').setNavigationHandler(handleNavigation.bind(this));
+		{{GLOBAL}}.get('Router').init();
 	};
 	var	defineViews = function() {
 		for (var i = 0; i < routes.length; i++) {
@@ -106,7 +106,7 @@ function Application() {
 		this.viewContainer = viewContainer;
 	};
 	var activateView = function(view, isActivated, isSameView) {
-		var parentElement = Core.getParentElement.call(view);
+		var parentElement = {{GLOBAL}}.get('Core').getParentElement.call(view);
 		if (!isActivated) {
 			this.viewContainer.removeChild(parentElement);
 		} else {
@@ -143,11 +143,10 @@ function Application() {
 		this.viewContainer.appendChild(element);
 		return element;
 	};
-	var p = Application.prototype;
-	p.initiate = function() {
+	_p.initiate = function() {
 		this.views = {};
 	};
-	p.run = function() {
+	_p.run = function() {
 		this.element = document.createElement('div');
 		document.body.appendChild(this.element);
 		this.render(this.element);
@@ -155,7 +154,7 @@ function Application() {
 		defineViews.call(this);
 		initRouter.call(this);
 	};
-	p.setPageTitle = function(title) {
+	_p.setPageTitle = function(title) {
 		var titleElement = document.getElementsByTagName('title')[0];
 		if (!isElement(titleElement)) {
 			var headElement = document.getElementsByTagName('head')[0];
@@ -167,16 +166,16 @@ function Application() {
 		}
 		titleElement.innerHTML = title;
 	};
-	p.getView = function(viewName) {
+	_p.getView = function(viewName) {
 		return this.views[viewName];
 	};
-	p.disposeView = function(viewName) {
+	_p.disposeView = function(viewName) {
 		if (isObject(this.views[viewName])) {
 			this.views[viewName].dispose();
 			this.views[viewName] = null;
 		}
 	};
-	p.onNoErrors=function(){};
-	p.onError=function(){};
+	_p.onNoErrors=function(){};
+	_p.onError=function(){};
 }
-Application();
+_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Application');

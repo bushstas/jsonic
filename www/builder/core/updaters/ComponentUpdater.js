@@ -1,4 +1,4 @@
-function ComponentUpdater(c, p) {
+_c = function(c, p) {
 	this.getKeys = function() {
 		var a = [];
 		for (var k in p['n']) {
@@ -26,3 +26,4 @@ function ComponentUpdater(c, p) {
 		c = p = null;
 	};
 }
+{{GLOBAL}}.set(_c, 'ComponentUpdater');

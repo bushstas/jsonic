@@ -1,4 +1,4 @@
-function CheckboxHandler() {
+_c = function() {
 	var subscribers = [];
 	var options = [];
 	var defaultCheckboxClass = '->> checkbox';
@@ -110,4 +110,4 @@ function CheckboxHandler() {
 		if (checkbox) return checkbox.getData('value');
 	};
 }
-CheckboxHandler = new CheckboxHandler();
+{{GLOBAL}}.set(_c, 'CheckboxHandler');

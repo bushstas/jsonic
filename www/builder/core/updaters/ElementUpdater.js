@@ -1,4 +1,4 @@
-function ElementUpdater(e, p, n) {
+_c = function(e, p, n) {
 	this.getKeys = function() {
 		var a = [];
 		for (k in n) {
@@ -24,3 +24,4 @@ function ElementUpdater(e, p, n) {
 		e = p = null;
 	};
 }
+{{GLOBAL}}.set(_c, 'ElementUpdater');

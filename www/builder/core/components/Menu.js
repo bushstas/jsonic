@@ -1,13 +1,13 @@
-function Menu() {};
-
-Menu.prototype.doRendering = function() {
-	Component.prototype.doRendering.call(this);
-	if (Router.hasMenu(this)) {
-		this.onNavigate(Router.getCurrentRouteName());
+_c = function() {};
+_p=_c.prototype;
+_p.doRendering = function() {
+	{{GLOBAL}}.get('Component').prototype.doRendering.call(this);
+	var router = {{GLOBAL}}.get('Router');
+	if (router.hasMenu(this)) {
+		this.onNavigate(router.getCurrentRouteName());
 	}
 };
-
-Menu.prototype.onNavigate = function(viewName) {
+_p.onNavigate = function(viewName) {
 	if (this.rendered) {
 		if (isElement(this.activeButton)) {
 			this.setButtonActive(this.activeButton, false);	
@@ -18,19 +18,17 @@ Menu.prototype.onNavigate = function(viewName) {
 		}
 	}
 };
-
-Menu.prototype.getButton = function(viewName) {
+_p.getButton = function(viewName) {
 	return this.findElement('a[role="' + viewName + '"]');
 };
-
-Menu.prototype.setButtonActive = function(button, isActive) {
+_p.setButtonActive = function(button, isActive) {
 	var activeClassName = this.activeButtonClass || '->> active';
 	button.toggleClass(activeClassName, isActive);
 	if (isActive) {
 		this.activeButton = button;
 	}
 };
-
-Menu.prototype.disposeInternal = function() {
+_p.disposeInternal = function() {
 	this.activeButton = null;
 };
+{{GLOBAL}}.set(_c, 'Menu');

@@ -1,4 +1,4 @@
-function OperatorUpdater(o, p, n) {
+_c = function(o, p, n) {
 	var a = isArray(n) ? n : [n];
 	this.getKeys = function() {
 		return a;
@@ -14,3 +14,4 @@ function OperatorUpdater(o, p, n) {
 		n = o = p = null;
 	};
 }
+{{GLOBAL}}.set(_c, 'OperatorUpdater');

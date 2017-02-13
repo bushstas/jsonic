@@ -1,4 +1,4 @@
-function EventHandler() {
+_c = function() {
 	var listeners;
 	this.listen = function(element, type, handler) {
 		listeners = listeners || [];
@@ -33,3 +33,4 @@ function EventHandler() {
 		listeners = null;
 	};
 }
+{{GLOBAL}}.set(_c, 'EventHandler');

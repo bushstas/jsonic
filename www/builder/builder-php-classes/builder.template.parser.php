@@ -1499,7 +1499,7 @@ class TemplateParser
 		$parents = $class['extends'];
 		if (is_array($parents)) {
 			foreach ($parents as $parent) {
-				if (is_array(self::$sources[$parent]) && preg_match('/\bp\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
+				if (is_array(self::$sources[$parent]) && preg_match('/\b_p\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
 					return true;
 				}
 				if (self::hasComponentMethod($method, self::$classes[$parent])) {
