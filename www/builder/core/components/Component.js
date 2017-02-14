@@ -1,5 +1,5 @@
 _c = function() {	
-	if (this !== window) return;
+	if (this) return;
 	var load = function() {
 		var loader = Objects.get(this.initials, 'loader');
 		if (isObject(loader) && isObject(loader['controller'])) {
@@ -47,7 +47,8 @@ _c = function() {
 	};
 
 	var doRendering = function() {
-		this.level = new {{GLOBAL}}.get('Level')(this);
+		var lvl = {{GLOBAL}}.get('Level');
+		this.level = new lvl(this);
 		var content = this.getTemplateMain(this.props, this);
 		if (content) this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 		this.rendered = true;

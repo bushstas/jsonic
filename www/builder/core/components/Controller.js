@@ -1,5 +1,5 @@
 _c = function() {	
-	if (this !== window) return;
+	if (this) return;
 	var makeUrl = function(url, options) {
 		var regExp, tmpUrl;
 		for (var k in options) {

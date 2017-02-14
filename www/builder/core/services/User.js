@@ -7,7 +7,8 @@ _c = function() {
 	var initOptions = function() {
 		if (isObject(userOptions)) {
 			if (userOptions['login'] && isString(userOptions['login'])) {
-				loadRequest = new {{GLOBAL}}.get('AjaxRequest')(userOptions['login'], onLoad.bind(this));
+				var ajr = {{GLOBAL}}.get('AjaxRequest');
+				loadRequest = new ajr(userOptions['login'], onLoad.bind(this));
 			}
 		}
 	};

@@ -4,7 +4,8 @@ _c = function() {
 		return requests[url] || createRequest(url, th);
 	};
 	var createRequest = function(url, th) {
-		requests[url] = new {{GLOBAL}}.get('AjaxRequest')(url, null, null, th);
+		var ajr = {{GLOBAL}}.get('AjaxRequest');
+		requests[url] = new ajr(url, null, null, th);
 		return requests[url];
 	};
 	this.get = function(url, data, callback, th) {

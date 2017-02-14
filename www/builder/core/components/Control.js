@@ -1,5 +1,5 @@
 _c = function() {
-	if (this !== window) return;
+	if (this) return;
 	var onChangeChildControl = function(e) {
 		this.dispatchChange();
 	};

@@ -36,7 +36,8 @@ _c = function(component) {
 	};
 
 	var createLevel = function(items, pe) {
-		var level = new {{GLOBAL}}.get('Level')(component);
+		var lvl = {{GLOBAL}}.get('Level');
+		var level = new lvl(component);
 		level.render(items, pe, self);
 		children.push(level);
 	};

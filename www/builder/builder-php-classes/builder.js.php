@@ -646,9 +646,10 @@ class JSCompiler
 	}
 
 	private function finish() {
+		$globals = JSGlobals::getVarNames();
 		$this->decodeTexts();
 		if (!$this->configProvider->isSplitMode()) {
-			$this->jsOutput = "'use strict';\nnew (function() {\nvar _G_=this,_cs_={};\nthis.get=function(k,i){if(i){var c=new _cs_[k]();this.set(c,k);return c}return _cs_[k]}\nthis.set=function(c,k,i) {if(i){c=new c()}_cs_[k]=c}\n;(function(){var _c,_p;\n".
+			$this->jsOutput = "'use strict';\nvar ".$globals['global'].";\nnew (function() {\n".$globals['global']."=this;\nvar _cs_={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function){this.set(new c(),k)}}\nthis.get=function(k,i){if(i){this.create(k)}return _cs_[k]}\nthis.set=function(c,k,i) {_cs_[k]=c;if(i){this.create(k)}}\n;(function(){var _c,_p;\n".
 			$this->jsOutput;
 		}
 		$this->jsOutput = preg_replace("/, *\)/", ')', $this->jsOutput);

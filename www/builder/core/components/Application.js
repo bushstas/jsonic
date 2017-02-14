@@ -1,5 +1,6 @@
 _c = function() {
-	if (this !== window) return;
+	if (this) return;
+	var controllers, router, dictionary;
 	var routes = {{ROUTES}};
 	var errorRoutes = {{ERRORROUTES}};
 	var viewContainerClass = {{VIEWCONTAINER}};
@@ -11,7 +12,7 @@ _c = function() {
 		if (isObject(route['dynamicParams'])) {
 			params = {};
 			for (var k in route['dynamicParams']) {
-				params[k] = {{GLOBAL}}.get('Router').getPathPartAt(route['dynamicParams'][k]);
+				params[k] = router.getPathPartAt(route['dynamicParams'][k]);
 			}
 		}
 		if (allParams) {
@@ -25,58 +26,59 @@ _c = function() {
 	};
 	var loadControllers = function(route) {
 		if (isArray(route['load']) || isNumber(route['load'])) {
-			{{GLOBAL}}.get('Controllers').load(route['load']);
+			controllers.load(route['load']);
 		}
 	};
 	var loadView = function(route) {
 		var script = document.createElement('script');
-		script.src = '/js/base_' + route['name'] + '.js';
+		script.src = '/js/' + route['name'] + '_chunk.js';
 		document.body.appendChild(script);
 		script.onload = onViewLoaded.bind(this, route);
 	};
 	var onViewLoaded = function(route) {
-		console.log(window[route['view']])
+		route['view'] = {{GLOBAL}}.get(route['view']);
+		renderView.call(this, route);
 	};
 	var renderView = function(route) {
-		var view = this.currentView = this.views[route['name']] = new route['view']();
+		var isSameView = this.currentView == route['name'];
+		if (!isSameView && this.currentView && this.views[this.currentView]) {
+			activateView.call(this, this.currentView, false);
+		}
+		this.currentView = route['name'];
+		loadControllers(route);
+		if (!isUndefined(dictionary)) {
+			dictionary.load(route['name']);
+		}
+		var view = this.views[route['name']] = new route['view']();
 		var viewParams = getViewParams.call(this, route, true);
 		{{GLOBAL}}.get('Core').initiate.call(view, viewParams);
 		view.setOnReadyHandler(onViewReady.bind(this));
 		var viewContentElement = createViewContentElement.call(this, route['name']);
 		view.render(viewContentElement);
+		if (isNumber(route['error'])) {
+			this.onError(route['error']);
+		} else {
+			this.onNoErrors();
+		}
 	};
 	var handleNavigation = function(route, changeTitle) {
 		this.isChangeTitle = changeTitle;
 		this.currentRoute = route;
 		var view = this.views[route['name']];
-		var isSameView = this.currentView == view;
-		if (!isSameView && this.currentView) {
-			activateView.call(this, this.currentView, false);
-		}
-		this.currentView = view;
-		if (!isUndefined(view) && !isUndefined(route['view'])) {
+		if (!view) {
+			view = {{GLOBAL}}.get(route['view']);
 			if (!view) {
 				loadView.call(this, route);
-				//renderView.call(this, route);
-				loadControllers(route);
-				if (typeof {{GLOBAL}}.get('Dictionary') != 'undefined') {
-					{{GLOBAL}}.get('Dictionary').load(route['name']);
-				}
 			} else {
-				activateView.call(this, view, true, isSameView);
-			}
-			if (isNumber(route['error'])) {
-				this.onError(route['error']);
-			} else {
-				this.onNoErrors();
+				renderView.call(this, route);
 			}
 		} else {
-			this.log('no view to represent given route', 'handleNavigation', route);
+			activateView.call(this, view, true, isSameView);
 		}
 	};
 	var initRouter = function() {
-		{{GLOBAL}}.get('Router').setNavigationHandler(handleNavigation.bind(this));
-		{{GLOBAL}}.get('Router').init();
+		router.setNavigationHandler(handleNavigation.bind(this));
+		router.init();
 	};
 	var	defineViews = function() {
 		for (var i = 0; i < routes.length; i++) {
@@ -146,7 +148,11 @@ _c = function() {
 	_p.initiate = function() {
 		this.views = {};
 	};
-	_p.run = function() {
+	_p.run = function() {		
+		{{GLOBAL}}.create('Loader');
+		dictionary = {{GLOBAL}}.get('Dictionary');
+		router = {{GLOBAL}}.get('Router');
+		controllers = {{GLOBAL}}.get('Controllers', 1);
 		this.element = document.createElement('div');
 		document.body.appendChild(this.element);
 		this.render(this.element);
