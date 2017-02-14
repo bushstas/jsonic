@@ -88,7 +88,7 @@ class InitialsParser
 		}
 	}
 
-	private function validateInitialValue($type, $value) {
+	private function validateInitialValue($type, &$value) {
 		$this->parseInitialsObject($value, $type);
 		switch ($type) {
 			case 'args':
@@ -143,7 +143,7 @@ class InitialsParser
 		return $this->actionsCache[$ctr];
 	}
 
-	private	function parseInitialsObject($value, $type) {
+	private	function parseInitialsObject(&$value, $type) {
 		$this->currentObject = array();
 		$this->currentBindings = array();
 		$originalValue = $value;
@@ -157,12 +157,13 @@ class InitialsParser
 		$this->currentBindings = $binds[1];
 		
 		$text = preg_replace($regexp, '__BIND__', $value);
-		TextParser::transformIntoValidJson($text);
-		
+		$text = TextParser::transformIntoValidJson($text);
+		Printer::log($text);
 		$this->currentObject = json_decode($text, true);
 		if ($this->currentObject === null) {
 			new Error($this->errors['parseError'], array($type, $this->currentClassName, $type, $originalValue, $this->getInitialParamExample($type)));
 		}
+		$value = $text;
 	}
 
 	private	function getInitialParamExample($type) {

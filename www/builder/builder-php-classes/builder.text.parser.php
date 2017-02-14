@@ -107,7 +107,8 @@ class TextParser
 			if (isset($signs[$i])) {
 				$content .= $signs[$i];
 			}
-		}		
+		}	
+		return $content;
 	}
 
 	private static function inDictionary($keyword) {

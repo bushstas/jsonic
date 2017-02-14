@@ -82,7 +82,7 @@ _c = function(component) {
 		}
 		if (isArray(props['e'])) {
 			var eventType, callback, isOnce, i;
-			eventHandler = eventHandler || new {{GLOBAL}}.get('EventHandler')();
+			eventHandler = eventHandler || new ({{GLOBAL}}.get('EventHandler'))();
 			for (i = 0; i < props['e'].length; i++) {
 				eventType = eventTypes[props['e'][i]] || eventType;
 				callback = props['e'][i + 1];

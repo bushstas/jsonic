@@ -1,7 +1,7 @@
 _c = function(e, p, n) {
 	this.getKeys = function() {
 		var a = [];
-		for (k in n) {
+		for (var k in n) {
 			if (isString(n[k])) a.push(n[k]);
 			else a.push.apply(a, n[k]);
 		}

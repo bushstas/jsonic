@@ -70,6 +70,7 @@ _c = function() {
 			if (!view) {
 				loadView.call(this, route);
 			} else {
+				route['view'] = view;
 				renderView.call(this, route);
 			}
 		} else {

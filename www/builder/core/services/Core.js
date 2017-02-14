@@ -66,7 +66,7 @@ _c = new (function() {
 	this.processPostRenderInitials = function() {
 		var events = getInitial.call(this, 'events');
 		if (isObject(events)) {
-			this.mouseHandler = new {{GLOBAL}}.get('MouseHandler')(this, events);
+			this.mouseHandler = new ({{GLOBAL}}.get('MouseHandler'))(this, events);
 		}
 		var helpers = getInitial.call(this, 'helpers');
 		if (isArray(helpers)) {

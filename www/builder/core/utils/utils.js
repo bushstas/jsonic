@@ -11,10 +11,10 @@ function isComponentLike(a) {
 	return isObject(a) && isFunction(a.instanceOf);
 }
 function isComponent(a) {
-	return isComponentLike(a) && a.instanceOf(Component);
+	return isComponentLike(a) && a.instanceOf({{GLOBAL}}.get('Component'));
 }
 function isController(a) {
-	return isComponentLike(a) && a.instanceOf(Controller);
+	return isComponentLike(a) && a.instanceOf({{GLOBAL}}.get('Controller'));
 }
 function isControl(a) {
 	return isComponentLike(a) && a.instanceOf(Control);
