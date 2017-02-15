@@ -107,7 +107,7 @@ _c = function(component) {
 
 	var createCondition = function(props) {
 		if (isFunction(props['i'])) {			
-			var condition = new {{GLOBAL}}.get('Condition')(props);
+			var condition = new ({{GLOBAL}}.get('Condition'))(props);
 			condition.render(parentElement, self);				
 			registerChild(condition);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), condition, props);
@@ -120,7 +120,7 @@ _c = function(component) {
 
 	var createForeach = function(props) {
 		if (props['n'] || props['g']) {
-			var foreach = new {{GLOBAL}}.get('Foreach')(props);
+			var foreach = new ({{GLOBAL}}.get('Foreach'))(props);
 			foreach.render(parentElement, self);
 			registerChild(foreach);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), foreach, props);
@@ -135,7 +135,7 @@ _c = function(component) {
 
 	var createIfSwitch = function(props) {
 		if (props['p'] || props['g']) {
-			var swtch = new {{GLOBAL}}.get('IfSwitch')(props);
+			var swtch = new ({{GLOBAL}}.get('IfSwitch'))(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), swtch, props);
@@ -152,7 +152,7 @@ _c = function(component) {
 
 	var createSwitch = function(props) {
 		if (props['p'] || props['g']) {
-			var swtch = new {{GLOBAL}}.get('Switch')(props);
+			var swtch = new ({{GLOBAL}}.get('Switch'))(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), swtch, props);

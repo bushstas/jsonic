@@ -88,7 +88,7 @@ class TextParser
 		self::encode($content, '_this_');
 	}
 
-	public static function transformIntoValidJson(&$content, $addNQs = false) {
+	public static function transformIntoValidJson(&$content) {
 		$regexp = '/\s*([\{\}\[\],:])\s*/';
 		preg_match_all($regexp, $content, $signs);
 		$signs = $signs[1];

@@ -83,7 +83,8 @@ _c = new (function() {
 		}
 	};
 	var subscribeToHelper = function(options) {
-		if (isObject(options['options'])) options['helper'].subscribe(this, options['options']);
+		console.log(options['helper'])
+		if (isObject(options['options'])) {{GLOBAL}}.get(options['helper']).subscribe(this, options['options']);
 	};
 	var isProperMethod = function(child, parent, method) {
 		if (!!child.prototype[method]) return false;

@@ -26,16 +26,21 @@ class InitialsParser
 		'typeError' => ' ласс {??} с типом {??} не может содержать initial параметр {??}',
 		'noActions' => '” контроллера {??} отсутствуют initial параметр <b>actions</b>.<br><br><b>ѕараметр должен иметь вид:</b> {?}',
 		'privateParamNotBool' => 'Initial параметр {??} в классе {??} имеет поле <b>private</b>, которое не €вл€етс€ true или false<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
-		'controllerMustBePrivate' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но его поле <b>private</b> отсутствует или не €вл€етс€ true<br>“олько работа€ с компонентом приватно, контрорллер может использовать параметр <b>options</b><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}'
-	);
+		'controllerMustBePrivate' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но его поле <b>private</b> отсутствует или не €вл€етс€ true<br>“олько работа€ с компонентом приватно, контрорллер может использовать параметр <b>options</b><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
+		'unknownMouseEvent' => '32423432',
+		'emptyMouseEvents' => 'Initial параметр <b>events</b> в классе {??} содержит поле {??}, которое не содержит элементов<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}'
+	); 
 
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
-	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'helpers', 'followers', 'correctors', 'listeners');
+	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'helpers', 'followers', 'correctors', 'listeners', 'events');
 	private $initials = array();
 	private $originalInitials = array();
 	private $regexp = '/\binitial\s+([\s\S]+?)(?=(initial|function|@EOF))/';
 	private $regexp2 = '/^([a-zA-Z]\w*)\s*=\s*([\s\S]+?)[;\s]*$/';
 	private $actionsCache = array();
+	private $mouseEvents = array(
+		'click', 'dblclick', 'mousedown', 'mouseup', 'mouseover', 'mouseout', 'mouseleave', 'mouseenter', 'contextmenu'
+	);
 
 	public function fetch(&$content, &$class) {
 		$this->defineForClass($class);
@@ -91,7 +96,6 @@ class InitialsParser
 	private function validateInitialValue($type, &$value) {
 		$this->parseInitialsObject($value, $type);
 		switch ($type) {
-			case 'args':
 			case 'options':
 			case 'props':
 				$this->validateDefaultInitials($value, $type);
@@ -113,8 +117,13 @@ class InitialsParser
 				$this->validateListenersInitials($value, $type);
 			break;
 
+			case 'events':
+				$this->validateEventsInitials($value, $type);
+			break;
+
 			case 'helpers':
 				$this->validateHelpersInitials($value, $type);
+				$value = preg_replace('/\bhelper([\'"]*)\s*:\s*([A-Z]\w*)/', "helper$1:'$2'", $value);
 			break;
 
 			case 'followers':
@@ -143,7 +152,7 @@ class InitialsParser
 		return $this->actionsCache[$ctr];
 	}
 
-	private	function parseInitialsObject(&$value, $type) {
+	private	function parseInitialsObject($value, $type) {
 		$this->currentObject = array();
 		$this->currentBindings = array();
 		$originalValue = $value;
@@ -157,13 +166,11 @@ class InitialsParser
 		$this->currentBindings = $binds[1];
 		
 		$text = preg_replace($regexp, '__BIND__', $value);
-		$text = TextParser::transformIntoValidJson($text);
-		Printer::log($text);
+		TextParser::transformIntoValidJson($text);
 		$this->currentObject = json_decode($text, true);
 		if ($this->currentObject === null) {
 			new Error($this->errors['parseError'], array($type, $this->currentClassName, $type, $originalValue, $this->getInitialParamExample($type)));
 		}
-		$value = $text;
 	}
 
 	private	function getInitialParamExample($type) {
@@ -172,12 +179,12 @@ class InitialsParser
 				return "<xmp>initial actions = {\n\t'load': {\n\t\t'url': './path',\n\t\t'method': 'GET',\n\t\t'callback': this.onLoad\n\t}\n}</xmp><b>или</b><xmp>initial actions = {\n\t'load': {\n\t\t'url': './path',\n\t\t'method': 'POST',\n\t\t'callback': this.onLoad.bind(this, ...args)\n\t}\n}</xmp>";
 			case 'listeners':
 				return "<xmp>initial listeners = {\n\t'globalEventName': this.handleGlobalEvent\n}</xmp>";
+			case 'events':
+				return "<xmp>initial events = {\n\t'click': {\n\t\t'class-name': this.onClick\n\t},\n\t'contextmenu': {\n\t\t'class-name': this.onContextMenu\n\t}\n}</xmp>";
 			case 'loader':
 				return "<xmp>initial loader = {\n\t'controller': ControllerClass,\n\t'async': true,\n\t'callback': this.handleLoad,\n\t'options': {\n\t\t'key': 'value'\n\t}\n}</xmp>";
 			case 'options':
 				return "<xmp>initial options = {\n\t'key': 'id',\n\t'store': true,\n\t'storeAs': 'items',\n\t'storePeriod': '1day',\n\t'clone': true\n}</xmp>";
-			case 'args':
-				return "<xmp>initial args = {\n\t'name': 'Name',\n\t'price': 1000,\n\t'tags': ['tag1', 'tag2']\n}</xmp>";
 			case 'globals':
 				return "<xmp>initial globals = {\n\t'userOnline': this.onChangeUserOnlineStatus,\n\t'siteBackground': this.onChangeSiteBackground.bind(this, true)\n}</xmp>";
 			case 'props':
@@ -218,14 +225,14 @@ class InitialsParser
 		new Error($this->errors['typeError'], array($this->currentClassName, $this->currentClass['type'], $type));	
 	}
 
-	private function validateObjectFields($obj, $value, $type) {
+	private function validateObjectFields($obj, $value, $type, $novalidation = false) {
 		if (is_array($obj)) {
 			foreach ($obj as $key => $val) {
-				if (!preg_match('/^[a-z]\w*$/i', $key)) {
+				if (!$novalidation && !preg_match('/^[a-z]\w*$/i', $key)) {
 					new Error($this->errors['noPatternKey'], array($type, $this->currentClassName, $key, $type, $value));
 				}
 				if ($this->isAssocArray($val)) {
-					$this->validateObjectFields($val, $value, $type);
+					$this->validateObjectFields($val, $value, $type, $novalidation);
 				}
 			}
 		}
@@ -267,7 +274,7 @@ class InitialsParser
 
 	private function validateDefaultInitials($value, $type) {
 		$initials = $this->currentObject;
-		if (($type == 'args' || $type == 'props') && !in_array($this->currentClass['type'], $this->componentLikeClassTypes)) {
+		if ($type == 'props' && !in_array($this->currentClass['type'], $this->componentLikeClassTypes)) {
 			$this->initialError($type);
 		}
 		if (!$this->isAssocArray($initials, $value)) {
@@ -354,6 +361,28 @@ class InitialsParser
 		foreach ($initials as $key => $val) {
 			$this->validateCallback($val, $value, $type, $key, '', $val);
 		}
+	}
+
+	private function validateEventsInitials($value, $type) {
+		$initials = $this->currentObject;
+		if (!$this->isAssocArray($initials, $value)) {
+			$this->initialAssocArrayTypeError($value, $type);
+		}
+		foreach ($initials as $key => $val) {
+			if (!in_array($key, $this->mouseEvents)) {
+				new Error($this->errors['unknownMouseEvent'], array($type, $this->currentClassName, $i, $type, $value, $this->getInitialParamExample($type)));
+			}
+			if (!$this->isAssocArray($initials, $val)) {
+				$this->initialAssocArrayTypeError($val, $type);
+			}
+			if (empty($val)) {
+				new Error($this->errors['emptyMouseEvents'], array($this->currentClassName, $key, $type, $value, $this->getInitialParamExample($type)));	
+			}
+		}
+		// $this->validateObjectFields($initials, $value, $type, true);
+		// foreach ($initials as $key => $val) {
+		// 	$this->validateCallback($val, $value, $type, $key, '', $val);
+		// }
 	}
 
 	private function validateCorrectorsInitials($value, $type) {

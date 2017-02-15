@@ -120,7 +120,7 @@ _p.render = function(parentElement, parentLevel) {
 	this.createLevels(false);
 };
 _p.createLevel = function(items, isUpdating, index) {
-	var level = new {{GLOBAL}}.get('Level')(this.parentLevel.getComponent());
+	var level = new ({{GLOBAL}}.get('Level'))(this.parentLevel.getComponent());
 	var nextSiblingChild;
 	if (isNumber(index) && this.levels[index]) {
 		nextSiblingChild = this.levels[index].getFirstNodeChild();

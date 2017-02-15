@@ -9,7 +9,7 @@ _p.render = function(parentElement, parentLevel) {
 	this.createLevel(false);
 };
 _p.createLevel = function(isUpdating) {
-	this.level = new {{GLOBAL}}.get('Level')(this.parentLevel.getComponent());
+	this.level = new ({{GLOBAL}}.get('Level'))(this.parentLevel.getComponent());
 	var nextSiblingChild = isUpdating ? {{GLOBAL}}.get('Core').getNextSiblingChild.call(this) : null;
 	this.level.render(this.getChildren(), this.parentElement, this.parentLevel, nextSiblingChild);
 };
