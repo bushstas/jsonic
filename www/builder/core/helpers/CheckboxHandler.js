@@ -1,4 +1,4 @@
-_c = function() {
+_c = new (function() {
 	var subscribers = [];
 	var options = [];
 	var defaultCheckboxClass = '->> checkbox';
@@ -109,5 +109,5 @@ _c = function() {
 		var checkbox = getCheckboxByName(name, subscriber);
 		if (checkbox) return checkbox.getData('value');
 	};
-}
+})();
 {{GLOBAL}}.set(_c, 'CheckboxHandler');

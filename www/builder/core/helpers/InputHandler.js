@@ -1,4 +1,4 @@
-_c = function() {
+_c = new (function() {
 	var subscribers = [];
 	var options = [];	
 	this.subscribe = function(subscriber, opts) {
@@ -40,5 +40,5 @@ _c = function() {
 		if (isFunction(cb)) r = cb.call(s, value);
 		if (r !== false && isString(eventName)) s.dispatchEvent(eventName, value);
 	}; 
-}
+})();
 {{GLOBAL}}.set(_c, 'InputHandler');

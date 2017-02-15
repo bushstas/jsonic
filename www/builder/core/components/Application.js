@@ -127,7 +127,7 @@ _c = function() {
 			if (this.isChangeTitle) {
 				var title = this.currentRoute['title'];
 				if (isString(title)) {
-					var titleParams = this.currentView.getTitleParams();
+					var titleParams = this.views[this.currentView].getTitleParams();
 					if (isObject(titleParams)) {
 						var regExp;
 						for (var k in titleParams) {
@@ -153,7 +153,7 @@ _c = function() {
 			{{GLOBAL}}.create('Loader');
 			dictionary = {{GLOBAL}}.get('Dictionary');
 			router = {{GLOBAL}}.get('Router');
-			controllers = {{GLOBAL}}.get('Controllers', 1);
+			controllers = {{GLOBAL}}.get('Controllers');
 			this.element = document.createElement('div');
 			document.body.appendChild(this.element);
 			this.render(this.element);

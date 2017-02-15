@@ -306,7 +306,6 @@ class JSCompiler
 
 	private function checkHelpersUse() {
 		$missingHelpers = array();
-		$isStatesUsed = $this->isStatesUsed();
 		foreach ($this->helpers as $helper) {
 			$isMissing = false;
 			if (!preg_match('/\b'.$helper.'\b/', $this->jsCode)) {
@@ -314,9 +313,11 @@ class JSCompiler
 				if ($helper == 'Tooltiper') {
 					$isMissing = empty($this->config['tooltipClass']);
 				} elseif ($helper == 'State') {
-					$isMissing = !$isStatesUsed;
+					$isMissing = !$this->isStatesUsed();
 				} elseif ($helper == 'StoreKeeper') {
 					$isMissing = !preg_match('/\bstoreAs\b/', ' '.$this->jsCode);
+				} elseif ($helper == 'MouseHandler') {
+					$isMissing = !$this->isMouseHandlerUsed();
 				}
 			}
 			if ($isMissing) $missingHelpers[] = $helper;
@@ -330,9 +331,13 @@ class JSCompiler
 
 	private function isStatesUsed() {
 		$code = $this->jsCode;
-		return preg_match('/\binitial (global|local|listener)s\b/', $code) ||
-			   preg_match('/\b(Loc|Glob)alState\b/', $code) || 
+		return preg_match('/\binitial listeners\b/', $code) ||
+			   preg_match('/\bState\b/', $code) || 
 			   preg_match('/\$:{1,2}\w/', $code);
+	}
+
+	private function isMouseHandlerUsed() {
+		return preg_match('/\binitial events\b/', $this->jsCode);
 	}
 
 	private function checkUtilsUse() {

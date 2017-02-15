@@ -1,14 +1,11 @@
 component TabPanel
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> tab-rest': this.onRestTabClick,
-			'->> content-tab': this.onTabClick
-		}
+initial events = {
+	'click': {
+		'->> tab-rest': this.onRestTabClick,
+		'->> content-tab': this.onTabClick
 	}
-]
+}
 
 function onRendered() {
 	this.tabWidth = $tabWidth || 200;

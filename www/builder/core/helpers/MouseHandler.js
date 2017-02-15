@@ -1,7 +1,8 @@
 _c = function() {
 	var subscribers = [];
 	var options = [];
-	var eventHandler = new {{GLOBAL}}.get('EventHandler')();
+	var eh = {{GLOBAL}}.get('EventHandler');
+	var eventHandler = new eh();
 	var extendOptions = function(index, opts) {
 		Objects.merge(options[index], opts);
 	};

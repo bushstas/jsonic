@@ -15,14 +15,14 @@ initial helpers = [
 			},
 			'inputSelector': 'input'
 		}
-	},
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> @variant': this.onVariantPick
-		}
 	}
 ];
+
+initial events = {
+	'click': {
+		'->> @variant': this.onVariantPick
+	}
+}
 
 initial followers = {
 	'variants': this.onChangeVariants,

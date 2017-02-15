@@ -4,14 +4,11 @@ initial loader = {
 	'controller': Filters
 }
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> @button': this.onSubscribeButtonClick
-		}
+initial events = {
+	'click': {
+		'->> @button': this.onSubscribeButtonClick
 	}
-];
+}
 
 function onLoaded(filters) {
 	$filters <<- = filters;

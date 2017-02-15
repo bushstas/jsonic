@@ -124,8 +124,12 @@ _c = function() {
 			}
 			return null;
 		};
+		var getNewRequest = function() {
+			var ajr = {{GLOBAL}}.get('AjaxRequest');
+			return new ajr();
+		};
 		var getRequest = function(action) {
-			return this.requests[action['name']] = this.requests[action['name']] || new {{GLOBAL}}.get('AjaxRequest')();
+			return this.requests[action['name']] = this.requests[action['name']] || getNewRequest();
 		};
 		var getOptions = function(options, action, initiator) {
 			if (!isObject(options)) options = {};
@@ -192,6 +196,7 @@ _c = function() {
 		};
 
 		_p.instanceOf = function(classFunc) {
+			if (isString(classFunc)) classFunc = {{GLOBAL}}.get(classFunc);
 			return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 		};
 

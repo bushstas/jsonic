@@ -1,14 +1,11 @@
 control Keywords
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> @add-request': this.addRequest,
-			'->> @remove-request': this.onRemoveRequestClick
-		}
+initial events = {
+	'click': {
+		'->> @add-request': this.addRequest,
+		'->> @remove-request': this.onRemoveRequestClick
 	}
-]
+}
 
 initial followers = {
 	'keywords': this.onKeywordsChange
@@ -39,7 +36,7 @@ function onKeywordsChange(kw) {
 	$tabs = tabs,
 	$activeTab = kwlen - 1;
 	this.appendChild('tabs', kwlen > 1);	
-	this.forChildren(KeywordsControl, function(child, i) {
+	this.forChildren('KeywordsControl', function(child, i) {
 		child.set('index', kwlen - i);
 	});
 }

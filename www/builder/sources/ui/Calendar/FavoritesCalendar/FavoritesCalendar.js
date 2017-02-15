@@ -9,14 +9,11 @@ initial controllers = [
 	}
 ]
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> marked': this.onMarkedDayClick
-		}
+initial events = {
+	'click': {
+		'->> marked': this.onMarkedDayClick
 	}
-]
+}
 
 function onRendered() {
 	this.month = Dates.getMonth();

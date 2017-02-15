@@ -5,15 +5,12 @@ initial props = {
 	'count': 0
 }
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> app-tags-remove': this.onRemoveButtonClick,
-			'->> app-tags-item-text': this.onTagClick
-		}
+initial events = {
+	'click': {
+		'->> app-tags-remove': this.onRemoveButtonClick,
+		'->> app-tags-item-text': this.onTagClick
 	}
-]
+}
 
 initial followers = {
 	'items': this.onItemsChange

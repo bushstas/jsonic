@@ -27,7 +27,7 @@ class InitialsParser
 		'noActions' => '” контроллера {??} отсутствуют initial параметр <b>actions</b>.<br><br><b>ѕараметр должен иметь вид:</b> {?}',
 		'privateParamNotBool' => 'Initial параметр {??} в классе {??} имеет поле <b>private</b>, которое не €вл€етс€ true или false<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
 		'controllerMustBePrivate' => 'Initial параметр {??} в классе {??} имеет поле <b>options</b>, но его поле <b>private</b> отсутствует или не €вл€етс€ true<br>“олько работа€ с компонентом приватно, контрорллер может использовать параметр <b>options</b><xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}',
-		'unknownMouseEvent' => '32423432',
+		'unknownMouseEvent' => 'Initial параметр <b>events</b> в классе {??} содержит неподдерживаемое событие {??}<xmp>initial {?} = {?}</xmp>—писок поддерживаемых событий:<xmp>{?}</xmp>',
 		'emptyMouseEvents' => 'Initial параметр <b>events</b> в классе {??} содержит поле {??}, которое не содержит элементов<xmp>initial {?} = {?}</xmp><b>ѕараметр должен иметь вид:</b> {?}'
 	); 
 
@@ -370,7 +370,7 @@ class InitialsParser
 		}
 		foreach ($initials as $key => $val) {
 			if (!in_array($key, $this->mouseEvents)) {
-				new Error($this->errors['unknownMouseEvent'], array($type, $this->currentClassName, $i, $type, $value, $this->getInitialParamExample($type)));
+				new Error($this->errors['unknownMouseEvent'], array($this->currentClassName, $key, $type, $value, implode("\n", $this->mouseEvents)));
 			}
 			if (!$this->isAssocArray($initials, $val)) {
 				$this->initialAssocArrayTypeError($val, $type);

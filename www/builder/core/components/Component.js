@@ -127,6 +127,7 @@ _c = function() {
 		};
 
 		_p.instanceOf = function(classFunc) {
+			if (isString(classFunc)) classFunc = {{GLOBAL}}.get(classFunc);
 			return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 		};
 
@@ -151,7 +152,8 @@ _c = function() {
 
 		_p.addListener = function(target, eventType, handler) {
 	 		if (isElement(target)) {
-	 			this.eventHandler = this.eventHandler || new {{GLOBAL}}.get('EventHandler')();
+	 			var eh = {{GLOBAL}}.get('EventHandler');
+	 			this.eventHandler = this.eventHandler || new eh();
 	 			this.eventHandler.listen(target, eventType, handler.bind(this));
 	 		} else target.subscribe(eventType, handler, this);
 	 	};
@@ -319,8 +321,8 @@ _c = function() {
 			}
 		};
 		
-		_p.forChildren = function(classFunc, callback) {
-			var children = this.getChildren(classFunc), result;
+		_p.forChildren = function(className, callback) {
+			var children = this.getChildren(className), result;
 			for (var i = 0; i < children.length; i++) {
 				result = callback.call(this, children[i], i);
 				if (result) return result;
@@ -381,11 +383,11 @@ _c = function() {
 			return idx;
 		};
 
-		_p.getChildren = function(classFunc) {
-			if (!isFunction(classFunc)) return this.children;
+		_p.getChildren = function(className) {
+			if (!isString(className)) return this.children;
 			var children = [];
 			this.forEachChild(function(child) {
-				if (isComponentLike(child) && child.instanceOf(classFunc)) children.push(child);
+				if (isComponentLike(child) && child.instanceOf(className)) children.push(child);
 			});
 			return children;
 		};
@@ -459,9 +461,9 @@ _c = function() {
 		_p.dispose = function() {
 			{{GLOBAL}}.get('State').dispose(this);
 			unrender.call(this);
-			if (this.mouseEvents) {
-				this.mouseEvents.dispose();
-				this.mouseEvents = null;
+			if (this.mouseHandler) {
+				this.mouseHandler.dispose();
+				this.mouseHandler = null;
 			}
 			this.updaters = null;
 			this.parentElement = null;

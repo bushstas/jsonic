@@ -11,13 +11,13 @@ function isComponentLike(a) {
 	return isObject(a) && isFunction(a.instanceOf);
 }
 function isComponent(a) {
-	return isComponentLike(a) && a.instanceOf({{GLOBAL}}.get('Component'));
+	return isComponentLike(a) && a.instanceOf('Component');
 }
 function isController(a) {
-	return isComponentLike(a) && a.instanceOf({{GLOBAL}}.get('Controller'));
+	return isComponentLike(a) && a.instanceOf('Controller');
 }
 function isControl(a) {
-	return isComponentLike(a) && a.instanceOf(Control);
+	return isComponentLike(a) && a.instanceOf('Control');
 }
 function isObject(a) {
 	return !!a && typeof a == 'object' && !isNode(a) && !isArray(a);

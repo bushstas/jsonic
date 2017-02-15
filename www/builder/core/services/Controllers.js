@@ -1,6 +1,9 @@
-_c = function() {
+_c = new (function() {
 	var ctrlist = {{CONTROLLERS}};
 	this.get = function(id) {
+		if (isString(ctrlist[id])) {
+			ctrlist[id] = {{GLOBAL}}.get(ctrlist[id]);
+		}
 		if (isFunction(ctrlist[id])) {
 			ctrlist[id] = new ctrlist[id]();
 			{{GLOBAL}}.get('Core').initiate.call(ctrlist[id]);
@@ -17,5 +20,6 @@ _c = function() {
 			}
 		}
 	};
-}
+})();
 {{GLOBAL}}.set(_c, 'Controllers');
+var {{CONTROLLER}} = _c;

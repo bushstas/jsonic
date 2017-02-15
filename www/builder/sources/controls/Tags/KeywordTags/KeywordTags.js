@@ -1,14 +1,11 @@
 control KeywordTags extends Tags
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> app-tags-remove-all': this.clear,
-			'->> app-tags-select-button': this.onOptionClick
-		}
+initial events = {
+	'click': {
+		'->> app-tags-remove-all': this.clear,
+		'->> app-tags-select-button': this.onOptionClick
 	}
-]
+}
 
 function onEnter(value) {
 	super(Tags, value);

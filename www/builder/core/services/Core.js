@@ -44,7 +44,7 @@ _c = new (function() {
 	};
 	var attachController = function(options) {		
 		if (isObject(options['on'])) {
-			var data;
+			var data, ctr;
 			for (var actionName in options['on']) {
 				data = {'initiator': this, 'callback': options['on'][actionName]};
 				options['controller'].addSubscriber(actionName, data, !!options['private'], Objects.get(options['options'], actionName));
@@ -66,7 +66,8 @@ _c = new (function() {
 	this.processPostRenderInitials = function() {
 		var events = getInitial.call(this, 'events');
 		if (isObject(events)) {
-			this.mouseHandler = new ({{GLOBAL}}.get('MouseHandler'))(this, events);
+			var mh = {{GLOBAL}}.get('MouseHandler');
+			this.mouseHandler = new mh(this, events);
 		}
 		var helpers = getInitial.call(this, 'helpers');
 		if (isArray(helpers)) {
@@ -83,7 +84,6 @@ _c = new (function() {
 		}
 	};
 	var subscribeToHelper = function(options) {
-		console.log(options['helper'])
 		if (isObject(options['options'])) {{GLOBAL}}.get(options['helper']).subscribe(this, options['options']);
 	};
 	var isProperMethod = function(child, parent, method) {

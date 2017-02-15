@@ -15,15 +15,12 @@ initial controllers = [
 	}
 ]
 
-initial helpers = [
-	{
-		'helper': ClickHandler,
-		'options': {
-			'->> @refresh': this.onRefreshButtonClick,
-			'->> @row-name': this.onFilterClick
-		}
+initial events = {
+	'click': {
+		'->> @refresh': this.onRefreshButtonClick,
+		'->> @row-name': this.onFilterClick
 	}
-]
+}
 
 function onRendered() {
 	this.refresh();
