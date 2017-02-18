@@ -70,6 +70,7 @@ class Builder
 		
 
 		$this->coreValidator->validateUtilsFunction($this->files['core']);
+		JSGlobals::init($this->config->getJsConfig());
 		$this->runCompilers();
 	}
 

@@ -31,7 +31,7 @@ _c = function() {
 		};
 		var loadView = function(route) {
 			var script = document.createElement('script');
-			script.src = '/js/' + route['name'] + '_chunk.js';
+			script.src = '/js/{{JSBASE}}_' + route['name'] + '_chunk.js';
 			document.body.appendChild(script);
 			script.onload = onViewLoaded.bind(this, route);
 		};
@@ -42,7 +42,7 @@ _c = function() {
 		var renderView = function(route) {
 			var isSameView = this.currentView == route['name'];
 			if (!isSameView && this.currentView && this.views[this.currentView]) {
-				activateView.call(this, this.currentView, false);
+				activateView.call(this, this.views[this.currentView], false);
 			}
 			this.currentView = route['name'];
 			loadControllers(route);
@@ -64,6 +64,7 @@ _c = function() {
 		var handleNavigation = function(route, changeTitle) {
 			this.isChangeTitle = changeTitle;
 			this.currentRoute = route;
+			var isSameView = this.currentView == route['name'];
 			var view = this.views[route['name']];
 			if (!view) {
 				view = {{GLOBAL}}.get(route['view']);
@@ -109,6 +110,7 @@ _c = function() {
 			this.viewContainer = viewContainer;
 		};
 		var activateView = function(view, isActivated, isSameView) {
+			if (!view) return;
 			var parentElement = {{GLOBAL}}.get('Core').getParentElement.call(view);
 			if (!isActivated) {
 				this.viewContainer.removeChild(parentElement);
@@ -150,7 +152,6 @@ _c = function() {
 			this.views = {};
 		};
 		_p.run = function() {
-			{{GLOBAL}}.create('Loader');
 			dictionary = {{GLOBAL}}.get('Dictionary');
 			router = {{GLOBAL}}.get('Router');
 			controllers = {{GLOBAL}}.get('Controllers');

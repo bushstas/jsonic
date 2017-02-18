@@ -4,7 +4,7 @@ var Dictionary = new (function() {
 	this.load = function(routeName) {
 		if (loaded[routeName]) return;
 		if (!isNone(dictionaryUrl)) {
-			{{GLOBAL}}.get('Loader').get(dictionaryUrl, {'route': routeName}, onLoad, this);
+			Loader.get(dictionaryUrl, {'route': routeName}, onLoad, this);
 		} else onLoad();
 		loaded[routeName] = true;
 	};

@@ -1,12 +1,12 @@
-p=MouseEvent.prototype;
-p.getTarget = function(selector) {
+_p=MouseEvent.prototype;
+_p.getTarget = function(selector) {
 	return this.target.getAncestor(selector);
 };
-p.getTargetData = function(selector, dataAttr) {
+_p.getTargetData = function(selector, dataAttr) {
 	var target = this.getTarget(selector);
 	return !!target ? target.getData(dataAttr) : '';
 };
-p.targetHasAncestor = function(element) {
+_p.targetHasAncestor = function(element) {
 	if (isElement(element)) {
 		var target = this.target;		
 		while (target) {
@@ -18,10 +18,10 @@ p.targetHasAncestor = function(element) {
 	}
 	return false;
 };
-p.targetHasClass = function(className) {
+_p.targetHasClass = function(className) {
 	return this.target.hasClass(className) || (!!this.target.parentNode && this.target.parentNode.hasClass(className));
 };
-p.getTargetWithClass = function(className, strict) {
+_p.getTargetWithClass = function(className, strict) {
 	if (this.target.hasClass(className)) return this.target;
 	if (!strict || !this.target.className) {
 		if (!!this.target.parentNode && this.target.parentNode.hasClass(className)) return this.target.parentNode;

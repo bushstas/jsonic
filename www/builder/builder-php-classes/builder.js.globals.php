@@ -2,6 +2,7 @@
 
 class JSGlobals
 {
+	private static $jsConfig;
 	private static $output	= array();
 	private static $excluded = array();
 	private static $varNames = array(
@@ -33,7 +34,26 @@ class JSGlobals
 		'stop'             => '__SP',
 		'prevent'          => '__PD',
 		'dialoger'         => '__DI',
-		'global'           => '_G_'
+		'global'           => '_G_',
+		'funcs'            => '_F_',
+		'objects'          => '__O',
+		'popuper'          => '__P',
+		'state'            => '__S'
+	);
+	
+	private static $varKeys = array(
+		'textConstants' => '_tc',
+		'textNodes' => '_tn',
+		'apiConfig' => '_ac',
+		'dataConstants' => '_dc',
+		'nullFunction' => '_nf',
+		'controller' => 'Controllers',
+		'stop' => '_sp',
+		'prevent' => '_pd',
+		'objects' => 'Objects',
+		'popuper' => 'Popuper',
+		'state' => 'State',
+		'dictionary' => 'Dictionary'
 	);
 
 	private static $errors = array(
@@ -44,7 +64,11 @@ class JSGlobals
 		'noApiConfigPath' => 'ѕараметр <b>CONFIG.{?}.{?}</b> не найден в файле конфигурации <b>config.js</b>',
 		'noDeclFilesFound' => "ќбнаружено использование утилины <b>Decliner</b>, но не найден ни один файл с расширением <b>decl</b><br><br>ѕример содержимого такого файла:<xmp>@item: штука,штуки,штук\n@ball: м€ч,м€ча,м€чей</xmp>"
 	);
-	
+
+	public static function init($jsConfig) {
+		self::$jsConfig = $jsConfig;
+	}
+
 	public static function run(&$jsOutput, $data) {
 		self::addTextNodes();
 		self::addTextConstants($data['texts']);
@@ -78,6 +102,7 @@ class JSGlobals
 
 	public static function getUsedNames() {
 		return array(
+			'FUNCS'           => self::$varNames['funcs'],
 			'GLOBAL'          => self::$varNames['global'],
 			'ATTRIBUTES'      => self::$varNames['props'],
 			'EVENTTYPES'      => self::$varNames['events'],
@@ -101,7 +126,9 @@ class JSGlobals
 			'CONSTANTS'       => self::$varNames['textConstants'],
 			'CONTROLLERS'     => self::$varNames['controllers'],
 			'CONTROLLER'      => self::$varNames['controller'],
-			'DIALOGER'        => self::$varNames['dialoger']
+			'DIALOGER'        => self::$varNames['dialoger'],
+			'JSBASE'          => self::$jsConfig['file'],
+			'OBJECTS'         => self::$jsConfig['objects']
 		);
 	}
 
@@ -111,6 +138,10 @@ class JSGlobals
 
 	public static function getVarName($key) {
 		return self::$varNames[$key];
+	}
+
+	public static function getVarKeys() {
+		return self::$varKeys;
 	}
 
 	public static function getVarNames() {
@@ -124,6 +155,10 @@ class JSGlobals
 		}
 	}
 
+	private static function addGlobalAddingCall($key) {
+		return ";".self::$varNames['global'].".set(".self::$varNames[$key].",'".self::$varKeys[$key]."');";
+	} 
+
 	private static function normJsonStr($str){
 		$str = preg_replace('/\\\\u00A0/i', '_nbsp_', $str);
 	    $str = preg_replace_callback('/\\\\u([a-f0-9]{4})/i', create_function('$m', 'return chr(hexdec($m[1])-1072+224);'), $str);
@@ -134,14 +169,14 @@ class JSGlobals
 
 	private static function addTextNodes() {
 		$textNodes = TemplateParser::getTextNodes();
-		self::add('textNodes', preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))));
+		self::add('textNodes', preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))).self::addGlobalAddingCall('textNodes'));
 	}
 
 	private static function addTextConstants($data) {
-		self::add('textConstants', str_replace('"', "'", json_encode($data['texts'])));
+		self::add('textConstants', str_replace('"', "'", json_encode($data['texts'])).self::addGlobalAddingCall('textConstants'));
 	}
 
-	private static function parseTextConstants(&$jsOutput, $data) {
+	public static function parseTextConstants(&$jsOutput, $data) {
 		if (is_array($data['index'])) {
 			$varName = self::getVarName('textConstants');
 			$regexp = '/\b'.$varName.'\.\w+\b/';
@@ -173,7 +208,7 @@ class JSGlobals
 		}
 	}
 
-	private function parseDataConstants(&$jsOutput, $data) {
+	public static function parseDataConstants(&$jsOutput, $data) {
 		if (is_array($data['index'])) {
 			$varName = self::getVarName('dataConstants');
 			$regexp = '/<data>\w+\b/';
@@ -208,7 +243,7 @@ class JSGlobals
 			}
 		}
 		TextParser::createObjectString($apiConfig, array('/\\\/', ''));
-		self::add('apiConfig', $apiConfig);
+		self::add('apiConfig', $apiConfig.self::addGlobalAddingCall('apiConfig'));
 	}
 
 	private static function addDataConstants($data) {
@@ -216,7 +251,7 @@ class JSGlobals
 		foreach ($data['data'] as $item) {
 			$allData = array_merge($allData, $item);
 		}
-		self::add('dataConstants', str_replace('"', "'", json_encode(array_values($allData))));
+		self::add('dataConstants', str_replace('"', "'", json_encode(array_values($allData))).self::addGlobalAddingCall('dataConstants'));
 	}
 
 	private static function addPathToDictionary($url) {
@@ -293,7 +328,7 @@ class JSGlobals
 	}
 
 	private static function addNullFunction() {
-		self::add('nullFunction', 'function(){return}');
+		self::add('nullFunction', 'function(){return}'.self::addGlobalAddingCall('nullFunction'));
 	}
 
 	private static function addControllers($controllers) {
@@ -301,10 +336,10 @@ class JSGlobals
 	}
 
 	private static function addStopPropagationFunction() {
-		self::add('stop', 'function(e){e.stopPropagation()}');
+		self::add('stop', 'function(e){e.stopPropagation()}'.self::addGlobalAddingCall('stop'));
 	}
 
 	private static function addPreventDefaultFunction() {
-		self::add('prevent', 'function(e){e.preventDefault()}');
+		self::add('prevent', 'function(e){e.preventDefault()}'.self::addGlobalAddingCall('prevent'));
 	}
 }

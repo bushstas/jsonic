@@ -1,4 +1,4 @@
-_c = function() {
+var Loader = new (function() {
 	var requests = {};
 	var getRequest = function(url, th) {
 		return requests[url] || createRequest(url, th);
@@ -19,5 +19,5 @@ _c = function() {
 		if (isFunction(callback)) req.setCallback(callback);
 		req.send(method, data);
 	};
-}
-{{GLOBAL}}.set(_c, 'Loader');
+})();
+{{GLOBAL}}.set(Loader, 'Loader');

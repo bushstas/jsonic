@@ -4,6 +4,10 @@ initial correctors = {
 	'text': this.correctAndSetText
 }
 
+initial props = {
+	control: Input
+}
+
 function correctAndSetText(text, changedProps) {
 	var corrector = changedProps['corrector'];
 	if (corrector == 'list') {

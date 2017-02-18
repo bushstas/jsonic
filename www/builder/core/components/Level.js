@@ -203,7 +203,8 @@ _c = function(component) {
 			props = props || {};
 			props['children'] = item['c'];
 		}
-		if (isString(item['tmp'])) item['tmp'] = {{GLOBAL}}.get('Core').getTemplateById.call(component, item['tmp']);
+		if (isNumber(item['tmp'])) item['tmp'] = {{GLOBAL}}.get('i_' + item['tmp']);
+		else if (isString(item['tmp'])) item['tmp'] = {{GLOBAL}}.get('Core').getTemplateById.call(component, item['tmp']);
 		if (isFunction(item['tmp'])) {		
 			var items = item['tmp'].call(component, props, component);
 			renderItems(items);

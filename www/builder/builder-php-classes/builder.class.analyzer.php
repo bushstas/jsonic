@@ -12,6 +12,7 @@ class ClassAnalyzer
 	private static $notUsedClasses = array();
 	private static $allJsClasses;
 	private static $jsClassesData;
+	private static $entryClassName;
 
 	private static $errors = array(
 		'unknownClass' => 'Вызываемый в одном из шаблонов класса {??} компонент {??} не найден<xmp>{?}</xmp>',
@@ -37,7 +38,8 @@ class ClassAnalyzer
 		}
 
 		$usedClasses = array();
-		$views[] = $configProvider->getEntry();
+		self::$entryClassName = $configProvider->getEntry();
+		$views[] = self::$entryClassName;
 		foreach ($views as $viewClass) {
 			$usedClasses[$viewClass] = $defaultClasses;
 			if (!in_array($viewClass, $disabledViews)) {
@@ -45,10 +47,22 @@ class ClassAnalyzer
 				self::addUsedClassFor($viewClass, $usedClasses[$viewClass]);
 			}
 		}
-		self::$usedClassesByViews = $usedClasses;
+		self::$usedClassesByViews = &$usedClasses;
+		$usedClassesInBase = self::$usedClassesByViews[self::$entryClassName];
+		foreach ($usedClasses as $k => &$list) {
+			if ($k != self::$entryClassName) {
+				$list = array_diff($list, $usedClassesInBase);
+			}
+		}
 
 		$allUsed = array();
-		foreach ($usedClasses as $list) {
+		foreach ($usedClasses as $k => &$list) {
+			if ($configProvider->isSplitMode() && $k != self::$entryClassName) {
+				$index = array_search(self::$entryClassName, $list);
+				if ($index !== false) {
+					array_splice($list, $index, 1);
+				}
+			}
 			$allUsed = array_merge($allUsed, $list);
 		}
 		$used = array_values(array_unique($allUsed));
@@ -65,16 +79,35 @@ class ClassAnalyzer
 		}
 		self::$notUsedClasses = array_diff(self::$allJsClasses, self::$usedClasses);
 		//Printer::log(self::$usedControllers);
-		//Printer::log(self::$usedClasses);
+		//Printer::log(self::$usedCorrectors);
 	}
 
-	public static function addCorrectors($classes) {
-		if (!is_array($classes)) {
-			$classes = array($classes);
-		}
-		foreach ($classes as $className) {
-			self::$usedCorrectors[] = $className;
-			self::$usedClasses[] = $className;
+	public static function attachCorrectors($isSplitted) {
+		$correctors = JSParser::getUsedCorrectorsByClass();
+		if (!$isSplitted) {
+			$crr = array();
+			foreach (self::$usedClasses as $value) {
+				if (is_array($correctors[$value])) {
+					$crr = array_merge($crr, $correctors[$value]);
+				}
+			}
+			if (!empty($crr)) {
+				$crr = array_unique($crr);
+				self::$usedClasses = array_merge(self::$usedClasses, $crr);
+			}
+		} else {
+			foreach (self::$usedClassesByViews as $key => &$classes) {
+				$crr = array();
+				foreach ($classes as $value) {
+					if (is_array($correctors[$value])) {
+						$crr = array_merge($crr, $correctors[$value]);
+					}
+				}
+				if (!empty($crr)) {
+					$crr = array_unique($crr);
+					$classes = array_merge($classes, $crr);
+				}
+			}
 		}
 	}
 
@@ -83,14 +116,13 @@ class ClassAnalyzer
 	}
 
 	public static function getUsedClasses($routeName = null) {
+		if ($routeName === true) {
+			return self::$usedClassesByViews[self::$entryClassName];
+		}
 		if (empty($routeName)) {
 			return self::$usedClasses;
 		}
 		return self::$usedClassesByViews[$routeName];
-	}
-
-	public static function getUsedCorrectors() {
-		return self::$usedCorrectors;
 	}
 
 	public static function getUsedControllers() {
@@ -101,7 +133,11 @@ class ClassAnalyzer
 		if (empty($routeName)) {
 			return self::$usedComponents;
 		}
-		$used = self::$usedClassesByViews[$routeName];
+		if ($routeName === true) {
+			$used = self::$usedClassesByViews[self::$entryClassName];
+		} else {
+			$used = self::$usedClassesByViews[$routeName];
+		}
 		$components = array();
 		foreach ($used as $className) {
 			$class = self::$jsClassesData[$className];
@@ -167,7 +203,7 @@ class ClassAnalyzer
 		}
 	}
 
-	private static function findClassesInScripts($files) {		
+	private static function findClassesInScripts($files) {
 		foreach ($files as $file) {
 			$classType = self::$jsClassesData[$file['name']]['type'];
 			$content = $file['content'];

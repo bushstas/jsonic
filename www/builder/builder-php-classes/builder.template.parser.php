@@ -1033,7 +1033,7 @@ class TemplateParser
 			if (empty($tmpName)) {
 				new Error(self::$errors['noIncludeTemplateName'], array(self::$templateName, self::$className));
 			}
-			$child['tmp'] = '<nq>includeGeneralTemplate'.ucfirst($tmpName).'<nq>';
+			$child['tmp'] = '<nq>__INC_TEMPLATE='.$tmpName.'__<nq>';
 		}
 		if (!empty($ifCondition) || !empty($else)) {
 			self::addIfConditionToChild(trim($ifCondition), $else, $child);

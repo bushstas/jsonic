@@ -146,7 +146,7 @@ _c = function() {
 		}
 	};
 	var getErrorRoute = function(errorCode) {
-		if (isFunction(errorRoutes[errorCode])) {
+		if (isString(errorRoutes[errorCode])) {
 			errorRoutes[errorCode] = {'name': errorCode, 'view': errorRoutes[errorCode], 'error': errorCode};
 		}
 		return errorRoutes[errorCode];

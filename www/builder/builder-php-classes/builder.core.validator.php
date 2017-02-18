@@ -33,12 +33,6 @@ class CoreValidator
 
 	private $allUtilsFunctionNames = array();
 
-	private $utilsFunctions = array(
-		'generateRandomKey', 'toCamelCase', 'isComponentLike', 'isComponent', 'isController', 'isControl', 'isObject',
-		'isArray', 'isArrayLike', 'isElement', 'isNode', 'isText', 'isFunction', 'isBool', 'isBoolean', 'isString', 'isNumber',
-		'isPrimitive', 'isNumeric', 'isUndefined', 'isNull', 'isNone', 'isZero', 'isNotEmptyString', 'stringToNumber', 'getCount'
-	);
-	
 	public function validate($pathToCore) {
 		$pathToCore = rtrim($pathToCore, '/').'/';
 		foreach ($this->content as $folder => $files) {

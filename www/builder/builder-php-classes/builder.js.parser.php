@@ -4,6 +4,7 @@ class JSParser
 {
 	private static $correctors, $globals;
 	private static $usedCorrectors = array();
+	private static $usedCorrectorsByClass = array();
 
 	private static $errors = array(
 		'validationError' => 'Ошибка в валидации кода класса {??}',
@@ -84,6 +85,10 @@ class JSParser
 
 	public static function getUsedCorrectors() {
 		return self::$usedCorrectors;
+	}
+
+	public static function getUsedCorrectorsByClass() {
+		return self::$usedCorrectorsByClass;
 	}
 
 	private static function parseFunctionCode($code, $functionName, $className) {
@@ -263,6 +268,10 @@ class JSParser
 				$code = $k."=".self::$globals['GLOBAL'].".get('".$crr."Crr').correct(".$k.");\n".$code;
 				if (!in_array($crrName, self::$usedCorrectors)) {
 					self::$usedCorrectors[] = $crrName;
+					if (!isset(self::$usedCorrectorsByClass[$class])) {
+						self::$usedCorrectorsByClass[$class] = array();
+					}
+					self::$usedCorrectorsByClass[$class][] = $crrName;
 				}
 			}
 		}

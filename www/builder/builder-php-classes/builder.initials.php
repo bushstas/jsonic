@@ -34,6 +34,7 @@ class InitialsParser
 	private $componentLikeClassTypes = array('component', 'dialog', 'form', 'control', 'menu', 'view', 'application');
 	private $availableInitials = array('loader', 'controllers', 'props', 'globals', 'actions', 'options', 'helpers', 'followers', 'correctors', 'listeners', 'events');
 	private $initials = array();
+	private $classNames = array();
 	private $originalInitials = array();
 	private $regexp = '/\binitial\s+([\s\S]+?)(?=(initial|function|@EOF))/';
 	private $regexp2 = '/^([a-zA-Z]\w*)\s*=\s*([\s\S]+?)[;\s]*$/';
@@ -67,6 +68,11 @@ class InitialsParser
 	}
 
 	public function run(&$classes) {
+		foreach ($classes as $className => $data) {
+			if ($data['type'] != 'controller') {
+				$this->classNames[] = $className;
+			}
+		}
 		foreach ($this->initials as $className => &$initials) {
 			if (!isset($classes[$className])) continue;
 			$this->defineForClass($classes[$className]);
@@ -75,6 +81,16 @@ class InitialsParser
 				if ($this->currentClass['type'] == 'controller') {
 					$this->validateControllerInitials($this->currentClass['initials']);
 				}
+			}
+			$this->parseClassNames($initials, $classes);
+		}
+	}
+
+	private function parseClassNames(&$initials) {
+		$regexp = '/([^\'"\.\w])('.implode('|', $this->classNames).')(?![\'"\w])/';
+		foreach ($initials as &$value) {
+			if (is_string($value)) {
+				$value = preg_replace($regexp, "$1'$2'", $value); 
 			}
 		}
 	}

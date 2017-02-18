@@ -1,16 +1,16 @@
 var __StyleNameCache = {};
-p=Element.prototype;
-p.setClass = function(className) {
+_p=Element.prototype;
+_p.setClass = function(className) {
 	this.className = className.trim();
 }
-p.toggleClass = function(className, isAdding) {
+_p.toggleClass = function(className, isAdding) {
 	if (isAdding) {
 		this.addClass(className);
 	} else {
 		this.removeClass(className);
 	}
 };
-p.switchClasses = function(className1, className2) {
+_p.switchClasses = function(className1, className2) {
 	var classes = this.getClasses();
 	if (classes.contains(className1)) { 
 		this.removeClass(className1);
@@ -20,7 +20,7 @@ p.switchClasses = function(className1, className2) {
 		this.addClass(className1);
 	}
 };
-p.addClass = function(className) {
+_p.addClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();
 		var addedClasses = className.split(' ');
@@ -32,7 +32,7 @@ p.addClass = function(className) {
 		this.className = classNames.join(' ');
 	}
 };
-p.removeClass = function(className) {
+_p.removeClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();
 		var removedClasses = className.split(' ');
@@ -45,21 +45,21 @@ p.removeClass = function(className) {
 		this.className = newClasses.join(' ');
 	}
 };
-p.hasClass = function(className) {
+_p.hasClass = function(className) {
 	return this.getClasses().indexOf(className) > -1;
 };
-p.getClasses = function() {
+_p.getClasses = function() {
 	var classNames = (this.className || '').trim().replace(/ {2,}/g, ' ');
 	if (classNames) {
 		return classNames.split(' ');
 	}
 	return [];
 };
-p.getAncestor = function(selector) {
+_p.getAncestor = function(selector) {
 	if (isNone(selector) || !isString(selector)) {
 		return null;
 	}
-	if (isFunction(p.closest)) {
+	if (isFunction(this.closest)) {
 		return this.closest(selector);
 	}
 	var parts = selector.trim().split(' ');
@@ -88,34 +88,34 @@ p.getAncestor = function(selector) {
 	}
 	return null;
 };
-p.getData = function(name) {
+_p.getData = function(name) {
 	return this.getAttribute('_' + name) || '';
 };
-p.setData = function(name, value) {
+_p.setData = function(name, value) {
 	this.setAttribute('_' + name, value);
 };
-p.getRect = function() {
+_p.getRect = function() {
 	return this.getBoundingClientRect();
 };
-p.setWidth = function(width) {
+_p.setWidth = function(width) {
 	this.style.width = isNumber(width) ? width + 'px' : width;
 };
-p.setHeight = function(height) {
+_p.setHeight = function(height) {
 	this.style.height = isNumber(height) ? height + 'px' : height;
 };
-p.getWidth = function() {
+_p.getWidth = function() {
 	return this.getRect().width;
 };
-p.getHeight = function() {
+_p.getHeight = function() {
 	return this.getRect().height;
 };
-p.getTop = function() {
+_p.getTop = function() {
 	return this.getRect().top;
 };
-p.getLeft = function() {
+_p.getLeft = function() {
 	return this.getRect().left;
 };
-p.css = function(style) {
+_p.css = function(style) {
 	var element = this;
 	var set = function(value, style) {
 		var propertyName = getVendorJsStyleName(style);	
@@ -139,10 +139,10 @@ p.css = function(style) {
 	   	}
 	}
 };
-p.getChildAt = function(index) {
+_p.getChildAt = function(index) {
 	return this.childNodes[index];
 };
-p.attr = function(attrName) {
+_p.attr = function(attrName) {
 	if (!isUndefined(arguments[1])) {
 		if (attrName == 'class') {
 			this.setClass(arguments[1]);
@@ -155,23 +155,23 @@ p.attr = function(attrName) {
 		return this.getAttribute(attrName);
 	}
 };
-p.show = function(isShown) {
+_p.show = function(isShown) {
 	var display = isString(isShown) ? isShown : (isUndefined(isShown) || isShown ? 'block' : 'none');
 	this.style.display = display;
 };
-p.hide = function() {
+_p.hide = function() {
 	this.show(false);
 };
-p.find = function(selector) {
+_p.find = function(selector) {
 	return this.querySelector(selector);
 };
-p.finds = function(selector) {
+_p.finds = function(selector) {
 	return this.querySelectorAll(selector);
 };
-p.getParent = function() {
+_p.getParent = function() {
 	return this.parentNode;
 };
-p.scrollTo = function(pxy, duration) {
+_p.scrollTo = function(pxy, duration) {
 	if (isElement(pxy)) pxy = pxy.getRelativePosition(this).y
 	if (!duration || !isNumber(duration)) this.scrollTop = pxy;
 	else {
@@ -187,18 +187,18 @@ p.scrollTo = function(pxy, duration) {
 		if (px != 0) cb();
 	}
 };
-p.getRelativePosition = function(element) {
+_p.getRelativePosition = function(element) {
 	var a = this.getRect();
 	var b = element.getRect();
 	return {x: Math.round(a.left - b.left + element.scrollLeft), y:  Math.round(a.top - b.top + element.scrollTop)};
 };
-p.clear = function() {
+_p.clear = function() {
 	if (isString(this.value)) this.value = '';
 	else this.innerHTML = '';
 };
-p.prev = function() {
+_p.prev = function() {
 	return this.previousSibling;
 };
-p.next = function() {
+_p.next = function() {
 	return this.nextSibling;
 };
