@@ -1,4 +1,4 @@
-_c = function(params) {
+{{COMPONENT}} = function(params) {
 	var handler = params['h'];
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
@@ -113,13 +113,13 @@ _c = function(params) {
 		params = null;
 	};
 }
-_p=_c.prototype;
-_p.render = function(parentElement, parentLevel) {
+{{PROTO}}={{COMPONENT}}.prototype;
+{{PROTO}}.render = function(parentElement, parentLevel) {
 	this.parentElement = parentElement;
 	this.parentLevel = parentLevel;
 	this.createLevels(false);
 };
-_p.createLevel = function(items, isUpdating, index) {
+{{PROTO}}.createLevel = function(items, isUpdating, index) {
 	var level = new ({{GLOBAL}}.get('Level'))(this.parentLevel.getComponent());
 	var nextSiblingChild;
 	if (isNumber(index) && this.levels[index]) {
@@ -130,10 +130,10 @@ _p.createLevel = function(items, isUpdating, index) {
 	level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
 	this.levels.insertAt(level, index);
 };
-_p.disposeLevels = function() {
+{{PROTO}}.disposeLevels = function() {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].dispose();
 	}
 	this.levels = [];
 };
-{{GLOBAL}}.set(_c, 'Foreach');
+{{GLOBAL}}.set({{COMPONENT}}, 'Foreach');

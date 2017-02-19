@@ -1,4 +1,4 @@
-_c = function(c, p) {
+{{GLOBAL}}.set(function(c, p) {
 	this.getKeys = function() {
 		var a = [];
 		for (var k in p['n']) {
@@ -25,5 +25,4 @@ _c = function(c, p) {
 	this.dispose = function() {
 		c = p = null;
 	};
-}
-{{GLOBAL}}.set(_c, 'ComponentUpdater');
+}, 'ComponentUpdater');

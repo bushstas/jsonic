@@ -1,16 +1,16 @@
 var __StyleNameCache = {};
-_p=Element.prototype;
-_p.setClass = function(className) {
+{{PROTO}}=Element.prototype;
+{{PROTO}}.setClass = function(className) {
 	this.className = className.trim();
 }
-_p.toggleClass = function(className, isAdding) {
+{{PROTO}}.toggleClass = function(className, isAdding) {
 	if (isAdding) {
 		this.addClass(className);
 	} else {
 		this.removeClass(className);
 	}
 };
-_p.switchClasses = function(className1, className2) {
+{{PROTO}}.switchClasses = function(className1, className2) {
 	var classes = this.getClasses();
 	if (classes.contains(className1)) { 
 		this.removeClass(className1);
@@ -20,7 +20,7 @@ _p.switchClasses = function(className1, className2) {
 		this.addClass(className1);
 	}
 };
-_p.addClass = function(className) {
+{{PROTO}}.addClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();
 		var addedClasses = className.split(' ');
@@ -32,7 +32,7 @@ _p.addClass = function(className) {
 		this.className = classNames.join(' ');
 	}
 };
-_p.removeClass = function(className) {
+{{PROTO}}.removeClass = function(className) {
 	if (isString(className)) {
 		var classNames = this.getClasses();
 		var removedClasses = className.split(' ');
@@ -45,17 +45,17 @@ _p.removeClass = function(className) {
 		this.className = newClasses.join(' ');
 	}
 };
-_p.hasClass = function(className) {
+{{PROTO}}.hasClass = function(className) {
 	return this.getClasses().indexOf(className) > -1;
 };
-_p.getClasses = function() {
+{{PROTO}}.getClasses = function() {
 	var classNames = (this.className || '').trim().replace(/ {2,}/g, ' ');
 	if (classNames) {
 		return classNames.split(' ');
 	}
 	return [];
 };
-_p.getAncestor = function(selector) {
+{{PROTO}}.getAncestor = function(selector) {
 	if (isNone(selector) || !isString(selector)) {
 		return null;
 	}
@@ -88,34 +88,34 @@ _p.getAncestor = function(selector) {
 	}
 	return null;
 };
-_p.getData = function(name) {
+{{PROTO}}.getData = function(name) {
 	return this.getAttribute('_' + name) || '';
 };
-_p.setData = function(name, value) {
+{{PROTO}}.setData = function(name, value) {
 	this.setAttribute('_' + name, value);
 };
-_p.getRect = function() {
+{{PROTO}}.getRect = function() {
 	return this.getBoundingClientRect();
 };
-_p.setWidth = function(width) {
+{{PROTO}}.setWidth = function(width) {
 	this.style.width = isNumber(width) ? width + 'px' : width;
 };
-_p.setHeight = function(height) {
+{{PROTO}}.setHeight = function(height) {
 	this.style.height = isNumber(height) ? height + 'px' : height;
 };
-_p.getWidth = function() {
+{{PROTO}}.getWidth = function() {
 	return this.getRect().width;
 };
-_p.getHeight = function() {
+{{PROTO}}.getHeight = function() {
 	return this.getRect().height;
 };
-_p.getTop = function() {
+{{PROTO}}.getTop = function() {
 	return this.getRect().top;
 };
-_p.getLeft = function() {
+{{PROTO}}.getLeft = function() {
 	return this.getRect().left;
 };
-_p.css = function(style) {
+{{PROTO}}.css = function(style) {
 	var element = this;
 	var set = function(value, style) {
 		var propertyName = getVendorJsStyleName(style);	
@@ -139,10 +139,10 @@ _p.css = function(style) {
 	   	}
 	}
 };
-_p.getChildAt = function(index) {
+{{PROTO}}.getChildAt = function(index) {
 	return this.childNodes[index];
 };
-_p.attr = function(attrName) {
+{{PROTO}}.attr = function(attrName) {
 	if (!isUndefined(arguments[1])) {
 		if (attrName == 'class') {
 			this.setClass(arguments[1]);
@@ -155,23 +155,23 @@ _p.attr = function(attrName) {
 		return this.getAttribute(attrName);
 	}
 };
-_p.show = function(isShown) {
+{{PROTO}}.show = function(isShown) {
 	var display = isString(isShown) ? isShown : (isUndefined(isShown) || isShown ? 'block' : 'none');
 	this.style.display = display;
 };
-_p.hide = function() {
+{{PROTO}}.hide = function() {
 	this.show(false);
 };
-_p.find = function(selector) {
+{{PROTO}}.find = function(selector) {
 	return this.querySelector(selector);
 };
-_p.finds = function(selector) {
+{{PROTO}}.finds = function(selector) {
 	return this.querySelectorAll(selector);
 };
-_p.getParent = function() {
+{{PROTO}}.getParent = function() {
 	return this.parentNode;
 };
-_p.scrollTo = function(pxy, duration) {
+{{PROTO}}.scrollTo = function(pxy, duration) {
 	if (isElement(pxy)) pxy = pxy.getRelativePosition(this).y
 	if (!duration || !isNumber(duration)) this.scrollTop = pxy;
 	else {
@@ -187,18 +187,18 @@ _p.scrollTo = function(pxy, duration) {
 		if (px != 0) cb();
 	}
 };
-_p.getRelativePosition = function(element) {
+{{PROTO}}.getRelativePosition = function(element) {
 	var a = this.getRect();
 	var b = element.getRect();
 	return {x: Math.round(a.left - b.left + element.scrollLeft), y:  Math.round(a.top - b.top + element.scrollTop)};
 };
-_p.clear = function() {
+{{PROTO}}.clear = function() {
 	if (isString(this.value)) this.value = '';
 	else this.innerHTML = '';
 };
-_p.prev = function() {
+{{PROTO}}.prev = function() {
 	return this.previousSibling;
 };
-_p.next = function() {
+{{PROTO}}.next = function() {
 	return this.nextSibling;
 };

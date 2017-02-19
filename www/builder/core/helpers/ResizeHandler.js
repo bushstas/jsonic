@@ -1,4 +1,4 @@
-_c = function() {
+{{GLOBAL}}.set(function() {
 	var subscribers = [], timer;	
 	this.subscribe = function(subscriber, options) {
 		subscribers.push([subscriber, options]);
@@ -13,5 +13,4 @@ _c = function() {
 		}, 200);
 	};
 	window.addEventListener('resize', onResize, false);
-}
-{{GLOBAL}}.set(_c, 'ResizeHandler');
+}, 'ResizeHandler');

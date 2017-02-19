@@ -1,4 +1,4 @@
-_c = function() {
+{{GLOBAL}}.set(function() {
 	var userOptions = {{USEROPTIONS}};
 	var app, status = {},
 	attributes = {}, settings = {}, loaded = false, 
@@ -99,5 +99,4 @@ _c = function() {
 			'accessLevel': 0
 		};
 	};
-}
-{{GLOBAL}}.set(_c, 'User');
+}, 'User');

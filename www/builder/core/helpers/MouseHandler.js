@@ -1,4 +1,4 @@
-_c = function() {
+{{GLOBAL}}.set(function() {
 	var subscribers = [];
 	var options = [];
 	var eh = {{GLOBAL}}.get('EventHandler');
@@ -36,5 +36,4 @@ _c = function() {
 			}
 		}
 	};
-}
-{{GLOBAL}}.set(_c, 'MouseHandler');
+}, 'MouseHandler');

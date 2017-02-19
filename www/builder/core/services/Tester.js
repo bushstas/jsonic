@@ -1,4 +1,4 @@
-_c = function() {
+{{GLOBAL}}.set(function() {
 	var log = [];
 	var views = [];
 	this.assert = function(t, a, k, e, c, m) {
@@ -49,5 +49,4 @@ _c = function() {
 	this.onTested = function(view) {
 
 	};
-}
-{{GLOBAL}}.set(_c, 'Tester');
+}, 'Tester');

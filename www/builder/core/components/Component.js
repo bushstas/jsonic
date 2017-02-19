@@ -1,4 +1,4 @@
-_c = function() {	
+{{COMPONENT}} = function() {	
 	if (!this || this == window) {
 		var load = function() {
 			var loader = Objects.get(this.initials, 'loader');
@@ -109,34 +109,34 @@ _c = function() {
 			this.level.dispose();
 			this.level = this.listeners = null;
 		};
-		_p.render = function(parentElement) {
+		{{PROTO}}.render = function(parentElement) {
 			this.parentElement = parentElement;
 			load.call(this);
 		};
 
-		_p.isDisabled = function() {
+		{{PROTO}}.isDisabled = function() {
 			return !!this.disabled;
 		};
 
-		_p.isRendered = function() {
+		{{PROTO}}.isRendered = function() {
 			return !!this.rendered;
 		};
 
-		_p.isDisposed = function() {
+		{{PROTO}}.isDisposed = function() {
 			return !!this.disposed;
 		};
 
-		_p.instanceOf = function(classFunc) {
+		{{PROTO}}.instanceOf = function(classFunc) {
 			if (isString(classFunc)) classFunc = {{GLOBAL}}.get(classFunc);
 			return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 		};
 
-		_p.disable = function(isDisabled) {
+		{{PROTO}}.disable = function(isDisabled) {
 			this.disabled = isDisabled;
 			this.addClass('->> disabled', !isDisabled);
 		};
 
-		_p.dispatchEvent = function(eventType) {
+		{{PROTO}}.dispatchEvent = function(eventType) {
 			var args = Array.prototype.slice.call(arguments), l;
 			args.splice(0, 1);
 			if (isArray(this.listeners)) {
@@ -150,7 +150,7 @@ _c = function() {
 			}
 		};
 
-		_p.addListener = function(target, eventType, handler) {
+		{{PROTO}}.addListener = function(target, eventType, handler) {
 	 		if (isElement(target)) {
 	 			var eh = {{GLOBAL}}.get('EventHandler');
 	 			this.eventHandler = this.eventHandler || new eh();
@@ -158,12 +158,12 @@ _c = function() {
 	 		} else target.subscribe(eventType, handler, this);
 	 	};
 
-		_p.removeValueFrom = function(propName, value) {
+		{{PROTO}}.removeValueFrom = function(propName, value) {
 			var prop = this.get(propName);
 			if (isArray(prop)) this.removeByIndexFrom(propName, prop.indexOf(value));
 		};
 
-		_p.removeByIndexFrom = function(propName, index) {
+		{{PROTO}}.removeByIndexFrom = function(propName, index) {
 			var prop = this.get(propName);
 			if (isString(index) && isNumeric(index)) index = ~~index;
 			if (isArray(prop) && isNumber(index) && index > -1 && !isUndefined(prop[index])) {
@@ -173,7 +173,7 @@ _c = function() {
 			}
 		};
 
-		_p.plusTo = function(propName, add, sign) {
+		{{PROTO}}.plusTo = function(propName, add, sign) {
 			var prop = this.get(propName);
 			if (!sign || sign == '+') {
 				if (isNumber(prop) || isString(prop)) this.set(propName, prop + add);
@@ -187,11 +187,11 @@ _c = function() {
 			}
 		};
 
-		_p.addOneTo = function(propName, item, index) {
+		{{PROTO}}.addOneTo = function(propName, item, index) {
 			this.addTo(propName, [item], index);
 		};
 
-		_p.addTo = function(propName, items, index) {
+		{{PROTO}}.addTo = function(propName, items, index) {
 			var prop = this.get(propName);
 			if (!isArray(items)) items = [items];
 			if (isArray(prop)) {
@@ -206,7 +206,7 @@ _c = function() {
 			}
 		};
 
-		_p.get = function(propName) {
+		{{PROTO}}.get = function(propName) {
 			var prop = this.props[propName];
 			if (isUndefined(arguments[1]) || !isArrayLike(prop)) return prop;
 			var end;
@@ -219,31 +219,31 @@ _c = function() {
 			return end ? prop || '' : '';
 		};
 
-		_p.showElement = function(element, isShown) {
+		{{PROTO}}.showElement = function(element, isShown) {
 			if (isString(element)) element = this.findElement(element);
 			if (isElement(element)) element.show(isShown);
 		};
 
-		_p.setStyle = function(styles) {
+		{{PROTO}}.setStyle = function(styles) {
 			if (this.isRendered()) this.getElement().css(styles);
 		};
 
-		_p.setPosition = function(x, y) {
+		{{PROTO}}.setPosition = function(x, y) {
 			this.setStyle({'top': y + 'px', 'left': x + 'px'});
 		};
 
-		_p.setVisible = function(isVisible) {
+		{{PROTO}}.setVisible = function(isVisible) {
 			if (this.isRendered() && !this.isDisposed()) this.getElement().show(isVisible);
 		};
 
-		_p.addClass = function(className, isAdding) {
+		{{PROTO}}.addClass = function(className, isAdding) {
 			if (this.isRendered()) {
 				if (isAdding || isUndefined(isAdding)) this.getElement().addClass(className);
 				else this.getElement().removeClass(className);
 			}
 		};
 
-		_p.each = function(propName, callback) {
+		{{PROTO}}.each = function(propName, callback) {
 			var ar = this.get(propName);
 			if (isArrayLike(ar) && isFunction(callback)) {
 				if (isArray(ar)) for (var i = 0; i < ar.length; i++) callback.call(this, ar[i], i, ar);
@@ -251,11 +251,11 @@ _c = function() {
 			}
 		};
 
-		_p.toggle = function(propName) {
+		{{PROTO}}.toggle = function(propName) {
 			this.set(propName, !this.get(propName));
 		};
 
-		_p.set = function(propName, propValue) {
+		{{PROTO}}.set = function(propName, propValue) {
 			this.props = this.props || {};
 			var props;
 			if (!isUndefined(propValue)) {
@@ -283,21 +283,21 @@ _c = function() {
 			changedProps = null;
 		};
 
-		_p.preset = function(propName, propValue) {
+		{{PROTO}}.preset = function(propName, propValue) {
 			this.props = this.props || {};
 			this.props[propName] = propValue;
 		};
 
-		_p.delay = function(f, n, p) {
+		{{PROTO}}.delay = function(f, n, p) {
 			window.clearTimeout(this.timeout);
 			if (isFunction(f)) this.timeout = window.setTimeout(f.bind(this, p), n || 200);
 		};
 
-		_p.addChild = function(child, parentElement) {
+		{{PROTO}}.addChild = function(child, parentElement) {
 			this.level.renderComponent(child, parentElement);
 		};
 
-		_p.removeChild = function(child) {
+		{{PROTO}}.removeChild = function(child) {
 			if (!child) return;
 			var childId = child;
 			if (isString(child)) child = this.getChild(child);
@@ -309,7 +309,7 @@ _c = function() {
 			}
 		 };
 
-		_p.forEachChild = function(callback) {
+		{{PROTO}}.forEachChild = function(callback) {
 			if (isArrayLike(this.children)) {
 				var result;
 				for (var k in this.children) {
@@ -321,7 +321,7 @@ _c = function() {
 			}
 		};
 		
-		_p.forChildren = function(className, callback) {
+		{{PROTO}}.forChildren = function(className, callback) {
 			var children = this.getChildren(className), result;
 			for (var i = 0; i < children.length; i++) {
 				result = callback.call(this, children[i], i);
@@ -329,31 +329,31 @@ _c = function() {
 			}
 		};
 
-		_p.getControl = function(name) {
+		{{PROTO}}.getControl = function(name) {
 			return Objects.get(this.controls, name) || this.forEachChild(function(child) {
 				return child.getControl(name);
 			});
 		};
 
-		_p.setControlValue = function(name, value) {
+		{{PROTO}}.setControlValue = function(name, value) {
 			var control = this.getControl(name);
 			if (control) control.setValue(value);
 		};
 
-		_p.enableControl = function(name, isEnabled) {
+		{{PROTO}}.enableControl = function(name, isEnabled) {
 			var control = this.getControl(name);
 			if (control) control.setEnabled(isEnabled);
 		};
 
-		_p.forEachControl = function(callback) {
+		{{PROTO}}.forEachControl = function(callback) {
 			if (isObject(this.controls)) Objects.each(this.controls, callback, this);
 		};
 
-		_p.hasControls = function() {
+		{{PROTO}}.hasControls = function() {
 			return !Objects.empty(this.controls);
 		};
 
-		_p.getControlsData = function(data) {
+		{{PROTO}}.getControlsData = function(data) {
 			data = data || {};
 			this.forEachChild(function(child) {
 				if (!isControl(child)) child.getControlsData(data);
@@ -362,7 +362,7 @@ _c = function() {
 			return data;
 		};
 
-		_p.setControlsData = function(data) {
+		{{PROTO}}.setControlsData = function(data) {
 			this.forEachChild(function(child) {
 				if (!isControl(child)) child.setControlsData(data);
 				else child.setValue(data[child.getName()]);
@@ -370,11 +370,11 @@ _c = function() {
 			return data;
 		};
 
-		_p.getChildAt = function(index) {
+		{{PROTO}}.getChildAt = function(index) {
 			return Objects.getByIndex(this.children, index);
 		};
 
-		_p.getChildIndex = function(child, same) {
+		{{PROTO}}.getChildIndex = function(child, same) {
 			var idx = -1;
 			this.forEachChild(function(ch) {
 				if (!same || (same && ch.constructor == child.constructor)) idx++;
@@ -383,7 +383,7 @@ _c = function() {
 			return idx;
 		};
 
-		_p.getChildren = function(className) {
+		{{PROTO}}.getChildren = function(className) {
 			if (!isString(className)) return this.children;
 			var children = [];
 			this.forEachChild(function(child) {
@@ -392,32 +392,32 @@ _c = function() {
 			return children;
 		};
 
-		_p.getChild = function(id) {
+		{{PROTO}}.getChild = function(id) {
 			return Objects.get(this.children, id);
 		};
 
-		_p.setId = function(id) {
+		{{PROTO}}.setId = function(id) {
 			this.componentId = id;
 		};
 
-		_p.getId = function() {
+		{{PROTO}}.getId = function() {
 			return this.componentId;
 		};
 
-		_p.getElement = function(id) {
+		{{PROTO}}.getElement = function(id) {
 			if (isString(id)) return Objects.get(this.elements, id);
 			else return this.scope || this.parentElement;
 		};
 
-		_p.findElement = function(selector, scopeElement) {
+		{{PROTO}}.findElement = function(selector, scopeElement) {
 			return (scopeElement || this.getElement()).querySelector(selector);
 		};
 
-		_p.findElements = function(selector, scopeElement) {
+		{{PROTO}}.findElements = function(selector, scopeElement) {
 			return Array.prototype.slice.call((scopeElement || this.scope || this.parentElement).querySelectorAll(selector));
 		};
 
-		_p.fill = function(element, data) {
+		{{PROTO}}.fill = function(element, data) {
 			if (isString(element)) element = this.findElement(element);
 			if (isElement(element)) {
 				var callback = function(el) {
@@ -433,32 +433,32 @@ _c = function() {
 			}
 		};
 
-		_p.setAppended = function(isAppended) {
+		{{PROTO}}.setAppended = function(isAppended) {
 			if (this.level) this.level.setAppended(isAppended);
 		};
 
-		_p.placeTo = function(element) {
+		{{PROTO}}.placeTo = function(element) {
 			if (this.level) this.level.placeTo(element);
 		};
 
-		_p.placeBack = function() {
+		{{PROTO}}.placeBack = function() {
 			this.setAppended(true);
 		};
 
-		_p.appendChild = function(child, isAppended) {
+		{{PROTO}}.appendChild = function(child, isAppended) {
 			if (isString(child)) child = this.getChild(child);
 			if (isComponentLike(child)) child.setAppended(isAppended);
 		};
 
-		_p.setScope = function(scope) {
+		{{PROTO}}.setScope = function(scope) {
 			this.scope = scope;
 		};
 
-		_p.getUniqueId = function() {
+		{{PROTO}}.getUniqueId = function() {
 			return this.uniqueId = this.uniqueId || generateRandomKey();
 		};
 
-		_p.dispose = function() {
+		{{PROTO}}.dispose = function() {
 			{{GLOBAL}}.get('State').dispose(this);
 			unrender.call(this);
 			if (this.mouseHandler) {
@@ -476,18 +476,20 @@ _c = function() {
 			this.correctors = null;
 			this.controls = null;
 		};
-		_p.a = function(n) {
+		{{PROTO}}.a = function(n) {
 			return {{GLOBAL}}.get('State').get(n);
 		};
 		var f = function(){return};
-		_p.initOptions=f;
-		_p.onRendered=f;
-		_p.onRenderComplete=f;
-		_p.onLoaded=f;
-		_p.getTemplateMain=f;
-		_p.disposeInternal=f;
-		_p.g=_p.get;
-		_p.d=_p.dispatchEvent;
+		{{PROTO}}.initOptions=f;
+		{{PROTO}}.onRendered=f;
+		{{PROTO}}.onRenderComplete=f;
+		{{PROTO}}.onLoaded=f;
+		{{PROTO}}.getTemplateMain=f;
+		{{PROTO}}.disposeInternal=f;
+		{{PROTO}}.g={{PROTO}}.get;
+		{{PROTO}}.d={{PROTO}}.dispatchEvent;
 	}
 }
-_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Component');
+{{PROTO}}={{COMPONENT}}.prototype;
+{{COMPONENT}}();
+{{GLOBAL}}.set({{COMPONENT}}, 'Component');

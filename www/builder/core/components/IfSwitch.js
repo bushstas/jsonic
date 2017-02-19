@@ -1,4 +1,4 @@
-_c = function(params) {
+{{COMPONENT}} = function(params) {
 	this.values = params['is'];
 	this.default = params['d'];
 	this.handler = params['c'];
@@ -35,10 +35,10 @@ _c = function(params) {
 		this.prevSiblingChild = null;
 	};
 }
-_p=_c.prototype;
-_p.update = function(value) {
+{{PROTO}}={{COMPONENT}}.prototype;
+{{PROTO}}.update = function(value) {
 	this.value = value;
 	this.disposeLevels();
 	this.createLevels(true);
 };
-{{GLOBAL}}.set(_c, 'IfSwitch');
+{{GLOBAL}}.set({{COMPONENT}}, 'IfSwitch');

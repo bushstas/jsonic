@@ -1,4 +1,4 @@
-_c = function() {
+{{COMPONENT}} = function() {
 	if (!this || this == window) {
 		var controllers, router, dictionary;
 		var routes = {{ROUTES}};
@@ -148,10 +148,10 @@ _c = function() {
 			this.viewContainer.appendChild(element);
 			return element;
 		};
-		_p.initiate = function() {
+		{{PROTO}}.initiate = function() {
 			this.views = {};
 		};
-		_p.run = function() {
+		{{PROTO}}.run = function() {
 			dictionary = {{GLOBAL}}.get('Dictionary');
 			router = {{GLOBAL}}.get('Router');
 			controllers = {{GLOBAL}}.get('Controllers');
@@ -162,7 +162,7 @@ _c = function() {
 			defineViews.call(this);
 			initRouter.call(this);
 		};
-		_p.setPageTitle = function(title) {
+		{{PROTO}}.setPageTitle = function(title) {
 			var titleElement = document.getElementsByTagName('title')[0];
 			if (!isElement(titleElement)) {
 				var headElement = document.getElementsByTagName('head')[0];
@@ -174,17 +174,19 @@ _c = function() {
 			}
 			titleElement.innerHTML = title;
 		};
-		_p.getView = function(viewName) {
+		{{PROTO}}.getView = function(viewName) {
 			return this.views[viewName];
 		};
-		_p.disposeView = function(viewName) {
+		{{PROTO}}.disposeView = function(viewName) {
 			if (isObject(this.views[viewName])) {
 				this.views[viewName].dispose();
 				this.views[viewName] = null;
 			}
 		};
-		_p.onNoErrors=function(){};
-		_p.onError=function(){};
+		{{PROTO}}.onNoErrors=function(){};
+		{{PROTO}}.onError=function(){};
 	}
 }
-_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Application');
+{{PROTO}}={{COMPONENT}}.prototype;
+{{COMPONENT}}();
+{{GLOBAL}}.set({{COMPONENT}}, 'Application');

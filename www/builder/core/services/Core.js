@@ -1,4 +1,4 @@
-_c = new (function() {
+{{GLOBAL}}.set(new (function() {
 	var extendInitials = function(initials1, initials2) {
 		if (isNull(initials1)) {
 			initials1 = initials2;
@@ -272,5 +272,4 @@ _c = new (function() {
 			}
 		}
 	};
-})();
-{{GLOBAL}}.set(_c, 'Core');
+})(), 'Core');

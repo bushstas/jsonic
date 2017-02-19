@@ -1,4 +1,4 @@
-_c = function(component) {
+{{GLOBAL}}.set(function(component) {
 	var tagsList = {{TAGS}};
 	var attrNames = {{ATTRIBUTES}};
 	var eventTypes = {{EVENTTYPES}};
@@ -366,5 +366,4 @@ _c = function(component) {
 		realParentElement = null;
 		component = null;
 	};
-}
-{{GLOBAL}}.set(_c, 'Level');
+}, 'Level');

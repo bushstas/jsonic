@@ -1495,11 +1495,12 @@ class TemplateParser
 	}
 
 	private static function hasComponentMethod($method, $class) {
+		$globals = JSGlobals::getVarNames();
 		if (is_array($class['functionList']) && in_array($method, $class['functionList'])) return true;
 		$parents = $class['extends'];
 		if (is_array($parents)) {
 			foreach ($parents as $parent) {
-				if (is_array(self::$sources[$parent]) && preg_match('/\b_p\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
+				if (is_array(self::$sources[$parent]) && preg_match('/\b'.$globals['proto'].'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
 					return true;
 				}
 				if (self::hasComponentMethod($method, self::$classes[$parent])) {

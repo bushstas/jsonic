@@ -5,7 +5,7 @@ var Dictionary = new (function() {
 		if (loaded[routeName]) return;
 		if (!isNone(dictionaryUrl)) {
 			Loader.get(dictionaryUrl, {'route': routeName}, onLoad, this);
-		} else onLoad();
+		}
 		loaded[routeName] = true;
 	};
 	this.get = function(key, callbackOrPropName, thisObj) {

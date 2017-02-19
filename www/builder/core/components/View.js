@@ -1,22 +1,22 @@
-_c = function() {};
-_p=_c.prototype;
-_p.onRenderComplete = function() {
+{{COMPONENT}} = function() {};
+{{PROTO}}={{COMPONENT}}.prototype;
+{{PROTO}}.onRenderComplete = function() {
 	this.dispatchReadyEvent();
 };
-_p.setOnReadyHandler = function(handler) {
+{{PROTO}}.setOnReadyHandler = function(handler) {
 	this.onReadyHandler = handler;
 };
-_p.dispatchReadyEvent = function() {
+{{PROTO}}.dispatchReadyEvent = function() {
 	if (isFunction(this.onReadyHandler)) {
 		this.onReadyHandler();
 	}
 	this.onReady();
 };
-_p.activate = function(isActivated) {
+{{PROTO}}.activate = function(isActivated) {
 	if (isActivated) {
 		this.dispatchReadyEvent();
 	}
 };
-_p.getTitleParams=function(){};
-_p.onReady=function(){};
-{{GLOBAL}}.set(_c, 'View');
+{{PROTO}}.getTitleParams=function(){};
+{{PROTO}}.onReady=function(){};
+{{GLOBAL}}.set({{COMPONENT}}, 'View');

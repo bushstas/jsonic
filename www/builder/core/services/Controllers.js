@@ -1,4 +1,4 @@
-_c = new (function() {
+var {{CONTROLLER}} = new (function() {
 	var ctrlist = {{CONTROLLERS}};
 	this.get = function(id) {
 		if (isString(ctrlist[id])) {
@@ -21,5 +21,4 @@ _c = new (function() {
 		}
 	};
 })();
-{{GLOBAL}}.set(_c, 'Controllers');
-var {{CONTROLLER}} = _c;
+{{GLOBAL}}.set({{CONTROLLER}}, 'Controllers');

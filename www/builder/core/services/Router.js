@@ -1,4 +1,4 @@
-_c = function() {
+{{GLOBAL}}.set(function() {
 	var properRoutes = {};
 	var routes = {{ROUTES}};
 	var isHashRouter = !!{{HASHROUTER}};
@@ -195,5 +195,4 @@ _c = function() {
 			}
 		}
 	};
-}
-{{GLOBAL}}.set(_c, 'Router');
+}, 'Router');

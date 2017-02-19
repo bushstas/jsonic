@@ -1,38 +1,38 @@
-_c = function() {
+{{COMPONENT}} = function() {
 	if (!this || this == window) {
 		var onChangeChildControl = function(e) {
 			this.dispatchChange();
 		};
-		_p.onChange = function(e) {};
+		{{PROTO}}.onChange = function(e) {};
 
-		_p.dispatchChange = function() {		
+		{{PROTO}}.dispatchChange = function() {		
 			var params = this.getChangeEventParams();
 			this.onChange(params);
 			this.dispatchEvent('change', params);
 		};
 
-		_p.getChangeEventParams = function() {
+		{{PROTO}}.getChangeEventParams = function() {
 			return {value: this.getValue()};
 		};
 
-		_p.initiate = function() {
+		{{PROTO}}.initiate = function() {
 			this.preset('enabled', true);
 		};
 
-		_p.registerControl = function(control, name) {
+		{{PROTO}}.registerControl = function(control, name) {
 			{{GLOBAL}}.get('Component').prototype.registerControl.call(this, control, name);
 		 	this.addListener(control, 'change', onChangeChildControl.bind(this));
 		};
 
-		_p.setName = function(name) {
+		{{PROTO}}.setName = function(name) {
 			this.name = name;
 		};
 
-		_p.getName = function() {
+		{{PROTO}}.getName = function() {
 			return this.name;
 		};
 
-		_p.getValue = function() {
+		{{PROTO}}.getValue = function() {
 			var value;
 			if (this.hasControls()) {
 				value = {};
@@ -46,15 +46,15 @@ _c = function() {
 			return value;
 		};
 
-		_p.getControlValue = function() {
+		{{PROTO}}.getControlValue = function() {
 			return this.get('value');
 		};
 
-		_p.getProperValue = function(value) {
+		{{PROTO}}.getProperValue = function(value) {
 			return value;
 		};
 
-		_p.setValue = function(value, fireChange) {
+		{{PROTO}}.setValue = function(value, fireChange) {
 			if (this.hasControls()) {
 				this.setControlsData(value);
 			} 
@@ -62,31 +62,33 @@ _c = function() {
 			if (fireChange) this.dispatchChange();
 		};
 
-		_p.setControlValue = function(value) {
+		{{PROTO}}.setControlValue = function(value) {
 			this.set('value', value);
 		};
 
-		_p.isEnabled = function() {
+		{{PROTO}}.isEnabled = function() {
 			return !!this.get('enabled');
 		};
 
-		_p.setEnabled = function(isEnabled) {
+		{{PROTO}}.setEnabled = function(isEnabled) {
 			this.set('enabled', isEnabled);
 		};
 
-		_p.clear = function(fireChange) {
+		{{PROTO}}.clear = function(fireChange) {
 			this.clearControl();
 			if (fireChange) this.dispatchChange();
 		};
 
-		_p.clearControl = function() {
+		{{PROTO}}.clearControl = function() {
 			this.setControlValue('');
 		};
 		
-		_p.disposeInternal = function() {
+		{{PROTO}}.disposeInternal = function() {
 			this.controls = null;
 			this.options = null;
 		};
 	}
 }
-_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Control');
+{{PROTO}}={{COMPONENT}}.prototype;
+{{COMPONENT}}();
+{{GLOBAL}}.set({{COMPONENT}}, 'Control');

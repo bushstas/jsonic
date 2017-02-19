@@ -1,4 +1,4 @@
-_c = function(e, p, n) {
+{{GLOBAL}}.set(function(e, p, n) {
 	this.getKeys = function() {
 		var a = [];
 		for (var k in n) {
@@ -23,5 +23,4 @@ _c = function(e, p, n) {
 	this.dispose = function() {
 		e = p = null;
 	};
-}
-{{GLOBAL}}.set(_c, 'ElementUpdater');
+}, 'ElementUpdater');

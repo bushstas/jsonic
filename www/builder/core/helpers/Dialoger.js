@@ -1,4 +1,4 @@
-_c = function() {
+{{GLOBAL}}.set(new (function() {
 	var ds = {};
 	var cid, dc, d, opts;
 	this.show = function(c, options) {
@@ -59,5 +59,4 @@ _c = function() {
 		}
 	};
 	window.addEventListener('popstate', closeAll);
-}
-{{GLOBAL}}.set(_c, 'Dialoger');
+})(), 'Dialoger');

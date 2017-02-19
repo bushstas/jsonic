@@ -1,4 +1,4 @@
-_c = function(url, callback, params, thisObj) {
+{{GLOBAL}}.set(function(url, callback, params, thisObj) {
 	var pathToApiDir = {{APIDIR}};
 	var self = this, tempUrl, active = false, 
 		withCredentials = false, headers, request, 
@@ -97,5 +97,4 @@ _c = function(url, callback, params, thisObj) {
 			}
 		}
 	};
-}
-{{GLOBAL}}.set(_c, 'AjaxRequest');
+}, 'AjaxRequest');

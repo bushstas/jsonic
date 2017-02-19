@@ -38,7 +38,9 @@ class JSGlobals
 		'funcs'            => '_F_',
 		'objects'          => '__O',
 		'popuper'          => '__P',
-		'state'            => '__S'
+		'state'            => '__S',
+		'proto'            => 'p',
+		'component'        => 'c'
 	);
 	
 	private static $varKeys = array(
@@ -128,7 +130,9 @@ class JSGlobals
 			'CONTROLLER'      => self::$varNames['controller'],
 			'DIALOGER'        => self::$varNames['dialoger'],
 			'JSBASE'          => self::$jsConfig['file'],
-			'OBJECTS'         => self::$jsConfig['objects']
+			'OBJECTS'         => self::$jsConfig['objects'],
+			'COMPONENT'       => self::$varNames['component'],
+			'PROTO'           => self::$varNames['proto']
 		);
 	}
 

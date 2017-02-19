@@ -1,4 +1,4 @@
-_c = function() {	
+{{COMPONENT}} = function() {	
 	if (!this || this == window) {
 		var makeUrl = function(url, options) {
 			var regExp, tmpUrl;
@@ -150,7 +150,7 @@ _c = function() {
 			this.activeRequests.push(action['name']);		
 		};
 
-		_p.initiate = function() {
+		{{PROTO}}.initiate = function() {
 			this.subscribers = {};
 			this.requests = {};
 			this.activeRequests = [];
@@ -158,7 +158,7 @@ _c = function() {
 			this.privateOptions = {};
 		};
 
-		_p.addSubscriber = function(actionName, data, isPriv, options) {
+		{{PROTO}}.addSubscriber = function(actionName, data, isPriv, options) {
 			this.subscribers[actionName] = this.subscribers[actionName] || [];
 			this.subscribers[actionName].push(data);
 			if (isPriv) {
@@ -168,7 +168,7 @@ _c = function() {
 			}
 		};
 
-		_p.removeSubscriber = function(initiator) {
+		{{PROTO}}.removeSubscriber = function(initiator) {
 			this.privateSubscribers.removeItem(initiator.getUniqueId());
 			var done = false;
 			for (var actionName in this.subscribers) {
@@ -181,7 +181,7 @@ _c = function() {
 			}
 		};
 
-		_p.dispatchEvent = function(actionName, data, initiator) {
+		{{PROTO}}.dispatchEvent = function(actionName, data, initiator) {
 			var dataToDispatch = data;
 			if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
 			var s = this.subscribers[actionName], i, p;
@@ -195,16 +195,16 @@ _c = function() {
 			}
 		};
 
-		_p.instanceOf = function(classFunc) {
+		{{PROTO}}.instanceOf = function(classFunc) {
 			if (isString(classFunc)) classFunc = {{GLOBAL}}.get(classFunc);
 			return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 		};
 
-		_p.getData = function(actionName) {
+		{{PROTO}}.getData = function(actionName) {
 			return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
 		};
 
-		_p.getItemById = function(id) {
+		{{PROTO}}.getItemById = function(id) {
 			var primaryKey = getPrimaryKey.call(this);
 			var data = this.data['load'];
 			if (isArray(data)) {
@@ -215,13 +215,13 @@ _c = function() {
 			return null;
 		};
 
-		_p.getItem = function(nameOrIndex, actionName) {
+		{{PROTO}}.getItem = function(nameOrIndex, actionName) {
 			actionName = actionName || 'load';
 			return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
 		};
 
 
-		_p.doAction = function(initiator, actionName, options) {
+		{{PROTO}}.doAction = function(initiator, actionName, options) {
 			if (this.activeRequests.has(actionName)) return;
 			var action = getAction.call(this, actionName);
 			if (isObject(action) && !gotFromStore.call(this, actionName, options, initiator)) {
@@ -230,14 +230,14 @@ _c = function() {
 			}
 		};
 
-		_p.handleRouteOptionsChange = function(routeOptions) {
+		{{PROTO}}.handleRouteOptionsChange = function(routeOptions) {
 			if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
 				setCurrentRouteOptions.call(this, routeOptions, getAction.call(this, 'load'));
 				this.doAction(null, 'load');
 			}
 		};
 
-		_p.dispose = function() {
+		{{PROTO}}.dispose = function() {
 			this.subscribers = null;
 			for (var k in this.requests) this.requests[k].dispose();
 			this.options = null;
@@ -252,4 +252,6 @@ _c = function() {
 		};
 	}
 }
-_p=_c.prototype;_c();{{GLOBAL}}.set(_c, 'Controller');
+{{PROTO}}={{COMPONENT}}.prototype;
+{{COMPONENT}}();
+{{GLOBAL}}.set({{COMPONENT}}, 'Controller');
