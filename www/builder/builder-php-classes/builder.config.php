@@ -19,7 +19,8 @@ class Config
 		'incorrectValue' => "Некорректоное значение параметра конфигурации {??}<br><br> Текущее значение: {??}<br><br>Корректное значение должно содержать имя директории и соответствовать паттерну <b>^[\w-]+$</b>",
 		'folderNotFound' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в папке <b>builder</b>",
 		'folderNotFound2' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в корневом каталоге",
-		'defaultFolderNotFound' => "Параметр конфигурации {??} не заполнен, директория по умолчанию {??} также не найдена"
+		'defaultFolderNotFound' => "Параметр конфигурации {??} не заполнен, директория по умолчанию {??} также не найдена",
+		'noDictionaryApi' => "Файл для загрузки словарей {??}, указанный в параметре конфигурации <b>pathToDictionary</b> не найден"
 	);
 
 	public function init($builder) {
@@ -42,8 +43,20 @@ class Config
 				new Error($this->errors['noApiDir'], array($this->pathToApiDir));
 			}
 		}
+		if (!empty($this->config['pathToDictionary'])) {
+			$this->pathToDictionary = $this->pathToApiDir.'/'.$this->config['pathToDictionary'];
+			if (!file_exists($this->pathToDictionary)) {
+				new Error($this->errors['noDictionaryApi'], array($this->pathToDictionary));	
+			}
+		}
 		$this->validatePathNames();
 		$this->validateUserConfig();
+	}
+
+	public function createAppLoader() {
+		if (!empty($this->config['singleLoad'])) {
+			$this->createLoadAppApi();
+		}
 	}
 
 	public function getBuilder() {
@@ -149,6 +162,10 @@ class Config
 			'js' => $jsConfig['path'],
 			'views' => $jsConfig['views']
 		);
+	}
+
+	public function get($key) {
+		return $this->config[$key];
 	}
 
 	public function getRoutesConfig() {
@@ -281,5 +298,30 @@ class Config
 			}
 			$this->isUser = !empty($user['login']);
 		}
+	}
+
+	private function createLoadAppApi() {
+		$content = "<?php die('{";
+		$path = (stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].'/'.$this->config['pathToApi'].'/';
+		$params = array();
+		if ($this->isUser) {
+			$user = $this->config['user'];
+			$params[] = '"user":\'.file_get_contents(\''.$path.$user['login'].'\').\'';
+		}
+		if (!empty($this->pathToDictionary)) {
+			$params[] = '"dictionary":\'.file_get_contents(\''.$path.$this->config['pathToDictionary'].'\').\'';	
+		}
+		if (!empty($this->config['loadData'])) {
+			$data = JSGlobals::getDataForLoader();
+			Printer::log($data, true);
+		}
+		$content .= implode(', ', $params)."}'); ?>";
+		file_put_contents($this->pathToApiDir.'/loadApp.php', $content);
+	}
+
+	public function isUsingDataLoader() {
+		$a = $this->get('singleLoad');
+		$b = $this->get('loadData');
+		return !empty($a) && !empty($b);
 	}
 }

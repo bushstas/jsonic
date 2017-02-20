@@ -1,4 +1,4 @@
-{{COMPONENT}} = function(params) {
+{{GLOBAL}}.set({{COMPONENT}} = function(params) {
 	var handler = params['h'];
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
@@ -112,7 +112,7 @@
 		handler = null;
 		params = null;
 	};
-}
+}, 'Foreach');
 {{PROTO}}={{COMPONENT}}.prototype;
 {{PROTO}}.render = function(parentElement, parentLevel) {
 	this.parentElement = parentElement;
@@ -136,4 +136,3 @@
 	}
 	this.levels = [];
 };
-{{GLOBAL}}.set({{COMPONENT}}, 'Foreach');

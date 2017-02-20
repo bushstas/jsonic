@@ -1,4 +1,4 @@
-{{COMPONENT}} = function() {	
+{{GLOBAL}}.set(({{COMPONENT}} = function() {	
 	if (!this || this == window) {
 		var makeUrl = function(url, options) {
 			var regExp, tmpUrl;
@@ -149,7 +149,7 @@
 			req.send(action['method'], options, url);
 			this.activeRequests.push(action['name']);		
 		};
-
+		{{PROTO}}={{COMPONENT}}.prototype;
 		{{PROTO}}.initiate = function() {
 			this.subscribers = {};
 			this.requests = {};
@@ -157,7 +157,6 @@
 			this.privateSubscribers = [];
 			this.privateOptions = {};
 		};
-
 		{{PROTO}}.addSubscriber = function(actionName, data, isPriv, options) {
 			this.subscribers[actionName] = this.subscribers[actionName] || [];
 			this.subscribers[actionName].push(data);
@@ -167,7 +166,6 @@
 				if (options) this.privateOptions[uid] = options;
 			}
 		};
-
 		{{PROTO}}.removeSubscriber = function(initiator) {
 			this.privateSubscribers.removeItem(initiator.getUniqueId());
 			var done = false;
@@ -180,7 +178,6 @@
 				}
 			}
 		};
-
 		{{PROTO}}.dispatchEvent = function(actionName, data, initiator) {
 			var dataToDispatch = data;
 			if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
@@ -194,16 +191,13 @@
 				}
 			}
 		};
-
 		{{PROTO}}.instanceOf = function(classFunc) {
 			if (isString(classFunc)) classFunc = {{GLOBAL}}.get(classFunc);
 			return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 		};
-
 		{{PROTO}}.getData = function(actionName) {
 			return !!action && !!this.data && isObject(this.data) ? this.data[action] : this.data;
 		};
-
 		{{PROTO}}.getItemById = function(id) {
 			var primaryKey = getPrimaryKey.call(this);
 			var data = this.data['load'];
@@ -214,13 +208,10 @@
 			}
 			return null;
 		};
-
 		{{PROTO}}.getItem = function(nameOrIndex, actionName) {
 			actionName = actionName || 'load';
 			return isArrayLike(this.data[actionName]) ? this.data[actionName][nameOrIndex] : null;
 		};
-
-
 		{{PROTO}}.doAction = function(initiator, actionName, options) {
 			if (this.activeRequests.has(actionName)) return;
 			var action = getAction.call(this, actionName);
@@ -229,14 +220,12 @@
 				send.call(this, action, options, initiator);
 			}
 		};
-
 		{{PROTO}}.handleRouteOptionsChange = function(routeOptions) {
 			if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
 				setCurrentRouteOptions.call(this, routeOptions, getAction.call(this, 'load'));
 				this.doAction(null, 'load');
 			}
 		};
-
 		{{PROTO}}.dispose = function() {
 			this.subscribers = null;
 			for (var k in this.requests) this.requests[k].dispose();
@@ -251,7 +240,5 @@
 			this.privateOptions = null;
 		};
 	}
-}
-{{PROTO}}={{COMPONENT}}.prototype;
-{{COMPONENT}}();
-{{GLOBAL}}.set({{COMPONENT}}, 'Controller');
+	return {{COMPONENT}};
+})(), 'Controller');

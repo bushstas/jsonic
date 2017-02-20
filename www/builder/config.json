@@ -16,6 +16,8 @@
 	"scripts"     : "scripts",
 	"views"       : "views",	
 	"pathToApi"   : "api",
+	"singleLoad"  : true,
+	"loadData"    : true,
 	
 	"router"      : {
 		"routes": [

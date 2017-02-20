@@ -1,4 +1,4 @@
-{{COMPONENT}} = function() {};
+{{GLOBAL}}.set({{COMPONENT}} = function(){}, 'Menu');
 {{PROTO}}={{COMPONENT}}.prototype;
 {{PROTO}}.doRendering = function() {
 	{{GLOBAL}}.get('Component').prototype.doRendering.call(this);
@@ -31,4 +31,3 @@
 {{PROTO}}.disposeInternal = function() {
 	this.activeButton = null;
 };
-{{GLOBAL}}.set({{COMPONENT}}, 'Menu');

@@ -1,7 +1,7 @@
-{{COMPONENT}} = function(params) {
+{{GLOBAL}}.set(({{COMPONENT}} = function(params) {
 	this.params = params;
 	this.isTrue = !!this.params['i']();
-}
+}), 'Condition');
 {{PROTO}}={{COMPONENT}}.prototype;
 {{PROTO}}.render = function(parentElement, parentLevel) {
 	this.parentElement = parentElement;
@@ -39,4 +39,3 @@
 	this.params = null;
 	this.nextSiblingChild = null;
 };
-{{GLOBAL}}.set({{COMPONENT}}, 'Condition');

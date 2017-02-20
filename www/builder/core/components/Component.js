@@ -1,4 +1,4 @@
-{{COMPONENT}} = function() {	
+{{GLOBAL}}.set(({{COMPONENT}} = function() {	
 	if (!this || this == window) {
 		var load = function() {
 			var loader = Objects.get(this.initials, 'loader');
@@ -19,12 +19,10 @@
 			}
 			onReadyToRender.call(this);
 		};
-
 		var renderTempPlaceholder = function() {
 			this.tempPlaceholder = document.createElement('span');
 			this.parentElement.appendChild(this.tempPlaceholder);
 		};
-
 		var onDataLoad = function(isAsync, data) {
 			this.toggle('__loading');
 			this.onLoaded(data);
@@ -34,7 +32,6 @@
 			}
 			if (!isAsync) onReadyToRender.call(this);
 		};
-
 		var onReadyToRender = function() {
 			if (!this.isRendered()) {
 				doRendering.call(this);
@@ -45,7 +42,6 @@
 				{{GLOBAL}}.get('Core').processPostRenderInitials.call(this);
 			}
 		};
-
 		var doRendering = function() {
 			var lvl = {{GLOBAL}}.get('Level');
 			this.level = new lvl(this);
@@ -59,7 +55,6 @@
 			});
 			delete this.waiting;
 		};
-
 		var propagatePropertyChange = function(changedProps) {
 			if (!this.updaters) return;
 			var updated = [];
@@ -76,17 +71,14 @@
 			updated = null;
 			callFollowers.call(this, changedProps);
 		};
-
 		var callFollowers = function(changedProps) {
 			for (var k in changedProps) {
 				callFollower.call(this, k, changedProps[k]);
 			}
 		};
-
 		var callFollower = function(propName, propValue) {
 			if (Objects.has(this.followers, propName)) this.followers[propName].call(this, propValue);
 		};
-
 		var updateForeach = function(propName, index, item) {
 			var updaters = this.updaters[propName], o;
 			if (isArray(updaters)) {
@@ -101,7 +93,6 @@
 				}
 			}
 		};
-
 		var unrender = function() {
 			this.elements = null;
 			{{GLOBAL}}.get('Core').disposeLinks.call(this);
@@ -109,6 +100,7 @@
 			this.level.dispose();
 			this.level = this.listeners = null;
 		};
+		{{PROTO}}={{COMPONENT}}.prototype;
 		{{PROTO}}.render = function(parentElement) {
 			this.parentElement = parentElement;
 			load.call(this);
@@ -488,8 +480,6 @@
 		{{PROTO}}.disposeInternal=f;
 		{{PROTO}}.g={{PROTO}}.get;
 		{{PROTO}}.d={{PROTO}}.dispatchEvent;
+		return {{COMPONENT}};
 	}
-}
-{{PROTO}}={{COMPONENT}}.prototype;
-{{COMPONENT}}();
-{{GLOBAL}}.set({{COMPONENT}}, 'Component');
+})(), 'Component');

@@ -638,7 +638,8 @@ class JSCompiler
 			'pathToApi'        => $this->config['pathToApi'],
 			'pagetitle'        => $this->config['pagetitle'],
 			'user'             => $this->config['user'],
-			'controllers'      => array_keys($this->classesByTypes['controller'])
+			'controllers'      => array_keys($this->classesByTypes['controller']),
+			'isDataLoader'     => $this->configProvider->isUsingDataLoader()
 		);
 		JSGlobals::run($this->jsOutput, $data);
 	}
@@ -666,6 +667,7 @@ class JSCompiler
 	}
 
 	private function finish($route = null) {
+		$this->configProvider->createAppLoader();
 		$isSplitted = $this->configProvider->isSplitMode();
 		$globals = JSGlobals::getVarNames();
 		if ($route === null) {
@@ -681,7 +683,7 @@ class JSCompiler
 			$this->decodeTexts($jsOutput, $route);
 		}		
 		if ($route === null) {
-			$jsOutput = "'use strict';\nvar ".$globals['global'].($isSplitted ? ",".$globals['funcs']."={}" : '').";\nnew (function() {\n".$globals['global']."=this;\nvar _cs_={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)_cs_[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return _cs_[k]}\nthis.set=function(c,k,i) {if(_cs_[k])return;_cs_[k]=c;if(i){this.create(k)}}\n;(function(){var ".$globals['component'].",".$globals['proto'].";\n".$jsOutput;
+			$jsOutput = "'use strict';\nvar ".$globals['global'].($isSplitted ? ",".$globals['funcs']."={}" : '').";\nnew (function() {\n(function(){\nvar cs={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return cs[k]}\nthis.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}\n}).call(".$globals['global']."=this);\n;(function(){var ".$globals['component'].",".$globals['proto'].";\n".$jsOutput;
 		} else {
 			$varname = 'g';
 			$top = "'use strict';\n(function(){\nvar ".$varname.'='.$globals['global'].'.get,';
@@ -1021,8 +1023,12 @@ class JSCompiler
 			}
 		}	
 		$core = $globals['global'];
-		$bottomOutput[] = "var core=".$core.".get('Core');";
-		$bottomOutput[] = "core.inherits([".implode(",", $inheritance)."]);";
+		if (empty($route)) {
+			$bottomOutput[] = "var core=".$core.".get('Core');";
+			$bottomOutput[] = "core.inherits([".implode(",", $inheritance)."]);";
+		} else {
+			$bottomOutput[] = $core.".get('Core').inherits([".implode(",", $inheritance)."]);";
+		}
 		if (empty($route)) {
 			$controllers = array('Router', 'User');
 			if (!empty($controllers)) {
@@ -1083,7 +1089,7 @@ class JSCompiler
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
 		$routerMenuClasses = $this->config['routerMenu'];
-		$output[] = $globals['component'].'=function(){';
+		$output[] = $g.".set(".$globals['component'].'=function(){';
 		if ($isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses)) {
 			$output[] = "\tRouter.addMenu(this);";
 			$output[] = "\tthis.isRouteMenu=true;";
@@ -1092,7 +1098,7 @@ class JSCompiler
 		if ($type == 'corrector') {
 			$isSingleton = ',1';
 		}
-		$output[] = "};\n".$g.".set(".$globals['component'].",'".$className."'".$isSingleton.");";
+		$output[] = "},'".$className."'".$isSingleton.");";
 	}
 
 	private function addPrototypeFunction($className, $method, $args = '', $code = '') {

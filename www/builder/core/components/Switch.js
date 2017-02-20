@@ -1,4 +1,4 @@
-{{COMPONENT}} = function(params) {
+{{GLOBAL}}.set({{COMPONENT}} = function(params) {
 	this.params = params;
 	this.levels = [];
 
@@ -27,12 +27,10 @@
 		this.nextSiblingChild = null;
 		this.prevSiblingChild = null;
 	};
-}
+}, 'Switch');
 {{PROTO}}={{COMPONENT}}.prototype;
 {{PROTO}}.update = function(value) {
 	this.value = value;
 	this.disposeLevels();
 	this.createLevels(true);
 };
-{{GLOBAL}}.set({{COMPONENT}}, 'Switch');
-

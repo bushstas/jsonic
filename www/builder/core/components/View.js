@@ -1,4 +1,4 @@
-{{COMPONENT}} = function() {};
+{{GLOBAL}}.set({{COMPONENT}} = function(){}, 'View');
 {{PROTO}}={{COMPONENT}}.prototype;
 {{PROTO}}.onRenderComplete = function() {
 	this.dispatchReadyEvent();
@@ -19,4 +19,3 @@
 };
 {{PROTO}}.getTitleParams=function(){};
 {{PROTO}}.onReady=function(){};
-{{GLOBAL}}.set({{COMPONENT}}, 'View');

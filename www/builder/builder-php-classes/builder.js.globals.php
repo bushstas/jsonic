@@ -2,7 +2,8 @@
 
 class JSGlobals
 {
-	private static $jsConfig;
+	private static $usingLoader = false;
+	private static $jsConfig, $dataForLoader;
 	private static $output	= array();
 	private static $excluded = array();
 	private static $varNames = array(
@@ -72,11 +73,21 @@ class JSGlobals
 	}
 
 	public static function run(&$jsOutput, $data) {
-		self::addTextNodes();
-		self::addTextConstants($data['texts']);
+		self::$usingLoader = $data['isDataLoader'];
 		self::addApiConfig($data['config'], $jsOutput);
-		self::addDataConstants($data['data']);
-		self::addPathToDictionary($data['pathToDictionary']);
+		if (!self::$usingLoader) {
+			self::addTextNodes();
+			self::addTextConstants($data['texts']);
+			self::addDataConstants($data['data']);
+			self::addPathToDictionary($data['pathToDictionary']);
+		} else {
+			self::$output[] = 'var '.self::$varNames['textConstants'].','.self::$varNames['textNodes'].','.self::$varNames['dataConstants'].';';
+			self::$dataForLoader = array(
+				'textConstants' => json_encode($data['texts']),
+				'textNodes' => preg_replace("/\\\{2,}/", '\\', json_encode(TemplateParser::getTextNodes())),
+				'dataConstants' => json_encode(array_values(self::getDataConstants($data['data'])))
+			);
+		}
 		self::addTags($data['tags']);
 		self::addProps($data['props']);
 		self::addDecls($data['decls']);
@@ -100,6 +111,10 @@ class JSGlobals
 		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
 		self::parseTextConstants($jsOutput, $data['texts']);
 		self::parseDataConstants($jsOutput, $data['data']);
+	}
+
+	public static function getDataForLoader() {
+		return self::$dataForLoader;
 	}
 
 	public static function getUsedNames() {
@@ -250,12 +265,16 @@ class JSGlobals
 		self::add('apiConfig', $apiConfig.self::addGlobalAddingCall('apiConfig'));
 	}
 
-	private static function addDataConstants($data) {
+	private static function addDataConstants($data) {		
+		self::add('dataConstants', str_replace('"', "'", json_encode(array_values(self::getDataConstants($data)))).self::addGlobalAddingCall('dataConstants'));
+	}
+
+	private static function getDataConstants($data) {
 		$allData = array();
 		foreach ($data['data'] as $item) {
 			$allData = array_merge($allData, $item);
 		}
-		self::add('dataConstants', str_replace('"', "'", json_encode(array_values($allData))).self::addGlobalAddingCall('dataConstants'));
+		return $allData;
 	}
 
 	private static function addPathToDictionary($url) {

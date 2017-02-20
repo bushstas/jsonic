@@ -1,4 +1,4 @@
-{{COMPONENT}} = function() {
+{{GLOBAL}}.set(({{COMPONENT}} = function() {
 	if (!this || this == window) {
 		var controllers, router, dictionary;
 		var routes = {{ROUTES}};
@@ -78,10 +78,6 @@
 				activateView.call(this, view, true, isSameView);
 			}
 		};
-		var initRouter = function() {
-			router.setNavigationHandler(handleNavigation.bind(this));
-			router.init();
-		};
 		var	defineViews = function() {
 			for (var i = 0; i < routes.length; i++) {
 				this.views[routes[i]['name']] = null;
@@ -148,6 +144,7 @@
 			this.viewContainer.appendChild(element);
 			return element;
 		};
+		{{PROTO}}={{COMPONENT}}.prototype;
 		{{PROTO}}.initiate = function() {
 			this.views = {};
 		};
@@ -160,7 +157,8 @@
 			this.render(this.element);
 			createViewContainer.call(this);
 			defineViews.call(this);
-			initRouter.call(this);
+			router.setNavigationHandler(handleNavigation.bind(this));
+			router.init();
 		};
 		{{PROTO}}.setPageTitle = function(title) {
 			var titleElement = document.getElementsByTagName('title')[0];
@@ -185,8 +183,6 @@
 		};
 		{{PROTO}}.onNoErrors=function(){};
 		{{PROTO}}.onError=function(){};
+		return {{COMPONENT}};
 	}
-}
-{{PROTO}}={{COMPONENT}}.prototype;
-{{COMPONENT}}();
-{{GLOBAL}}.set({{COMPONENT}}, 'Application');
+})(), 'Application');
