@@ -5,7 +5,7 @@
 			'active': true
 		},
 		{
-			'title': @mailingParams
+			'title': @mailingParams @mailingParams
 		},
 		{
 			'title': @settings
@@ -25,4 +25,8 @@
 #calendarTooltip = {
 	'key': 'calendar',
 	'className': '->> float-right'
+}
+
+#aaa = {
+	'aaa': 'Привет'
 }

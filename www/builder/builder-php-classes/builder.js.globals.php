@@ -41,7 +41,8 @@ class JSGlobals
 		'popuper'          => '__P',
 		'state'            => '__S',
 		'proto'            => 'p',
-		'component'        => 'c'
+		'component'        => 'c',
+		'loadurl'          => '__LU'
 	);
 	
 	private static $varKeys = array(
@@ -81,12 +82,13 @@ class JSGlobals
 			self::addDataConstants($data['data']);
 			self::addPathToDictionary($data['pathToDictionary']);
 		} else {
-			self::$output[] = 'var '.self::$varNames['textConstants'].','.self::$varNames['textNodes'].','.self::$varNames['dataConstants'].';';
+			self::$output[] = 'var '.self::$varNames['textConstants'].','.self::$varNames['textNodes'].','.self::$varNames['dataConstants'].','.self::$varNames['pathToDictionary'].';';
 			self::$dataForLoader = array(
-				'textConstants' => json_encode($data['texts']),
-				'textNodes' => preg_replace("/\\\{2,}/", '\\', json_encode(TemplateParser::getTextNodes())),
-				'dataConstants' => json_encode(array_values(self::getDataConstants($data['data'])))
+				'textConstants' => $data['texts'],
+				'textNodes' => TemplateParser::getTextNodes(),
+				'dataConstants' => self::getDataConstants($data['data'])
 			);
+			self::addLoadUrl($data['pathToLoadAppApi']);
 		}
 		self::addTags($data['tags']);
 		self::addProps($data['props']);
@@ -141,13 +143,15 @@ class JSGlobals
 			'WORDS'           => self::$varNames['decls'],
 			'TEXTS'           => self::$varNames['textNodes'],
 			'CONSTANTS'       => self::$varNames['textConstants'],
+			'DATA'            => self::$varNames['dataConstants'],
 			'CONTROLLERS'     => self::$varNames['controllers'],
 			'CONTROLLER'      => self::$varNames['controller'],
 			'DIALOGER'        => self::$varNames['dialoger'],
 			'JSBASE'          => self::$jsConfig['file'],
 			'OBJECTS'         => self::$jsConfig['objects'],
 			'COMPONENT'       => self::$varNames['component'],
-			'PROTO'           => self::$varNames['proto']
+			'PROTO'           => self::$varNames['proto'],
+			'LOADURL'         => self::$varNames['loadurl']
 		);
 	}
 
@@ -283,6 +287,10 @@ class JSGlobals
 
 	private static function addTags($tags) {
 		self::add('tags', str_replace('"', "'", json_encode($tags)));
+	}
+
+	private static function addLoadUrl($url) {
+		self::add('loadurl', "'".preg_replace('/^\.+/', '', trim($url))."'");
 	}
 
 	private static function addProps($props) {

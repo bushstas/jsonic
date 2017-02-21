@@ -4,23 +4,24 @@ class Config
 {
 
 	private $config, $pathToApiDir, $builder, $configJson, $isUser;
+	private $LOAD_APP = 'loadApp';
 	private $errors = array(
-		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
-		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
-		'noIndexBlank' => 'Шаблон индексного файла <b>index.html</b> в директории {??} не найден',
-		'invalidPathToApi' => 'Параметр конфигурации <b>pathToApi</b> существует, но пуст или не является строкой',
-		'noApiDir' => 'Директория {??}, указанная в параметре конфигурации <b>pathToApi</b>, не найдена в корневом каталоге',
-		'userLoginNotString' => "Параметр конфигурации <b>user['login']</b> должен быть строкой",
-		'userLogoutNotString' => "Параметр конфигурации <b>user['logout']</b> должен быть строкой",
-		'userSaveNotString' => "Параметр конфигурации <b>user['save']</b> должен быть строкой",
-		'userLoginEmpty1' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['logout']</b> задан",
-		'userLoginEmpty2' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['save']</b> задан",
-		'coreNotFound' => "Директория {??} не найдена в папке <b>builder</b>",
-		'incorrectValue' => "Некорректоное значение параметра конфигурации {??}<br><br> Текущее значение: {??}<br><br>Корректное значение должно содержать имя директории и соответствовать паттерну <b>^[\w-]+$</b>",
-		'folderNotFound' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в папке <b>builder</b>",
-		'folderNotFound2' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в корневом каталоге",
-		'defaultFolderNotFound' => "Параметр конфигурации {??} не заполнен, директория по умолчанию {??} также не найдена",
-		'noDictionaryApi' => "Файл для загрузки словарей {??}, указанный в параметре конфигурации <b>pathToDictionary</b> не найден"
+		'noConfig' => 'Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅ. Р”Р°РЅРЅС‹Р№ С„Р°Р№Р» РґРѕР»Р¶РµРЅ СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РІ РґРёСЂРµРєС‚РѕСЂРёРё <b>builder</b>',
+		'incorrectConfig' => 'Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РєРѕСЂСЂРµРєС‚РµРЅ',
+		'noIndexBlank' => 'РЁР°Р±Р»РѕРЅ РёРЅРґРµРєСЃРЅРѕРіРѕ С„Р°Р№Р»Р° <b>index.html</b> РІ РґРёСЂРµРєС‚РѕСЂРёРё {??} РЅРµ РЅР°Р№РґРµРЅ',
+		'invalidPathToApi' => 'РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>pathToApi</b> СЃСѓС‰РµСЃС‚РІСѓРµС‚, РЅРѕ РїСѓСЃС‚ РёР»Рё РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃС‚СЂРѕРєРѕР№',
+		'noApiDir' => 'Р”РёСЂРµРєС‚РѕСЂРёСЏ {??}, СѓРєР°Р·Р°РЅРЅР°СЏ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>pathToApi</b>, РЅРµ РЅР°Р№РґРµРЅР° РІ РєРѕСЂРЅРµРІРѕРј РєР°С‚Р°Р»РѕРіРµ',
+		'userLoginNotString' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['login']</b> РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРєРѕР№",
+		'userLogoutNotString' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['logout']</b> РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРєРѕР№",
+		'userSaveNotString' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['save']</b> РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРєРѕР№",
+		'userLoginEmpty1' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['login']</b> РЅРµ РЅР°Р№РґРµРЅ, С‚РѕРіРґР° РєР°Рє <b>user['logout']</b> Р·Р°РґР°РЅ",
+		'userLoginEmpty2' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['login']</b> РЅРµ РЅР°Р№РґРµРЅ, С‚РѕРіРґР° РєР°Рє <b>user['save']</b> Р·Р°РґР°РЅ",
+		'coreNotFound' => "Р”РёСЂРµРєС‚РѕСЂРёСЏ {??} РЅРµ РЅР°Р№РґРµРЅР° РІ РїР°РїРєРµ <b>builder</b>",
+		'incorrectValue' => "РќРµРєРѕСЂСЂРµРєС‚РѕРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??}<br><br> РўРµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ: {??}<br><br>РљРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ РёРјСЏ РґРёСЂРµРєС‚РѕСЂРёРё Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ РїР°С‚С‚РµСЂРЅСѓ <b>^[\w-]+$</b>",
+		'folderNotFound' => "Р”РёСЂРµРєС‚РѕСЂРёСЏ {??}, СѓРєР°Р·Р°РЅРЅР°СЏ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅР°<br><br>РћРЅР° РґРѕР»Р¶РЅР° СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ РїР°РїРєРµ <b>builder</b>",
+		'folderNotFound2' => "Р”РёСЂРµРєС‚РѕСЂРёСЏ {??}, СѓРєР°Р·Р°РЅРЅР°СЏ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅР°<br><br>РћРЅР° РґРѕР»Р¶РЅР° СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ РєРѕСЂРЅРµРІРѕРј РєР°С‚Р°Р»РѕРіРµ",
+		'defaultFolderNotFound' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ Р·Р°РїРѕР»РЅРµРЅ, РґРёСЂРµРєС‚РѕСЂРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ {??} С‚Р°РєР¶Рµ РЅРµ РЅР°Р№РґРµРЅР°",
+		'noDictionaryApi' => "Р¤Р°Р№Р» РґР»СЏ Р·Р°РіСЂСѓР·РєРё СЃР»РѕРІР°СЂРµР№ {??}, СѓРєР°Р·Р°РЅРЅС‹Р№ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>pathToDictionary</b> РЅРµ РЅР°Р№РґРµРЅ"
 	);
 
 	public function init($builder) {
@@ -309,14 +310,50 @@ class Config
 			$params[] = '"user":\'.file_get_contents(\''.$path.$user['login'].'\').\'';
 		}
 		if (!empty($this->pathToDictionary)) {
-			$params[] = '"dictionary":\'.file_get_contents(\''.$path.$this->config['pathToDictionary'].'\').\'';	
+			$params[] = '"dictionary":\'.file_get_contents(\''.$path.$this->config['pathToDictionary'].'?page=\'.$_GET[\'page\']).\'';	
 		}
 		if (!empty($this->config['loadData'])) {
-			$data = JSGlobals::getDataForLoader();
-			Printer::log($data, true);
+			extract(JSGlobals::getDataForLoader());
+			extract($textConstants);
+
+			$textConstants = array();
+			foreach ($index as $i => $value) {
+				$textConstants[$value] = $texts[$i];
+			}					
+
+			$this->parseDataConstants($dataConstants, $textConstants);
+			$params[] = '"texts":'.json_encode($textNodes);
+			$params[] = '"textsConstants":'.json_encode($texts);
+			$params[] = '"dataConstants":'.json_encode($dataConstants);
+			
+			//Printer::log($dataConstants);
 		}
 		$content .= implode(', ', $params)."}'); ?>";
-		file_put_contents($this->pathToApiDir.'/loadApp.php', $content);
+		file_put_contents($this->pathToApiDir.'/'.$this->LOAD_APP.'.php', $content);
+	}
+
+	private function parseDataConstants(&$data, $textConstants) {
+		foreach ($data as $k => &$v) {
+			if (is_array($v)) {
+				$this->parseDataConstants($v, $textConstants);
+			} elseif (is_string($v)) {
+				if (preg_match('/^<nq>/', $v)) {
+					$mark = JSGlobals::getVarName('textConstants');
+					$v = str_replace('<nq>', '', $v);
+					if (preg_match('/'.$mark.'\./', $v)) {
+						$d = Splitter::split('/'.$mark.'\.\w+/', $v);
+						$v = '';
+						foreach ($d['items'] as $i => $item) {
+							$v .= $item;
+							if (isset($d['delimiters'][$i])) {
+								$dl = str_replace($mark.'.', '', $d['delimiters'][$i]);
+								$v .= $textConstants[$dl];
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public function isUsingDataLoader() {
@@ -324,4 +361,8 @@ class Config
 		$b = $this->get('loadData');
 		return !empty($a) && !empty($b);
 	}
-}
+
+	public function getPathToLoadAppApi() {
+		return $this->pathToApiDir.'/'.$this->LOAD_APP.'.php';
+	}
+} 

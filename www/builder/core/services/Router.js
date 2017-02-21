@@ -16,6 +16,8 @@
 		if (isHashRouter) {
 			window.addEventListener('popstate', onNavigate.bind(this));
 		}
+	};
+	this.run = function() {
 		onNavigate();
 	};
 	this.getPathPartAt = function(index) {
@@ -62,7 +64,7 @@
 		return menues.indexOf(menu) > -1;
 	};
 	this.getCurrentRoute = function() {
-		return currentRoute;
+		return currentRoute || getRoute();
 	};
 	this.getCurrentRouteName = function() {
 		if (currentRoute) return currentRoute['name'];

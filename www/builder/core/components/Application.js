@@ -5,7 +5,7 @@
 		var errorRoutes = {{ERRORROUTES}};
 		var viewContainerClass = {{VIEWCONTAINER}};
 		var defaultPagetitle = {{PAGETITLE}};
-		var parentalContainerClass = {{PARENTALVIEWCNT}}
+		var parentalContainerClass = {{PARENTALVIEWCNT}};
 		
 		var getViewParams = function(route, allParams) {
 			var params;
@@ -152,13 +152,14 @@
 			dictionary = {{GLOBAL}}.get('Dictionary');
 			router = {{GLOBAL}}.get('Router');
 			controllers = {{GLOBAL}}.get('Controllers');
+			defineViews.call(this);
+			router.setNavigationHandler(handleNavigation.bind(this));
+			router.init();
 			this.element = document.createElement('div');
 			document.body.appendChild(this.element);
 			this.render(this.element);
 			createViewContainer.call(this);
-			defineViews.call(this);
-			router.setNavigationHandler(handleNavigation.bind(this));
-			router.init();
+			router.run();
 		};
 		{{PROTO}}.setPageTitle = function(title) {
 			var titleElement = document.getElementsByTagName('title')[0];

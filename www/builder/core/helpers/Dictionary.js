@@ -8,7 +8,7 @@ var Dictionary = new (function() {
 		}
 		loaded[routeName] = true;
 	};
-	this.get = function(key, callbackOrPropName, thisObj) {
+	this.get = function(key, callbackOrPropName, thisObj) {alert(key)
 		var item = Objects.get(items, key);
 		if (item) return item;
 		callbacks = callbacks || [];
@@ -16,6 +16,10 @@ var Dictionary = new (function() {
 	};
 	this.set = function(key, value) {
 		items[key] = value;
+	};
+	this.setData = function(routeName, data) {
+		loaded[routeName] = true;
+		for (var k in data) this.set(k, data[k]);
 	};
 	var onLoad = function(data) {
 		if (isObject(data)) {

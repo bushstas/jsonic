@@ -639,7 +639,8 @@ class JSCompiler
 			'pagetitle'        => $this->config['pagetitle'],
 			'user'             => $this->config['user'],
 			'controllers'      => array_keys($this->classesByTypes['controller']),
-			'isDataLoader'     => $this->configProvider->isUsingDataLoader()
+			'isDataLoader'     => $this->configProvider->isUsingDataLoader(),
+			'pathToLoadAppApi' => $this->configProvider->getPathToLoadAppApi()
 		);
 		JSGlobals::run($this->jsOutput, $data);
 	}
@@ -1033,6 +1034,9 @@ class JSCompiler
 			$controllers = array('Router', 'User');
 			if (!empty($controllers)) {
 				foreach ($controllers as $controller) {
+					if ($controller == 'User' && !$this->config['hasUser']) {
+						continue;
+					}
 					$bottomOutput[] = "var ".$controller."=".$core.".get('".$controller."',1);";
 				}
 				
@@ -1040,10 +1044,19 @@ class JSCompiler
 			$entry = $this->config['entry'];
 			$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
 			$bottomOutput[] = "core.initiate.call(".$entry.");";
+			$bottomOutput[] = $entry.".init();";
 			if ($this->config['hasUser']) {
-				$bottomOutput[] = "User.load(".$entry.");";
+				if (!$this->configProvider->isUsingDataLoader()) {
+					$bottomOutput[] = "User.load(".$entry.");";
+				} else {
+					$bottomOutput[] = $entry.".load();";
+				}
 			} else {
-				$bottomOutput[] = $entry.".run();";
+				if (!$this->configProvider->isUsingDataLoader()) {
+					$bottomOutput[] = $entry.".run();";
+				} else {
+					$bottomOutput[] = $entry.".load();";
+				}
 			}
 			$bottomOutput[] = "})();\n});";
 		} else {

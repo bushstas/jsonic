@@ -8,7 +8,7 @@
 		if (isObject(userOptions)) {
 			if (userOptions['login'] && isString(userOptions['login'])) {
 				var ajr = {{GLOBAL}}.get('AjaxRequest');
-				loadRequest = new ajr(userOptions['login'], onLoad.bind(this));
+				loadRequest = new ajr(userOptions['login'], this.setData.bind(this));
 			}
 		}
 	};
@@ -23,7 +23,7 @@
 		}
 		onLoad(getDefaultAttributes());
 	};
-	var onLoad = function(data) {
+	this.setData = function(data) {
 		status = data['status'];
 		attributes = data['attributes'];
 		settings = data['settings'];
