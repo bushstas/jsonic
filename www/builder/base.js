@@ -3794,7 +3794,19 @@ function stringToNumber(str) {
 function getCount(a) {
 	return isArray(a) ? a.length : 0;
 }
-var __CB = function(__DATA) {
+
+
+/////////////////
+/////////////////
+/////////////////
+
+
+var Router=_G_.get('Router',1);
+var User=_G_.get('User',1);
+var route = Router.getCurrentRoute();
+
+Loader.get(__LU, {'route': route['name']},
+function(__DATA) {
 var route = Router.getCurrentRoute();
 __V = __DATA['dataConstants'];
 __T = __DATA['texts'];
@@ -5313,19 +5325,15 @@ function getFzName(type) {
 }
 var core=_G_.get('Core');
 core.inherits(['Component',['Application','View','Control','Menu','DataTable','DataTableFragmets','DataTableRow','FilterStatistics','SearchForm','SearchFormButton','SearchFormPanel','SearchFormFilters','AutoComplete','Calendar','Dialog','Editor','Form','PopupMenu','PopupSelect','Recommendations','TabPanel','Tabs','TooltipPopup','FilterSubscription','FilterSubscriptionOptions','UserInfo','FormField','Submit'],'Foreach',['Switch','IfSwitch'],'DataTableRow',['DataTableStandartRow'],'DataTable',['TenderDataTable'],'SearchFormButton',['SearchFormPanelButton'],'Control',['Keywords','KeywordsControl','Checkbox','Input','Select','Tags','Textarea'],'SearchFormPanelButton',['KeywordsButton'],'SearchFormPanel',['KeywordsPanel'],'SearchForm',['TenderSearchForm'],'Controller',['Favorites','Filters','FiltersStat','RecommendationsLoader','Subscription','UserInfoLoader'],'Application',['App'],'Menu',['TopMenu'],'AutoComplete',['KeywordsAutoComplete'],'Calendar',['FavoritesCalendar'],'Editor',['KeywordTagEditor'],'View',['Error401','Error404','Favorite','Main','Search'],'TabPanel',['DataTableTabPanel'],'PopupMenu',['SearchFormCreateFilterMenu','SearchFormFilterMenu'],'Tags',['KeywordTags'],'Dialog',['CalendarFavorites','FilterEdit','OrderCall','Support'],'Form',['AuthForm','OrderCallForm'],'OrderCallForm',['SupportForm'],'KeywordTags',['ContainKeywordTags','ExcludeKeywordTags']]);
-var App=_G_.get('App',1);
-core.initiate.call(App);
-App.run();
 if (isObject(__DATA['user'])) {
 	User.setData(__DATA['user']);
 }
 if (isObject(__DATA['dictionary'])) {
 	Dictionary.setData(route['name'], __DATA['dictionary']);
 }
-};
-var Router=_G_.get('Router',1);
-var User=_G_.get('User',1);
-var route = Router.getCurrentRoute();
-Loader.get(__LU, {'route': route['name']}, __CB);
+var App=_G_.get('App',1);
+core.initiate.call(App);
+App.run();
+});
 })();
 });
