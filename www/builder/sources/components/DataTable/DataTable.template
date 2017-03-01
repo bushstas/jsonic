@@ -3,9 +3,8 @@
 	<DataTableTabPanel/>
 	{$:aaa}
 	<::hello>
-		<div>==== {$var} ====</div>
 		<Reason>
-			{$var}
+			<div>{$var}</div>
 		</Reason>
 	</::hello>
 </div>

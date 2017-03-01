@@ -152,6 +152,7 @@ class TemplateParser
 		$template = preg_replace('/[\t\r\n]/', '', $template);
 		$template = preg_replace('/ {2,}/', ' ', $template);
 		$template = preg_replace('/&nbsp;/', self::$space, $template);
+		$template = preg_replace('/\$children\b/', '~children', $template);
 
 		preg_match_all("/\{template +\.(\w+) +as +\.(\w+) *\}/", $template, $matches);		
 		foreach ($matches[1] as $i => $match) {
