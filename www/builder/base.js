@@ -3795,10 +3795,9 @@ function getCount(a) {
 	return isArray(a) ? a.length : 0;
 }
 var __CB = function(__DATA) {
-var route = Router.getCurrentRoute();
-__V = __DATA['dataConstants'];
 __T = __DATA['texts'];
 __ = __DATA['textsConstants'];
+__V = __V();
 _G_.set(c=function(){},'DataTable');
 p=c.prototype;
 p.handleClick=function(){

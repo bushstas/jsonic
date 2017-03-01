@@ -818,6 +818,9 @@ class JSCompiler
 			$usedClasses = ClassAnalyzer::getUsedClasses($route['view']);
 		} else {
 			$output = &$this->jsOutput;
+			if ($this->configProvider->isUsingDataLoader()) {
+				$output[] = "var __CB = function(__DATA) {\n__T = __DATA['texts'];\n__ = __DATA['textsConstants'];\n__V = __V();";
+			}
 			$usedClasses = ClassAnalyzer::getUsedClasses($isSplitted ? true : null);
 		}
 		$this->currentRoute = $route;
@@ -1025,12 +1028,20 @@ class JSCompiler
 		}	
 		$core = $globals['global'];
 		if (empty($route)) {
-			$bottomOutput[] = "var core=".$core.".get('Core');";
-			$bottomOutput[] = "core.inherits([".implode(",", $inheritance)."]);";
+			$bottomOutput[] = $core.".get('Core').inherits([".implode(",", $inheritance)."]);";
 		} else {
 			$bottomOutput[] = $core.".get('Core').inherits([".implode(",", $inheritance)."]);";
 		}
 		if (empty($route)) {
+			$entry = $this->config['entry'];
+			if ($this->configProvider->isUsingDataLoader()) {
+				$bottomOutput[] = "if (isObject(__DATA['user'])) User.setData(__DATA['user']);";
+				$bottomOutput[] = "if (isObject(__DATA['dictionary'])) Dictionary.setData(Router.getCurrentRoute()['name'], __DATA['dictionary']);";
+				$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
+				$bottomOutput[] = $core.".get('Core').initiate.call(".$entry.");";
+				$bottomOutput[] = $entry.".run();";
+				$bottomOutput[] = "};";
+			}
 			$controllers = array('Router', 'User');
 			if (!empty($controllers)) {
 				foreach ($controllers as $controller) {
@@ -1040,23 +1051,17 @@ class JSCompiler
 					$bottomOutput[] = "var ".$controller."=".$core.".get('".$controller."',1);";
 				}
 				
-			}		
-			$entry = $this->config['entry'];
-			$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
-			$bottomOutput[] = "core.initiate.call(".$entry.");";
-			$bottomOutput[] = $entry.".init();";
-			if ($this->config['hasUser']) {
-				if (!$this->configProvider->isUsingDataLoader()) {
+			}
+			if (!$this->configProvider->isUsingDataLoader()) {
+				$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
+				$bottomOutput[] = $core.".get('Core').initiate.call(".$entry.");";
+				if ($this->config['hasUser']) {
 					$bottomOutput[] = "User.load(".$entry.");";
 				} else {
-					$bottomOutput[] = $entry.".load();";
+					$bottomOutput[] = $entry.".run();";
 				}
 			} else {
-				if (!$this->configProvider->isUsingDataLoader()) {
-					$bottomOutput[] = $entry.".run();";
-				} else {
-					$bottomOutput[] = $entry.".load();";
-				}
+				$bottomOutput[] = "Loader.get(__LU, {'route': Router.getCurrentRoute()['name']}, __CB);";
 			}
 			$bottomOutput[] = "})();\n});";
 		} else {

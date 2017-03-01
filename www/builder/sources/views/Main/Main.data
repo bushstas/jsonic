@@ -5,7 +5,7 @@
 			'active': true
 		},
 		{
-			'title': @mailingParams @mailingParams
+			'title': @mailingParams + '43543543' + @mailingParams
 		},
 		{
 			'title': @settings

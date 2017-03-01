@@ -321,39 +321,11 @@ class Config
 				$textConstants[$value] = $texts[$i];
 			}					
 
-			$this->parseDataConstants($dataConstants, $textConstants);
 			$params[] = '"texts":'.json_encode($textNodes);
 			$params[] = '"textsConstants":'.json_encode($texts);
-			$params[] = '"dataConstants":'.json_encode($dataConstants);
-			
-			//Printer::log($dataConstants);
 		}
 		$content .= implode(', ', $params)."}'); ?>";
 		file_put_contents($this->pathToApiDir.'/'.$this->LOAD_APP.'.php', $content);
-	}
-
-	private function parseDataConstants(&$data, $textConstants) {
-		foreach ($data as $k => &$v) {
-			if (is_array($v)) {
-				$this->parseDataConstants($v, $textConstants);
-			} elseif (is_string($v)) {
-				if (preg_match('/^<nq>/', $v)) {
-					$mark = JSGlobals::getVarName('textConstants');
-					$v = str_replace('<nq>', '', $v);
-					if (preg_match('/'.$mark.'\./', $v)) {
-						$d = Splitter::split('/'.$mark.'\.\w+/', $v);
-						$v = '';
-						foreach ($d['items'] as $i => $item) {
-							$v .= $item;
-							if (isset($d['delimiters'][$i])) {
-								$dl = str_replace($mark.'.', '', $d['delimiters'][$i]);
-								$v .= $textConstants[$dl];
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	public function isUsingDataLoader() {

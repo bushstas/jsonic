@@ -14,7 +14,7 @@
 	};
 	this.load = function(application) {
 		if (!loaded) {
-			initOptions();
+			initOptions.call(this);
 			app = application;
 			if (loadRequest) {
 				loadRequest.execute();

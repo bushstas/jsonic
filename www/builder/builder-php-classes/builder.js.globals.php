@@ -79,17 +79,16 @@ class JSGlobals
 		if (!self::$usingLoader) {
 			self::addTextNodes();
 			self::addTextConstants($data['texts']);
-			self::addDataConstants($data['data']);
 			self::addPathToDictionary($data['pathToDictionary']);
 		} else {
-			self::$output[] = 'var '.self::$varNames['textConstants'].','.self::$varNames['textNodes'].','.self::$varNames['dataConstants'].','.self::$varNames['pathToDictionary'].';';
+			self::$output[] = 'var '.self::$varNames['textConstants'].','.self::$varNames['textNodes'].','.self::$varNames['pathToDictionary'].';';
 			self::$dataForLoader = array(
 				'textConstants' => $data['texts'],
-				'textNodes' => TemplateParser::getTextNodes(),
-				'dataConstants' => self::getDataConstants($data['data'])
+				'textNodes' => TemplateParser::getTextNodes()
 			);
 			self::addLoadUrl($data['pathToLoadAppApi']);
 		}
+		self::addDataConstants($data['data'], self::$usingLoader);
 		self::addTags($data['tags']);
 		self::addProps($data['props']);
 		self::addDecls($data['decls']);
@@ -269,8 +268,12 @@ class JSGlobals
 		self::add('apiConfig', $apiConfig.self::addGlobalAddingCall('apiConfig'));
 	}
 
-	private static function addDataConstants($data) {		
-		self::add('dataConstants', str_replace('"', "'", json_encode(array_values(self::getDataConstants($data)))).self::addGlobalAddingCall('dataConstants'));
+	private static function addDataConstants($data, $usingLoader) {
+		$data = str_replace('"', "'", json_encode(array_values(self::getDataConstants($data))));
+		if ($usingLoader) {
+			$data = 'function(){return '.$data.'}';
+		}
+		self::add('dataConstants', $data).self::addGlobalAddingCall('dataConstants');
 	}
 
 	private static function getDataConstants($data) {
