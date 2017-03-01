@@ -4,7 +4,7 @@
 	{$:aaa}
 	<::hello>
 		<Reason>
-			<div>{$var}</div>
+			<div>{$bbb}</div>
 		</Reason>
 	</::hello>
 </div>

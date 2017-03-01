@@ -1,5 +1,9 @@
 component DataTable
 
+initial props = {
+	bbb: '======'
+}
+
 function handleClick() {
-	$var = 'HELLO';
+	$bbb = 'HELLO';
 }
