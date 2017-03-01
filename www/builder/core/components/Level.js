@@ -49,8 +49,8 @@
 
 	var createUpdater = function(u, s, p) {
 		updaters = updaters || [];
-		if (p['n']) {{GLOBAL}}.get('Core').createUpdater(u, component, s, p, updaters);
-		if (p['g']) {{GLOBAL}}.get('State').createUpdater(u, component, s, p);
+		if (p['n']) {{GLOBAL}}.get('Core').createUpdater(u, p['$'] || component, s, p, updaters);
+		if (p['g']) {{GLOBAL}}.get('State').createUpdater(u, p['$'] || component, s, p);
 	};
 
 	var createPropertyNode = function(props) {
