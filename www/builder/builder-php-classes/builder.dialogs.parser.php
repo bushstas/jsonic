@@ -39,7 +39,7 @@ class DialogsParser
 		if (preg_match(self::$regexp, $code)) {
 			foreach (self::$dlgs as $i => $dlg) {				
 				$regexp  = '/\b'.$dlg.'\.('.implode('|', self::$methods).')\(/';
-				$code = preg_replace($regexp, self::$globals['DIALOGER'].".$1($dlg,", $code);
+				$code = preg_replace($regexp, self::$globals['DIALOGER'].".$1('$dlg',", $code);
 			}
 			$regexp = rtrim(self::$regexp, '/').'\.(\w+)/';
 			preg_match_all($regexp, $code, $matches);

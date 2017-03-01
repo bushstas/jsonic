@@ -161,4 +161,22 @@ class Gatherer
 			}
 		}
 	}
+
+	public static function emptyFolder($dir) {
+		if (is_dir($dir)) {
+			$fs = scandir($dir);
+			if (is_array($fs)) {
+				foreach ($fs as $file) {
+					if ($file != '..' && $file != '.') {
+						$path = $dir."/".$file;
+						if (is_dir($path)) {
+							self::emptyFolder($path);
+						} elseif (file_exists($path)) {
+							unlink($path);
+						}
+					}
+				}
+			}
+		}
+	}
 }

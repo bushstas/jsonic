@@ -42,7 +42,9 @@ class JSGlobals
 		'state'            => '__S',
 		'proto'            => 'p',
 		'component'        => 'c',
-		'loadurl'          => '__LU'
+		'loadurl'          => '__LU',
+		'callback'         => '__CB',
+		'data'             => '__DT'
 	);
 	
 	private static $varKeys = array(
@@ -273,7 +275,7 @@ class JSGlobals
 		if ($usingLoader) {
 			$data = 'function(){return '.$data.'}';
 		}
-		self::add('dataConstants', $data).self::addGlobalAddingCall('dataConstants');
+		self::add('dataConstants', $data.($usingLoader ? '' : self::addGlobalAddingCall('dataConstants')));
 	}
 
 	private static function getDataConstants($data) {

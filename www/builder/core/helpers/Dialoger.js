@@ -1,7 +1,9 @@
-{{GLOBAL}}.set(new (function() {
+var {{DIALOGER}};
+{{GLOBAL}}.set({{DIALOGER}} = new (function() {
 	var ds = {};
 	var cid, dc, d, opts;
 	this.show = function(c, options) {
+		if (isString(c)) c = {{GLOBAL}}.get(c);
 		if (isFunction(c)) {
 			var id;
 			if (isObject(options)) {

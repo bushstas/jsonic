@@ -1,5 +1,11 @@
 {template .main}
-<div class="@outer-container">
+<div class="@outer-container" onCLick="handleClick">
 	<DataTableTabPanel/>
 	{$:aaa}
+	<::hello>
+		<div>==== {$var} ====</div>
+		<Reason>
+			{$var}
+		</Reason>
+	</::hello>
 </div>

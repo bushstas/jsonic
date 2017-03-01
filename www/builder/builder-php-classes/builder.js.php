@@ -720,6 +720,7 @@ class JSCompiler
 		$jsOutput = preg_replace('/\{\s+\}/', '{}', $jsOutput);
 		$jsOutput .= "\n".implode("\n", $bottomOutput);
 		$pathToCompiledJs = DEFAULT_PATH.$fileName;
+		Gatherer::emptyFolder(DEFAULT_PATH.$this->config['folder']);
 		if ($this->configProvider->isAdvancedMode()) {		
 			Gatherer::createFile('temp.js', $jsOutput);
 			exec('java -jar compiler.jar --js temp.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file temp2.js 2>&1', $output);	
@@ -819,7 +820,12 @@ class JSCompiler
 		} else {
 			$output = &$this->jsOutput;
 			if ($this->configProvider->isUsingDataLoader()) {
-				$output[] = "var __CB = function(__DATA) {\n__T = __DATA['texts'];\n__ = __DATA['textsConstants'];\n__V = __V();";
+				$output[] = "var ".$globals['callback']." = function(".$globals['data'].") {\n__T = ".$globals['data']."['texts'];\n__ = ".$globals['data']."['textsConstants'];\n__V = __V();";
+				$keys = JSGlobals::getVarKeys();
+				$ks = array('textConstants' => $keys['textConstants'], 'textNodes' => $keys['textNodes'], 'dataConstants' => $keys['dataConstants']);
+				foreach ($ks as $k => $v) {
+					$output[] = $globals['global'].".set(".$globals[$k].",'".$v."');";
+				}
 			}
 			$usedClasses = ClassAnalyzer::getUsedClasses($isSplitted ? true : null);
 		}
@@ -1035,8 +1041,8 @@ class JSCompiler
 		if (empty($route)) {
 			$entry = $this->config['entry'];
 			if ($this->configProvider->isUsingDataLoader()) {
-				$bottomOutput[] = "if (isObject(__DATA['user'])) User.setData(__DATA['user']);";
-				$bottomOutput[] = "if (isObject(__DATA['dictionary'])) Dictionary.setData(Router.getCurrentRoute()['name'], __DATA['dictionary']);";
+				$bottomOutput[] = "if (isObject(".$globals['data']."['user'])) User.setData(".$globals['data']."['user']);";
+				$bottomOutput[] = "if (isObject(".$globals['data']."['dictionary'])) Dictionary.setData(Router.getCurrentRoute()['name'], ".$globals['data']."['dictionary']);";
 				$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
 				$bottomOutput[] = $core.".get('Core').initiate.call(".$entry.");";
 				$bottomOutput[] = $entry.".run();";
@@ -1061,7 +1067,7 @@ class JSCompiler
 					$bottomOutput[] = $entry.".run();";
 				}
 			} else {
-				$bottomOutput[] = "Loader.get(__LU, {'route': Router.getCurrentRoute()['name']}, __CB);";
+				$bottomOutput[] = "Loader.get(__LU, {'route': Router.getCurrentRoute()['name']},".$globals['callback'].");";
 			}
 			$bottomOutput[] = "})();\n});";
 		} else {
@@ -1155,7 +1161,7 @@ class JSCompiler
 				if ($fl != '{' && $fl != '[' && $fl != '(') {
 					$templateFunction['content'] = ' '.$templateFunction['content'];
 				}
-				$content = $let."\n\treturn".$templateFunction['content'];
+				$content = $let."\n\treturn ".$templateFunction['content'];
 			} else {
 				$content = $let."\n";
 			}
@@ -1173,8 +1179,8 @@ class JSCompiler
 		$templateFunctions = TemplateParser::parse($templateContent, $file);
 		foreach ($templateFunctions as $templateFunction) {
 			$this->includesTemplateIndex[$templateFunction['name']] = $idx;
-			$this->jsOutput[] = $globals['global'].'.set(function(_){';
-			$this->jsOutput[] = "\n\treturn".$templateFunction['content']."\n},'i_".$idx."');";
+			$this->jsOutput[] = $globals['global'].'.set(function(_,$){';
+			$this->jsOutput[] = "\n\treturn ".$templateFunction['content']."\n},'i_".$idx."');";
 			$idx++;
 		}
 	}

@@ -1153,9 +1153,9 @@ class TemplateParser
 					}
 				}
 				if (is_array($data['reactNames'])) {
-					if (is_string(self::$class)) {
-						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
-					}
+					// if (is_string(self::$class)) {
+					// 	new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
+					// }
 					if (is_array($names)) {
 						$names = array_merge($names, $data['reactNames']);
 					}
@@ -1574,9 +1574,9 @@ class TemplateParser
 					$isLet = false;
 				}			
 				if (!empty($data['reactNames'])) {
-					if (!is_array(self::$class)) {
-						new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
-					}
+					// if (!is_array(self::$class)) {
+					// 	new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
+					// }
 				}			
 			}
 			
