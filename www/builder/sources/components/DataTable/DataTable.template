@@ -5,6 +5,9 @@
 	<::hello>
 		<Reason>
 			<div>{$bbb}</div>
+			<Reason>
+				<div>{$bbb}</div>
+			</Reason>
 		</Reason>
 	</::hello>
 </div>
