@@ -10,6 +10,7 @@ class ClassAnalyzer
 	private static $usedCorrectors = array();
 	private static $usedComponents = array();
 	private static $notUsedClasses = array();
+	private static $unknownClasses = array();
 	private static $allJsClasses;
 	private static $jsClassesData;
 	private static $entryClassName;
@@ -78,7 +79,12 @@ class ClassAnalyzer
 			self::$usedClasses[] = $className;
 		}
 		self::$notUsedClasses = array_diff(self::$allJsClasses, self::$usedClasses);
-		//Printer::log(self::$usedControllers);
+		foreach (self::$unknownClasses as $className => $fileName) {
+			if (in_array($className, self::$usedClasses)) {
+				new Error(self::$errors['unknownClass'], array($fileName, $className));	
+			}
+		}
+		//Printer::log(self::$usedClasses, true);
 		//Printer::log(self::$usedCorrectors);
 	}
 
@@ -197,7 +203,7 @@ class ClassAnalyzer
 		foreach (self::$matches as $class => $classNames) {
 			foreach ($classNames as $className) {
 				if (!in_array($className, self::$allJsClasses)) {
-					new Error(self::$errors['unknownClass'], array($file['name'], $className));
+					self::$unknownClasses[$className] = $class;
 				}
 			}
 		}
