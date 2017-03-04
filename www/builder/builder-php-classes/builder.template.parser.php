@@ -80,7 +80,7 @@ class TemplateParser
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $templateName, $globalNames,
-				   $parsedItem, $globalVarNames, $initials;
+				   $parsedItem, $globalVarNames, $initials, $componentsOpen = false;
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
@@ -532,7 +532,6 @@ class TemplateParser
 
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
-
 			$tagName = trim($item['tagName']);
 			if ($item['type'] == 'text') {
 				if (!$isElse) {
@@ -601,13 +600,11 @@ class TemplateParser
 			elseif (in_array($tagName, $usedClasses) || $tagName == 'Component' || $tagName == 'Control')
 			{
 				if (!$item['isClosing']) {
+					self::$componentsOpen = true;
 					$isComponent = true;
 					self::getTagProperties($item, $child, true);
-				} else {
-					return null;
-				}
+				} else return null;
 			}
-
 			
 			$toProper = false;
 			if ($tagName == 'if') {
@@ -694,6 +691,7 @@ class TemplateParser
 				$child['ie'] = self::getProperChildren($child['ie']);
 			}
 		}
+		self::$componentsOpen = false;
 		return $child;
 	}
 
@@ -723,10 +721,14 @@ class TemplateParser
 			if ($list[$i]['type'] == 'tag') {
 				if (!$list[$i]['isClosing']) {
 					if (!$list[$i]['isSingle']) $level++;
-					if ($list[$i]['tagName'] == $tagName) $openedTagsCount++;
-				} elseif ($list[$i]['isClosing']) {
+					if ($list[$i]['tagName'] == $tagName) {
+						$openedTagsCount++;
+					}
+				} else {
 					if (!$list[$i]['isSingle']) $level--;
-					if ($list[$i]['tagName'] == $tagName) $openedTagsCount--;
+					if ($list[$i]['tagName'] == $tagName) {
+						$openedTagsCount--;
+					}
 				}
 			}
 			if ($openedTagsCount > 0) {
@@ -1567,6 +1569,9 @@ class TemplateParser
 						}
 						if (!empty($data['globalNames'])) {
 							$child['g'] = self::getProperChildren($data['globalNames']);
+						}
+						if (self::$componentsOpen) {
+							$child['$'] = '<nq>$<nq>';
 						}
 						$code = '<nq>'.json_encode($child).'<nq>';
 					} else {
