@@ -80,7 +80,8 @@ class TemplateParser
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $templateName, $globalNames,
-				   $parsedItem, $globalVarNames, $initials, $componentsOpen = false;
+				   $parsedItem, $globalVarNames, $initials,
+				   $componentsOpen = array();
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
@@ -189,7 +190,8 @@ class TemplateParser
 			}
 			self::$templateName = $templateNames[$i];
 			TemplateCodeParser::init(self::$templateName, $className);
-			$templates[] = self::getParsedTemplate($templateContents[$i]);
+			$tmp = self::getParsedTemplate($templateContents[$i]);
+			$templates[] = $tmp;
 		}
 
 		$isSingle = count($templates) == 1;
@@ -600,8 +602,9 @@ class TemplateParser
 			elseif (in_array($tagName, $usedClasses) || $tagName == 'Component' || $tagName == 'Control')
 			{
 				if (!$item['isClosing']) {
-					self::$componentsOpen = true;
+					self::$componentsOpen[] = $tagName;
 					$isComponent = true;
+
 					self::getTagProperties($item, $child, true);
 				} else return null;
 			}
@@ -613,7 +616,6 @@ class TemplateParser
 				$ifContent = $match[1];
 				$ifContentIsEmpty = preg_replace('/\s/', '', $ifContent) === '';
 			}
-			
 			$childrenList = self::gatherChildren($list, $i, $tagName);
 		
 			$isLet = 0;
@@ -691,7 +693,10 @@ class TemplateParser
 				$child['ie'] = self::getProperChildren($child['ie']);
 			}
 		}
-		self::$componentsOpen = false;
+		if ((is_array($usedClasses) && in_array($tagName, $usedClasses)) || $tagName == 'Component' || $tagName == 'Control') {
+			array_pop(self::$componentsOpen);
+			Printer::log(self::$componentsOpen);
+		}
 		return $child;
 	}
 
@@ -839,7 +844,6 @@ class TemplateParser
 				if ($shouldBeCase) {
 					new Error(self::$errors[$errorType], array(self::$templateName, self::$className, $item['content']));
 				}		
-
 				$childList = self::gatherChildren($childrenList, $j, $item['tagName']);
 				array_unshift($childList, $item);
 				$childList[] = $childrenList[$j];
@@ -1570,7 +1574,7 @@ class TemplateParser
 						if (!empty($data['globalNames'])) {
 							$child['g'] = self::getProperChildren($data['globalNames']);
 						}
-						if (self::$componentsOpen) {
+						if (!empty(self::$componentsOpen)) {
 							$child['$'] = '<nq>$<nq>';
 						}
 						$code = '<nq>'.json_encode($child).'<nq>';
