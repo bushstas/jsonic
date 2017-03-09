@@ -7,10 +7,12 @@
 			<div>{$bbb}</div>
 			<Reason>
 				<div>{$bbb}</div>
-				{switch $ddd}
-					{case 3}
+				{if}
+					{case $ddd == 2}
 						ITS 2
-				{/switch}
+					{case $ddd == 3}
+						ITS 3
+				{/if}
 			</Reason>
 		</Reason>
 	</::hello>

@@ -134,7 +134,7 @@
 	};
 
 	var createIfSwitch = function(props) {
-		if (props['p'] || props['g']) {
+		if (props['n'] || props['g']) {
 			var swtch = new ({{GLOBAL}}.get('IfSwitch'))(props);
 			swtch.render(parentElement, self);
 			registerChild(swtch);
