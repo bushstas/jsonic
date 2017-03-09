@@ -1,9 +1,11 @@
 component DataTable
 
 initial props = {
-	bbb: '======'
+	
 }
 
 function handleClick() {
 	$bbb = 'HELLO';
+	$ccc = ['first', 'second', 'third'];
+	$ddd = 3;
 }

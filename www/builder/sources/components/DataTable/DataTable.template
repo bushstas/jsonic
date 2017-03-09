@@ -7,6 +7,10 @@
 			<div>{$bbb}</div>
 			<Reason>
 				<div>{$bbb}</div>
+				{switch $ddd}
+					{case 3}
+						ITS 2
+				{/switch}
 			</Reason>
 		</Reason>
 	</::hello>

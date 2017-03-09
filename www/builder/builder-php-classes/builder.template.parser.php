@@ -695,7 +695,6 @@ class TemplateParser
 		}
 		if ((is_array($usedClasses) && in_array($tagName, $usedClasses)) || $tagName == 'Component' || $tagName == 'Control') {
 			array_pop(self::$componentsOpen);
-			Printer::log(self::$componentsOpen);
 		}
 		return $child;
 	}
@@ -926,6 +925,9 @@ class TemplateParser
 		if (!empty($data['reactNames'])) {
 			$child['n'] = self::getProperChildren($data['reactNames']);
 		}
+		if (!empty(self::$componentsOpen)) {
+			$child['$'] = '<nq>$<nq>';
+		}
 		if ($data['reactiveItems']) {
 			self::wrapInFunction($child['p']);
 		}
@@ -963,8 +965,11 @@ class TemplateParser
 		if (!empty($data['reactNames'])) {
 			$child['n'] = self::getProperChildren($data['reactNames']);
 			$child['sw'] = '<nq>function(){return'.$switch.'}<nq>';			
+			if (!empty(self::$componentsOpen)) {
+				$child['$'] = '<nq>$<nq>';
+			}
 		} else {
-			$child['sw'] = '<nq>'.$switch.'</nq>';
+			$child['sw'] = '<nq>'.$switch.'<nq>';
 		}
 		unset($child['d']);
 		unset($child['c']);
@@ -1074,7 +1079,7 @@ class TemplateParser
 		if (!empty($names)) {
 			$child['n'] = $names;
 			if (empty($child['c'])) {
-				$child['c'] = "<nq>function(){return''}</nq>";			 
+				$child['c'] = "<nq>function(){return''}<nq>";			 
 			} else {
 				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
 			}

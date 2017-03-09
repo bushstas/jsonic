@@ -1,1 +1,5 @@
-3432432 + {$children}
+<div class="@">
+	<div>++++++++++++++++</div>
+	<div>{$children}</div>
+	<div>++++++++++++++++</div>
+</div>
