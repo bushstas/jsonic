@@ -259,6 +259,9 @@
 		this.updaters = this.updaters || {};
 		var keys = u.getKeys();
 		for (var i = 0; i < keys.length; i++) {
+			if (keys[i] == 'ddd') {
+				console.log(this)
+			}
 			this.updaters[keys[i]] = this.updaters[keys[i]] || [];
 			l.push(keys[i], u);
 			this.updaters[keys[i]].push(u);

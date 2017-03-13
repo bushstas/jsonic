@@ -788,7 +788,7 @@ class TemplateParser
 				if ($shouldBeCase && preg_replace('/\s/', '', $items[0]) != '') {
 					new Error(self::$errors[$errorType], array(self::$templateName, self::$className, $items[0]));
 				}
-
+				$allReactNames = array();
 				for ($i = 0; $i < count($items); $i++) {
 					$part = $items[$i];
 					if (!empty($part)) {
@@ -831,7 +831,10 @@ class TemplateParser
 
 						if ($isCase) {
 							$case = array();
-							self::parseTextNode($code, $case, $let, $caseType);
+							$names = array();
+							self::parseTextNode($code, $case, $let, $caseType, $names);
+							$allReactNames = array_merge($allReactNames, $names);
+
 							$case = $case[0];
 							$shouldBeCase = false;
 						} elseif (!$isDefault) {
@@ -865,7 +868,9 @@ class TemplateParser
 
 		$child['is'] = array();
 		$child['c'] = array();
-		$child['isn'] = array();
+		if (!empty($allReactNames)) {
+			$child['n'] = array_values(array_unique($allReactNames));
+		}
 		foreach ($switch as $case) {
 			if (isset($case['default'])) {
 				if (!empty($case['children'])) {
@@ -1542,8 +1547,8 @@ class TemplateParser
 		return self::processCode($value, 'componentClass');
 	}
 
-	private static function parseTextNode($content, &$children, &$let, $place = 'textNode') {		
-		if (!empty($content)) {			
+	private static function parseTextNode($content, &$children, &$let, $place = 'textNode', &$names = null) {		
+		if (!empty($content)) {
 			$regexp = '/\{([^\}]+)\}/';
 			preg_match_all($regexp, $content, $matches);
 			$codes = $matches[1];
@@ -1582,6 +1587,9 @@ class TemplateParser
 						if (!empty(self::$componentsOpen)) {
 							$child['$'] = '<nq>$<nq>';
 						}
+						if ($place == 'ifcase') {
+							unset($child['n']);
+						}
 						$code = '<nq>'.json_encode($child).'<nq>';
 					} else {
 						$code = '<nq>'.$data['code'].'<nq>';
@@ -1589,9 +1597,7 @@ class TemplateParser
 					$isLet = false;
 				}			
 				if (!empty($data['reactNames'])) {
-					// if (!is_array(self::$class)) {
-					// 	new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $content));
-					// }
+					$names = $data['reactNames'];
 				}			
 			}
 			

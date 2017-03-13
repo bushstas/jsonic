@@ -10,7 +10,7 @@
 			{if}
 				{case $ddd == 2}
 					ITS 2
-				{case $ddd == 3}
+				{case ~ddd == 3}
 					ITS 3
 			{/if}			
 		</Reason>
