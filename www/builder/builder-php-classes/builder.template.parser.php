@@ -865,6 +865,7 @@ class TemplateParser
 
 		$child['is'] = array();
 		$child['c'] = array();
+		$child['isn'] = array();
 		foreach ($switch as $case) {
 			if (isset($case['default'])) {
 				if (!empty($case['children'])) {
@@ -956,7 +957,6 @@ class TemplateParser
 		$data = TemplateCodeParser::parse($code, 'switch', self::$parsedItem);
 		
 		self::parseCases($childrenList, $child);
-		
 		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);
 		if (!empty($child['d'])) {
 			$switch .= ','.self::getProperChildren($child['d'], true);

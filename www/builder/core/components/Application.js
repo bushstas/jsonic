@@ -39,12 +39,27 @@
 			route['view'] = {{GLOBAL}}.get(route['view']);
 			renderView.call(this, route);
 		};
-		var renderView = function(route) {
-			var isSameView = this.currentView == route['name'];
-			if (!isSameView && this.currentView && this.views[this.currentView]) {
-				activateView.call(this, this.views[this.currentView], false);
+		var activateView = function(view, isSameView) {
+			if (!view) return;
+			var parentElement = {{GLOBAL}}.get('Core').getParentElement.call(view);
+			var params = getViewParams.call(this, this.currentRoute);
+			if (isObject(params)) {
+				view.set(params);
 			}
-			this.currentView = route['name'];
+			if (!isSameView) {
+				this.viewContainer.appendChild(parentElement);
+			}
+			view.activate(true);
+		};
+		var disactivateView = function() {
+			var view = this.views[this.currentView];
+			if (view) {
+				var parentElement = {{GLOBAL}}.get('Core').getParentElement.call(view);			
+				this.viewContainer.removeChild(parentElement);
+				view.activate(false);
+			}
+		};
+		var renderView = function(route) {
 			loadControllers(route);
 			if (!isUndefined(dictionary)) {
 				dictionary.load(route['name']);
@@ -62,9 +77,13 @@
 			}
 		};
 		var handleNavigation = function(route, changeTitle) {
+			if (this.currentRoute && route['name'] != this.currentRoute) {
+				disactivateView.call(this);
+			}
 			this.isChangeTitle = changeTitle;
 			this.currentRoute = route;
 			var isSameView = this.currentView == route['name'];
+			this.currentView = route['name'];
 			var view = this.views[route['name']];
 			if (!view) {
 				view = {{GLOBAL}}.get(route['view']);
@@ -75,7 +94,7 @@
 					renderView.call(this, route);
 				}
 			} else {
-				activateView.call(this, view, true, isSameView);
+				activateView.call(this, view, isSameView);
 			}
 		};
 		var	defineViews = function() {
@@ -104,22 +123,6 @@
 				this.element.appendChild(viewContainer);
 			}
 			this.viewContainer = viewContainer;
-		};
-		var activateView = function(view, isActivated, isSameView) {
-			if (!view) return;
-			var parentElement = {{GLOBAL}}.get('Core').getParentElement.call(view);
-			if (!isActivated) {
-				this.viewContainer.removeChild(parentElement);
-			} else {
-				var params = getViewParams.call(this, this.currentRoute);
-				if (isObject(params)) {
-					view.set(params);
-				}
-				if (!isSameView) {
-					this.viewContainer.appendChild(parentElement);
-				}
-			}
-			view.activate(isActivated);
 		};
 		var onViewReady = function() {
 			if (this.isChangeTitle) {

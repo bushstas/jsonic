@@ -2,35 +2,14 @@ component Form
 
 function onSubmit() {
 	if (this.isValid()) {
-		var form = this.getElement();
-		var ajax = form.getData('ajax');
-		if (ajax) {
-			this.sendAjaxRequest();
-		} else {
-			this.setFormKey();
-			form.submit();
-		}
+		this.send();
 	}
 };
 
-function sendAjaxRequest() {
-	var form = this.getElement();
-	var action = form.attr('action');
-	var method = form.attr('method');
+function send() {
+	get action, method;
 	if (action) {
-		Loader.doAction(method, action, this.getControlsData(), this.handleResponse, this);
-	}
-};
-
-function setFormKey() {
-	this.formKey = generateRandomKey();
-	window[this.formKey] = this;
-	if (!isElement(this.keyInput)) {
-		this.keyInput = document.createElement('input');
-		this.keyInput.setAttribute('name', 'formKey');
-		this.keyInput.setAttribute('type', 'hidden');
-		this.keyInput.value = this.formKey;
-		this.getElement().appendChild(this.keyInput);
+		Loader.doAction(method || 'POST', action, this.getControlsData(), this.handleResponse, this);
 	}
 };
 
@@ -46,14 +25,10 @@ function handleResponse(data) {
 			log('incorrect form response', 'handleResponse', this, {'data': data});
 		}
 	}
-	if (isObject(data) && data['success']) {
+	if (isObject(data) && !data['error']) {
 		this.onSuccess(data);
 	} else {
 		this.onFailure(data);
-	}
-	if (isString(this.formKey)) {
-		this.formKey = null;
-		delete window[this.formKey];
 	}
 };
 

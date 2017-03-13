@@ -302,12 +302,15 @@ class Config
 	}
 
 	private function createLoadAppApi() {
-		$content = "<?php die('{";
+		$content = "<?php \n\n";
 		$path = (stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].'/'.$this->config['pathToApi'].'/';
 		$params = array();
 		if ($this->isUser) {
-			$user = $this->config['user'];
-			$params[] = '"user":\'.file_get_contents(\''.$path.$user['login'].'\').\'';
+			$user = $this->config['user'];			
+		
+			$content .= '$opts = array(\'http\' => array(\'header\'=> \'Cookie: \' . $_SERVER[\'HTTP_COOKIE\']."\r\n"));'."\n".'$context = stream_context_create($opts);'."\n".'$user = file_get_contents(\''.$path.$user['login'].'\', false, $context);'."\n\ndie('{";
+
+			$params[] = '"user": \'.$user.\'';
 		}
 		if (!empty($this->pathToDictionary)) {
 			$params[] = '"dictionary":\'.file_get_contents(\''.$path.$this->config['pathToDictionary'].'?page=\'.$_GET[\'page\']).\'';	
