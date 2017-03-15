@@ -1,6 +1,6 @@
 {template .main}
-<div class="@outer-container" onCLick="handleClick">
-	<DataTableTabPanel/>
+<div class="@outer-container" onCLick="handleClick" if="{~a==2}">
+	<DataTableTabPanel onChange="handleChange"/>
 	{$:aaa}
 	<::hello>
 		<Reason>

@@ -11,3 +11,7 @@ function handleClick() {
 	$ccc = ['first', 'second', 'third'];
 	$ddd = 3;
 }
+
+function handleChange() {
+	
+}

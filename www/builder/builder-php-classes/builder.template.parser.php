@@ -305,12 +305,9 @@ class TemplateParser
 				if (!empty($ech)) {
 					self::parseChildren($ech, $child['else']);
 				}
-				
-				list($propNames, $propValues) = self::getTagAttrs($child['content']);
-				$child['attributes'] = array();
-				foreach ($propNames as $j => $value) {
-					$child['attributes'][$value] = $propValues[$j];
-				}
+				$isComponent = in_array($child['tagName'], $usedClasses) || $child['tagName'] == 'Component' || $child['tagName'] == 'Control';
+				$attributes = self::parseTagAttrsibutes($child, $isComponent);
+				$child['attributes'] = $attributes;
 				
 				$chld = array();
 				if ($child['content'][0] == '{') {
@@ -326,7 +323,7 @@ class TemplateParser
 				} else {
 					if ($child['tagName'][0] == ':') {
 						$chld[$child['tagName'][1] == ':' ? 'include' : 'template'] = trim($child['tagName'], ':');
-					} elseif (in_array($child['tagName'], $usedClasses) || $child['tagName'] == 'Component' || $child['tagName'] == 'Control') {
+					} elseif ($isComponent) {
 						$chld['component'] = $child['tagName'];
 					} else {
 						$chld['element'] = $child['tagName'];
@@ -343,6 +340,9 @@ class TemplateParser
 				}
 				if (!empty($lets)) {
 					$chld['lets'] = $lets;	
+				}
+				if (!empty($child['e'])) {
+					$chld['events'] = $child['e'];	
 				}
 				
 				$children[] = $chld;
@@ -405,9 +405,14 @@ class TemplateParser
 		$isLet = 0;
 		self::checkHtmlTagStructure($list);
 		
-		$ch = array();
-		self::parseChildren($list, $ch);		
-		Printer::log($ch);
+		$children = array();
+		self::parseChildren($list, $children);		
+		$finishedChildren = array();
+		self::finish($children, $finishedChildren);
+		Printer::log($finishedChildren);
+		
+
+
 		$children = self::getHtmlChildren($list, $isLet, false);
 
 		$let = '';
@@ -440,6 +445,36 @@ class TemplateParser
 			}
 		}
 		return array('name' => self::$templateName, 'children' => $children, 'let' => $let);
+	}
+
+	private static function finish($children, &$finishedChildren) {
+		foreach ($children as $child) {
+			if (is_string($child)) {
+				$finishedChildren[] = $child;
+			} else {
+				$ch = array();
+				
+				if (!empty($child['element'])) {
+					$idx = array_search($child['element'], self::$tagShortcuts);
+					$ch['t'] = 	$idx !== false ? $idx : 'span';
+				} elseif (!empty($child['component'])) {
+					$ch['cmp'] = $child['component'];
+				}
+				if (!empty($child['events'])) {
+					$ch['e'] = $child['events'];
+				}
+				if (!empty($child['attributes'])) {
+					if (!empty($child['attributes']['if'])) {
+						Printer::log($child['attributes']);
+					}
+				}
+				if (!empty($child['children'])) {
+					$ch['c'] = array();
+					self::finish($child['children'], $ch['c']);
+				}
+				$finishedChildren[] = $ch;
+			}
+		}
 	}
 
 	private static function invalidTagName($tagName) {
@@ -1222,6 +1257,36 @@ class TemplateParser
 		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
 	}
 
+	private static function parseTagAttrsibutes(&$child, $isComponent) {
+		$html = $child['content'];
+		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
+		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
+		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
+		$regexp = "/ ([a-z][\w\-]*)=\"([^\"]+)\"/";
+		preg_match_all($regexp, $html, $matches1);
+		$regexp2 = "/ ([a-z][\w\-]*)='([^']+)'/";
+		preg_match_all($regexp2, $html, $matches2);
+		
+		if ($html[0] == '<') {
+			$tagContent = preg_replace($regexp, '', $html);
+			$tagContent = preg_replace($regexp, '', $tagContent);
+			if (preg_match('/\{[^\}]+\}/', $tagContent)) {
+				new Error(self::$errors['codeOutsideAttribute'], array(self::$templateName, self::$className, $html));
+			}
+		}
+		$names = array_merge($matches1[1], $matches2[1]);
+		$values = array_merge($matches1[2], $matches2[2]);
+		$attrs = array();
+		foreach ($names as $i => $name) {
+			if (preg_match("/^on([A-Z]\w+)$/i", $name, $match)) {
+				self::parseEventAttribute($match[1], $values[$i], $child, $html, $isComponent);
+				continue;
+			}
+			$attrs[$name] = $values[$i];
+		}
+		return $attrs;
+	}
+
 	private static function getTagAttrs($html) {
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
@@ -1366,7 +1431,7 @@ class TemplateParser
 					}
 				}
 				if (preg_match("/^on([A-Z]\w+)$/i", $propName, $match)) {
-					self::parseEventAttribute($match[1], $propValue, $child, $item, $isComponentTag);
+					self::parseEventAttribute($match[1], $propValue, $child, $item['content'], $isComponentTag);
 					continue;
 				}
 			}
@@ -1468,23 +1533,23 @@ class TemplateParser
 		}
 	}
 
-	private static function parseEventAttribute($match, $propValue, &$child, $item, $isComponentTag) {
+	private static function parseEventAttribute($match, $propValue, &$child, $itemContent, $isComponentTag) {
 		$origValue = $propValue;
 		$isDispatching = $propValue[0] == '!';
 		$isSpecial     = $propValue[0] == ':';
 		if ($isDispatching) {
 			$propValue = preg_replace('/^\!/', '', $propValue);
 			if ($propValue[0] == ':') {
-				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 			}
 		}
 		if ($isSpecial) {
 			$propValue = preg_replace('/^:/', '', $propValue);
 			if ($propValue[0] == '!') {
-				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 			}
 			if ($isComponentTag) {
-				new Error(self::$errors['specEventAttrInComp'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+				new Error(self::$errors['specEventAttrInComp'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 			}
 		}
 		$parts = explode('(', $propValue);
@@ -1496,22 +1561,22 @@ class TemplateParser
 		$eventArgs = '';
 		if (isset($parts[1])) {
 			if ($isSpecial) {
-				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 			}
 			$parts[0] = '';
 			$eventArgs = implode('(', $parts);
 			if ($eventArgs[strlen($eventArgs) - 1] != ')') {
-				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 			}
 			preg_match_all('/\{/', $eventArgs, $matches1);
 			preg_match_all('/\}/', $eventArgs, $matches2);
 			if (count($matches1[0]) != count($matches2[0])) {
-				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));		
+				new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));		
 			}
 			$spacelessArgs = preg_replace('/\s/', '', $eventArgs);
 			if (!empty($matches1[0])) {
 				if (preg_match('/[^\(,]\{/', $spacelessArgs) || preg_match('/\}[^,\)]/', $spacelessArgs)) {
-					new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));		
+					new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));		
 				}
 			}
 			$data = TemplateCodeParser::parse('.'.$propValue.preg_replace('/[\{\}]/', '', $eventArgs), 'eventAttribute', null, self::$usedLocalVariables);
@@ -1522,21 +1587,21 @@ class TemplateParser
 			if ($isSpecial) {
 				$specs = array('stop', 'prevent');
 				if (!in_array($propValue, $specs)) {
-					new Error(self::$errors['unknownSpecEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, implode(', ', $specs), $item['content']));
+					new Error(self::$errors['unknownSpecEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, implode(', ', $specs), $itemContent));
 				}
 			}
 		}
 		if (empty($propValue)) {
-			new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 		}
 		if (in_array($propValue, array('this', 'true', 'false', 'null', 'undefined'))) {
-			new Error(self::$errors['keywordInEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			new Error(self::$errors['keywordInEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 		}
 		if (is_numeric($propValue)) {
-			new Error(self::$errors['numericEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			new Error(self::$errors['numericEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 		}
 		if (!preg_match('/^[:\!]*[_a-z]\w+$/i', $propValue)) {
-			new Error(self::$errors['incorrectEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $item['content']));
+			new Error(self::$errors['incorrectEventAttr'], array($propValue, 'on'.$match, self::$templateName, self::$className, $itemContent));
 		}
 		$once      = false;
 		$eventType = strtolower($match);
@@ -1558,7 +1623,7 @@ class TemplateParser
 		if ($eventTypeIndex > -1) {
 			$eventType = $eventTypeIndex;
 		} elseif (!$isComponentTag) {
-			new Error(self::$errors['unknownEventAttr'], array('on'.$match, self::$templateName, self::$className, $item['content']));
+			new Error(self::$errors['unknownEventAttr'], array('on'.$match, self::$templateName, self::$className, $itemContent));
 		}
  		$child['e'][] = $eventType;
 		if ($isDispatching) {
