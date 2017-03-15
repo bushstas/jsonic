@@ -15,6 +15,8 @@ class TemplateCodeParser
 				   $thereWasWord, $place, $parsedCode, $element, $context, $nextPart,
 				   $isForeach, $foreach, $foreachKeyword;
 
+	private static $usedLocalVariables;
+
 	private static $signs = array(
 		'a' => 'определение переменной или функции',
 		'b' => 'false, true, null или undefined',
@@ -154,7 +156,8 @@ class TemplateCodeParser
 		self::$expectedKeywords = array();
 	}
 
-	public static function parse($code, $place, $element = null) {
+	public static function parse($code, $place, $element = null, &$usedLocalVariables) {
+		self::$usedLocalVariables = &$usedLocalVariables;
 		self::initiate($code, $place, $element);
 		$parts = preg_split('/\b/', $code);		
 
@@ -997,6 +1000,10 @@ class TemplateCodeParser
 		self::$notLetValue = !self::$open['letvarname'];
 		self::$foreach = self::isForeachContext();
 
+		if (self::isOpen('letvarname')) {
+			self::$usedLocalVariables[] = $part;
+		}
+
 		if (self::$isNum) {
 			if (self::$decOpen) {
 				self::off('decimal');
@@ -1049,6 +1056,8 @@ class TemplateCodeParser
 		}			
 		if ((self::$open['foreachAs'] || self::$open['foreachAs2']) && !self::$isNum) {
 			self::on('foreachAsVar');
+			//self::$usedLocalVariables[] = $part;
+			//Printer::log('Найдено определение перменной '.$part.' в классе '.self::$className.' //// '.$code);
 			return false;
 		}		
 		if (self::isOpen('placeholder') && !self::isOpen('placeholderShouldHaveDefaultValue')) {
@@ -1059,6 +1068,10 @@ class TemplateCodeParser
 			self::$data['callbacks'][] = $part;
 			self::$expected = array('(');
 			return false;
+		}
+		if (self::$prevSign == '&' && !in_array($part, self::$usedLocalVariables)) {
+			//Printer::log('Опеределение перменной '.$part.' не найдено в классе '.self::$className.' //// '.$code);
+			//die('Опеределение перменной '.$part.' не найдено');
 		}
 		return true;
 	}

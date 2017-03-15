@@ -10,9 +10,7 @@
 		var conditions = this.conditions, c;
 		for (var i = 0; i < conditions.length; i++) {
 			c = conditions[i];
-			if (isObject(c) && isFunction(c['v'])) {
-				c = c['v']();
-			}
+			if (isFunction(c)) c = c();
 			if (!!c) {
 				if (i === this.current) return;
 				for (var j = 0; j < children[i].length; j++) this.createLevel(children[i][j], isUpdating);
