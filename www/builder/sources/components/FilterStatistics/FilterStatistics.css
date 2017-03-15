@@ -5,9 +5,9 @@ $imgsrc = filterstat
 }
 .@refresh {
 	$(abs r20 t pointer norep lh40 bold png=refresh bp0_50% pl20)
-}
-.@refresh:hover {
-	$c#5c6ea0
+	&:hover {
+		$c#5c6ea0	
+	}
 }
 .@row {
 	$(nowrap p12_0 bob#E0E6F3)
