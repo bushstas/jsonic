@@ -70,7 +70,5 @@
 		"adminAccess": 100
 	},
 
-	"pathToDictionary": "dictionary/get.php",
-	"tooltipClass": "TooltipPopup",
-	"tooltipApi": "tooltip/get.php"
+	"pathToDictionary": "dictionary/get.php"
 }

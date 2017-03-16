@@ -7,7 +7,6 @@ class TemplateParser
 	private static $regexp = "/\{ *template +\.(\w+) *\}/";
 	private static $space = '_u00A0_';
 	private static $textNodes = array();
-	private static $usedLocalVariables;
 	
 	private static $simpleTags = array(
 		'br', 'input', 'img', 'hr'
@@ -252,6 +251,7 @@ class TemplateParser
 				if ($item['content'][0] == '{') {
 					if (preg_match('/^\{\s*let\s/', $item['content'])) {
 						$lets[] = trim(preg_replace('/^\s*{\s*let */', '', $item['content']), '}');		
+						continue;
 					}
 				}
 				$children[] = $item['content'];
@@ -346,6 +346,72 @@ class TemplateParser
 				}
 				
 				$children[] = $chld;
+			}
+		}
+	}
+
+
+	private static function finish($children, &$finishedChildren) {
+		if (!is_array($children)) {
+			$finishedChildren = $children;
+			return; 
+		}
+		foreach ($children as $child) {
+			if (is_string($child)) {
+				if (self::hasCode($child)) {
+					$let = 0;
+					self::parseTextNode($child, $finishedChildren, $let);
+				} else {
+					$finishedChildren[] = $child;
+				}
+			} else {
+				$ch = array();
+				$isElement = false;
+				$isComponent = false;
+				$isTemplate = false;
+				if (!empty($child['element'])) {
+					$isElement = true;
+					$idx = array_search($child['element'], self::$tagShortcuts);
+					$ch['t'] = 	$idx !== false ? $idx : 'span';
+				} elseif (!empty($child['component'])) {
+					$isComponent = true;
+					$ch['cmp'] = $child['component'];
+				} elseif (!empty($child['template'])) {
+					$isTemplate = true;
+					$ch['tmp'] =  '<nq><this>getTemplate'.ucfirst($child['template']).'<nq>';
+				}
+				if (!empty($child['events'])) {
+					$ch['e'] = $child['events'];
+				}
+				if (!empty($child['attributes'])) {
+					$parsedPlace = $isComponent ? 'componentAttribute' : 'elementAttribute';
+					$names = array();
+					foreach ($child['attributes'] as $attrName => $attrValue) {
+						if (in_array($attrName, array('if', 'else'))) continue;
+						if ($attrValue[0] == '{') {
+							$isObfClName = self::$obfuscate === true && $attrName == 'class';
+							$names[$attrName] = array();
+							$code = self::processCode($attrValue, $parsedPlace, $names[$attrName], $isObfClName);
+						}
+					}
+					if (!empty($child['attributes']['if'])) {
+						$ch['c'] = array();
+						self::finish($child['children'], $ch['c']);
+
+						self::addIfConditionToChild($child['attributes']['if'], $child['attributes']['else'], $ch);
+						unset($child['children']);
+					}
+
+				}
+				if (!empty($child['children'])) {
+					if (is_array($child['children'])) {
+						$ch['c'] = array();
+						self::finish($child['children'], $ch['c']);
+					} else {
+						$ch['c'] = $child['children'];
+					}
+				}
+				$finishedChildren[] = $ch;
 			}
 		}
 	}
@@ -445,36 +511,6 @@ class TemplateParser
 			}
 		}
 		return array('name' => self::$templateName, 'children' => $children, 'let' => $let);
-	}
-
-	private static function finish($children, &$finishedChildren) {
-		foreach ($children as $child) {
-			if (is_string($child)) {
-				$finishedChildren[] = $child;
-			} else {
-				$ch = array();
-				
-				if (!empty($child['element'])) {
-					$idx = array_search($child['element'], self::$tagShortcuts);
-					$ch['t'] = 	$idx !== false ? $idx : 'span';
-				} elseif (!empty($child['component'])) {
-					$ch['cmp'] = $child['component'];
-				}
-				if (!empty($child['events'])) {
-					$ch['e'] = $child['events'];
-				}
-				if (!empty($child['attributes'])) {
-					if (!empty($child['attributes']['if'])) {
-						Printer::log($child['attributes']);
-					}
-				}
-				if (!empty($child['children'])) {
-					$ch['c'] = array();
-					self::finish($child['children'], $ch['c']);
-				}
-				$finishedChildren[] = $ch;
-			}
-		}
 	}
 
 	private static function invalidTagName($tagName) {
@@ -672,7 +708,6 @@ class TemplateParser
 		if (empty($list)) {
 			return array();
 		}
-		self::$usedLocalVariables = array();
 		$children = array();
 		$elseChildren = array();
 		$ifEmptyChildren = array();
@@ -1074,7 +1109,7 @@ class TemplateParser
 		$child['h'] = $child['c'];
 		unset($child['c']);
 		$content = ltrim(rtrim($item['content'], '}'), '{');
-		$data = TemplateCodeParser::parse($content, 'foreach', null, self::$usedLocalVariables);
+		$data = TemplateCodeParser::parse($content, 'foreach', null);
 		$child['p'] = $data['items'];
 		if (!empty($data['reactNames'])) {
 			$child['n'] = self::getProperChildren($data['reactNames']);
@@ -1107,7 +1142,7 @@ class TemplateParser
 
 	private static function parseSwitch($item, $childrenList, &$child) {
 		$code = rtrim(ltrim($item['content'], '{'), '}');
-		$data = TemplateCodeParser::parse($code, 'switch', self::$parsedItem, self::$usedLocalVariables);
+		$data = TemplateCodeParser::parse($code, 'switch', self::$parsedItem);
 		
 		self::parseCases($childrenList, $child);
 		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);
@@ -1214,7 +1249,11 @@ class TemplateParser
 		}
 		$child = array('c' => array($child));
 		if (!empty($else)) {
-			$child['e'] = self::processCode($else, 'else');
+			if ($else[0] == '{') {
+				$child['e'] = self::processCode($else, 'else');
+			} else {
+				$child['e'] = $else;
+			}
 		}
 		self::parseIf($ifCondition, $child);
 	}
@@ -1334,7 +1373,7 @@ class TemplateParser
 			}
 			if (isset($attrData['delimiters'][$idx])) {
 				$code = rtrim(ltrim($attrData['delimiters'][$idx], '{'), '}');
-				$data = TemplateCodeParser::parse($code, $parsedPlace, self::$parsedItem, self::$usedLocalVariables);
+				$data = TemplateCodeParser::parse($code, $parsedPlace, self::$parsedItem);
 				
 				$code = $data['code'];
 				if ($data['inFunc']) {
@@ -1579,7 +1618,7 @@ class TemplateParser
 					new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));		
 				}
 			}
-			$data = TemplateCodeParser::parse('.'.$propValue.preg_replace('/[\{\}]/', '', $eventArgs), 'eventAttribute', null, self::$usedLocalVariables);
+			$data = TemplateCodeParser::parse('.'.$propValue.preg_replace('/[\{\}]/', '', $eventArgs), 'eventAttribute', null);
 			$parts = explode('(', rtrim(trim($data['code']), ')'));
 			$parts[0] = '';
 			$eventArgs = trim(implode('(', $parts), '(');
@@ -1742,7 +1781,7 @@ class TemplateParser
 			$isLet = false;
 			$lets = array();
 			foreach ($codes as &$code) {
-				$data = TemplateCodeParser::parse($code, $place, null, self::$usedLocalVariables);
+				$data = TemplateCodeParser::parse($code, $place, null);
 				if ($data['isLet']) {
 					if (!$isLet) {
 						$let++;

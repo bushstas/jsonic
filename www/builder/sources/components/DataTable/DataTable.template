@@ -1,5 +1,7 @@
 {template .main}
-<div class="@outer-container" onCLick="handleClick" if="{~a==2}">
+<div class="@outer-container" onCLick="handleClick" if="{$a==2}" else="1111">
+	{let &a = 2}
+
 	<DataTableTabPanel onChange="handleChange"/>
 	{$:aaa}
 	<::hello>
@@ -7,16 +9,6 @@
 			<div>
 				{$bbb}
 			</div>			
-			{let &ddd=3}
-			{if}
-				{case $ddd == 2}
-					ITS 2
-				{/case}
-				
-				{case &ddd == 3}
-					ITS 3
-				{/case}				
-			{/if}
 		</Reason>
 	</::hello>
 </div>
