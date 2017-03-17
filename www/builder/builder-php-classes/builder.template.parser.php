@@ -369,16 +369,32 @@ class TemplateParser
 				$isElement = false;
 				$isComponent = false;
 				$isTemplate = false;
-				if (!empty($child['element'])) {
+				
+				if (!empty($child['element']))
+				{
 					$isElement = true;
 					$idx = array_search($child['element'], self::$tagShortcuts);
 					$ch['t'] = 	$idx !== false ? $idx : 'span';
-				} elseif (!empty($child['component'])) {
+				}
+				elseif (!empty($child['component']))
+				{
 					$isComponent = true;
 					$ch['cmp'] = $child['component'];
-				} elseif (!empty($child['template'])) {
+				}
+				elseif (!empty($child['template']))
+				{
 					$isTemplate = true;
 					$ch['tmp'] =  '<nq><this>getTemplate'.ucfirst($child['template']).'<nq>';
+				}
+				elseif (!empty($child['if']))
+				{
+					$ch['c'] = array();
+					$else = array();
+					self::finish($child['children'], $ch['c']);
+					self::finish($child['else'], $else);
+					self::parseIf($child['if'], $ch, $else);
+					$finishedChildren[] = $ch;
+					continue;
 				}
 				if (!empty($child['events'])) {
 					$ch['e'] = $child['events'];
@@ -1248,17 +1264,13 @@ class TemplateParser
 			new Error(self::$errors['incorrectIf'], array(self::$templateName, self::$className, $ifCondition));
 		}
 		$child = array('c' => array($child));
-		if (!empty($else)) {
-			if ($else[0] == '{') {
-				$child['e'] = self::processCode($else, 'else');
-			} else {
-				$child['e'] = $else;
-			}
+		if (!empty($else) && $else[0] == '{') {
+			$else = self::processCode($else, 'else');
 		}
-		self::parseIf($ifCondition, $child);
+		self::parseIf($ifCondition, $child, $else);
 	}
 
-	private static function parseIf($ifCondition, &$child) {
+	private static function parseIf($ifCondition, &$child, $else = '') {
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string(self::$class) && $hasCode) {
 			new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $ifCondition));
@@ -1267,27 +1279,36 @@ class TemplateParser
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
 		$ifCondition = self::processCode($ifCondition, 'if', $names);
 			
-		$child['i'] = $ifCondition;
 		if (!empty($names)) {
-			$child['n'] = $names;
-			if (empty($child['c'])) {
-				$child['c'] = "<nq>function(){return''}<nq>";			 
-			} else {
-				$child['c'] = '<nq>function(){return '.str_replace('\\', '', json_encode($child['c'])).'}<nq>';
+			if (is_array($child['c'])) {
+				$child['c'] = str_replace('\\', '', json_encode($child['c']));
 			}
+			if (is_array($else)) {
+				$else = str_replace('\\', '', json_encode($else));
+			}
+			if (empty($child['c'])) {
+				$child['i'] = "<nq>function(){return ".$ifCondition."?'':".(!empty($else) ? $else : "''")."}<nq>";			 
+			} else {
+				$child['i'] = '<nq>function(){return '.$ifCondition.'?'.$child['c'].':'.(!empty($else) ? $else : "''").'}<nq>';
+			}
+			$child['n'] = $names;
+			unset($child['c']);
 		} else {
 			$then = '""';
 			$else = '""';
+			if (!empty($child['e']) && empty($else)) {
+				$else = $child['e'];
+			}
 			if (!empty($child['c'])) {
 				$then = is_array($child['c']) ? (count($child['c']) > 1 || is_array($child['c'][0]) ? str_replace('\\', '', json_encode($child['c'])) : $child['c'][0]) :  $child['c'];
 			}
-			if (is_array($child['e'][0]) && isset($child['e'][0][0])) {
-				$child['e'] = $child['e'][0];
+			if (is_array($else) && is_array($else[0]) && isset($else[0][0])) {
+				$else = $else[0];
 			}
-			if (!empty($child['e'])) {
-				$else = is_array($child['e']) ? (count($child['e']) > 1 || is_array($child['e'][0]) ? str_replace('\\', '', json_encode($child['e'])) : $child['e'][0]) :  $child['e'];
+			if (!empty($else)) {
+				$else = is_array($else) ? (count($else) > 1 || is_array($else[0]) ? str_replace('\\', '', json_encode($else)) : $else[0]) :  $else;
 			}
-			$child = '<nq>'.str_replace('<nq>', '', $child['i']).'?'.$then.':'.$else.'<nq>';
+			$child = '<nq>'.str_replace('<nq>', '', $ifCondition).'?'.$then.':'.$else.'<nq>';
 		}
 	}
 
@@ -1402,9 +1423,9 @@ class TemplateParser
 		}
 		if (!$inFunc && is_array($names)) {
 			if (in_array($parsedPlace, array('if', 'else'))) {
-				$inFunc = count($names) > 0;	
+				//$inFunc = count($names) > 0;	
 			} else {
-				$inFunc = count($names) > 1;
+				//$inFunc = count($names) > 1;
 			}
 		}
 		$attrContent = implode('+', $attrParts);

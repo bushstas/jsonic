@@ -1658,7 +1658,7 @@ class TemplateCodeParser
 		} else {
 			$names = json_encode($names);
 		}
-		if (!preg_match('/^\$\.g\(\'\w+\'\)$/', $code)) {
+		if (!preg_match('/^\$\.g\(\'\w+\'\)$/', $code) && self::$place != 'if' && self::$place != 'else') {
 			self::$data['inFunc'] = true;
 		}
 		return $code;

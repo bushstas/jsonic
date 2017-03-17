@@ -1,4 +1,9 @@
 {template .main}
+{if $aaa == 5}
+	<span/>
+{else}
+	<div/>
+{/if}
 <div class="@outer-container" onCLick="handleClick" if="{$a==2}" else="1111">
 	{let &a = 2}
 
