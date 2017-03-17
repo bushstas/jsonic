@@ -531,7 +531,7 @@ class TemplateCodeParser
 		$ternary = self::$ternaries[count(self::$ternaries) - 1];
 		if (!empty($ternary) && $ternary[$env] == $cnt) {
 			array_pop(self::$ternaries);
-			self::$parsedCode .= ":''";
+			self::$parsedCode .= ":<emptystring>";
 		}
 	}
 
@@ -1588,11 +1588,12 @@ class TemplateCodeParser
 	private static function getParsedData($code) {
 		if (!empty(self::$open['ternary'])) {
 			if (self::$open['ternary'] > self::$open['ternary2']) {
-				$code .= ":''";
+				$code .= ":<emptystring>";
 			}
 			self::$data['ternary'] = true;
 		}
 		if (self::$open['placeholder']) {
+			self::$data['placeholder'] = true;
 			return self::getPlaceholderCode($code);		
 		} 
 		if (!empty(self::$data['react'])) {

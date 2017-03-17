@@ -204,8 +204,8 @@ class TemplateParser
 				$data = str_replace('"', "'", $data);		
 				$data = str_replace("\'", "'", $data);				
 				$data = str_replace('<this>', '$.', $data);
-				$data = preg_replace("/'<nq>/", '', $data);
-				$data = preg_replace("/<nq>'/", '', $data);
+				$data = preg_replace("/['\"]+<nq>/", '', $data);
+				$data = preg_replace("/<nq>['\"]+/", '', $data);
 				$data = preg_replace("/<nq>/", '', $data);
 
 				$data = str_replace('\\', '', $data);
@@ -217,6 +217,8 @@ class TemplateParser
 				$data = preg_replace("/,'<\/let>'/", "]}", $data);
 				$data = preg_replace("/<\/let>'/", "']}", $data);
 				$data = str_replace("<quote>", "'", $data);
+				$data = str_replace("<emptystring>", "''", $data);
+				$data = str_replace("<space>", "' '", $data);
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
@@ -241,21 +243,49 @@ class TemplateParser
 		return false;
 	}
 
-	private static function parseChildren($list, &$children) {
-		$isElse = false;
+	private static function parseLetOperator(&$content) {
 		$lets = array();
+		$data = Splitter::split('/\{\s*let([\s&][^\}]+)\}/', $content, 1);
+		$content = '';
+		foreach ($data['items'] as $i => $item) {
+			$content .= $item;
+		}
+		$names = array();
+		foreach ($data['delimiters'] as $i => $delmr) {
+			$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'textNode', $names));
+			$parts = explode(',', $delmr);
+			foreach ($parts as $part) {
+				$p = explode('=', $part);
+				$key = str_replace('&', '', trim($p[0]));
+				$lets[$key] = trim($p[1]);
+			}
+		}
+		return $lets;
+	}
+
+	private static function parseChildren($list, &$children, &$parentalChild, $ofElse = false) {
+		$isElse = false;
 		$usedClasses = ClassAnalyzer::getUsedClasses();
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
+			$lets = array();
 			if ($item['type'] == 'text') {
-				if ($item['content'][0] == '{') {
-					if (preg_match('/^\{\s*let\s/', $item['content'])) {
-						$lets[] = trim(preg_replace('/^\s*{\s*let */', '', $item['content']), '}');		
-						continue;
+				if (self::hasCode($item['content'])) {
+					if (preg_match('/\{\s*let\b/', $item['content'])) {
+						$lets = self::parseLetOperator($item['content']);
+						$letsKey = $ofElse ? 'elseLets' : 'lets';
+						if (!empty($lets)) {
+							if (!isset($parentalChild[$letsKey])) {
+								$parentalChild[$letsKey] = $lets;
+							} else {
+								$parentalChild[$letsKey] = array_merge($parentalChild[$letsKey], $lets);
+							}
+						}
 					}
 				}
-				$children[] = $item['content'];
-				continue;
+				if (!empty($item['content'])) {
+					$children[] = $item['content'];
+				}
 			} else {
 				$tag = $item['tagName'];
 				if ($tag == 'br') {
@@ -298,18 +328,25 @@ class TemplateParser
 						break;
 					}
 				}
+				$chld = array();
 				$isElse = false;
 				if (!empty($ch)) {
-					self::parseChildren($ch, $child['children']);
+					self::parseChildren($ch, $child['children'], $chld);
 				}
 				if (!empty($ech)) {
-					self::parseChildren($ech, $child['else']);
+					self::parseChildren($ech, $child['else'], $chld, true);
 				}
 				$isComponent = in_array($child['tagName'], $usedClasses) || $child['tagName'] == 'Component' || $child['tagName'] == 'Control';
-				$attributes = self::parseTagAttrsibutes($child, $isComponent);
+				$attributes = self::parseTagAttributes($child, $isComponent, $child['tagName']);
 				$child['attributes'] = $attributes;
+
+				if (!empty($child['reactProps'])) {
+					$chld['reactProps'] = $child['reactProps'];
+				}
+				if (!empty($child['componentProps'])) {
+					$chld['componentProps'] = $child['componentProps'];
+				}
 				
-				$chld = array();
 				if ($child['content'][0] == '{') {
 					if (preg_match('/\{\s*if\s*\}/', $child['content'])) {
 						$chld['ifswitch'] = 1;	
@@ -338,12 +375,10 @@ class TemplateParser
 				if (!empty($child['else'])) {
 					$chld['else'] = $child['else'];
 				}
-				if (!empty($lets)) {
-					$chld['lets'] = $lets;	
-				}
 				if (!empty($child['e'])) {
 					$chld['events'] = $child['e'];	
 				}
+				$chld['content'] = $child['content'];
 				
 				$children[] = $chld;
 			}
@@ -359,8 +394,7 @@ class TemplateParser
 		foreach ($children as $child) {
 			if (is_string($child)) {
 				if (self::hasCode($child)) {
-					$let = 0;
-					self::parseTextNode($child, $finishedChildren, $let);
+					self::parseTextNode($child, $finishedChildren);
 				} else {
 					$finishedChildren[] = $child;
 				}
@@ -386,13 +420,21 @@ class TemplateParser
 					$isTemplate = true;
 					$ch['tmp'] =  '<nq><this>getTemplate'.ucfirst($child['template']).'<nq>';
 				}
+				elseif (!empty($child['foreach']))
+				{
+					$ch['c'] = array();
+					self::finish($child['children'], $ch['c']);
+					self::parseForeach('foreach '.$child['foreach'], $ch);
+					$finishedChildren[] = $ch;
+					continue;
+				}
 				elseif (!empty($child['if']))
 				{
 					$ch['c'] = array();
 					$else = array();
 					self::finish($child['children'], $ch['c']);
 					self::finish($child['else'], $else);
-					self::parseIf($child['if'], $ch, $else);
+					self::parseIf($child['if'], $ch, $else, $child);
 					$finishedChildren[] = $ch;
 					continue;
 				}
@@ -400,24 +442,34 @@ class TemplateParser
 					$ch['e'] = $child['events'];
 				}
 				if (!empty($child['attributes'])) {
+					$ch['p'] = array();
 					$parsedPlace = $isComponent ? 'componentAttribute' : 'elementAttribute';
 					$names = array();
-					foreach ($child['attributes'] as $attrName => $attrValue) {
+					$attrs = $child['attributes'];
+					foreach ($attrs as $attrName => $attrValue) {
 						if (in_array($attrName, array('if', 'else'))) continue;
 						if ($attrValue[0] == '{') {
 							$isObfClName = self::$obfuscate === true && $attrName == 'class';
 							$names[$attrName] = array();
 							$code = self::processCode($attrValue, $parsedPlace, $names[$attrName], $isObfClName);
 						}
+						self::addProperTagAttribute($attrName, $attrValue, $ch['p'], $isElement);
 					}
-					if (!empty($child['attributes']['if'])) {
+					if (!empty($attrs['if'])) {
 						$ch['c'] = array();
 						self::finish($child['children'], $ch['c']);
 
-						self::addIfConditionToChild($child['attributes']['if'], $child['attributes']['else'], $ch);
+						self::addIfConditionToChild($attrs['if'], $attrs['else'], $ch);
 						unset($child['children']);
 					}
 
+				}
+				if (!empty($child['componentProps'])) {
+					$ch['w'] = $child['componentProps'];
+				}
+				if (!empty($child['reactProps'])) {
+					$ch['n'] = $child['reactProps'];
+					$ch['p'] = '<nq>function(){return'.self::getProperChildren($ch['p']).'}<nq>';
 				}
 				if (!empty($child['children'])) {
 					if (is_array($child['children'])) {
@@ -430,6 +482,25 @@ class TemplateParser
 				$finishedChildren[] = $ch;
 			}
 		}
+		if (count($finishedChildren) == 1) {
+			$finishedChildren = $finishedChildren[0];
+		}
+	}
+
+	private static function addProperTagAttribute($name, $value, &$attrs, $isElement) {
+		if (!$isElement && in_array($value, array('true', 'false', 'null', 'undefined'))) {
+			$value = '<nq>'.$value.'<nq>';
+		}		
+		if ($name == 'scope') {
+			$attrs[self::$propsShortcuts[$name]] = 1;
+			return;
+		}		
+		if ($isElement && isset(self::$propsShortcuts[$name])) {
+			$name = self::$propsShortcuts[$name];
+		} else {
+			$name = preg_replace('/^data-/', '_', $name);
+		}
+		$attrs[$name] = $value;
 	}
 
 	private static function getParsedTemplate($content) {
@@ -487,12 +558,13 @@ class TemplateParser
 		$isLet = 0;
 		self::checkHtmlTagStructure($list);
 		
-		$children = array();
-		self::parseChildren($list, $children);		
+		$children = array('c' => array());
+		self::parseChildren($list, $children['c'], $children);
+		//Printer::log($children);
 		$finishedChildren = array();
-		self::finish($children, $finishedChildren);
-		Printer::log($finishedChildren);
-		
+		self::finish($children['c'], $finishedChildren);
+		//Printer::log($finishedChildren);
+		return array('name' => self::$templateName, 'children' => $finishedChildren, 'let' =>  $children['lets']);
 
 
 		$children = self::getHtmlChildren($list, $isLet, false);
@@ -866,7 +938,7 @@ class TemplateParser
 					break;
 				
 					case 'foreach':
-						self::parseForeach($item, $child);
+						self::parseForeach($item['content'], $child);
 						//if (!empty())
 					break;
 
@@ -1112,7 +1184,7 @@ class TemplateParser
 		$children = '<nq>function('.$args.'){return '.self::getProperChildren($children).'}<nq>';
 	}
 
-	private static function parseForeach($item, &$child) {
+	private static function parseForeach($content, &$child) {
 		if (is_array($child['ie'])) {
 			$child['ie'] = self::getProperChild($child['ie']);
 			if (isset($child['ie']['c'])) {
@@ -1124,7 +1196,7 @@ class TemplateParser
 		}
 		$child['h'] = $child['c'];
 		unset($child['c']);
-		$content = ltrim(rtrim($item['content'], '}'), '{');
+		$content = ltrim(rtrim($content, '}'), '{');
 		$data = TemplateCodeParser::parse($content, 'foreach', null);
 		$child['p'] = $data['items'];
 		if (!empty($data['reactNames'])) {
@@ -1134,7 +1206,8 @@ class TemplateParser
 			$child['$'] = '<nq>$<nq>';
 		}
 		if ($data['reactiveItems']) {
-			self::wrapInFunction($child['p']);
+			$child['$'] = '$';
+			unset($child['p']);
 		}
 		$args = array($data['value']);
 		if (isset($data['key'])) {
@@ -1270,7 +1343,15 @@ class TemplateParser
 		self::parseIf($ifCondition, $child, $else);
 	}
 
-	private static function parseIf($ifCondition, &$child, $else = '') {
+	private static function getLetVars($lets) {
+		$list = array();
+		foreach ($lets as $key => $value) {
+			$list[] = $key.'='.$value;
+		}
+		return implode(',', $list);
+	}
+
+	private static function parseIf($ifCondition, &$child, $else = '', $source = null) {
 		$hasCode = preg_match('/\$\w/', $ifCondition);
 		if (is_string(self::$class) && $hasCode) {
 			new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $ifCondition));
@@ -1279,36 +1360,43 @@ class TemplateParser
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
 		$ifCondition = self::processCode($ifCondition, 'if', $names);
 			
-		if (!empty($names)) {
+		if (is_array($child['c'])) {
+			if (isset($child['c'][0]) && count($child['c']) == 1) {
+				$child['c'] = $child['c'][0];
+			}
 			if (is_array($child['c'])) {
 				$child['c'] = str_replace('\\', '', json_encode($child['c']));
+			}
+		}
+		if (is_array($else)) {
+			if (isset($else[0]) && count($else) == 1) {
+				$else = $else[0];
 			}
 			if (is_array($else)) {
 				$else = str_replace('\\', '', json_encode($else));
 			}
+		}
+		if (is_array($source)) {
+			if (!empty($source['lets'])) {
+				$child['c'] = '(function(){var '.self::getLetVars($source['lets']).';return '.$child['c'].'})()';
+			}
+			if (!empty($else) && !empty($source['elseLets'])) {
+				$else = '(function(){var '.self::getLetVars($source['elseLets']).';return '.$else.'})()';
+			}
+		}
+		if (empty($else)) {
+			$else = "<emptystring>";
+		}
+		if (!empty($names)) {
 			if (empty($child['c'])) {
-				$child['i'] = "<nq>function(){return ".$ifCondition."?'':".(!empty($else) ? $else : "''")."}<nq>";			 
+				$child['i'] = "<nq>function(){return ".$ifCondition."?'':".$else."}<nq>";			 
 			} else {
-				$child['i'] = '<nq>function(){return '.$ifCondition.'?'.$child['c'].':'.(!empty($else) ? $else : "''").'}<nq>';
+				$child['i'] = '<nq>function(){return '.$ifCondition.'?'.$child['c'].':'.$else.'}<nq>';
 			}
 			$child['n'] = $names;
 			unset($child['c']);
 		} else {
-			$then = '""';
-			$else = '""';
-			if (!empty($child['e']) && empty($else)) {
-				$else = $child['e'];
-			}
-			if (!empty($child['c'])) {
-				$then = is_array($child['c']) ? (count($child['c']) > 1 || is_array($child['c'][0]) ? str_replace('\\', '', json_encode($child['c'])) : $child['c'][0]) :  $child['c'];
-			}
-			if (is_array($else) && is_array($else[0]) && isset($else[0][0])) {
-				$else = $else[0];
-			}
-			if (!empty($else)) {
-				$else = is_array($else) ? (count($else) > 1 || is_array($else[0]) ? str_replace('\\', '', json_encode($else)) : $else[0]) :  $else;
-			}
-			$child = '<nq>'.str_replace('<nq>', '', $ifCondition).'?'.$then.':'.$else.'<nq>';
+			$child = '<nq>'.str_replace('<nq>', '', $ifCondition).'?'.$child['c'].':'.$else.'<nq>';
 		}
 	}
 
@@ -1317,7 +1405,7 @@ class TemplateParser
 		return $tagNameIndex !== false ? $tagNameIndex : $tagName;
 	}
 
-	private static function parseTagAttrsibutes(&$child, $isComponent) {
+	private static function parseTagAttributes(&$child, $isComponent, $cmpName = '') {
 		$html = $child['content'];
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
@@ -1337,12 +1425,92 @@ class TemplateParser
 		$names = array_merge($matches1[1], $matches2[1]);
 		$values = array_merge($matches1[2], $matches2[2]);
 		$attrs = array();
+		$reactNames = array();
+		$isDinamycComponent = $isComponent && ($child['tagName'] == 'Component' || $child['tagName'] == 'Control');
+		$cmpType = self::$classes[$child['tagName']]['type'];
 		foreach ($names as $i => $name) {
+			$value = $values[$i];
 			if (preg_match("/^on([A-Z]\w+)$/i", $name, $match)) {
-				self::parseEventAttribute($match[1], $values[$i], $child, $html, $isComponent);
+				self::parseEventAttribute($match[1], $value, $child, $html, $isComponent);
 				continue;
 			}
-			$attrs[$name] = $values[$i];
+
+			if ($isComponent) {
+				if (($cmpType == 'control' || $child['tagName'] == 'Control') && $name == 'name') {
+					$attrs['nm'] = self::parseComponentClassName($value, $child['content'], true);
+					continue;
+				}
+			}
+			
+			if ($name != 'if' && $name != 'else' && self::hasCode($value)) {
+				$reactProps = array();
+				$parsedPlace = $isComponent ? 'componentAttribute' : 'elementAttribute';
+				$code = self::processCode($value, $parsedPlace, $reactProps, $isObfClName);
+				$value = self::correctTagAttributeText($name, $code);
+				if ($isDinamycComponent && $name == 'class') {
+					$child['cmp'] = $value;
+					continue;
+				}				
+				if (!empty($reactProps)) {
+					$reactProps = array_unique($reactProps);
+					sort($reactProps);
+					if (count($reactProps) == 1) {
+						$reactProps = $reactProps[0];
+					}
+					$reactName = self::$propsShortcuts[$name];
+					if (empty($reactName)) {
+						$reactName = $name;
+					}
+					$reactNames[$reactName] = $reactProps;
+				}
+			} elseif (self::$obfuscate === true && $name == 'class') {
+				self::getObfuscatedClassName($value);
+			} else {
+				self::checkPropertyForObfuscation($value);
+			}
+			$attrs[$name] = $value;
+		}
+		if (!empty($reactNames)) {
+			$child['reactProps'] = $reactNames;
+		}
+		if (empty($cmpName)) {
+			$cmpName = $child['cmp'];
+		}
+		if ($isComponent) {
+			$comp = '<ComponentClassName/>';
+			if ($cmpType == 'control') {
+				$comp = '<ControlClassName name="controlName"/>';
+			} elseif ($cmpType == 'menu') {
+				$comp = '<MenuClassName/>';
+			} elseif ($cmpType == 'form') {
+				$comp = '<FormClassName/>';
+			}
+			if (empty($cmpName)) {
+				new Error(self::$errors['unknownComponent'], array(self::$templateName, self::$className, $item['content'], $comp));
+			}
+			if ($cmpType == 'control' && empty($attrs['nm'])) {
+				new Error(self::$errors['controlWithoutName'], array($cmpName, self::$templateName, self::$className, $item['content'], $comp));
+			}
+		}
+		if ($isComponent) {
+			if (is_array($attrs)) {
+				foreach ($attrs as $k => $v) {
+					$v = strip_tags(trim($v));
+					if ($v[0] == '^') {
+						unset($attrs[$k]);
+						if (!is_array($child['componentProps'])) {
+							$child['componentProps'] = array();
+						}
+						$child['componentProps'][] = $k;
+						$child['componentProps'][] = ltrim($v, '^');
+					} elseif ($v[0] == '%') {
+						$attrs[$k] = '<nq>$.getTemplate'.ucfirst(ltrim($v, '%')).'<nq>';
+					}
+				}				
+				if (!empty($attrs)) {
+					self::getProperComponentData($attrs);
+				}
+			}
 		}
 		return $attrs;
 	}
@@ -1565,7 +1733,7 @@ class TemplateParser
 				if (empty($child['p'])) {
 					unset($child['p']);
 				} else {					
-					self::getProperComponentData($child);
+					self::getProperComponentData($child['p']);
 				}
 			}
 		}
@@ -1705,8 +1873,7 @@ class TemplateParser
 		}
 	}
 
-	private static function getProperComponentData(&$child) {
-		$props = $child['p'];
+	private static function getProperComponentData(&$props) {
 		$properData = array();
 		if (!empty($props['props'])) {
 			$properData['ap'] = array();	
@@ -1732,10 +1899,7 @@ class TemplateParser
 		if (empty($properData['p'])) {
 			unset($properData['p']);
 		}
-		$child['p'] = $properData;
-		if (is_array($child['n']) && empty($child['n'])) {
-			unset($child['n']);
-		}
+		$props = $properData;
 	}
 
 	private static function correctTagAttributeText($propName, $text) {
@@ -1785,7 +1949,7 @@ class TemplateParser
 		return self::processCode($value, 'componentClass');
 	}
 
-	private static function parseTextNode($content, &$children, &$let, $place = 'textNode', &$names = null) {		
+	private static function parseTextNode($content, &$children, &$let = 0, $place = 'textNode', &$names = null) {		
 		if (!empty($content)) {
 			$regexp = '/\{([^\}]+)\}/';
 			preg_match_all($regexp, $content, $matches);
@@ -1844,20 +2008,46 @@ class TemplateParser
 			}
 			$parts = preg_split($regexp, $content);
 			$items = array();
-			foreach ($parts as $i => $part) {
-				if (!empty($part)) {
-					$items[] = $part;
+			if (!$data['inFunc'] && !$data['placeholder']) {
+				$ch = array();
+				foreach ($parts as $i => $part) {
+					if (!empty($part)) {
+						if (strlen($part) > 5) {
+							$part = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($part).']<nq>';
+						}
+						if (preg_match('/[^ ]/', $part)) {
+							$ch[] = "<quote>".$part."<quote>";
+						} else {
+							$ch[] = '<nq><space><nq>';
+						}
+					}
+					if (isset($codes[$i])) {
+						$ch[] = '<nq>('.$codes[$i].')<nq>';
+					}
 				}
-				if (isset($codes[$i])) {
-					$items[] = $codes[$i];
+				if (count($ch) == 1 && preg_match('/^<nq>\(/', $ch[0])) {
+					$ch[0] = preg_replace('/^<nq>\(|\)<nq>$/', '', $ch[0]);
 				}
-			}
-			if (!empty($letCode)) {
-				array_unshift($items, $letCode);
-			}
-			foreach ($items as $item) {
-				if (!empty($item)) {
-					$children[] = $item;
+				$children[] = implode('+', $ch);
+			} else {
+				foreach ($parts as $i => $part) {
+					if (!empty($part)) {
+						if (strlen($part) > 5) {
+							$part = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($part).']<nq>';
+						}
+						$items[] = $part;
+					}
+					if (isset($codes[$i])) {
+						$items[] = $codes[$i];
+					}
+				}
+				if (!empty($letCode)) {
+					array_unshift($items, $letCode);
+				}
+				foreach ($items as $item) {
+					if (!empty($item)) {
+						$children[] = $item;
+					}
 				}
 			}
 		}

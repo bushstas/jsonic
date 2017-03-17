@@ -18,10 +18,7 @@
 	};
 
 	var getItems = function() {
-		if (isFunction(params['p'])) {
-			return params['p']();
-		} 
-		return params['p'];
+		return params['$'].g(params['n']);
 	};
 
 	var getLimit = function() {
