@@ -397,11 +397,7 @@ class TemplateParser
 		}
 		foreach ($children as $child) {
 			if (is_string($child)) {
-				if (self::hasCode($child)) {
-					self::parseTextNode($child, $finishedChildren);
-				} else {
-					$finishedChildren[] = self::getTextNode($child);
-				}
+				self::parseTextNode($child, $finishedChildren);
 			} else {
 				$ch = array();
 				$isElement = false;
@@ -462,8 +458,9 @@ class TemplateParser
 					if (!empty($attrs['if'])) {
 						$ch['c'] = array();
 						self::finish($child['children'], $ch['c']);
-
-						self::addIfConditionToChild($attrs['if'], $attrs['else'], $ch);
+						$else = array();
+						self::parseTextNode($attrs['else'], $else);
+						self::addIfConditionToChild($attrs['if'], $else, $ch);
 						unset($child['children']);
 					}
 
@@ -1189,7 +1186,12 @@ class TemplateParser
 	}
 
 	private static function wrapInFunction(&$children, $args = '') {
-		$children = '<nq>function('.$args.'){return '.self::getProperChildren($children).'}<nq>';
+		$c = preg_replace('/^<nq>/', '', self::getProperChildren($children));
+		$space = ' ';
+		if (in_array($c[0], array('[', '{', '(', "'"))) {
+			$space = '';
+		}
+		$children = '<nq>function('.$args.'){return'.$space.$c.'}<nq>';
 	}
 
 	private static function parseForeach($content, &$child) {
@@ -1367,7 +1369,9 @@ class TemplateParser
 		$names = array();
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
 		$ifCondition = self::processCode($ifCondition, 'if', $names);
-			
+		
+
+		$isStringC = is_string($child['c']);
 		if (is_array($child['c'])) {
 			if (isset($child['c'][0]) && count($child['c']) == 1) {
 				$child['c'] = $child['c'][0];
@@ -1376,6 +1380,7 @@ class TemplateParser
 				$child['c'] = str_replace('\\', '', json_encode($child['c']));
 			}
 		}
+		$isStringE = is_string($else);
 		if (is_array($else)) {
 			if (isset($else[0]) && count($else) == 1) {
 				$else = $else[0];
@@ -1392,18 +1397,36 @@ class TemplateParser
 				$else = '(function(){var '.self::getLetVars($source['elseLets']).';return '.$else.'})()';
 			}
 		}
-		if (empty($else)) {
-			$else = "<emptystring>";
-		}
 		if (!empty($names)) {
+			$child['i'] = $ifCondition;
+			self::wrapInFunction($child['i']);
 			if (empty($child['c'])) {
-				$child['i'] = "<nq>function(){return ".$ifCondition."?'':".$else."}<nq>";			 
+				$child['c'] = "<emptystring>";
 			} else {
-				$child['i'] = '<nq>function(){return '.$ifCondition.'?'.$child['c'].':'.$else.'}<nq>';
+				if (preg_match('/\$\.g\(/', $child['c'])) {
+					self::wrapInFunction($child['c']);
+				}
+				if (!$isStringC) {
+					$child['c'] = '<nq>'.$child['c'].'<nq>';
+				} else {
+					$child['c'] = $child['c'];
+				}				
+			}
+			if (!empty($else)) {
+				if (preg_match('/\$\.g\(/', $else)) {
+					self::wrapInFunction($else);
+				}
+				if (!$isStringE) {
+					$child['e'] = '<nq>'.$else.'<nq>';
+				} else {
+					$child['e'] = $else;
+				}
 			}
 			$child['n'] = $names;
-			unset($child['c']);
 		} else {
+			if (empty($else)) {
+				$else = "<emptystring>";
+			}
 			$child = '<nq>'.str_replace('<nq>', '', $ifCondition).'?'.$child['c'].':'.$else.'<nq>';
 		}
 	}

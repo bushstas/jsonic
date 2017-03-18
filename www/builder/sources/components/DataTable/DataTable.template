@@ -1,9 +1,8 @@
 {template .main}
-{foreach ~a as &i => &f}
-	<div>{$f}</div>
-{/foreach}
-<div class="@outer-container" onCLick="handleClick" if="{$a==2}" else="1111">
-	{let &a = 2}
+<div class="@outer-container" onCLick="handleClick" if="{$vvv==2}" else="34324{$a}32432{.handleChange($f)}">
+	{foreach $a as &i => &f}
+		<div>{&f}</div>
+	{/foreach}
 
 	<DataTableTabPanel onChange="handleChange"/>
 	{$:aaa}
