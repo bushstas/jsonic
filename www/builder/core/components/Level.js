@@ -118,18 +118,12 @@
 		}
 	};
 
-	var createForeach = function(props) {
+	var createForeach = function(props) {		
+		var foreach = new ({{GLOBAL}}.get('Foreach'))(props);
+		foreach.render(parentElement, self);
 		if (props['n'] || props['g']) {
-			var foreach = new ({{GLOBAL}}.get('Foreach'))(props);
-			foreach.render(parentElement, self);
 			registerChild(foreach);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), foreach, props);
-		} else {
-			if (isArray(props['p'])) {
-				for (var i = 0; i < props['p'].length; i++) renderItems(props['h'](props['p'][i], i));
-			} else if (isObject(props['p'])) {
-				for (var k in props['p']) renderItems(props['h'](props['p'][k], k));
-			}
 		}
 	};
 

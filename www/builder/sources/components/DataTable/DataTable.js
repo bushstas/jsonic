@@ -1,18 +1,20 @@
 component DataTable
 
 initial props = {
-	vvv: 2,
-	a: [1,2,3,4,5],
+	items: [1,2,3,4,5],
+	a: 1,
 	bbb: '======',
 	ccc: [1],
-	ddd: 2
+	ddd: 2,
+	name: 'bushstas'
 }
 
 function handleClick() {
 	$bbb = 'HELLO';
 	$ccc = ['first', 'second', 'third'];
 	$ddd = 3;
-	$a = ['a','b','c']
+	$a = 2;
+	$items = ['aaaa','bbbb','ccccc','ddddd'];
 }
 
 function handleChange() {

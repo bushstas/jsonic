@@ -8,10 +8,13 @@ class TemplateCompiler
 		'includeNoTemplateNames' => "В файле {??} нет ни одного имени шаблона. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>",
 		'includeHasTemplateKeys' => "В файле {??} один или несколько шаблонов имеют оператор <b>as</b>, что недопустимо. Код должен иметь вид:<xmp>{template .checkbox}\n\t<div></div>\n{/template}</xmp>",
 		'fewNamespaces' => 'Обнаружено более одной метки <b>namespace</b> в шаблоне класса {??}',
-		'unknownNamespaces' => 'Обнаружена <b>namespace</b> метка {??} ссылающаяся на несуществующий класс в шаблоне класса {??}'
+		'unknownNamespaces' => 'Обнаружена <b>namespace</b> метка {??} ссылающаяся на несуществующий класс в шаблоне класса {??}',
+		'doubleInclTmp' => "Обнаружено повторяющееся имя include шаблона {??} в файлах<xmp>{?}\n{?}</xmp>",
+		'doubleInclTmp2' => 'Обнаружено повторяющееся имя include шаблона {??} в файле<xmp>{?}</xmp>'
 	);
 	private $templates = array();
 	private $includedTemlates = array();
+	private $includedTemlateNames = array();
 	private $usedComponents = array();
 
 	public function run($templatesFiles, $includesFiles) {		
@@ -26,6 +29,7 @@ class TemplateCompiler
 				$this->templates[$templateFile['name']] = preg_replace("/<\!--.*?-->/", '', $content);
 			}
 		}
+		$includeSources = array();
 		if (is_array($includesFiles)) {
 			foreach ($includesFiles as $includesFile) {
 				$content = preg_replace("/<\!--.*?-->/", '', $includesFile['content']);
@@ -36,6 +40,19 @@ class TemplateCompiler
 					new Error($this->errors['includeNoTemplateNames'], $includesFile['filename']);
 				}
 				$this->includedTemlates[$includesFile['filename']] = $content;
+				preg_match_all('/\{\s*template\s+\.(\w+)\s*\}/', $content, $matches);
+				$matches = $matches[1];
+				foreach ($matches as $inclTmpName) {
+					if (in_array($inclTmpName, $this->includedTemlateNames)) {
+						if (isset($includeSources[$inclTmpName]) && $includeSources[$inclTmpName] != $includesFile['path']) {
+							new Error($this->errors['doubleInclTmp'], array($inclTmpName, $includeSources[$inclTmpName], $includesFile['path']));
+						} else {
+							new Error($this->errors['doubleInclTmp2'], array($inclTmpName, $includesFile['path']));
+						}
+					}
+					$includeSources[$inclTmpName] = $includesFile['path'];
+					$this->includedTemlateNames[] = $inclTmpName;
+				}
 			}
 		}
 	}
@@ -50,6 +67,10 @@ class TemplateCompiler
 
 	public function getIncludes() {
 		return $this->includedTemlates;
+	}
+
+	public function getIncludesNames() {
+		return $this->includedTemlateNames;
 	}
 
 	public function getTemplateClasses() {

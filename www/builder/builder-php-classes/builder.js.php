@@ -837,6 +837,7 @@ class JSCompiler
 				'classes' => $this->classes,
 				'sources' => $this->sources,
 				'templates' => $templates,
+				'includes' => $this->templateCompiler->getIncludesNames(),
 				'obfuscateCss' => $this->configProvider->needCssObfuscation(),
 				'utilsFuncs' => $this->validator->getUtilsFunctionNames(),
 				'userUtilsFuncs' => $this->utilsCompiler->getFunctionsList(),

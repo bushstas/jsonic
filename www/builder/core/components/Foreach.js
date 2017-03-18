@@ -1,4 +1,5 @@
 {{GLOBAL}}.set({{COMPONENT}} = function(params) {
+	var list = params['p'];
 	var handler = params['h'];
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
@@ -18,7 +19,7 @@
 	};
 
 	var getItems = function() {
-		return params['$'].g(params['n']);
+		return list || params['$'].g(params['n']);
 	};
 
 	var getLimit = function() {
@@ -108,6 +109,7 @@
 		this.prevSiblingChild = null;
 		handler = null;
 		params = null;
+		list = null;
 	};
 }, 'Foreach');
 {{PROTO}}={{COMPONENT}}.prototype;
