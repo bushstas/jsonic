@@ -183,7 +183,7 @@ class JSGlobals
 		return ";".self::$varNames['global'].".set(".self::$varNames[$key].",'".self::$varKeys[$key]."');";
 	} 
 
-	private static function normJsonStr($str){
+	public static function normJsonStr($str){
 		$str = preg_replace('/\\\\u00A0/i', '_nbsp_', $str);
 	    $str = preg_replace_callback('/\\\\u([a-f0-9]{4})/i', create_function('$m', 'return chr(hexdec($m[1])-1072+224);'), $str);
 	    $str = str_replace('_nbsp_', '\\u00A0', $str);

@@ -198,6 +198,7 @@ class TemplateParser
 		$templateFunctions = array();
 		foreach ($templates as $template) {
 			$data = json_encode($template['children']);
+			$data = JSGlobals::normJsonStr($data);
 			if ($data == '[]') {
 				$data = '';
 			} else {
@@ -396,7 +397,7 @@ class TemplateParser
 				if (self::hasCode($child)) {
 					self::parseTextNode($child, $finishedChildren);
 				} else {
-					$finishedChildren[] = $child;
+					$finishedChildren[] = self::getTextNode($child);
 				}
 			} else {
 				$ch = array();
@@ -562,6 +563,7 @@ class TemplateParser
 		self::parseChildren($list, $children['c'], $children);
 		//Printer::log($children);
 		$finishedChildren = array();
+
 		self::finish($children['c'], $finishedChildren);
 		//Printer::log($finishedChildren);
 		return array('name' => self::$templateName, 'children' => $finishedChildren, 'let' =>  $children['lets']);
@@ -1206,7 +1208,7 @@ class TemplateParser
 			$child['$'] = '<nq>$<nq>';
 		}
 		if ($data['reactiveItems']) {
-			$child['$'] = '$';
+			$child['$'] = '<nq>$<nq>';
 			unset($child['p']);
 		}
 		$args = array($data['value']);
@@ -1956,11 +1958,7 @@ class TemplateParser
 			$codes = $matches[1];
 			$count = count($codes);
 			if (empty($codes)) {
-				if (strlen($content) > 5) {
-					$children[] = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($content).']<nq>';
-				} else {
-					$children[] = $content;
-				}
+				$children[] = self::getTextNode($content);
 				return;
 			}
 			$isLet = false;
@@ -1992,7 +1990,7 @@ class TemplateParser
 						} elseif (!empty(self::$componentsOpen)) {
 							$child['$'] = '<nq>$<nq>';
 						}
-						$code = '<nq>'.json_encode($child).'<nq>';
+						$code = '<nq>'.str_replace('\\', '', json_encode($child)).'<nq>';
 					} else {
 						$code = '<nq>'.$data['code'].'<nq>';
 					}
@@ -2007,49 +2005,23 @@ class TemplateParser
 				$letCode = '<nq><let>var '.implode(',', $lets).'<=let><nq>';
 			}
 			$parts = preg_split($regexp, $content);
-			$items = array();
-			if (!$data['inFunc'] && !$data['placeholder']) {
-				$ch = array();
-				foreach ($parts as $i => $part) {
-					if (!empty($part)) {
-						if (strlen($part) > 5) {
-							$part = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($part).']<nq>';
-						}
-						if (preg_match('/[^ ]/', $part)) {
-							$ch[] = "<quote>".$part."<quote>";
-						} else {
-							$ch[] = '<nq><space><nq>';
-						}
-					}
-					if (isset($codes[$i])) {
-						$ch[] = '<nq>('.$codes[$i].')<nq>';
-					}
+			$items = array();			
+			foreach ($parts as $i => $part) {					
+				if (!empty($part)) {
+					$items[] = self::getTextNode($part);
 				}
-				if (count($ch) == 1 && preg_match('/^<nq>\(/', $ch[0])) {
-					$ch[0] = preg_replace('/^<nq>\(|\)<nq>$/', '', $ch[0]);
-				}
-				$children[] = implode('+', $ch);
-			} else {
-				foreach ($parts as $i => $part) {
-					if (!empty($part)) {
-						if (strlen($part) > 5) {
-							$part = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($part).']<nq>';
-						}
-						$items[] = $part;
-					}
-					if (isset($codes[$i])) {
-						$items[] = $codes[$i];
-					}
-				}
-				if (!empty($letCode)) {
-					array_unshift($items, $letCode);
-				}
-				foreach ($items as $item) {
-					if (!empty($item)) {
-						$children[] = $item;
-					}
+				if (isset($codes[$i])) {
+					$items[] = $codes[$i];
 				}
 			}
+			if (!empty($letCode)) {
+				array_unshift($items, $letCode);
+			}
+			foreach ($items as $item) {
+				if (!empty($item)) {
+					$children[] = $item;
+				}
+			}			
 		}
 	}
 
@@ -2092,6 +2064,13 @@ class TemplateParser
 		$obfuscatedClassName = CSSObfuscator::generate();
 		CSSCompiler::$cssClassIndex[$className] = $obfuscatedClassName;
 		return $obfuscatedClassName;
+	}
+
+	private static function getTextNode($text) {
+		if (strlen($text) > 5) {
+			$text = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($text).']<nq>';
+		}
+		return $text;
 	}
 
 	private static function addTextNode($text) {
