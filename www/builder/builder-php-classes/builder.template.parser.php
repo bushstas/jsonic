@@ -347,6 +347,9 @@ class TemplateParser
 				if (!empty($child['componentProps'])) {
 					$chld['componentProps'] = $child['componentProps'];
 				}
+				if (!empty($child['controlName'])) {
+					$chld['controlName'] = $child['controlName'];
+				}
 				
 				if ($child['content'][0] == '{') {
 					if (preg_match('/\{\s*if\s*\}/', $child['content'])) {
@@ -464,6 +467,9 @@ class TemplateParser
 						unset($child['children']);
 					}
 
+				}
+				if (!empty($child['controlName'])) {
+					$ch['nm'] = $child['controlName'];
 				}
 				if (!empty($child['componentProps'])) {
 					$ch['w'] = $child['componentProps'];
@@ -1439,7 +1445,7 @@ class TemplateParser
 
 			if ($isComponent) {
 				if (($cmpType == 'control' || $child['tagName'] == 'Control') && $name == 'name') {
-					$attrs['nm'] = self::parseComponentClassName($value, $child['content'], true);
+					$child['controlName'] = self::parseComponentClassName($value, $child['content'], true);
 					continue;
 				}
 			}
@@ -1490,7 +1496,7 @@ class TemplateParser
 			if (empty($cmpName)) {
 				new Error(self::$errors['unknownComponent'], array(self::$templateName, self::$className, $item['content'], $comp));
 			}
-			if ($cmpType == 'control' && empty($attrs['nm'])) {
+			if ($cmpType == 'control' && empty($child['controlName'])) {
 				new Error(self::$errors['controlWithoutName'], array($cmpName, self::$templateName, self::$className, $item['content'], $comp));
 			}
 		}
