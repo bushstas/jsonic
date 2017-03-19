@@ -10,10 +10,10 @@ initial props = {
 }
 
 function handleClick() {
-	$bbb = 'HELLO';
+	$aaa = 'HELLO';
 	$ccc = ['first', 'second', 'third'];
 	$ddd = 3;
-	$a = 2;
+	$a = 0;
 	$items = ['aaaa','bbbb','ccccc','ddddd'];
 }
 

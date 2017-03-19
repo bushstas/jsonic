@@ -1,13 +1,17 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	{let &a = [1,2,3,4,5,[5,7,8]], &b = 2, &d = .isArray([1,2])}
-	<DataTableTabPanel onChange="handleChange" r="{$a}"/>
-	{$:aaa}
+	<DataTableTabPanel onChange="handleChange"/>	
 	<::hello>
 		<Reason>
-			{foreach $items as &i}
-				<div>{&i}</div>
-			{/foreach}
+			{switch $a}
+				<a>
+				{case 1}
+					it's 1
+				{/case}
+				{default}
+					it's none
+				{/default}
+			{/switch}
 		</Reason>
 	</::hello>
 </div>

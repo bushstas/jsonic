@@ -15,8 +15,14 @@ function onRendered() {
 	});
 
 	delay(6000) {
-		$:aaa = 'super-puper-class'
+		$:aaa = [9,8,7,6,5,4,3,2,1]
 		State.dispatchEvent('aaa');
+		delay(3000) {
+			$:aaa = [100,200,300,400]
+			delay(3000) {
+				$:aaa = null
+			}
+		}
 	}
 }
 

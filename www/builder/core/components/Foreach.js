@@ -4,31 +4,27 @@
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
 	var ifEmpty = params['ie'];
+	var isGlobal = !!params['g'];
 	this.levels = [];
-
 	var getKeysInRandomOrder = function() {
 		var keys = Objects.getKeys(getItems());
 		keys.shuffle();
 		return keys;
 	};
-
 	var createIfEmptyLevel = function() {
 		if (!isUndefined(ifEmpty)) {
 			this.createLevel(ifEmpty);
 		}
 	};
-
-	var getItems = function() {
-		return list || params['$'].g(params['n']);
+	var getItems = function() {		
+		return list || (isGlobal ? params['$'].a(params['g']) : params['$'].g(params['n']));
 	};
-
 	var getLimit = function() {
 		if (isFunction(params['l'])) {
 			return params['l']();
 		} 
 		return ~~params['l'];
 	};
-
 	this.createLevels = function(isUpdating) {
 		var items = getItems();
 		var limit = getLimit();

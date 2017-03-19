@@ -323,8 +323,7 @@ class Config
 			foreach ($index as $i => $value) {
 				$textConstants[$value] = $texts[$i];
 			}					
-
-			$params[] = '"texts":'.json_encode($textNodes);
+			$params[] = '"texts":'.preg_replace("/\\\u00A0/", "u00A0", preg_replace("/\\\'/", "'", json_encode($textNodes)));
 			$params[] = '"textsConstants":'.json_encode($texts);
 		}
 		$content .= implode(', ', $params)."}'); ?>";

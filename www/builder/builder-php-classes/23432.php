@@ -357,7 +357,7 @@ private	static function getHtmlChildren($list, &$let) {
 		unset($child['is']);
 	}
 
-		private	static function parseCases($childrenList, &$child, $isIfSwitch = false) {
+	private	static function parseCases($childrenList, &$child, $isIfSwitch = false) {
 		$caseType = $isIfSwitch ? 'ifcase' : 'textNode';
 		$switchType = $isIfSwitch ? 'ifswitch' : 'switch';
 		$errorType = $isIfSwitch ? 'ifCaseExpected' : 'caseExpected';

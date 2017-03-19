@@ -120,13 +120,17 @@ class TemplateParser
 		'unknownSpecEventAttr' => 'Обнаружен неизвестный спецпараметр {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Ожидается одно из значений: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'unknownEventAttr' => 'Обнаружен атрибут неизвестного события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'specEventAttrInComp' => 'Обнаружен спецпараметр {??} события {??} в теге компонента в шаблоне {??} класса {??}<br><br>Данный функционал доступен только для элементов DOM<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'operatorOutOfPlace' => 'Обнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}',
+		'operatorOutOfPlace' => 'Обнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'operatorInInnerLevel' => 'Обнаружен оператор {??} не на одном уровне с оператором {??} в шаблоне {??} класса {??}',
 		'doubleOperator' => 'Обнаружен оператор {??} внутри другого оператора {??} в шаблоне {??} класса {??}',
 		'fewSameOperators' => 'Обнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
 		'loadingOperatorWithoutLoader' => 'Обнаружено использование одного из операторов <b>loading, loader</b> в шаблоне {??} класса {??}. У данного класса отсутствует initial параметр <b>loader</b>',
 		'invalidTagName' => 'Некорректное имя тега {??} в шаблоне {??} класса {??}<br><br>Теги элементов DOM должны иметь вид:<xmp><div>, <h1>, <table></xmp>Теги компонентов должны иметь вид:<xmp><Select>, <TableColumn></xmp>Теги вызова шаблона класса:<xmp><:content>, <:innerContent></xmp>Теги вызова свободного шаблона:<xmp><::checkbox>, <::userArea></xmp>',
-		'includeNotFound' => 'Обнаружен вызов несуществующего include шаблона {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
+		'includeNotFound' => 'Обнаружен вызов несуществующего include шаблона {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'textInSwitch' => 'Обнаружен текстовый элемент непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный текст: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'elementInSwitch' => 'Обнаружен элемент DOM непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный элемент: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'componentInSwitch' => 'Обнаружен компонент непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный компонент: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'operatorInSwitch' => 'Обнаружен оператор {??} непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный оператор: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
 	public static function init($params) {
@@ -224,6 +228,7 @@ class TemplateParser
 				$data = str_replace("<space>", "' '", $data);
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				$data = str_replace("_#_comma_#_", ",", $data);
+				$data = str_replace("_#_equal_#_", "=", $data);
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
 			$templateFunctions[] = array('content' => $data, 'name' => $template['name'], 'let' => $template['let']);
@@ -247,16 +252,13 @@ class TemplateParser
 		return false;
 	}
 
-	private static function parseLetOperator(&$content) {
+	private static function parseLetOperator($content) {
 		$lets = array();
 		$data = Splitter::split('/\{\s*let([\s&][^\}]+)\}/', $content, 1);
-		$content = '';
-		foreach ($data['items'] as $i => $item) {
-			$content .= $item;
-		}
 		$names = array();
+		$globals = array();
 		foreach ($data['delimiters'] as $i => $delmr) {
-			$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names));
+			$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names, $globals));
 			if (preg_match('/\[/', $delmr)) {
 				$d = Splitter::split('/[\[\]]/', $delmr);
 				$open = 0;
@@ -264,6 +266,7 @@ class TemplateParser
 				foreach ($d['items'] as $j => $it) {
 					if ($open > 0) {
 						$it = str_replace(',', '_#_comma_#_', $it);
+						$it = str_replace('=', '_#_equal_#_', $it);
 					}
 					$delmr .= $it;
 					if (isset($d['delimiters'][$j])) {
@@ -288,6 +291,7 @@ class TemplateParser
 
 	private static function parseChildren($list, &$children, &$parentalChild, $ofElse = false) {
 		$isElse = false;
+		$isIfEmpty = false;
 		$usedClasses = ClassAnalyzer::getUsedClasses();
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
@@ -297,6 +301,7 @@ class TemplateParser
 					if (preg_match('/\{\s*let\b/', $item['content'])) {
 						$lets = self::parseLetOperator($item['content']);
 						$letsKey = $ofElse ? 'elseLets' : 'lets';
+						$parentalChild[$letsKey.'Content'] = $item['content'];
 						if (!empty($lets)) {
 							if (!isset($parentalChild[$letsKey])) {
 								$parentalChild[$letsKey] = $lets;
@@ -310,14 +315,16 @@ class TemplateParser
 					$children[] = $item['content'];
 				}
 			} else {
+				self::$parsedItem = $item['content'];
 				$tag = $item['tagName'];
 				if ($tag == 'br') {
 					$children[] = '<br>';
 					continue;
 				}
-				$child = array('tagName' => $tag, 'content' => $item['content'], 'children' => array(), 'else' => array());
+				$child = array('tagName' => $tag, 'content' => $item['content'], 'children' => array(), 'else' => array(), 'ifempty' => array());
 				$ch = array();
 				$ech = array();
+				$iech = array();
 				$open = 0;
 				while (true) {
 					$i++;
@@ -326,7 +333,13 @@ class TemplateParser
 							$isElse = true;
 							continue;
 						}
-						if (!$isElse) {
+						if ($tag == 'foreach' && $open == 0 && $list[$i]['tagName'] == 'ifempty') {
+							$isIfEmpty = true;
+							continue;
+						}
+						if ($isIfEmpty) {
+							$iech[] = $list[$i];
+						} else if (!$isElse) {
 							$ch[] = $list[$i];
 						} else {
 							$ech[] = $list[$i];
@@ -338,7 +351,9 @@ class TemplateParser
 								if ($open > 0) {
 									$open--;
 								} else {
-									if (!$isElse) {
+									if ($isIfEmpty) {
+										array_pop($iech);
+									} elseif (!$isElse) {
 										array_pop($ch);
 									} else {
 										array_pop($ech);
@@ -359,12 +374,18 @@ class TemplateParser
 				if (!empty($ech)) {
 					self::parseChildren($ech, $child['else'], $chld, true);
 				}
+				if (!empty($iech)) {
+					self::parseChildren($iech, $child['ifempty'], $chld, true);
+				}
 				$isComponent = in_array($child['tagName'], $usedClasses) || $child['tagName'] == 'Component' || $child['tagName'] == 'Control';
 				$attributes = self::parseTagAttributes($child, $isComponent, $child['tagName']);
 				$child['attributes'] = $attributes;
 
 				if (!empty($child['reactProps'])) {
 					$chld['reactProps'] = $child['reactProps'];
+				}
+				if (!empty($child['globalProps'])) {
+					$chld['globalProps'] = $child['globalProps'];
 				}
 				if (!empty($child['componentProps'])) {
 					$chld['componentProps'] = $child['componentProps'];
@@ -376,12 +397,16 @@ class TemplateParser
 				if ($child['content'][0] == '{') {
 					if (preg_match('/\{\s*if\s*\}/', $child['content'])) {
 						$chld['ifswitch'] = 1;	
+					} elseif ($child['tagName'] == 'switch') {
+						$chld['switch'] = trim(preg_replace('/^\s*{\s*switch */', '', $child['content']), '}');
 					} elseif ($child['tagName'] == 'if') {
 						$chld['if'] = trim(preg_replace('/^\s*{\s*if */', '', $child['content']), '}');
 					} elseif ($child['tagName'] == 'foreach') {
 						$chld['foreach'] = trim(preg_replace('/^\s*{\s*foreach */', '', $child['content']), '}');
 					} elseif ($child['tagName'] == 'case') {
 						$chld['case'] = trim(preg_replace('/^\s*{\s*case */', '', $child['content']), '}');
+					} elseif ($child['tagName'] == 'default') {
+						$chld['default'] = trim(preg_replace('/^\s*{\s*default */', '', 1), '}');
 					}
 				} else {
 					if ($child['tagName'][0] == ':') {
@@ -405,6 +430,9 @@ class TemplateParser
 				}
 				if (!empty($child['else'])) {
 					$chld['else'] = $child['else'];
+				}
+				if (!empty($child['ifempty'])) {
+					$chld['ifempty'] = $child['ifempty'];
 				}
 				if (!empty($child['e'])) {
 					$chld['events'] = $child['e'];	
@@ -437,15 +465,9 @@ class TemplateParser
 				if (!empty($child['attributes'])) {
 					$ch['p'] = array();
 					$parsedPlace = $isComponent ? 'componentAttribute' : 'elementAttribute';
-					$names = array();
 					$attrs = $child['attributes'];
 					foreach ($attrs as $attrName => $attrValue) {
 						if (in_array($attrName, array('if', 'else'))) continue;
-						if ($attrValue[0] == '{') {
-							$isObfClName = self::$obfuscate === true && $attrName == 'class';
-							$names[$attrName] = array();
-							$code = self::processCode($attrValue, $parsedPlace, $names[$attrName], $isObfClName);
-						}
 						self::addProperTagAttribute($attrName, $attrValue, $ch['p'], $isElement);
 					}
 					if (!empty($attrs['if'])) {
@@ -466,6 +488,9 @@ class TemplateParser
 				elseif ($isComponent)
 				{
 					$ch['cmp'] = $child['component'];
+					if (!empty($ch['p'])) {
+						self::getProperComponentData($ch['p']);
+					}
 				}
 				elseif ($isTemplate)
 				{					
@@ -475,9 +500,19 @@ class TemplateParser
 				elseif (!empty($child['foreach']))
 				{
 					$ch['c'] = array();
+					$ch['ie'] = array();
+					if (!empty($child['ifempty'])) {
+						self::finish($child['ifempty'], $ch['ie']);
+					}
 					self::finish($child['children'], $ch['c']);
 					self::parseForeach('foreach '.$child['foreach'], $ch);
 					$finishedChildren[] = $ch;
+					continue;
+				}
+				elseif (!empty($child['switch']))
+				{
+					$ch['c'] = array();
+					self::parseSwitch($child['switch'], $child['children'], $ch, $child);
 					continue;
 				}
 				elseif (!empty($child['if']))
@@ -500,8 +535,15 @@ class TemplateParser
 				if (!empty($child['componentProps'])) {
 					$ch['w'] = $child['componentProps'];
 				}
-				if (!empty($child['reactProps'])) {
-					$ch['n'] = $child['reactProps'];
+				$hasReactProps = !empty($child['reactProps']);
+				$hasGlobalProps = !empty($child['globalProps']);
+				if ($hasReactProps || $hasGlobalProps) {
+					if ($hasReactProps) {
+						$ch['n'] = $child['reactProps'];
+					}
+					if ($hasGlobalProps) {
+						$ch['g'] = $child['globalProps'];
+					}
 					$ch['p'] = '<nq>function(){return'.self::getProperChildren($ch['p']).'}<nq>';
 				}
 				if (!empty($child['children'])) {
@@ -511,6 +553,9 @@ class TemplateParser
 					} else {
 						$ch['c'] = $child['children'];
 					}
+				}
+				if (!empty($child['lets'])) {
+					self::wrapInFunction($ch['c'], '', $child['lets']);
 				}
 				$finishedChildren[] = $ch;
 				if ($isComponent) {
@@ -562,7 +607,7 @@ class TemplateParser
 				$html .= $matches[$i];
 			}
 		}
-		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\})/i";
+		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*\/*default\s*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
 		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
 		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
@@ -592,16 +637,40 @@ class TemplateParser
 			}
 		}
 		$isLet = 0;
-		self::checkHtmlTagStructure($list);
+		//self::checkHtmlTagStructure($list);
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);
-		Printer::log($children);
+		self::validateChildren($children['c']);
 		$finishedChildren = array();
-
 		self::finish($children['c'], $finishedChildren);
 		//Printer::log($finishedChildren);
 		return array('name' => self::$templateName, 'children' => $finishedChildren, 'let' =>  $children['lets']);
+	}
+
+	private static function validateChildren($children, $parent = null) {
+		foreach ($children as $child) {
+			if (is_array($child)) {
+				if (is_array($parent)) {
+					if (!empty($parent['switch']) && empty($child['case']) && empty($child['default'])) {
+						if (!empty($child['element'])) {
+							new Error(self::$errors['elementInSwitch'], array(self::$templateName, self::$className, $child['content'], $parent['content']));
+						}
+						if (!empty($child['component'])) {
+							new Error(self::$errors['componentInSwitch'], array(self::$templateName, self::$className, $child['content'], $parent['content']));
+						}
+						new Error(self::$errors['operatorInSwitch'], array($child['operator'], self::$templateName, self::$className, $child['content'], $parent['content']));
+					}
+				}
+				if (!empty($child['children'])) {
+					self::validateChildren($child['children'], $child);
+				}
+			} else {
+				if (!empty($parent['switch'])) {
+					new Error(self::$errors['textInSwitch'], array(self::$templateName, self::$className, $child, $parent['content']));
+				}
+			}
+		}
 	}
 
 	private static function invalidTagName($tagName) {
@@ -654,8 +723,15 @@ class TemplateParser
 						if (!isset($openedTags[$tn])) {
 							$openedTags[$tn] = 0;
 						}
+						$lastAny = $opened[count($opened) - 1];
 						$last = $openedHtml[count($openedHtml) - 1];
 						$openedTags[$tn]++;
+						if ($tn != 'case' && $tn != 'default' && $lastAny == 'switch') {
+							new Error(self::$errors['extraContentInSwitch'], array($tn, 'switch', self::$templateName, self::$class['name'], $item['content']));
+						}
+						if (($tn == 'case' || $tn == 'default') && $lastAny != 'switch') {
+							new Error(self::$errors['operatorOutOfPlace'], array($tn, 'switch', self::$templateName, self::$class['name'], $item['content']));
+						}
 						if (in_array($tn, self::$forbiddenElements)) {
 							new Error(self::$errors['forbiddenTag'], array($tn, self::$templateName, self::$class['name'], $item['content']));
 						}
@@ -678,6 +754,7 @@ class TemplateParser
 							'content' => $item['content'],
 							'orderNumber' => $openedTags[$tn]
 						);
+						$prevItem = $item;
 						$opened2[] = $tn;
 						$lastType = 'open';
 						$all[] = $tn;
@@ -762,9 +839,9 @@ class TemplateParser
 						new Error(self::$errors['closingSimpleTag'], array($tn, self::$templateName, self::$className, $item['content']));
 					}
 					if ($tn == 'ifempty' && !in_array('foreach', $opened)) {
-						new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className));
+						new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className, $item['content']));
 					} elseif ($tn == 'else' && !in_array('if', $opened)) {
-						new Error(self::$errors['operatorOutOfPlace'], array('else', 'if', self::$templateName, self::$className));
+						new Error(self::$errors['operatorOutOfPlace'], array('else', 'if', self::$templateName, self::$className, $item['content']));
 					}
 					if (!isset($openedTags[$tn])) {
 						$openedTags[$tn] = 0;
@@ -788,11 +865,11 @@ class TemplateParser
 	}
 
 	private	static function isHtmlTag($tn) {
-		return !($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case');
+		return !($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case' || $tn == 'default');
 	}
 
 	private	static function getTagTypeName($tn, $ending = '') {
-		return ($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case' ? 'оператор' : 'тег').$ending;
+		return ($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case' || $tn == 'default' ? 'оператор' : 'тег').$ending;
 	}
 
 	private static function getProperChild($children) {
@@ -816,21 +893,26 @@ class TemplateParser
 		return is_array($children) ? '<nq>'.preg_replace('/\\\(?=[\'"])/', '', json_encode($children)).'<nq>' : $children;
 	}
 
-	private static function wrapInFunction(&$children, $args = '') {
+	private static function wrapInFunction(&$children, $args = '', $lets = null) {
 		$c = preg_replace('/^<nq>/', '', self::getProperChildren($children));
 		$space = ' ';
 		if (in_array($c[0], array('[', '{', '(', "'"))) {
 			$space = '';
 		}
-		$children = '<nq>function('.$args.'){return'.$space.$c.'}<nq>';
+		$before = '';
+		$after = '';
+		$inner = '';
+		if (!empty($lets)) {
+			$before = '(';
+			$after = ')()';
+			$inner = 'var '.self::getLetVars($lets).';';
+		}
+		$children = '<nq>'.$before.'function('.$args.'){'.$inner.'return'.$space.$c.'}'.$after.'<nq>';
 	}
 
 	private static function parseForeach($content, &$child) {
 		if (is_array($child['ie'])) {
 			$child['ie'] = self::getProperChild($child['ie']);
-			if (isset($child['ie']['c'])) {
-				$child['ie'] = $child['ie']['c'];
-			}
 		}
 		if (empty($child['ie'])) {
 			unset($child['ie']);	
@@ -838,18 +920,18 @@ class TemplateParser
 		$child['h'] = $child['c'];
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
-		$data = TemplateCodeParser::parse($content, 'foreach', null);
+		$data = TemplateCodeParser::parse($content, 'foreach', $content);
 		$child['p'] = $data['items'];
-		if (!empty($data['reactNames'])) {
-			$child['n'] = self::getProperChildren($data['reactNames']);
-		}
-		if (!empty(self::$componentsOpen)) {
-			$child['$'] = '<nq>$<nq>';
-		}
-		if ($data['reactiveItems']) {
+		
+		$hasReactNames = !empty($data['reactNames']);
+		$hasGlobalNames = !empty($data['globalNames']);
+		if ($hasReactNames || $hasGlobalNames) {
+			if ($hasGlobalNames) $child['g'] = self::getProperChildren($data['globalNames']);
+			if ($hasReactNames) $child['n'] = self::getProperChildren($data['reactNames']);
 			$child['$'] = '<nq>$<nq>';
 			unset($child['p']);
 		}
+		
 		$args = array($data['value']);
 		if (isset($data['key'])) {
 			$args[] = $data['key'];
@@ -967,8 +1049,9 @@ class TemplateParser
 			new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $ifCondition));
 		}
 		$names = array();
+		$globals = array();
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
-		$ifCondition = self::processCode($ifCondition, 'if', $names);
+		$ifCondition = self::processCode($ifCondition, 'if', $names, $globals);
 		
 
 		$isStringC = is_string($child['c']);
@@ -997,16 +1080,16 @@ class TemplateParser
 				$else = '(function(){var '.self::getLetVars($source['elseLets']).';return '.$else.'})()';
 			}
 		}
-		if (!empty($names)) {
+		if (!empty($names) || !empty($globals)) {
 			$child['i'] = $ifCondition;
-			if (!empty(self::$componentsOpen)) {
+			if (!empty($names) && !empty(self::$componentsOpen)) {
 				$child['$']	= '<nq>$<nq>';
 			}
 			self::wrapInFunction($child['i']);
 			if (empty($child['c'])) {
 				$child['c'] = "<emptystring>";
 			} else {
-				if (preg_match('/\$\.g\(/', $child['c'])) {
+				if (preg_match('/\$\.[ga]\(/', $child['c'])) {
 					self::wrapInFunction($child['c']);
 				}
 				if (!$isStringC) {
@@ -1016,7 +1099,7 @@ class TemplateParser
 				}				
 			}
 			if (!empty($else)) {
-				if (preg_match('/\$\.g\(/', $else)) {
+				if (preg_match('/\$\.[ga]\(/', $else)) {
 					self::wrapInFunction($else);
 				}
 				if (!$isStringE) {
@@ -1025,7 +1108,8 @@ class TemplateParser
 					$child['e'] = $else;
 				}
 			}
-			$child['n'] = $names;
+			if (!empty($names)) $child['n'] = $names;
+			if (!empty($globals)) $child['g'] = $globals;
 		} else {
 			if (empty($else)) {
 				$else = "<emptystring>";
@@ -1055,6 +1139,7 @@ class TemplateParser
 		$values = array_merge($matches1[2], $matches2[2]);
 		$attrs = array();
 		$reactNames = array();
+		$globalNames = array();
 		$isDinamycComponent = $isComponent && ($child['tagName'] == 'Component' || $child['tagName'] == 'Control');
 		$cmpType = self::$classes[$child['tagName']]['type'];
 		foreach ($names as $i => $name) {
@@ -1073,8 +1158,10 @@ class TemplateParser
 			
 			if ($name != 'if' && $name != 'else' && self::hasCode($value)) {
 				$reactProps = array();
+				$globalProps = array();
 				$parsedPlace = $isComponent ? 'componentAttribute' : 'elementAttribute';
-				$code = self::processCode($value, $parsedPlace, $reactProps, $isObfClName);
+				$isObfClName = self::$obfuscate === true && $name == 'class';
+				$code = self::processCode($value, $parsedPlace, $reactProps, $globalProps, $isObfClName);
 				$value = self::correctTagAttributeText($name, $code);
 				if ($isDinamycComponent && $name == 'class') {
 					$child['cmp'] = $value;
@@ -1092,6 +1179,18 @@ class TemplateParser
 					}
 					$reactNames[$reactName] = $reactProps;
 				}
+				if (!empty($globalProps)) {
+					$globalProps = array_unique($globalProps);
+					sort($globalProps);
+					if (count($globalProps) == 1) {
+						$globalProps = $globalProps[0];
+					}
+					$globalName = self::$propsShortcuts[$name];
+					if (empty($globalName)) {
+						$globalName = $name;
+					}
+					$globalNames[$globalName] = $globalProps;
+				}
 			} elseif (self::$obfuscate === true && $name == 'class') {
 				self::getObfuscatedClassName($value);
 			} else {
@@ -1101,6 +1200,9 @@ class TemplateParser
 		}
 		if (!empty($reactNames)) {
 			$child['reactProps'] = $reactNames;
+		}
+		if (!empty($globalNames)) {
+			$child['globalProps'] = $globalNames;
 		}
 		if (empty($cmpName)) {
 			$cmpName = $child['cmp'];
@@ -1135,9 +1237,6 @@ class TemplateParser
 					} elseif ($v[0] == '%') {
 						$attrs[$k] = '<nq>$.getTemplate'.ucfirst(ltrim($v, '%')).'<nq>';
 					}
-				}				
-				if (!empty($attrs)) {
-					self::getProperComponentData($attrs);
 				}
 			}
 		}
@@ -1166,7 +1265,7 @@ class TemplateParser
 		);
 	}
 
-	private static function processCode($code, $parsedPlace = 'elementAttribute', &$names = null, $isObfClName = false) {
+	private static function processCode($code, $parsedPlace = 'elementAttribute', &$names = null, &$globals = null, $isObfClName = false) {
 		$attrParts = array();
 		if (is_array(self::$class) && !is_array(self::$class['tmpCallbacks'])) {
 			self::$class['tmpCallbacks'] = array();
@@ -1205,11 +1304,13 @@ class TemplateParser
 					}
 				}
 				if (is_array($data['reactNames'])) {
-					// if (is_string(self::$class)) {
-					// 	new Error(self::$errors['reactVarInInclude'], array(self::$templateName, self::$class, $code));
-					// }
 					if (is_array($names)) {
 						$names = array_merge($names, $data['reactNames']);
+					}
+				}
+				if (is_array($data['globalNames'])) {
+					if (is_array($globals)) {
+						$globals = array_merge($globals, $data['globalNames']);
 					}
 				}
 				if ($data['ternary'] && $hasText) {
@@ -1218,16 +1319,10 @@ class TemplateParser
 				$attrParts[] = $code;
 			}
 		}
-		if (!$inFunc && is_array($names)) {
-			if (in_array($parsedPlace, array('if', 'else'))) {
-				//$inFunc = count($names) > 0;	
-			} else {
-				//$inFunc = count($names) > 1;
-			}
-		}
+
 		$attrContent = implode('+', $attrParts);
 		if ($inFunc && $parsedPlace != 'componentAttribute' && $parsedPlace != 'elementAttribute') {
-			$attrContent = '<nq>function(){return '.$attrContent.'}<nq>';
+			self::wrapInFunction($attrContent);
 		} else {
 			$attrContent = '<nq>'.$attrContent.'<nq>';
 		}
@@ -1296,7 +1391,7 @@ class TemplateParser
 					new Error(self::$errors['incorrectEventAttr'], array($origValue, 'on'.$match, self::$templateName, self::$className, $itemContent));		
 				}
 			}
-			$data = TemplateCodeParser::parse('.'.$propValue.preg_replace('/[\{\}]/', '', $eventArgs), 'eventAttribute', null);
+			$data = TemplateCodeParser::parse('.'.$propValue.preg_replace('/[\{\}]/', '', $eventArgs), 'eventAttribute', $itemContent);
 			$parts = explode('(', rtrim(trim($data['code']), ')'));
 			$parts[0] = '';
 			$eventArgs = trim(implode('(', $parts), '(');
@@ -1447,7 +1542,7 @@ class TemplateParser
 			$isLet = false;
 			$lets = array();
 			foreach ($codes as &$code) {
-				$data = TemplateCodeParser::parse($code, $place, null);
+				$data = TemplateCodeParser::parse($code, $place, $content);
 				if ($data['isLet']) {
 					if (!$isLet) {
 						$let++;
@@ -1508,6 +1603,155 @@ class TemplateParser
 		}
 	}
 
+	private static function parseSwitch($content, $childrenList, &$child, $source) {
+		if (!empty($source['letsContent'])) {
+			new Error(self::$errors['operatorInSwitch'], array('let', self::$templateName, self::$className, $source['letsContent'], '{switch '.$content.'}'));
+		}
+		$data = TemplateCodeParser::parse('switch '.$content, 'switch', self::$parsedItem);
+		
+		self::parseCases($childrenList, $child);
+		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);
+		if (!empty($child['d'])) {
+			$switch .= ','.self::getProperChildren($child['d'], true);
+		}
+		$switch .= ']';
+		if (!empty($data['reactNames'])) {
+			$child['n'] = self::getProperChildren($data['reactNames']);
+			$child['sw'] = '<nq>function(){return'.$switch.'}<nq>';			
+			if (!empty(self::$componentsOpen)) {
+				$child['$'] = '<nq>$<nq>';
+			}
+		} else {
+			$child['sw'] = '<nq>'.$switch.'<nq>';
+		}
+		unset($child['d']);
+		unset($child['c']);
+		unset($child['is']);
+	}
+
+	private	static function parseCases($childrenList, &$child, $isIfSwitch = false) {
+		$caseType = $isIfSwitch ? 'ifcase' : 'textNode';
+		$switchType = $isIfSwitch ? 'ifswitch' : 'switch';
+		$errorType = $isIfSwitch ? 'ifCaseExpected' : 'caseExpected';
+		TemplateCodeParser::setContext($switchType);
+		$shouldBeCase = true;
+		$switch = array();
+		$children = array();
+		$defaultCase = false;
+		$defaultCases = 0;
+		$let = 0;
+		for ($j = 0; $j < count($childrenList); $j++) {
+			$item = $childrenList[$j];
+			if ($item['type'] == 'text') {
+				$data = Splitter::split('/\{([^\}]*)\}/', $item['content']);
+				$items = $data['items'];
+				$codes = $data['delimiters'];
+				if ($shouldBeCase && preg_replace('/\s/', '', $items[0]) != '') {
+					new Error(self::$errors[$errorType], array(self::$templateName, self::$className, $items[0]));
+				}
+				$allReactNames = array();
+				for ($i = 0; $i < count($items); $i++) {
+					$part = $items[$i];
+					if (!empty($part)) {
+						$children[] = $part;
+					}
+					if (isset($codes[$i])) {
+						$code = $codes[$i];
+
+						$isCase = preg_match('/\s*case\b/', $code);
+						$isDefault = false;
+						if (!$isCase) {
+							$isDefault = preg_match('/\s*default\b/', $code);
+						}
+						if ($shouldBeCase && !$isCase && !$isDefault) {
+							new Error(self::$errors[$errorType], array(self::$templateName, self::$className, $code));
+						}
+						if ($isCase || $isDefault) {
+							if ($defaultCase) {
+								if ($defaultCases > 0) {
+									new Error(self::$errors['fewDefaults'], array('if', self::$templateName, self::$className));
+								}
+								$switch[] = array(
+									'default' => '',
+									'children' => $children
+								);
+							} else if (!empty($case)) {
+								if ($isDefault) {
+									$defaultCases++;
+									$defaultCase = true;
+								} else {
+									$defaultCase = false;
+								}
+								$switch[] = array(
+									'case' => $case,
+									'children' => $children
+								);
+							}
+							$children = array();
+						}
+
+						if ($isCase) {
+							$case = array();
+							$names = array();
+							self::parseTextNode($code, $case, $let, $caseType, $names);
+							$allReactNames = array_merge($allReactNames, $names);
+
+							$case = $case[0];
+							$shouldBeCase = false;
+						} elseif (!$isDefault) {
+							self::parseTextNode($code, $children, $let);
+						}
+					}
+				}
+			} else {
+				if ($shouldBeCase) {
+					new Error(self::$errors[$errorType], array(self::$templateName, self::$className, $item['content']));
+				}		
+				$childList = self::gatherChildren($childrenList, $j, $item['tagName']);
+				array_unshift($childList, $item);
+				$childList[] = $childrenList[$j];
+				TemplateCodeParser::setContext(null);
+				$children = array_merge($children, self::getHtmlChildren($childList, $let));
+				TemplateCodeParser::setContext($switchType);
+			}
+		}
+		if ($defaultCase) {
+			$switch[] = array(
+				'default' => '',
+				'children' => $children
+			);
+		} else {
+			$switch[] = array(
+				'case' => $case,
+				'children' => $children
+			);
+		}		
+
+		$child['is'] = array();
+		$child['c'] = array();
+		if (!empty($allReactNames)) {
+			$child['n'] = array_values(array_unique($allReactNames));
+		}
+		if (!empty(self::$componentsOpen)) {
+			$child['$'] = '<nq>$<nq>';
+		}
+		foreach ($switch as $case) {
+			if (isset($case['default'])) {
+				if (!empty($case['children'])) {
+					$child['d'] = self::getProperChildren($case['children']);
+				}
+			} else {
+				$child['is'][] = $case['case'];
+				if (!empty($case['children'])) {
+					$child['c'][] = self::getProperChildren($case['children']);
+				} else {
+					$child['c'][] = '';
+				}
+			}
+		}
+		TemplateCodeParser::setContext(null);
+	}
+
 	private static function getObfuscatedClassName(&$value) {
 		$parts = explode(' ', $value);
 		$newClassName = array();
@@ -1545,7 +1789,7 @@ class TemplateParser
 		if ($text == self::$space) {
 			$text = '\\'.trim(self::$space, '_');
 		}
-		self::$textNodes[] = $text;
+		self::$textNodes[] = addcslashes($text, "'");
 		return count(self::$textNodes) - 1;
 	}
 }

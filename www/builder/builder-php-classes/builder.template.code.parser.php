@@ -78,8 +78,8 @@ class TemplateCodeParser
 		'globalVarAsCompAttr' => 'Обнаружена попытка передать класс State дочернему компоненту в шаблоне {??} класса {??}<br>Данный класс является синглтоном и не нуждается в передаче по ссылке<br><br>Код в котором произошла ошибка: {{??}}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'globalVarAsTemplAttr' => 'Обнаружена попытка передать класс State дочернему шаблону в шаблоне {??} класса {??}<br>Данный класс является синглтоном и не нуждается в передаче по ссылке<br><br>Код в котором произошла ошибка: {{??}}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'thisKeyword' => 'Обнаружено использование ключевого слова <b>this</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
-		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
-		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
+		'caseOutOfSwitchContext' => 'Обнаружен оператор {??} вне операторов <b>switch</b> или <b>if</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{{?}}</xmp>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
+		'operatorInAppropPlace' => 'Обнаружен оператор {??} в ненадлежащем месте в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'doubleForeachKeyword' => 'Обнаружено более одного ключевого слова в операторе <b>foreach</b> в шаблоне {??} класса {??}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'improperCallback' => 'Обнаружен вызов неподходящего для этого метода {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'improperPlaceForTempl' => "Обнаружена попытка передать ссылку на шаблон {??} в неподходящем месте в шаблоне {??} класса {??}<br>Ссылки на шаблоны можно передавать только дочерним компонентам<xmp>{template .main}\n   <component class=\"Component\" tpl=\"{%item}\">\n{/template}\n\n{template .item}\n   <div></div>\n{/template}</xmp>",
@@ -289,28 +289,28 @@ class TemplateCodeParser
 						switch ($part) {
 							case 'foreach':
 								if (self::$place != 'foreach') {
-									new Error(self::$errors['operatorInAppropPlace'], array('foreach', self::$templateName, self::$className, self::$element));
+									new Error(self::$errors['operatorInAppropPlace'], array('foreach', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isForeach = true;
 								self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
 							break;
 							case 'let':
 								if (self::$place != 'let') {
-									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$templateName, self::$className, self::$element));
+									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isLet = true;
 								self::$expected = array('&', self::$space);
 							break;
 							case 'switch':
 								if (self::$place != 'switch') {
-									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$templateName, self::$className, self::$element));
+									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isSwitch = true;
 								self::$expected = array('~', '@', '&', '$', '#', self::$space);
 							break;
 							case 'case':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
-									new Error(self::$errors['caseOutOfSwitchContext'], array('case', self::$templateName, self::$className, self::$code));
+									new Error(self::$errors['caseOutOfSwitchContext'], array('case', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isCase = true;
 								if (self::$place != 'ifcase') {
@@ -321,7 +321,7 @@ class TemplateCodeParser
 							break;
 							case 'default':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
-									new Error(self::$errors['caseOutOfSwitchContext'], array('default', self::$templateName, self::$className, self::$code));
+									new Error(self::$errors['caseOutOfSwitchContext'], array('default', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								$isDefault = true;
 								self::$thereWasWord = true;
@@ -547,7 +547,6 @@ class TemplateCodeParser
 			}
 			if (self::$isLet && empty(self::$open['func']) && !self::$open['array']) {
 				self::off('letvalue');
-				self::$expected[] = ',';
 				self::on('letvarname');
 			} else {
 				self::$expected[] = '(';
@@ -637,8 +636,7 @@ class TemplateCodeParser
 				} elseif (!empty(self::$varType)) {
 					self::on('var2');
 				}
-			}
-			if (self::$open['letvalue']) {
+			} else {
 				self::on('array');
 				self::$expected[] = ']';
 			}
@@ -650,10 +648,10 @@ class TemplateCodeParser
 			self::tryToCloseTernary();
 			self::minus('bracket');
 			self::$expected = array();
-			self::off('number');
-			// if (!self::$open['letvarname']) {
-			// 	array_push(self::$expected, '&&', '||', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');
-			// }
+			self::off('number');			
+			if (!self::$open['letvarname'] && !self::$open['array']) {
+				array_push(self::$expected, '[', '&&', '||', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');
+			}
 			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
 				self::$expected[] = ')';
 			}
@@ -674,16 +672,17 @@ class TemplateCodeParser
 			if (self::$open['array']) {
 				self::off('array');
 				self::off('letvalue');
-				self::$expected[] = ',';
+				self::off('letvarname');
+				array_push(self::$expected, ',', self::$space);
 				self::off('number');
 			} else {
 				self::on('recentVar');
 			}
 			if (self::$isLet) {
-				if (self::$open['letvarname']) {
-					self::$expected[] = '=';
-				} elseif (!self::$open['letvalue']) {
+				if (!self::$open['letvalue']) {
 					array_push(self::$expected, ',', 'end');
+				} elseif (self::$open['letvarname']) {
+					self::$expected[] = '=';
 				}
 			} else {
 				self::$expected[] = 'end';
@@ -1140,7 +1139,7 @@ class TemplateCodeParser
 	}
 
 	private static function couldBeLeftBracket() {
-		return !self::$isNum && !self::$isKey && !self::$open['text'] && !self::$open['letvarname'];
+		return !self::$isNum && !self::$isKey && !self::$open['text'] && (!self::$open['letvarname'] || self::$open['array']);
 	}
 
 	private static function couldBeRightBracket() {
@@ -1411,6 +1410,7 @@ class TemplateCodeParser
 
 	private static function getExpected() {
 		$items = array();
+		self::$expected = array_unique(self::$expected);
 		foreach (self::$expected as $exp) {
 			if ($exp == self::$space) continue;
 			if ($exp == 'a') {
@@ -1633,7 +1633,7 @@ class TemplateCodeParser
 			}
 			$parts = preg_split('/\s+as\s+/', $code);
 			self::$data['items'] = '<nq>'.$parts[0].'<nq>';
-			self::$data['reactiveItems'] = preg_match('/\$\.g/', $parts[0]);
+			self::$data['reactiveItems'] = preg_match('/\$\.[ga]/', $parts[0]);
 			$parts = preg_split('/\s*=>\s*/', $parts[1]);
 			if (isset($parts[1])) {
 				self::$data['key'] = '<nq>'.$parts[0].'<nq>';
@@ -1681,7 +1681,7 @@ class TemplateCodeParser
 		} else {
 			$names = json_encode($names);
 		}
-		if (!self::$data['inFunc'] && !preg_match('/^\$\.a\(\'\w+\',1\)$/', $code)) {
+		if (!self::$data['inFunc'] && !preg_match('/^\$\.a\(\'\w+\',1\)$/', $code) && self::$place != 'if' && self::$place != 'else') {
 			self::$data['inFunc'] = true;
 		}
 		return $code;
