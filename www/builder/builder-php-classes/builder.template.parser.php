@@ -638,6 +638,7 @@ class TemplateParser
 		}
 		$isLet = 0;
 		//self::checkHtmlTagStructure($list);
+		TemplateValidator::validate($list, self::$templateName, self::$className);
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);

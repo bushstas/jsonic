@@ -1,17 +1,4 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	<DataTableTabPanel onChange="handleChange"/>	
-	<::hello>
-		<Reason>
-			{switch $a}
-				<a>
-				{case 1}
-					it's 1
-				{/case}
-				{default}
-					it's none
-				{/default}
-			{/switch}
-		</Reason>
-	</::hello>
+	<a><div>
 </div>
