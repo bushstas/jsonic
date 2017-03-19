@@ -1,6 +1,7 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	<DataTableTabPanel onChange="handleChange"/>
+	{let &a = [1,2,3,4,5,[5,7,8]], &b = 2, &d = .isArray([1,2])}
+	<DataTableTabPanel onChange="handleChange" r="{$a}"/>
 	{$:aaa}
 	<::hello>
 		<Reason>

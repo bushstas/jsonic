@@ -223,6 +223,7 @@ class TemplateParser
 				$data = str_replace("<emptystring>", "''", $data);
 				$data = str_replace("<space>", "' '", $data);
 				$data = preg_replace("/''\+|\+''/", "", $data);
+				$data = str_replace("_#_comma_#_", ",", $data);
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
 			$templateFunctions[] = array('content' => $data, 'name' => $template['name'], 'let' => $template['let']);
@@ -255,7 +256,26 @@ class TemplateParser
 		}
 		$names = array();
 		foreach ($data['delimiters'] as $i => $delmr) {
-			$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'textNode', $names));
+			$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names));
+			if (preg_match('/\[/', $delmr)) {
+				$d = Splitter::split('/[\[\]]/', $delmr);
+				$open = 0;
+				$delmr = '';
+				foreach ($d['items'] as $j => $it) {
+					if ($open > 0) {
+						$it = str_replace(',', '_#_comma_#_', $it);
+					}
+					$delmr .= $it;
+					if (isset($d['delimiters'][$j])) {
+						if ($d['delimiters'][$j] == '[') {
+							$open++;
+						} else {
+							$open--;
+						}
+						$delmr .= $d['delimiters'][$j];
+					}
+				}
+			}
 			$parts = explode(',', $delmr);
 			foreach ($parts as $part) {
 				$p = explode('=', $part);
@@ -576,7 +596,7 @@ class TemplateParser
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);
-		//Printer::log($children);
+		Printer::log($children);
 		$finishedChildren = array();
 
 		self::finish($children['c'], $finishedChildren);

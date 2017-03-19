@@ -295,7 +295,7 @@ class TemplateCodeParser
 								self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
 							break;
 							case 'let':
-								if (self::$place != 'textNode') {
+								if (self::$place != 'let') {
 									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$templateName, self::$className, self::$element));
 								}
 								self::$isLet = true;
@@ -539,8 +539,8 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			self::tryToCloseTernary();
 			self::$expected = array();
-			if (!self::$isLet || !empty(self::$open['func']) || self::$open['array']) {
-				self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', self::$space);
+			if (!self::$isLet || self::$open['func'] || self::$open['array']) {
+				self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', '[', self::$space);
 				self::maybeAddDollar();
 			} else {
 				self::$expected = array('&', self::$space);
@@ -649,11 +649,11 @@ class TemplateCodeParser
 		if (!self::$quoted) {
 			self::tryToCloseTernary();
 			self::minus('bracket');
-			self::$expected = array('[', '.', self::$space);
+			self::$expected = array();
 			self::off('number');
-			if (!self::$open['letvarname']) {
-				array_push(self::$expected, '&&', '||', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');
-			}
+			// if (!self::$open['letvarname']) {
+			// 	array_push(self::$expected, '&&', '||', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');
+			// }
 			if (!empty(self::$open['func']) || !empty(self::$open['parenthesis'])) {
 				self::$expected[] = ')';
 			}
@@ -662,6 +662,9 @@ class TemplateCodeParser
 			}
 			if (!empty(self::$open['ternary']) && self::$open['ternary'] > self::$open['ternary2']) {
 				self::$expected[] = ':';
+			}
+			if (self::$open['bracket'] > 0) {
+				self::$expected[] = ']';
 			}
 			if (self::$varType == 'r') {
 				self::on('react2');
@@ -908,7 +911,7 @@ class TemplateCodeParser
 
 	private static function handleLeftParens() {
 		if (!self::$quoted) {
-			self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', '(', self::$space);
+			self::$expected = array('"', "'", 'a', '0', '+', '-', '!', '&', '~', '@', '#', '.', '(', '[', self::$space);
 			if (self::$prevSign == 'a') {
 				self::off('fn');
 				self::add('func');
@@ -1344,6 +1347,9 @@ class TemplateCodeParser
 
 			case 'textNode':
 				return 'текстового элемента';
+
+			case 'let':
+				return 'let оператора';
 			
 			default:
 				return '';
@@ -1365,6 +1371,7 @@ class TemplateCodeParser
 			case 'componentAttribute':
 				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%');
 			break;
+			case 'let':
 			case 'textNode':
 				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%');
 			break;
