@@ -21,11 +21,81 @@ class TemplateValidator
 	private static $items;
 	private static $prevType;
 
+	private static $simpleTags = array(
+		'br', 'input', 'img', 'hr'
+	);
+
 	private static $errors = array(
 		'noClosingTag' => 'Обнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>Данный {?} {?}-й по счету открывающийся {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag' => 'Обнаружен лишний закрывающийся {?} {??} в шаблоне {??} класса {??}<br>Данный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>Ожидается закрытие тега {??}<br>Данный {?} {?}-й по счету открывающийся {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag2' => 'Обнаружен лишний закрывающийся {?} {??} в шаблоне {??} класса {??}<br>Данный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>',
-		'extraClosingTag3' => 'Обнаружен закрывающийся {?} {??} в начале шаблона {??} класса {??}'
+		'extraClosingTag3' => 'Обнаружен закрывающийся {?} {??} в начале шаблона {??} класса {??}',
+		'tagInsideTag' => 'Обнаружена недопустимая вложенность: тег {??} внутри тега {??} в шаблоне {??} класса {??}<br>Данный тег {?}-й по счету открывающийся тег {??}<xmp>{?}</xmp>',
+		'tagOutsideProperTag' => 'Обнаружена недопустимая вложенность: тег {??} вне {?} {??} в шаблоне {??} класса {??}<br>Данный тег {?}-й по счету открывающийся тег {??}<xmp>{?}</xmp>',
+		'operatorOutOfPlace' => 'Обнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'textInSwitch' => 'Обнаружен текстовый элемент непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный текст: <xmp>{?}</xmp>',
+		'elementInSwitch' => 'Обнаружен элемент DOM непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный элемент: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'componentInSwitch' => 'Обнаружен компонент непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный компонент: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'operatorInSwitch' => 'Обнаружен оператор непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный оператор: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'templateInSwitch' => 'Обнаружен вызов шаблона непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный вызов шаблона: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'closingSimpleTag' => 'Обнаружен закрывающийся тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>'
+	);
+
+	private static $onlyParentalElements = array(
+		'command' => array('menu'),
+		'tbody' => array('table'),
+		'thead' => array('table'),
+		'tr' => array('table', 'thead', 'tbody'),
+		'th' => array('tr'),
+		'td' => array('tr'),
+		'tfoot' => array('table'),
+		'colgroup' => array('table'),
+		'col' => array('colgroup', 'table'),
+		'area' => array('map'),
+		'source' => array('audio', 'video'),
+		'dd' => array('dl'),
+		'dt' => array('dl'),
+		'fieldset' => array('form'),
+		'figcaption' => array('figure'),
+		'keygen' => array('form'),
+		'li' => array('ul', 'ol', 'menu'),
+		'optgroup' => array('select'),
+		'option' => array('select', 'optgroup'),
+		'summary' => array('details')
+	);
+
+	private static $forbiddenElements = array(
+		'body', 'head', 'html', 'script', 'noscript', 'style', 'meta', 'link', 'title', 'frame',
+		'base', 'bgsound', 'blink', 'center', 'comment', 'dir', 'font', 'applet', 'acronym',
+		'frameset', 'hgroup', 'isindex', 'marquee', 'nobr', 'noembed', 'noframes', 'object',
+		'plaintext', 'strike', 'tt', 'u', 'xmp'
+	);
+
+	private static $forbiddenInnerElements = array(
+		'a' => array('a', 'form', 'caption'),
+		'form' => array('a', 'form'),
+		'address' => array('nav'),
+		'pre' => array('big', 'img', 'small', 'sub', 'sup')
+	);
+
+	private static $allowedInnerElements = array(
+		'p' => array(
+			'span', 'table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'a', 'input',
+			'img', 'video', 'audio', 'b', 'big', 'button', 'canvas', 'code', 'i',
+			'iframe', 'label', 's', 'select', 'strong', 'textarea', 'small', 'abbr',
+			'map', 'basefont', 'cite', 'datalist', 'del', 'dfn', 'em', 'embed', 'ins',
+			'kbd', 'mark', 'meter', 'output', 'progress', 'q', 'samp', 'sub', 'sup', 'time',
+			'var', 'wbr'
+		),
+		'canvas' => array(),
+		'iframe' => array(),
+		'textarea' => array(),
+		'table' => array(
+			'caption', 'tbody', 'thead', 'tr', 'td', 'th', 'colgroup', 'col', 'tfoot'
+		),
+		'dl' => array('dt', 'dd'),
+		'select' => array('optgroup', 'option'),
+		'details' => array('summary')
 	);
 
 	private static function init() {
@@ -52,18 +122,31 @@ class TemplateValidator
 			if ($item['type'] == 'tag') {
 				self::$currentIndex = $index;
 				self::$tag = $item['tagName'];
-				if (empty($item['isClosing'])) {
-					self::handleOpening($item);
+				if (!$item['isSingle']) {
+					if (empty($item['isClosing'])) {
+						self::handleOpening($item);
+					} else {
+						self::handleClosing($item);
+					}
 				} else {
-					self::handleClosing($item);
+					self::handleSingleTag($item);
 				}
 				self::$allTagNames[] = self::$tag;
 				self::$prevType = empty($item['isClosing']) ? 'open' : 'closed';
 				self::$types[] = self::$prevType;
+			} else {
+				self::validateTextParent($item);
 			}
 		}
 		self::checkCompleteness();
 		die('ok');
+	}
+
+	private static function validateTextParent($item) {
+		$last = self::getLastOpenTag();
+		if ($last == 'switch') {
+			new Error(self::$errors['textInSwitch'], array(self::$templateName, self::$className, $item['content']));
+		}
 	}
 
 	private static function checkCompleteness() {
@@ -75,15 +158,32 @@ class TemplateValidator
 		}
 	}
 
-	private static function handleOpening($item) {
-		self::$openTags[] = $item;
-		self::$allOpenTagNames[] = self::$tag;		
-		self::$openTagNames[] = self::$tag;
-		if (!isset(self::$openedTags[self::$tag])) {
-			self::$openedTags[self::$tag] = 0;
+	private static function handleSingleTag($item) {
+		$tag = self::$tag;
+		if (self::isSimpleTag($tag) && $item['isClosing']) {
+			new Error(self::$errors['closingSimpleTag'], array($tag, self::$templateName, self::$className, $item['content']));
 		}
-		self::$openedTags[self::$tag]++;
+		if ($tag == 'ifempty' && !in_array('foreach', self::$openTagNames)) {
+			new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className, $item['content']));
+		} elseif ($tag == 'else' && !in_array('if', self::$openTagNames)) {
+			new Error(self::$errors['operatorOutOfPlace'], array('else', 'if', self::$templateName, self::$className, $item['content']));
+		}
+		self::validateOpenTag($item);	
+		self::$allOpenTagNames[] = $tag;
+	}
+
+	private static function handleOpening($item) {
+		$tag = self::$tag;
+		if (!isset(self::$openedTags[$tag])) {
+			self::$openedTags[$tag] = 0;
+		}
+		self::$openedTags[$tag]++;
+		self::validateOpenTag($item);
 		
+		self::$openTags[] = $item;
+		self::$allOpenTagNames[] = $tag;
+		self::$openTagNames[] = $tag;
+
 		self::$openedData[] = array(
 			'tag' => self::$tag,
 			'content' => $item['content'],
@@ -93,6 +193,44 @@ class TemplateValidator
 		self::$indexes[] = self::$index;
 		self::$realIndexes[self::$index] = self::$currentIndex;
 		self::$index++;
+	}
+
+	private static function validateOpenTag($item) {
+		$tag = self::$tag;
+		$last = self::getLastOpenTag();
+		if ($tag != 'case' && $tag != 'default' && $last == 'switch') {
+			$error = self::getSwitchError($tag);
+			new Error(self::$errors[$error], array(self::$templateName, self::$className, $tag, $item['content']));
+		}
+		if (($tag == 'case' || $tag == 'default') && $last != 'switch') {
+			new Error(self::$errors['operatorOutOfPlace'], array($tag, 'switch', self::$templateName, self::$className, $item['content']));
+		}
+		if (in_array($tag, self::$forbiddenElements)) {
+			new Error(self::$errors['forbiddenTag'], array($tag, self::$templateName, self::$className, $item['content']));
+		}
+		
+		if (isset(self::$forbiddenInnerElements[$last]) && in_array($tag, self::$forbiddenInnerElements[$last])) {
+			new Error(self::$errors['tagInsideTag'], array($tag, $last, self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
+		}
+		if (isset(self::$onlyParentalElements[$tag]) && !in_array($last, self::$onlyParentalElements[$tag])) {
+			new Error(self::$errors['tagOutsideProperTag'], array($tag, count(self::$onlyParentalElements[$tag]) > 1 ? 'тегов' : 'тега', implode(', ', self::$onlyParentalElements[$tag]), self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
+		}
+		if (isset(self::$allowedInnerElements[$last]) && !in_array($tag, self::$allowedInnerElements[$last])) {
+			new Error(self::$errors['tagInsideTag'], array($tag, $last, self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
+		}
+	}
+
+	private static function getSwitchError($tag) {
+		if (self::isOperator($tag)) {
+			return 'operatorInSwitch';
+		}
+		if ($tag[0] == ':') {
+			return 'templateInSwitch';
+		}
+		if (preg_match('/^[a-z]/', $tag)) {
+			return 'elementInSwitch';
+		}
+		return 'componentInSwitch';
 	}
 
 	private static function handleClosing($item) {
@@ -157,7 +295,7 @@ class TemplateValidator
 			if (isset($content)) {
 				$object3 = self::getTagTypeName($tag);
 				new Error(
-					self::$errors['extraClosingTag'], array($object, $tn, self::$templateName, self::$className, $object, self::$openedTags[$prev], $typeTag, $object2, $prev, self::$items[self::$currentIndex - 1]['content'],
+					self::$errors['extraClosingTag'], array($object, self::$tag, self::$templateName, self::$className, $object, self::$openedTags[$prev], $typeTag, $object2, $prev, self::$items[self::$currentIndex - 1]['content'],
 					$tag, $object3, $orderNumber, $object3, $tag, $content
 				));
 			} else {			
@@ -168,7 +306,15 @@ class TemplateValidator
 		}
 	}
 
-	private	static function getTagTypeName($tn, $ending = '') {
-		return ($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case' || $tn == 'default' ? 'оператор' : 'тег').$ending;
+	private	static function isOperator($tag) {
+		return $tag == 'if' || $tag == 'switch' || $tag == 'foreach'|| $tag == 'else' || $tag == 'ifempty' || $tag == 'case' || $tag == 'default';
+	}
+
+	private	static function getTagTypeName($tag, $ending = '') {
+		return (self::isOperator($tag) ? 'оператор' : 'тег').$ending;
+	}
+
+	private	static function isSimpleTag($tag) {
+		return in_array($tag, self::$simpleTags);
 	}
 }

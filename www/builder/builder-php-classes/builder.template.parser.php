@@ -16,67 +16,6 @@ class TemplateParser
 		'else', 'ifempty'
 	);
 	
-	private static $contexts = array(
-		'else' => 'if', 'ifempty' => 'foreach'
-	);
-
-	private static $forbiddenElements = array(
-		'body', 'head', 'html', 'script', 'noscript', 'style', 'meta', 'link', 'title', 'frame',
-		'base', 'bgsound', 'blink', 'center', 'comment', 'dir', 'font', 'applet', 'acronym',
-		'frameset', 'hgroup', 'isindex', 'marquee', 'nobr', 'noembed', 'noframes', 'object',
-		'plaintext', 'strike', 'tt', 'u', 'xmp'
-	);
-
-	private static $forbiddenInnerElements = array(
-		'a' => array('a', 'form', 'caption'),
-		'form' => array('a', 'form'),
-		'address' => array('nav'),
-		'pre' => array('big', 'img', 'small', 'sub', 'sup')
-	);
-
-	private static $onlyParentalElements = array(
-		'command' => array('menu'),
-		'tbody' => array('table'),
-		'thead' => array('table'),
-		'tr' => array('table', 'thead', 'tbody'),
-		'th' => array('tr'),
-		'td' => array('tr'),
-		'tfoot' => array('table'),
-		'colgroup' => array('table'),
-		'col' => array('colgroup', 'table'),
-		'area' => array('map'),
-		'source' => array('audio', 'video'),
-		'dd' => array('dl'),
-		'dt' => array('dl'),
-		'fieldset' => array('form'),
-		'figcaption' => array('figure'),
-		'keygen' => array('form'),
-		'li' => array('ul', 'ol', 'menu'),
-		'optgroup' => array('select'),
-		'option' => array('select', 'optgroup'),
-		'summary' => array('details')
-	);
-
-	private static $allowedInnerElements = array(
-		'p' => array(
-			'span', 'table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'a', 'input',
-			'img', 'video', 'audio', 'b', 'big', 'button', 'canvas', 'code', 'i',
-			'iframe', 'label', 's', 'select', 'strong', 'textarea', 'small', 'abbr',
-			'map', 'basefont', 'cite', 'datalist', 'del', 'dfn', 'em', 'embed', 'ins',
-			'kbd', 'mark', 'meter', 'output', 'progress', 'q', 'samp', 'sub', 'sup', 'time',
-			'var', 'wbr'
-		),
-		'canvas' => array(),
-		'iframe' => array(),
-		'textarea' => array(),
-		'table' => array(
-			'caption', 'tbody', 'thead', 'tr', 'td', 'th', 'colgroup', 'col', 'tfoot'
-		),
-		'dl' => array('dt', 'dd'),
-		'select' => array('optgroup', 'option'),
-		'details' => array('summary')
-	);
-
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
 				   $templateName, $globalNames,
@@ -86,10 +25,7 @@ class TemplateParser
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
 		'forbiddenTag' => 'Обнаружен недопустимый тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>',
-		'closingSimpleTag' => 'Обнаружен закрывающийся тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>',
 		'noClosingTag' => 'Обнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>Данный {?} {?}-й по счету открывающийся {?} {??}<xmp>{?}</xmp>',
-		'tagInsideTag' => 'Обнаружена недопустимая вложенность: тег {??} внутри тега {??} в шаблоне {??} класса {??}<br>Данный тег {?}-й по счету открывающийся тег {??}<xmp>{?}</xmp>',
-		'tagOutsideProperTag' => 'Обнаружена недопустимая вложенность: тег {??} вне {?} {??} в шаблоне {??} класса {??}<br>Данный тег {?}-й по счету открывающийся тег {??}<xmp>{?}</xmp>',
 		'noClosingTag2' => 'Обнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>Данный {?} {?}-й по счету открывающийся {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag' => 'Обнаружен лишний закрывающийся {?} {??} в шаблоне {??} класса {??}<br>Данный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>Ожидается закрытие тега {??}<br>Данный {?} {?}-й по счету открывающийся {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag2' => 'Обнаружен лишний закрывающийся {?} {??} в шаблоне {??} класса {??}<br>Данный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>',
@@ -120,17 +56,12 @@ class TemplateParser
 		'unknownSpecEventAttr' => 'Обнаружен неизвестный спецпараметр {??} атрибута события {??} в шаблоне {??} класса {??}<br><br>Ожидается одно из значений: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'unknownEventAttr' => 'Обнаружен атрибут неизвестного события {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'specEventAttrInComp' => 'Обнаружен спецпараметр {??} события {??} в теге компонента в шаблоне {??} класса {??}<br><br>Данный функционал доступен только для элементов DOM<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'operatorOutOfPlace' => 'Обнаружен оператор {??} вне границ оператора {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
 		'operatorInInnerLevel' => 'Обнаружен оператор {??} не на одном уровне с оператором {??} в шаблоне {??} класса {??}',
 		'doubleOperator' => 'Обнаружен оператор {??} внутри другого оператора {??} в шаблоне {??} класса {??}',
 		'fewSameOperators' => 'Обнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
 		'loadingOperatorWithoutLoader' => 'Обнаружено использование одного из операторов <b>loading, loader</b> в шаблоне {??} класса {??}. У данного класса отсутствует initial параметр <b>loader</b>',
 		'invalidTagName' => 'Некорректное имя тега {??} в шаблоне {??} класса {??}<br><br>Теги элементов DOM должны иметь вид:<xmp><div>, <h1>, <table></xmp>Теги компонентов должны иметь вид:<xmp><Select>, <TableColumn></xmp>Теги вызова шаблона класса:<xmp><:content>, <:innerContent></xmp>Теги вызова свободного шаблона:<xmp><::checkbox>, <::userArea></xmp>',
-		'includeNotFound' => 'Обнаружен вызов несуществующего include шаблона {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'textInSwitch' => 'Обнаружен текстовый элемент непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный текст: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'elementInSwitch' => 'Обнаружен элемент DOM непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный элемент: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'componentInSwitch' => 'Обнаружен компонент непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный компонент: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>',
-		'operatorInSwitch' => 'Обнаружен оператор {??} непосредственно внутри оператора <b>switch</b> в шаблоне {??} класса {??}<br><br>Обнаруженный оператор: <xmp>{?}</xmp>Код в котором произошла ошибка: <xmp>{?}</xmp>'
+		'includeNotFound' => 'Обнаружен вызов несуществующего include шаблона {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
 	public static function init($params) {
@@ -637,7 +568,6 @@ class TemplateParser
 			}
 		}
 		$isLet = 0;
-		//self::checkHtmlTagStructure($list);
 		TemplateValidator::validate($list, self::$templateName, self::$className);
 		
 		$children = array('c' => array());
