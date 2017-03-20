@@ -2,3 +2,4 @@
 <div class="@outer-container" onCLick="handleClick">
 	<a><div>
 </div>
+</a>

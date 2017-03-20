@@ -23,7 +23,6 @@ class TemplateValidator
 
 	private static $errors = array(
 		'noClosingTag' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
-		'noClosingTag2' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>ќжидаетс€ закрытие тега {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag2' => 'ќбнаружен лишний закрывающийс€ {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} следует после {?}-го по счету {?} {?} {??}<xmp>{?}</xmp>',
 		'extraClosingTag3' => 'ќбнаружен закрывающийс€ {?} {??} в начале шаблона {??} класса {??}'
@@ -49,7 +48,6 @@ class TemplateValidator
 		self::$items = $items;
 		self::$templateName = $templateName;
 		self::$className = $className;
-
 		foreach ($items as $index => $item) {
 			if ($item['type'] == 'tag') {
 				self::$currentIndex = $index;
@@ -73,7 +71,7 @@ class TemplateValidator
 			$openedData = array_reverse(self::$openedData);
 			extract($openedData[0]);			
  			$object = self::getTagTypeName($tag);
-		 	new Error(self::$errors['noClosingTag2'], array($object, $tag, self::$templateName, self::$className, $object, $orderNumber, $object, $tag, $content));
+		 	new Error(self::$errors['noClosingTag'], array($object, $tag, self::$templateName, self::$className, $object, $orderNumber, $object, $tag, $content));
 		}
 	}
 
@@ -92,14 +90,14 @@ class TemplateValidator
 			'orderNumber' => self::$openedTags[self::$tag]
 		);
 
-		self::$prev = self::$tag;
 		self::$indexes[] = self::$index;
 		self::$realIndexes[self::$index] = self::$currentIndex;
 		self::$index++;
 	}
 
 	private static function handleClosing($item) {
-		if (empty(self::$prev) || self::$prev != self::$tag) {
+		$prev = self::getLastOpenTag();
+		if (empty($prev) || $prev != self::$tag) {
 			if (in_array(self::$tag, self::$openTagNames)) { 
 				self::onClosingError();						
 			} else {
@@ -119,8 +117,9 @@ class TemplateValidator
 		array_pop(self::$indexes);
 	}
 
-	private static function getLastOpenTag() {
-		return self::$allOpenTagNames[count(self::$allOpenTagNames) - 1];
+	private static function getLastOpenTag($isAll = false) {
+		$source = $isAll ? self::$allOpenTagNames : self::$openTagNames;
+		return $source[count($source) - 1];
 	}
 
 	private static function getLastClosedTag() {
@@ -128,19 +127,21 @@ class TemplateValidator
 	}
 
 	private static function onClosingError() {
+		$prev = self::getLastOpenTag();
 		$prevIndex = array_pop(self::$indexes);
 		$realIndex = self::$realIndexes[$prevIndex];		
 		$count = 0;
 		foreach (self::$allTagNames as $i => $tag) {
-			if ($tag == self::$prev && self::$types[$i] == 'open') $count++;
+			if ($tag == $prev && self::$types[$i] == 'open') $count++;
 			if ($i == $realIndex) break;
 		}
-		$object = self::getTagTypeName(self::$prev);
-		new Error(self::$errors['noClosingTag'], array($object, self::$prev, self::$templateName, self::$className, $object, $count, $object, self::$prev, self::$items[$realIndex]['content']));
+		$object = self::getTagTypeName($prev);
+		new Error(self::$errors['noClosingTag'], array($object, $prev, self::$templateName, self::$className, $object, $count, $object, $prev, self::$items[$realIndex]['content']));
 	}
 
 	private static function onClosingError2() {
-		$prev = self::$prevType == 'open' ? self::getLastOpenTag() : self::getLastClosedTag();
+		$prevOpen = self::getLastOpenTag();
+		$prev = self::$prevType == 'open' ? self::getLastOpenTag(true) : self::getLastClosedTag();
 		$openedData = array_reverse(self::$openedData);
 		if (isset($openedData[0])) {
 			extract($openedData[0]);
@@ -149,7 +150,7 @@ class TemplateValidator
 		$object2 = self::getTagTypeName($prev, 'а');
 		
 		$typeTag = self::$prevType == 'open' ? 'открывающегос€' : 'закрывающегос€';
-		if (self::$prev != $prev && self::$prevType == 'open') {
+		if ($prevOpen != $prev && self::$prevType == 'open') {
 			$typeTag = '';
 		}
 		if (!empty($prev)) {
