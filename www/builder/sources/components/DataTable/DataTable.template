@@ -1,12 +1,7 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-
-{switch}
-	{case}
-		
-	{/case}
-	{default}
-
-	{/default}
-{/switch}
+{let &a = [1,2]}
+{foreach &a as &i => &f while (&i > 10)}
+	111
+{/foreach}
 </div>

@@ -4,6 +4,7 @@ class TemplateValidator
 {	
 	private static $openTags;
 	private static $openTagNames;
+	private static $openHtmlTagNames;
 	private static $closedTagNames;
 	private static $allOpenTagNames;
 	private static $allTagNames;
@@ -20,10 +21,6 @@ class TemplateValidator
 	private static $className;
 	private static $items;
 	private static $prevType;
-
-	private static $simpleTags = array(
-		'br', 'input', 'img', 'hr'
-	);
 
 	private static $errors = array(
 		'noClosingTag' => 'ќбнаружен незакрытый {?} {??} в шаблоне {??} класса {??}<br>ƒанный {?} {?}-й по счету открывающийс€ {?} {??}<xmp>{?}</xmp>',
@@ -101,6 +98,7 @@ class TemplateValidator
 	private static function init() {
 		self::$openTags = array();
 		self::$openTagNames = array();
+		self::$openHtmlTagNames = array();
 		self::$closedTagNames = array();
 		self::$allOpenTagNames = array();
 		self::$allTagNames = array();
@@ -139,7 +137,7 @@ class TemplateValidator
 			}
 		}
 		self::checkCompleteness();
-		die('ok');
+		//die('ok');
 	}
 
 	private static function validateTextParent($item) {
@@ -160,11 +158,11 @@ class TemplateValidator
 
 	private static function handleSingleTag($item) {
 		$tag = self::$tag;
-		if (self::isSimpleTag($tag) && $item['isClosing']) {
+		if (!empty($item['isSingle']) && !empty($item['isClosing'])) {
 			new Error(self::$errors['closingSimpleTag'], array($tag, self::$templateName, self::$className, $item['content']));
 		}
 		if ($tag == 'ifempty' && !in_array('foreach', self::$openTagNames)) {
-			new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className, $item['content']));
+			new Error(self::$errors['operatorOutOfPlace'], array($tag, 'foreach', self::$templateName, self::$className, $item['content']));
 		} elseif ($tag == 'else' && !in_array('if', self::$openTagNames)) {
 			new Error(self::$errors['operatorOutOfPlace'], array('else', 'if', self::$templateName, self::$className, $item['content']));
 		}
@@ -184,6 +182,10 @@ class TemplateValidator
 		self::$allOpenTagNames[] = $tag;
 		self::$openTagNames[] = $tag;
 
+		if (self::isHtmlTag($tag)) {
+			self::$openHtmlTagNames[] = $tag;
+		}
+
 		self::$openedData[] = array(
 			'tag' => self::$tag,
 			'content' => $item['content'],
@@ -198,6 +200,7 @@ class TemplateValidator
 	private static function validateOpenTag($item) {
 		$tag = self::$tag;
 		$last = self::getLastOpenTag();
+		$lastHtmlTag = self::getLastOpenHtmlTag();
 		if ($tag != 'case' && $tag != 'default' && $last == 'switch') {
 			$error = self::getSwitchError($tag);
 			new Error(self::$errors[$error], array(self::$templateName, self::$className, $tag, $item['content']));
@@ -209,14 +212,14 @@ class TemplateValidator
 			new Error(self::$errors['forbiddenTag'], array($tag, self::$templateName, self::$className, $item['content']));
 		}
 		
-		if (isset(self::$forbiddenInnerElements[$last]) && in_array($tag, self::$forbiddenInnerElements[$last])) {
-			new Error(self::$errors['tagInsideTag'], array($tag, $last, self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
+		if (isset(self::$forbiddenInnerElements[$lastHtmlTag]) && in_array($tag, self::$forbiddenInnerElements[$lastHtmlTag])) {
+			new Error(self::$errors['tagInsideTag'], array($tag, $lastHtmlTag, self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
 		}
-		if (isset(self::$onlyParentalElements[$tag]) && !in_array($last, self::$onlyParentalElements[$tag])) {
+		if (isset(self::$onlyParentalElements[$tag]) && !in_array($lastHtmlTag, self::$onlyParentalElements[$tag])) {
 			new Error(self::$errors['tagOutsideProperTag'], array($tag, count(self::$onlyParentalElements[$tag]) > 1 ? 'тегов' : 'тега', implode(', ', self::$onlyParentalElements[$tag]), self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
 		}
-		if (isset(self::$allowedInnerElements[$last]) && !in_array($tag, self::$allowedInnerElements[$last])) {
-			new Error(self::$errors['tagInsideTag'], array($tag, $last, self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
+		if (isset(self::$allowedInnerElements[$lastHtmlTag]) && !in_array($tag, self::$allowedInnerElements[$lastHtmlTag])) {
+			new Error(self::$errors['tagInsideTag'], array($tag, $lastHtmlTag, self::$templateName, self::$className, self::$openedTags[$tag], $tag, $item['content']));
 		}
 	}
 
@@ -234,30 +237,38 @@ class TemplateValidator
 	}
 
 	private static function handleClosing($item) {
+		$tag = self::$tag;
 		$prev = self::getLastOpenTag();
-		if (empty($prev) || $prev != self::$tag) {
-			if (in_array(self::$tag, self::$openTagNames)) { 
+		if (empty($prev) || $prev != $tag) {
+			if (in_array($tag, self::$openTagNames)) { 
 				self::onClosingError();						
 			} else {
 				self::onClosingError2();
 			}
 		}
 
-		if (!isset(self::$closedTags[self::$tag])) {
-			self::$closedTags[self::$tag] = 0;
+		if (!isset(self::$closedTags[$tag])) {
+			self::$closedTags[$tag] = 0;
 		}
-		self::$closedTags[self::$tag]++;
-		self::$closedTagNames[] = self::$tag;
+		self::$closedTags[$tag]++;
+		self::$closedTagNames[] = $tag;
 		
 		array_pop(self::$openTags);
 		array_pop(self::$openTagNames);
 		array_pop(self::$openedData);
 		array_pop(self::$indexes);
+		if (self::isHtmlTag($tag)) {
+			array_pop(self::$openHtmlTagNames);
+		}
 	}
 
 	private static function getLastOpenTag($isAll = false) {
 		$source = $isAll ? self::$allOpenTagNames : self::$openTagNames;
 		return $source[count($source) - 1];
+	}
+
+	private static function getLastOpenHtmlTag() {
+		return self::$openHtmlTagNames[count(self::$openHtmlTagNames) - 1];
 	}
 
 	private static function getLastClosedTag() {
@@ -306,15 +317,15 @@ class TemplateValidator
 		}
 	}
 
+	private	static function isHtmlTag($tag) {
+		return !self::isOperator($tag);
+	}
+
 	private	static function isOperator($tag) {
 		return $tag == 'if' || $tag == 'switch' || $tag == 'foreach'|| $tag == 'else' || $tag == 'ifempty' || $tag == 'case' || $tag == 'default';
 	}
 
 	private	static function getTagTypeName($tag, $ending = '') {
 		return (self::isOperator($tag) ? 'оператор' : 'тег').$ending;
-	}
-
-	private	static function isSimpleTag($tag) {
-		return in_array($tag, self::$simpleTags);
 	}
 }

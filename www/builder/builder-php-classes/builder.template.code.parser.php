@@ -59,6 +59,7 @@ class TemplateCodeParser
 		'pl' => 'имя плэйсхолдера',
 		'fn' => 'имя функции',
 		'limit' => 'ключевое слово limit',
+		'while' => 'ключевое слово while',
 		'var' => 'имя переменной',
 		'method' => 'название метода класса',
 		'comp' => 'идентификатор дочернего компонента',
@@ -295,7 +296,7 @@ class TemplateCodeParser
 								self::$expected = array('a', '.', '$', '~', '&', '#', self::$space);
 							break;
 							case 'let':
-								if (self::$place != 'let') {
+								if (self::$place != 'let') {die(self::$place);
 									new Error(self::$errors['operatorInAppropPlace'], array('let', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isLet = true;
@@ -344,8 +345,8 @@ class TemplateCodeParser
 						self::on('foreachAs');
 						self::$expected = array('&', self::$space);
 					} else {						
-						if (self::prepare($part, $code)) {
-
+						$prepared = self::prepare($part, $code);
+						if ($prepared) {
 							if (self::couldBeColon()) {
 								self::$expected[] = ':';
 							}
@@ -410,7 +411,7 @@ class TemplateCodeParser
 						}					
 						self::$prevSign = !$isNum ? 'a' : '0';
 						$prevCode = $code;
-						self::finish();					
+						self::finish($prepared);
 					}
 				} elseif (self::$expected != '*') {
 					self::error('unexpectedCyr', array($code, $part, ' ...}', self::getExpected()));
@@ -886,7 +887,7 @@ class TemplateCodeParser
 			self::$expected = array();
 			if (!self::$open['name'] && !self::$open['number']) {
 				self::$expected[] = 'a';
-			}
+			}			
 			self::on('var');
 			self::off('var2');
 			self::off('functionResult');
@@ -897,7 +898,7 @@ class TemplateCodeParser
 				self::off('recentVar');
 				array_push(self::$expected, '0', '~', '#', '+', '-', '!', '(', self::$space);
 				self::maybeAddDollar();
-			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math']) && !self::$open['foreachAs'] && !self::$open['foreachAs2']) || self::$open['bracket']) {
+			} else if ((self::$thereWasWord && !self::$open['letvarname'] && empty(self::$open['math']) && !self::$open['foreachAs'] && !self::$open['foreachAs2'] && !self::$open['foreachWhile']) || self::$open['bracket']) {
 				self::$expected[] = '&';
 			}
 			if (self::$isLet && !self::$open['letvarname'] && !self::$open['letvalue'] && empty(self::$open['func']) && empty(self::$open['parenthesis']) && self::$prevSign != '&') {
@@ -1029,12 +1030,18 @@ class TemplateCodeParser
 			return false;
 		}
 
-		if ($part == 'limit' && (self::$open['foreachAs'] || self::$open['foreachAs2']) && self::$open['foreachAsVar']) {
-			self::on('foreachLimit');
+		$isForeach = (self::$open['foreachAs'] || self::$open['foreachAs2']) && self::$open['foreachAsVar'];
+		if ($isForeach) {
 			self::off('foreachAs2');
 			self::off('foreachAs');
 			self::off('foreachAsVar');
-			self::$expected = array('0', '~', '$', '&', '#', '.', self::$space);
+			if ($part == 'limit') {
+				self::on('foreachLimit');
+				self::$expected = array('0', '~', '$', '&', '#', '.', self::$space);
+			} elseif ($part == 'while') {
+				self::on('foreachWhile');
+				self::$expected = array('a', '0', '~', '$', '&', '.', '!', '(', self::$space);
+			}
 			return false;
 		}
 		if (!self::$isNum && !self::$anyVar && !self::$isKey && !self::$open['comp'] && (!self::$open['placeholder'] || self::$open['placeholderShouldHaveDefaultValue'])) {
@@ -1050,11 +1057,14 @@ class TemplateCodeParser
 					new Error(self::$errors['improperCallback'], array(self::$currentPart, self::$className, self::$templateName, !empty(self::$element) ? self::$element : self::$code));
 				}
 			}
-		}			
+		}
 		if ((self::$open['foreachAs'] || self::$open['foreachAs2']) && !self::$isNum) {
+			if (self::$open['foreachAs2']) {
+				self::on('foreachAsVar2');	
+			}
 			self::on('foreachAsVar');
 			return false;
-		}		
+		}
 		if (self::isOpen('placeholder') && !self::isOpen('placeholderShouldHaveDefaultValue')) {
 			self::$expected = array('=', 'end', self::$space);
 			return false;
@@ -1210,7 +1220,7 @@ class TemplateCodeParser
 		return (self::$objVar || (self::$isNum && !self::$decOpen)) && self::$notLetValue;
 	}
 
-	private static function finish() {
+	private static function finish($prepared) {
 		self::$expectedKeywords = array();
 		self::off('recentQuote');
 		if (self::$open['placeholder']) {
@@ -1236,13 +1246,14 @@ class TemplateCodeParser
 			self::$reactName = '';
 		}
 
-		if (self::$isForeach && !self::$open['foreachLimit']) {
+		if (self::$isForeach && !self::$open['foreachLimit'] && !self::$open['foreachWhile']) {
 			if (!empty(self::$open['foreachAs2'])) {
 				self::$expected = array(self::$space, 'end');
-				self::$expectedKeywords = array('limit');
+				self::$expectedKeywords = array('limit', 'while');
 			} elseif (!empty(self::$open['foreachAs'])) {
 				self::$expected = array('=', self::$space, 'end');
 				self::$expectedKeywords[] = 'limit';
+				self::$expectedKeywords[] = 'while';
 			} elseif (empty(self::$open['foreachArr'])) {
 				self::on('foreachArr');
 				if (!self::$open['fn']) {
@@ -1264,7 +1275,7 @@ class TemplateCodeParser
 			self::$expected[] = ',';
 		}
 
-		self::offVars();
+		self::offVars($prepared);
 		self::offEquals();
 		self::off('letvalue');
 		self::off('space');
@@ -1278,8 +1289,8 @@ class TemplateCodeParser
 		self::set('math', '');
 	}
 
-	private static function offVars() {
-		if (!self::$isNum) {
+	private static function offVars($prepared) {
+		if ($prepared && !self::$isNum) {
 			self::on('name');
 		}
 		self::off('global');
@@ -1490,7 +1501,7 @@ class TemplateCodeParser
 			self::$expected = array('a', '0', '!', '&', '~', '#', '@', '(', self::$space);
 			self::maybeAddDollar();
 		}
-		elseif (self::$isForeach && !self::$open['foreachAs'] && !self::$open['foreachAs2'] && !self::$open['foreachLimit'])
+		elseif (self::$isForeach && !self::$open['foreachAs'] && !self::$open['foreachAs2'] && !self::$open['foreachLimit'] && !self::$open['foreachWhile'])
 		{
 			if (self::$open['foreachArr']) {
 				self::$expected = array();
@@ -1506,7 +1517,7 @@ class TemplateCodeParser
 				}
 			}
 		} 
-		elseif ((self::$open['foreachAs2'] && !self::$open['name']) || (self::$open['foreachAs'] && !self::$open['foreachAsVar']))
+		elseif ((self::$open['foreachAs2'] && !self::$open['foreachAsVar2']) || (self::$open['foreachAs'] && !self::$open['foreachAsVar']))
 		{
 			if (self::$open['var']) {
 				self::$expected = array('a');

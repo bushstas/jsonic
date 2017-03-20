@@ -240,6 +240,7 @@ class TemplateParser
 								$parentalChild[$letsKey] = array_merge($parentalChild[$letsKey], $lets);
 							}
 						}
+						$item['content'] = '';
 					}
 				}
 				if (!empty($item['content'])) {
@@ -572,6 +573,7 @@ class TemplateParser
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);
+		//Printer::log($children);
 		$finishedChildren = array();
 		self::finish($children['c'], $finishedChildren);
 		//Printer::log($finishedChildren);
@@ -779,8 +781,6 @@ class TemplateParser
 		$globals = array();
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
 		$ifCondition = self::processCode($ifCondition, 'if', $names, $globals);
-		
-
 		$isStringC = is_string($child['c']);
 		if (is_array($child['c'])) {
 			if (isset($child['c'][0]) && count($child['c']) == 1) {
