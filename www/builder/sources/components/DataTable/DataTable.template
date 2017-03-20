@@ -1,6 +1,5 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-{loading}
 
 {switch}
 	{case}

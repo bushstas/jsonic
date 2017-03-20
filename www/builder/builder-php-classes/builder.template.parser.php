@@ -572,36 +572,10 @@ class TemplateParser
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);
-		self::validateChildren($children['c']);
 		$finishedChildren = array();
 		self::finish($children['c'], $finishedChildren);
 		//Printer::log($finishedChildren);
 		return array('name' => self::$templateName, 'children' => $finishedChildren, 'let' =>  $children['lets']);
-	}
-
-	private static function validateChildren($children, $parent = null) {
-		foreach ($children as $child) {
-			if (is_array($child)) {
-				if (is_array($parent)) {
-					if (!empty($parent['switch']) && empty($child['case']) && empty($child['default'])) {
-						if (!empty($child['element'])) {
-							new Error(self::$errors['elementInSwitch'], array(self::$templateName, self::$className, $child['content'], $parent['content']));
-						}
-						if (!empty($child['component'])) {
-							new Error(self::$errors['componentInSwitch'], array(self::$templateName, self::$className, $child['content'], $parent['content']));
-						}
-						new Error(self::$errors['operatorInSwitch'], array($child['operator'], self::$templateName, self::$className, $child['content'], $parent['content']));
-					}
-				}
-				if (!empty($child['children'])) {
-					self::validateChildren($child['children'], $child);
-				}
-			} else {
-				if (!empty($parent['switch'])) {
-					new Error(self::$errors['textInSwitch'], array(self::$templateName, self::$className, $child, $parent['content']));
-				}
-			}
-		}
 	}
 
 	private static function invalidTagName($tagName) {
@@ -611,12 +585,6 @@ class TemplateParser
 		return !(preg_match('/^[a-z][a-z0-9]*$/', $tagName) ||
 			   preg_match('/^[A-Z][a-zA-Z0-9]*$/', $tagName) ||
 			   preg_match('/^:{1,2}\w+$/', $tagName));
-	}
-
-	private static function getLet($content) {
-		$parts = explode('<let>', $content);
-		$parts = explode('<=let>', $parts[1]);
-		return $parts[0];
 	}
 
 	private static function isTagClosing($tagName, $tagContent) {
@@ -629,178 +597,6 @@ class TemplateParser
 
 	private	static function isSingleTag($tagName) {
 		return in_array($tagName, self::$singleTags);
-	}
-
-	private	static function checkHtmlTagStructure($list) {
-		$all = array();
-		$allTypes = array();
-		$indexes = array();
-		$opened = array();
-		$openedHtml = array();
-		$openedData = array();
-		
-		$closed = array();
-		$opened2 = array();
-		$openedTags = array();
-		$closedTags = array();
-		$lastType = '';
-		$ix = 0;
-		$aixs = array();
-		foreach ($list as $aix => $item) {
-			$tn = $item['tagName'];
-			if (!empty($tn)) {
-				if (!$item['isSingle']) {
-					if ($item['isClosing'] == 0) {								
-						if (!isset($openedTags[$tn])) {
-							$openedTags[$tn] = 0;
-						}
-						$lastAny = $opened[count($opened) - 1];
-						$last = $openedHtml[count($openedHtml) - 1];
-						$openedTags[$tn]++;
-						if ($tn != 'case' && $tn != 'default' && $lastAny == 'switch') {
-							new Error(self::$errors['extraContentInSwitch'], array($tn, 'switch', self::$templateName, self::$class['name'], $item['content']));
-						}
-						if (($tn == 'case' || $tn == 'default') && $lastAny != 'switch') {
-							new Error(self::$errors['operatorOutOfPlace'], array($tn, 'switch', self::$templateName, self::$class['name'], $item['content']));
-						}
-						if (in_array($tn, self::$forbiddenElements)) {
-							new Error(self::$errors['forbiddenTag'], array($tn, self::$templateName, self::$class['name'], $item['content']));
-						}
-						
-						if (isset(self::$forbiddenInnerElements[$last]) && in_array($tn, self::$forbiddenInnerElements[$last])) {
-							new Error(self::$errors['tagInsideTag'], array($tn, $last, self::$templateName, self::$class['name'], $openedTags[$tn], $tn, $item['content']));
-						}
-						if (isset(self::$onlyParentalElements[$tn]) && !in_array($last, self::$onlyParentalElements[$tn])) {
-							new Error(self::$errors['tagOutsideProperTag'], array($tn, count(self::$onlyParentalElements[$tn]) > 1 ? 'тегов' : 'тега', implode(', ', self::$onlyParentalElements[$tn]), self::$templateName, self::$class['name'], $openedTags[$tn], $tn, $item['content']));
-						}
-						if (isset(self::$allowedInnerElements[$last]) && !in_array($tn, self::$allowedInnerElements[$last])) {
-							new Error(self::$errors['tagInsideTag'], array($tn, $last, self::$templateName, self::$class['name'], $openedTags[$tn], $tn, $item['content']));
-						}
-						$opened[] = $tn;
-						if (self::isHtmlTag($tn)) {
-							$openedHtml[] = $tn;
-						}
-						$openedData[] = array(
-							'tag' => $tn,
-							'content' => $item['content'],
-							'orderNumber' => $openedTags[$tn]
-						);
-						$prevItem = $item;
-						$opened2[] = $tn;
-						$lastType = 'open';
-						$all[] = $tn;
-						$allTypes[] = 'open';
-						$indexes[] = $ix;
-						$aixs[$ix] = $aix;
-						$ix++;
-					} else {
-						$prev = $opened[count($opened) - 1];
-						if (!isset($prev) || $prev != $tn) {
-
-							if (in_array($tn, $opened)) { 								
-								$prevIndex = array_pop($indexes);
-								$realIndex = $aixs[$prevIndex];
-								$count = 0;
-								foreach ($all as $i => $tag) {
-									if ($tag == $prev && $allTypes[$i] == 'open') $count++;
-									if ($i == $realIndex) break;
-								}
-								$object = self::getTagTypeName($prev);
-								new Error(
-									self::$errors['noClosingTag'], 
-									array(
-										$object, $prev, self::$templateName, self::$class['name'], $object, $count, $object, $prev, $list[$realIndex]['content']
-									)
-								);
-								
-							} else {
-								if ($lastType == 'open') {
-									$prev2 = $opened2[count($opened2) - 1];
-								} else {
-									$prev2 = $closed[count($closed) - 1];
-								}
-								$openedData = array_reverse($openedData);
-								if (isset($openedData[0])) {
-									extract($openedData[0]);
-								}
-
-								$object = self::getTagTypeName($tn);
-								$object2 = self::getTagTypeName($prev2, 'а');
-								
-								$typeTag = $lastType == 'open' ? 'открывающегося' : 'закрывающегося';
-								if ($prev != $prev2 && $lastType == 'open') {
-									$typeTag = '';
-								}
-								if (!empty($prev2)) {
-									if (isset($content)) {
-										$object3 = self::getTagTypeName($tag);
-										new Error(
-											self::$errors['extraClosingTag'], array($object, $tn, self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, $prev2, $list[$aix - 1]['content'],
-											$tag, $object3, $orderNumber, $object3, $tag, $content
-										));
-									} else {
-										new Error(
-											self::$errors['extraClosingTag2'], array($object, $tn, self::$templateName, self::$class['name'], $object, $openedTags[$prev2], $typeTag, $object2, $prev2, $list[$aix - 1]['content']
-										));
-									}
-								} else {
-									new Error(
-										self::$errors['extraClosingTag3'], array($object, $tn, self::$templateName, self::$class['name']
-									));
-								}
-							}
-						}
-						if (!isset($closedTags[$tn])) {
-							$closedTags[$tn] = 0;
-						}
-						$closedTags[$tn]++;
-						$closed[] = $tn;
-						array_pop($opened);
-						if (self::isHtmlTag($tn)) {
-							array_pop($openedHtml);
-						}
-						array_pop($openedData);
-						array_pop($indexes);
-						$all[] = $tn;
-						$lastType = 'closed';
-						$allTypes[] = 'closed';
-					}
-				} else {
-					if (self::isSimpleTag($tn) && $item['isClosing']) {
-						new Error(self::$errors['closingSimpleTag'], array($tn, self::$templateName, self::$className, $item['content']));
-					}
-					if ($tn == 'ifempty' && !in_array('foreach', $opened)) {
-						new Error(self::$errors['operatorOutOfPlace'], array('ifempty', 'foreach', self::$templateName, self::$className, $item['content']));
-					} elseif ($tn == 'else' && !in_array('if', $opened)) {
-						new Error(self::$errors['operatorOutOfPlace'], array('else', 'if', self::$templateName, self::$className, $item['content']));
-					}
-					if (!isset($openedTags[$tn])) {
-						$openedTags[$tn] = 0;
-					}
-					$opened2[] = $tn;
-					$openedTags[$tn]++;
-					$lastType = 'open';
-					$all[] = $tn;
-					$allTypes[] = '';
-				}
-			}
-		}
-		if (!empty($openedData)) {
-			$openedData = array_reverse($openedData);
-			extract($openedData[0]);			
- 			$object = self::getTagTypeName($tag);
-		 	new Error(self::$errors['noClosingTag2'], array(
-		 		$object, strtoupper($tag), self::$templateName, self::$class['name'], $object, $orderNumber, $object, strtoupper($tag), $content
-		 	));
-		}
-	}
-
-	private	static function isHtmlTag($tn) {
-		return !($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case' || $tn == 'default');
-	}
-
-	private	static function getTagTypeName($tn, $ending = '') {
-		return ($tn == 'if' || $tn == 'switch' || $tn == 'foreach'|| $tn == 'else' || $tn == 'ifempty' || $tn == 'case' || $tn == 'default' ? 'оператор' : 'тег').$ending;
 	}
 
 	private static function getProperChild($children) {
