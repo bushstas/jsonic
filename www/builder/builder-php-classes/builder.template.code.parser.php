@@ -618,7 +618,7 @@ class TemplateCodeParser
 	private static function handleExclamation() {
 		if (!self::$quoted) {
 			if (!self::$open['name']) {
-				self::$expected = array('a', '0', '&', '~', '#', '=', '-', '+', '!', self::$space);
+				self::$expected = array('a', '0', '&', '~', '#', '=', '-', '+', '!', '(', self::$space);
 				self::maybeAddDollar();
 			} else {
 				self::$expected = array('=');
@@ -1641,6 +1641,11 @@ class TemplateCodeParser
 			} elseif (preg_match('/^random\b/', $code)) {
 				$code = preg_replace('/^random\s*/', '', $code);
 				self::$data['random'] = true;
+			}
+			$parts = preg_split('/\s+while\s+/', $code);
+			if (isset($parts[1])) {
+				self::$data['while'] = $parts[1];
+				$code = $parts[0];
 			}
 			$parts = preg_split('/\s+as\s+/', $code);
 			self::$data['items'] = '<nq>'.$parts[0].'<nq>';

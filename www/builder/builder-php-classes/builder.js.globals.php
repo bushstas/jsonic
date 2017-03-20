@@ -44,7 +44,8 @@ class JSGlobals
 		'component'        => 'c',
 		'loadurl'          => '__LU',
 		'callback'         => '__CB',
-		'data'             => '__DT'
+		'data'             => '__DT',
+		'break'            => '_brk'
 	);
 	
 	private static $varKeys = array(
@@ -152,7 +153,8 @@ class JSGlobals
 			'OBJECTS'         => self::$jsConfig['objects'],
 			'COMPONENT'       => self::$varNames['component'],
 			'PROTO'           => self::$varNames['proto'],
-			'LOADURL'         => self::$varNames['loadurl']
+			'LOADURL'         => self::$varNames['loadurl'],
+			'BREAK'           => self::$varNames['break']
 		);
 	}
 

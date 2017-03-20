@@ -28,13 +28,16 @@
 	this.createLevels = function(isUpdating) {
 		var items = getItems();
 		var limit = getLimit();
+		var r;
 		if (isArrayLike(items)) {
 			if (isRandom) {
 				if (!Objects.empty(items)) {
 					var keys = getKeysInRandomOrder();
 					for (var i = 0; i < keys.length; i++) {
 						if (limit && i + 1 > limit) break;
-						this.createLevel(handler(items[keys[i]], keys[i]), isUpdating);
+						r = handler(items[keys[i]], keys[i]);
+						if (r == '{{BREAK}}') break;
+						this.createLevel(r, isUpdating);
 					}
 					return;
 				}
@@ -43,14 +46,18 @@
 					if (!isRight) {
 						for (var i = 0; i < items.length; i++) {
 							if (limit && i + 1 > limit) break;
-							this.createLevel(handler(items[i], i), isUpdating);
+							r = handler(items[i], i);
+							if (r == '{{BREAK}}') break;
+							this.createLevel(r, isUpdating);
 						}
 					} else {
 						var j = 0;
 						for (var i = items.length - 1; i >= 0; i--) {
 							j++;
 							if (limit && j > limit) break;
-							this.createLevel(handler(items[i], i), isUpdating);
+							r = handler(items[i], i);
+							if (r == '{{BREAK}}') break;
+							this.createLevel(r, isUpdating);
 						}
 					}
 					return;
@@ -62,14 +69,18 @@
 						for (var k in items) {
 							i++;
 							if (limit && i > limit) break;
-							this.createLevel(handler(items[k], k), isUpdating);
+							r = handler(items[k], k);
+							if (r == '{{BREAK}}') break;
+							this.createLevel(r, isUpdating);
 						}
 					} else {
 						var keys = Objects.getKeys(items);
 						keys.reverse();
 						for (var i = 0; i < keys.length; i++) {
 							if (limit && i + 1 > limit) break;
-							this.createLevel(handler(items[keys[i]], keys[i]), isUpdating);
+							r = handler(items[keys[i]], keys[i]);
+							if (r == '{{BREAK}}') break;
+							this.createLevel(r, isUpdating);
 						}
 					}
 					return;
@@ -85,7 +96,8 @@
 	};
 
 	this.add = function(item, index) {
-		this.createLevel(handler(item, ~~index), false, index);	
+		var r = handler(item, ~~index);
+		if (r != '{{BREAK}}') this.createLevel(r, false, index);	
 	};
 
 	this.remove = function(index) {

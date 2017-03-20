@@ -1,7 +1,7 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
 {let &a = [1,2]}
-{foreach &a as &i => &f while (&i > 10)}
-	111
+{foreach &a as &i => &f while &i >= 0}
+	_brk2
 {/foreach}
 </div>

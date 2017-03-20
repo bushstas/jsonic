@@ -487,7 +487,7 @@ class TemplateParser
 					}
 				}
 				if (!empty($child['lets'])) {
-					self::wrapInFunction($ch['c'], '', $child['lets']);
+					self::wrapInFunction($ch['c'], '', 'lets', $child['lets']);
 				}
 				$finishedChildren[] = $ch;
 				if ($isComponent) {
@@ -622,7 +622,7 @@ class TemplateParser
 		return is_array($children) ? '<nq>'.preg_replace('/\\\(?=[\'"])/', '', json_encode($children)).'<nq>' : $children;
 	}
 
-	private static function wrapInFunction(&$children, $args = '', $lets = null) {
+	private static function wrapInFunction(&$children, $args = '', $mode = '', $data = null) {
 		$c = preg_replace('/^<nq>/', '', self::getProperChildren($children));
 		$space = ' ';
 		if (in_array($c[0], array('[', '{', '(', "'"))) {
@@ -630,13 +630,20 @@ class TemplateParser
 		}
 		$before = '';
 		$after = '';
-		$inner = '';
-		if (!empty($lets)) {
-			$before = '(';
-			$after = ')()';
-			$inner = 'var '.self::getLetVars($lets).';';
+		$innerBefore = '';
+		$innerAfter = '';
+		if (!empty($data)) {
+			if ($mode == 'lets') {
+				$before = '(';
+				$after = ')()';
+				$innerBefore = 'var '.self::getLetVars($data).';';
+			} elseif ($mode == 'while') {
+				$globals = JSGlobals::getVarNames();
+				$innerBefore = 'if('.$data.'){';
+				$innerAfter = "}else{return'".$globals['break']."'}";
+			}
 		}
-		$children = '<nq>'.$before.'function('.$args.'){'.$inner.'return'.$space.$c.'}'.$after.'<nq>';
+		$children = '<nq>'.$before.'function('.$args.'){'.$innerBefore.'return'.$space.$c.$innerAfter.'}'.$after.'<nq>';
 	}
 
 	private static function parseForeach($content, &$child) {
@@ -677,7 +684,11 @@ class TemplateParser
 			$child['l'] = $data['limit'];
 		}
 		$args = implode(',', $args);
-		self::wrapInFunction($child['h'], $args);
+		if (!empty($data['while'])) {
+			self::wrapInFunction($child['h'], $args, 'while', $data['while']);
+		} else {
+			self::wrapInFunction($child['h'], $args);
+		}
 		return $child;
 	}
 
