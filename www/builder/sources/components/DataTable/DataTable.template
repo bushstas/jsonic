@@ -1,7 +1,11 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-{let &a = [1,2]}
-{foreach &a as &i => &f while &i >= 0}
-	_brk2
+1
+{let &a = [1,2,6,7,8,9,0,-3]}
+4343
+{foreach &a as &i => &f while $i >= 0}
+	<div>{&f}</div>
 {/foreach}
+
+534
 </div>

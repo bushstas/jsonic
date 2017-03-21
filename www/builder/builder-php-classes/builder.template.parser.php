@@ -625,7 +625,7 @@ class TemplateParser
 	private static function wrapInFunction(&$children, $args = '', $mode = '', $data = null) {
 		$c = preg_replace('/^<nq>/', '', self::getProperChildren($children));
 		$space = ' ';
-		if (in_array($c[0], array('[', '{', '(', "'"))) {
+		if (in_array($c[0], array('[', '{', '(', "'")) || ($c[0] == '<' && preg_match('/^<quote>/', $c))) {
 			$space = '';
 		}
 		$before = '';
@@ -646,7 +646,14 @@ class TemplateParser
 		$children = '<nq>'.$before.'function('.$args.'){'.$innerBefore.'return'.$space.$c.$innerAfter.'}'.$after.'<nq>';
 	}
 
+	private static function enquote(&$text) {
+		$text = '<quote>'.$text.'<quote>';
+	}
+
 	private static function parseForeach($content, &$child) {
+		if (is_string($child['c']) && !preg_match('/^<nq>/', $child['c'])) {
+			self::enquote($child['c']);
+		}
 		if (is_array($child['ie'])) {
 			$child['ie'] = self::getProperChild($child['ie']);
 		}
