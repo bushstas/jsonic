@@ -11,7 +11,7 @@ class CoreValidator
 
 	private $content = array(
 		'components' => array(
-			'Application', 'Component', 'Condition', 'Control', 'Controller', 'Foreach', 'IfSwitch', 'Level', 'Menu', 'Switch', 'View'
+			'Application', 'Component', 'Condition', 'Control', 'Controller', 'Foreach', 'IfSwitch', 'Level', 'Menu', 'Switch', 'View', 'Let'
 		),
 		'helpers' => array(
 			'State'

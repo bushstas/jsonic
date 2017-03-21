@@ -33,6 +33,7 @@
 		else if (i.hasOwnProperty('is'))  createIfSwitch(i);
 		else if (i.hasOwnProperty('sw'))  createSwitch(i);
 		else if (i.hasOwnProperty('pl'))  createPlaceholder(i);
+		else if (i.hasOwnProperty('l'))   createLet(i);
 	};
 
 	var createLevel = function(items, pe) {
@@ -163,6 +164,15 @@
 				}
 			}
 			if (!isUndefined(props[3])) renderItems(props[3]);
+		}
+	};
+
+	var createLet = function(props) {
+		if (props['n'] || props['g']) {
+			var l = new ({{GLOBAL}}.get('Let'))(props);
+			l.render(parentElement, self);
+			registerChild(l);
+			createUpdater({{GLOBAL}}.get('OperatorUpdater'), l, props);
 		}
 	};
 

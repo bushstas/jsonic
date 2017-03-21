@@ -1,13 +1,6 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	{let &v = 1234}
+	{let &v = $a, &i = $:aaa}
 	{&v}
-	{switch &a}
-		{case true}
-			it's true
-		{/case}
-		{case false}
-			it's false
-		{/case}
-	{/switch}
+	<div>{&i}</div>
 </div>

@@ -225,7 +225,7 @@ class TemplateParser
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);
-		Printer::log($children);
+		//Printer::log($children);
 		$finishedChildren = array();
 		self::finish($children['c'], $finishedChildren);
 		//Printer::log($finishedChildren);
@@ -354,16 +354,26 @@ class TemplateParser
 							$chld['if'] = ' ';
 						}
 					} elseif ($child['tagName'] == 'let') {						
-						$lets = self::parseLetOperator($item['content']);
+						$names = array();
+						$globals = array();
+						$lets = self::parseLetOperator($item['content'], $names, $globals);
 						$letsKey = $ofElse ? 'elseLets' : 'lets';
+						$reactNamesKey = $ofElse ? 'elseLetsReactNames' : 'letsReactNames';
+						$globalNamesKey = $ofElse ? 'elseLetsGlobalNames' : 'letsGlobalNames';
 						if (!empty($lets)) {
+							if (!empty($names)) {
+								$parentalChild[$reactNamesKey] = $names;
+							}
+							if (!empty($globals)) {
+								$parentalChild[$globalNamesKey] = $globals;
+							}
 							if (!isset($parentalChild[$letsKey])) {
 								$parentalChild[$letsKey] = $lets;
 							} else {
 								$parentalChild[$letsKey] = array_merge($parentalChild[$letsKey], $lets);
 							}
 						}
-						//continue;
+						continue;
 					} elseif ($child['tagName'] == 'foreach') {
 						$chld['foreach'] = trim(preg_replace('/^\s*{\s*foreach */', '', $child['content']), '}');
 						if (empty($chld['foreach'])) {
@@ -465,6 +475,7 @@ class TemplateParser
 				{					
 					$tmpName = $isInclude ? $child['include'] : $child['template'];
 					self::parseTemplate($child['content'], $tmpName, $ch, $isInclude);
+					unset($child['reactProps'], $child['globalProps']);
 				}
 				elseif (!empty($child['foreach']))
 				{
@@ -524,7 +535,7 @@ class TemplateParser
 					}
 				}
 				if (!empty($child['lets'])) {
-					self::wrapInFunction($ch['c'], '', 'lets', $child['lets']);
+					self::wrapInFunction($ch['c'], '', 'lets', $child);
 				}
 				$finishedChildren[] = $ch;
 				if ($isComponent) {
@@ -587,11 +598,9 @@ class TemplateParser
 		return $children;
 	}
 
-	private static function parseLetOperator(&$content) {
+	private static function parseLetOperator(&$content, &$names, &$globals) {
 		$lets = array();
 		$data = Splitter::split('/\{\s*let([\s&][^\}]+)\}/', $content, 1);
-		$names = array();
-		$globals = array();
 		$content = '';
 		foreach ($data['items'] as $i => $item) {
 			$content .= $item;
@@ -649,12 +658,31 @@ class TemplateParser
 		$innerAfter = '';
 		if (!empty($data)) {
 			if ($mode == 'lets') {
-				$before = '(';
-				$after = ')()';
-				$innerBefore = 'var '.self::getLetVars($data).';';
+				$innerBefore = 'var '.self::getLetVars($data['lets']).';';
+				if (!empty($data['letsReactNames']) || !empty($data['letsGlobalNames'])) {
+					$before = "{'l':";
+					$after = '}';
+					if (!empty($data['letsReactNames'])) {
+						if (count($data['letsReactNames']) == 1) {
+							$after = ",'n':'".$data['letsReactNames'][0]."'}";
+						} else {
+							$after = ",'n':['".implode("','", $data['letsReactNames'])."']}";
+						}
+					}
+					if (!empty($data['letsGlobalNames'])) {
+						if (count($data['letsGlobalNames']) == 1) {
+							$after = ",'g':'".$data['letsGlobalNames'][0]."'".$after;
+						} else {
+							$after = ",'g':['".implode("','", $data['letsGlobalNames'])."']".$after;
+						}
+					}
+				} else {
+					$before = '(';
+					$after = ')()';
+				}
 			} elseif ($mode == 'while') {
 				$globals = JSGlobals::getVarNames();
-				$innerBefore = 'if('.$data.'){';
+				$innerBefore = 'if('.$data['while'].'){';
 				$innerAfter = "}else{return'".$globals['break']."'}";
 			}
 		}
@@ -677,7 +705,7 @@ class TemplateParser
 		}
 		$child['h'] = $child['c'];
 		if (!empty($source['lets'])) {
-			self::wrapInFunction($child['h'], '', 'lets', $source['lets']);
+			self::wrapInFunction($child['h'], '', 'lets', $source);
 		}
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
@@ -716,7 +744,7 @@ class TemplateParser
 		}
 		$args = implode(',', $args);
 		if (!empty($data['while'])) {
-			self::wrapInFunction($child['h'], $args, 'while', $data['while']);
+			self::wrapInFunction($child['h'], $args, 'while', $data);
 		} else {
 			self::wrapInFunction($child['h'], $args);
 		}
@@ -807,7 +835,7 @@ class TemplateParser
 	}
 
 	private static function getLetVars($lets) {
-		$list = array();
+		$list = array(); 
 		foreach ($lets as $key => $value) {
 			$list[] = $key.'='.$value;
 		}
@@ -843,7 +871,7 @@ class TemplateParser
 		}
 		if (is_array($source)) {
 			if (!empty($source['lets'])) {
-				self::wrapInFunction($child['c'], '', 'lets', $source['lets']);
+				self::wrapInFunction($child['c'], '', 'lets', $source);
 			}
 			if (!empty($else) && !empty($source['elseLets'])) {
 				$else = '(function(){var '.self::getLetVars($source['elseLets']).';return '.$else.'})()';
@@ -1049,7 +1077,6 @@ class TemplateParser
 			}
 		}
 		$parts = array();
-		$inFunc = false;
 		foreach ($items as $idx => $item) {
 			if ($item !== '') {
 				if ($isObfClName) {
@@ -1062,9 +1089,6 @@ class TemplateParser
 				$data = TemplateCodeParser::parse($code, $parsedPlace, self::$parsedItem);
 				
 				$code = $data['code'];
-				if ($data['inFunc']) {
-					$inFunc = true;
-				}
 				if (!empty($data['callbacks'])) {
 					if (is_array(self::$class)) {
 						self::$class['tmpCallbacks'] = array_merge(self::$class['tmpCallbacks'], $data['callbacks']);
@@ -1089,13 +1113,7 @@ class TemplateParser
 			}
 		}
 
-		$attrContent = implode('+', $attrParts);
-		if ($inFunc && $parsedPlace != 'componentAttribute' && $parsedPlace != 'elementAttribute') {
-			self::wrapInFunction($attrContent);
-		} else {
-			$attrContent = '<nq>'.$attrContent.'<nq>';
-		}
-		return $attrContent;
+		return '<nq>'.implode('+', $attrParts).'<nq>';
 	}
 
 	private static function checkPropertyForObfuscation(&$value) {
@@ -1374,7 +1392,6 @@ class TemplateParser
 
 	private static function parseSwitch($content, $childrenList, &$child, $source) {
 		$data = TemplateCodeParser::parse('switch '.$content, 'switch', self::$parsedItem);
-		Printer::log($data);
 		
 		self::parseCases($childrenList, $child);
 		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);

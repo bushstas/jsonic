@@ -74,7 +74,7 @@ class TemplateCodeParser
 		'usingReservedName' => 'Использование зарезервированного локально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
 		'capitalFirstLetter' => 'Использование вызова функции начинающейся с заглавной буквы в шаблоне {??} класса {??}<br><br>Имена функций утилит должны начинаться с маленькой буквы<br><br>Код в котором произошла ошибка: {{??}}',
 		'usingGlobalName' => 'Использование зарезервированного глобально имени переменной {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: {{??}}',
-		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: {{??}}',
+		'usingUnknownFunc' => 'Использование функции {??} в шаблоне {??} класса {??}. Данная функция не найдена в утилитах<br><br>Код в котором произошла ошибка: <xmp>{{?}}</xmp>',
 		'fewOuterTernaries' => 'Обнаружено несколько конфликтующих тернерных операций в шаблоне {??} класса {??}<br><br>Используйте скобки для их группировки<br><br>Код в котором произошла ошибка: {{??}}',
 		'globalVarAsCompAttr' => 'Обнаружена попытка передать класс State дочернему компоненту в шаблоне {??} класса {??}<br>Данный класс является синглтоном и не нуждается в передаче по ссылке<br><br>Код в котором произошла ошибка: {{??}}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
 		'globalVarAsTemplAttr' => 'Обнаружена попытка передать класс State дочернему шаблону в шаблоне {??} класса {??}<br>Данный класс является синглтоном и не нуждается в передаче по ссылке<br><br>Код в котором произошла ошибка: {{??}}<br><br>Элeмент в котором произошла ошибка: <xmp>{?}</xmp>',
@@ -344,7 +344,7 @@ class TemplateCodeParser
 						self::off('foreachArr');
 						self::on('foreachAs');
 						self::$expected = array('&', self::$space);
-					} else {						
+					} else {
 						$prepared = self::prepare($part, $code);
 						if ($prepared) {
 							if (self::couldBeColon()) {
@@ -408,7 +408,7 @@ class TemplateCodeParser
 							if (self::couldBeDot()) {
 								self::$expected[] = '.';
 							}
-						}					
+						}
 						self::$prevSign = !$isNum ? 'a' : '0';
 						$prevCode = $code;
 						self::finish($prepared);
@@ -980,7 +980,7 @@ class TemplateCodeParser
 	}
 
 	private static function maybeAddDollar() {
-		if (!self::$open['placeholder'] && !self::$isLet && !self::$isCase) {
+		if (!self::$open['placeholder']) {
 			self::$expected[] = '$';
 		}
 	}
@@ -1271,7 +1271,7 @@ class TemplateCodeParser
 			}
 		}
 
-		if (self::$isLet && self::$open['letvalue'] && empty(self::$open['parenthesis'])) {
+		if (self::$isLet && self::$open['letvalue'] && empty(self::$open['parenthesis']) && empty(self::$open['fn'])) {
 			self::$expected[] = ',';
 		}
 
