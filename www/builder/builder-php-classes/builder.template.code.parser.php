@@ -307,7 +307,7 @@ class TemplateCodeParser
 									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isSwitch = true;
-								self::$expected = array('~', '@', '&', '$', '#', self::$space);
+								self::$expected = array('~', '&', '$', '.', 'a', self::$space);
 							break;
 							case 'case':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
@@ -1649,7 +1649,14 @@ class TemplateCodeParser
 			}
 			$parts = preg_split('/\s+as\s+/', $code);
 			self::$data['items'] = '<nq>'.$parts[0].'<nq>';
-			self::$data['reactiveItems'] = preg_match('/\$\.[ga]/', $parts[0]);
+			self::$data['reactiveItems'] = preg_match('/\$\.([ga])\(\'([^\']+)\'/', $parts[0], $match);
+			if (self::$data['reactiveItems']) {
+				if ($match[1] == 'g') {
+					self::$data['reactName'] = $match[2];
+				} else {
+					self::$data['globalName'] = $match[2];
+				}
+			}
 			$parts = preg_split('/\s*=>\s*/', $parts[1]);
 			if (isset($parts[1])) {
 				self::$data['key'] = '<nq>'.$parts[0].'<nq>';

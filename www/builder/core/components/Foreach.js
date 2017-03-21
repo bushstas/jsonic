@@ -4,7 +4,7 @@
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
 	var ifEmpty = params['ie'];
-	var isGlobal = !!params['g'];
+	var isGlobal = !!params['gn'];
 	this.levels = [];
 	var getKeysInRandomOrder = function() {
 		var keys = Objects.getKeys(getItems());
@@ -16,8 +16,8 @@
 			this.createLevel(ifEmpty);
 		}
 	};
-	var getItems = function() {		
-		return list || (isGlobal ? params['$'].a(params['g']) : params['$'].g(params['n']));
+	var getItems = function() {
+		return list || (isGlobal ? params['$'].a(params['gn']) : params['$'].g(params['rn']));
 	};
 	var getLimit = function() {
 		if (isFunction(params['l'])) {

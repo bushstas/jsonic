@@ -13,7 +13,7 @@ class TemplateParser
 	);
 
 	private static $singleTags = array(
-		'else', 'ifempty'
+		'else', 'ifempty', 'let'
 	);
 	
 	private static $class, $className, $tmpids, $propsShortcuts,
@@ -167,6 +167,71 @@ class TemplateParser
 		return $templateFunctions;
 	}
 
+	private static function getParsedTemplate($content) {
+		$html = preg_replace(self::$regexp, '', $content);
+		$html = str_replace('->>', "#classobfus#", $html);
+		$html = preg_replace('/<('.implode('|', self::$simpleTags).') ([^\/>]*)\/>/', "<=$1 $2/>", $html);
+		$html = preg_replace('/<(:*\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
+		$html = preg_replace('/<=(\w+) ([^\/>]*)\/>/', "<$1 $2/>", $html);
+		$parts = preg_split('/\{\/template\}/', $html);
+		$html = $parts[0];
+
+		$regexp = "/\{[^\}]+\}/";
+		preg_match_all($regexp, $html, $matches);
+		$matches = $matches[0];
+		foreach ($matches as &$match) {
+			$match = str_replace('>', '_#_MORE_#_', $match);
+		}
+		$parts = preg_split($regexp, $html);
+		$html = '';
+		foreach ($parts as $i => $part) {
+			$html .= $part;
+			if (isset($matches[$i])) {
+				$html .= $matches[$i];
+			}
+		}
+		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*\/*default\s*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\}|\{\s*\/*let\b[^\}]*\})/i";
+		preg_match_all($regexp, $html, $matches);
+		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
+		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
+		$parts = preg_split($regexp, $html);
+		$list = array();
+		for ($j = 0; $j < count($parts); $j++) {
+			$part = $parts[$j];
+			if (!empty($part)) {
+				$list[] = array('type' => 'text', 'content' => $part);
+			}
+			if (isset($tags[$j]) && !empty($tags[$j])) {
+				preg_match('/^[<\{]\s*\/*(:*[a-z]\w*) */i', $tags[$j], $match);
+				$tagName = $match[1];
+				$tagContent = $tags[$j];
+				if (self::invalidTagName($tagName)) {
+					new Error(self::$errors['invalidTagName'], array($tagName, self::$templateName, self::$class['name'], $tagContent));
+				}
+				$isClosing = self::isTagClosing($tagName, $tagContent);
+				$tagContent = str_replace('#classobfus#', '->>', $tagContent);
+				$list[] = array(
+					'type' => 'tag',
+					'content' => $tagContent,
+					'tagName' => $tagName,
+					'isClosing' => $isClosing,
+					'isSingle' => self::isSingleTag($tagName) || self::isSimpleTag($tagName)
+				);
+			}
+		}
+		$isLet = 0;
+		TemplateValidator::validate($list, self::$templateName, self::$className);
+		
+		
+		$children = array('c' => array());
+		self::parseChildren($list, $children['c'], $children);
+		Printer::log($children);
+		$finishedChildren = array();
+		self::finish($children['c'], $finishedChildren);
+		//Printer::log($finishedChildren);
+		return array('name' => self::$templateName, 'children' => $finishedChildren, 'let' =>  $children['lets']);
+	}
+
 	private	static function hasParentMainTemplate($class) {
 		if (!is_array($class['extends']) || empty($class['extends'])) {
 			return false;
@@ -183,48 +248,6 @@ class TemplateParser
 		return false;
 	}
 
-	private static function parseLetOperator(&$content) {
-		$lets = array();
-		$data = Splitter::split('/\{\s*let([\s&][^\}]+)\}/', $content, 1);
-		$names = array();
-		$globals = array();
-		$content = '';
-		foreach ($data['items'] as $i => $item) {
-			$content .= $item;
-			$delmr = $data['delimiters'][$i];
-			if (!empty($delmr)) {
-				$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names, $globals));
-				if (preg_match('/\[/', $delmr)) {
-					$d = Splitter::split('/[\[\]]/', $delmr);
-					$open = 0;
-					$delmr = '';
-					foreach ($d['items'] as $j => $it) {
-						if ($open > 0) {
-							$it = str_replace(',', '_#_comma_#_', $it);
-							$it = str_replace('=', '_#_equal_#_', $it);
-						}
-						$delmr .= $it;
-						if (isset($d['delimiters'][$j])) {
-							if ($d['delimiters'][$j] == '[') {
-								$open++;
-							} else {
-								$open--;
-							}
-							$delmr .= $d['delimiters'][$j];
-						}
-					}
-				}
-				$parts = explode(',', $delmr);
-				foreach ($parts as $part) {
-					$p = explode('=', $part);
-					$key = str_replace('&', '', trim($p[0]));
-					$lets[$key] = trim($p[1]);
-				}
-			}
-		}
-		return $lets;
-	}
-
 	private static function parseChildren($list, &$children, &$parentalChild, $ofElse = false) {
 		$isElse = false;
 		$isIfEmpty = false;
@@ -232,23 +255,8 @@ class TemplateParser
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
 			$lets = array();
-			if ($item['type'] == 'text') {
-				if (self::hasCode($item['content'])) {
-					if (preg_match('/\{\s*let\b/', $item['content'])) {
-						$lets = self::parseLetOperator($item['content']);
-						$letsKey = $ofElse ? 'elseLets' : 'lets';
-						if (!empty($lets)) {
-							if (!isset($parentalChild[$letsKey])) {
-								$parentalChild[$letsKey] = $lets;
-							} else {
-								$parentalChild[$letsKey] = array_merge($parentalChild[$letsKey], $lets);
-							}
-						}
-					}
-				}
-				if (!empty($item['content'])) {
-					$children[] = $item['content'];
-				}
+			if ($item['type'] == 'text' && !empty($item['content'])) {
+				$children[] = $item['content'];			
 			} else {
 				self::$parsedItem = $item['content'];
 				$tag = $item['tagName'];
@@ -262,6 +270,9 @@ class TemplateParser
 				$iech = array();
 				$open = 0;
 				while (true) {
+					if ($tag == 'let') {
+						break;
+					}
 					$i++;
 					if (isset($list[$i])) {
 						if ($tag == 'if' && $open == 0 && $list[$i]['tagName'] == 'else') {
@@ -334,12 +345,35 @@ class TemplateParser
 						$chld['ifswitch'] = 1;	
 					} elseif ($child['tagName'] == 'switch') {
 						$chld['switch'] = trim(preg_replace('/^\s*{\s*switch */', '', $child['content']), '}');
+						if (empty($chld['switch'])) {
+							$chld['switch'] = ' ';
+						}
 					} elseif ($child['tagName'] == 'if') {
 						$chld['if'] = trim(preg_replace('/^\s*{\s*if */', '', $child['content']), '}');
+						if (empty($chld['if'])) {
+							$chld['if'] = ' ';
+						}
+					} elseif ($child['tagName'] == 'let') {						
+						$lets = self::parseLetOperator($item['content']);
+						$letsKey = $ofElse ? 'elseLets' : 'lets';
+						if (!empty($lets)) {
+							if (!isset($parentalChild[$letsKey])) {
+								$parentalChild[$letsKey] = $lets;
+							} else {
+								$parentalChild[$letsKey] = array_merge($parentalChild[$letsKey], $lets);
+							}
+						}
+						//continue;
 					} elseif ($child['tagName'] == 'foreach') {
 						$chld['foreach'] = trim(preg_replace('/^\s*{\s*foreach */', '', $child['content']), '}');
+						if (empty($chld['foreach'])) {
+							$chld['foreach'] = ' ';
+						}
 					} elseif ($child['tagName'] == 'case') {
 						$chld['case'] = trim(preg_replace('/^\s*{\s*case */', '', $child['content']), '}');
+						if (empty($chld['case'])) {
+							$chld['case'] = ' ';
+						}
 					} elseif ($child['tagName'] == 'default') {
 						$chld['default'] = trim(preg_replace('/^\s*{\s*default */', '', 1), '}');
 					}
@@ -440,7 +474,7 @@ class TemplateParser
 						self::finish($child['ifempty'], $ch['ie']);
 					}
 					self::finish($child['children'], $ch['c']);
-					self::parseForeach('foreach '.$child['foreach'], $ch);
+					self::parseForeach('foreach '.$child['foreach'], $ch, $child);
 					$finishedChildren[] = $ch;
 					continue;
 				}
@@ -519,70 +553,6 @@ class TemplateParser
 		$attrs[$name] = $value;
 	}
 
-	private static function getParsedTemplate($content) {
-		$html = preg_replace(self::$regexp, '', $content);
-		$html = str_replace('->>', "#classobfus#", $html);
-		$html = preg_replace('/<('.implode('|', self::$simpleTags).') ([^\/>]*)\/>/', "<=$1 $2/>", $html);
-		$html = preg_replace('/<(:*\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
-		$html = preg_replace('/<=(\w+) ([^\/>]*)\/>/', "<$1 $2/>", $html);
-		$parts = preg_split('/\{\/template\}/', $html);
-		$html = $parts[0];
-
-		$regexp = "/\{[^\}]+\}/";
-		preg_match_all($regexp, $html, $matches);
-		$matches = $matches[0];
-		foreach ($matches as &$match) {
-			$match = str_replace('>', '_#_MORE_#_', $match);
-		}
-		$parts = preg_split($regexp, $html);
-		$html = '';
-		foreach ($parts as $i => $part) {
-			$html .= $part;
-			if (isset($matches[$i])) {
-				$html .= $matches[$i];
-			}
-		}
-		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*\/*default\s*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\})/i";
-		preg_match_all($regexp, $html, $matches);
-		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
-		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
-		$parts = preg_split($regexp, $html);
-		$list = array();
-		for ($j = 0; $j < count($parts); $j++) {
-			$part = $parts[$j];
-			if (!empty($part)) {
-				$list[] = array('type' => 'text', 'content' => $part);
-			}
-			if (isset($tags[$j]) && !empty($tags[$j])) {
-				preg_match('/^[<\{]\s*\/*(:*[a-z]\w*) */i', $tags[$j], $match);
-				$tagName = $match[1];
-				$tagContent = $tags[$j];
-				if (self::invalidTagName($tagName)) {
-					new Error(self::$errors['invalidTagName'], array($tagName, self::$templateName, self::$class['name'], $tagContent));
-				}
-				$isClosing = self::isTagClosing($tagName, $tagContent);
-				$tagContent = str_replace('#classobfus#', '->>', $tagContent);
-				$list[] = array(
-					'type' => 'tag',
-					'content' => $tagContent,
-					'tagName' => $tagName,
-					'isClosing' => $isClosing,
-					'isSingle' => self::isSingleTag($tagName) || self::isSimpleTag($tagName)
-				);
-			}
-		}
-		$isLet = 0;
-		TemplateValidator::validate($list, self::$templateName, self::$className);
-		
-		$children = array('c' => array());
-		self::parseChildren($list, $children['c'], $children);
-		Printer::log($children);
-		$finishedChildren = array();
-		self::finish($children['c'], $finishedChildren);
-		//Printer::log($finishedChildren);
-		return array('name' => self::$templateName, 'children' => $finishedChildren, 'let' =>  $children['lets']);
-	}
-
 	private static function invalidTagName($tagName) {
 		if (strlen($tagName) > 1 && !preg_match('/[a-z]/', $tagName)) {
 			return true;
@@ -615,6 +585,48 @@ class TemplateParser
 			}
 		}
 		return $children;
+	}
+
+	private static function parseLetOperator(&$content) {
+		$lets = array();
+		$data = Splitter::split('/\{\s*let([\s&][^\}]+)\}/', $content, 1);
+		$names = array();
+		$globals = array();
+		$content = '';
+		foreach ($data['items'] as $i => $item) {
+			$content .= $item;
+			$delmr = $data['delimiters'][$i];
+			if (!empty($delmr)) {
+				$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names, $globals));
+				if (preg_match('/\[/', $delmr)) {
+					$d = Splitter::split('/[\[\]]/', $delmr);
+					$open = 0;
+					$delmr = '';
+					foreach ($d['items'] as $j => $it) {
+						if ($open > 0) {
+							$it = str_replace(',', '_#_comma_#_', $it);
+							$it = str_replace('=', '_#_equal_#_', $it);
+						}
+						$delmr .= $it;
+						if (isset($d['delimiters'][$j])) {
+							if ($d['delimiters'][$j] == '[') {
+								$open++;
+							} else {
+								$open--;
+							}
+							$delmr .= $d['delimiters'][$j];
+						}
+					}
+				}
+				$parts = explode(',', $delmr);
+				foreach ($parts as $part) {
+					$p = explode('=', $part);
+					$key = str_replace('&', '', trim($p[0]));
+					$lets[$key] = trim($p[1]);
+				}
+			}
+		}
+		return $lets;
 	}
 
 	private static function getProperChildren($children, $addQuotes = false) {
@@ -653,7 +665,7 @@ class TemplateParser
 		$text = '<quote>'.$text.'<quote>';
 	}
 
-	private static function parseForeach($content, &$child) {
+	private static function parseForeach($content, &$child, $source) {
 		if (is_string($child['c']) && !preg_match('/^<nq>/', $child['c'])) {
 			self::enquote($child['c']);
 		}
@@ -664,6 +676,9 @@ class TemplateParser
 			unset($child['ie']);	
 		}
 		$child['h'] = $child['c'];
+		if (!empty($source['lets'])) {
+			self::wrapInFunction($child['h'], '', 'lets', $source['lets']);
+		}
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
 		$data = TemplateCodeParser::parse($content, 'foreach', $content);
@@ -671,11 +686,17 @@ class TemplateParser
 		
 		$hasReactNames = !empty($data['reactNames']);
 		$hasGlobalNames = !empty($data['globalNames']);
+		$reactName = !empty($data['reactName']);
+		$globalName = !empty($data['globalName']);
 		if ($hasReactNames || $hasGlobalNames) {
+			if ($reactName) $child['rn'] = $data['reactName'];
+			if ($globalName) $child['gn'] = $data['globalName'];
 			if ($hasGlobalNames) $child['g'] = self::getProperChildren($data['globalNames']);
 			if ($hasReactNames) $child['n'] = self::getProperChildren($data['reactNames']);
 			$child['$'] = '<nq>$<nq>';
-			unset($child['p']);
+			if ($reactName || $globalName) {
+				unset($child['p']);
+			}
 		}
 		
 		$args = array($data['value']);
@@ -822,7 +843,7 @@ class TemplateParser
 		}
 		if (is_array($source)) {
 			if (!empty($source['lets'])) {
-				$child['c'] = '(function(){var '.self::getLetVars($source['lets']).';return '.$child['c'].'})()';
+				self::wrapInFunction($child['c'], '', 'lets', $source['lets']);
 			}
 			if (!empty($else) && !empty($source['elseLets'])) {
 				$else = '(function(){var '.self::getLetVars($source['elseLets']).';return '.$else.'})()';
@@ -1353,6 +1374,7 @@ class TemplateParser
 
 	private static function parseSwitch($content, $childrenList, &$child, $source) {
 		$data = TemplateCodeParser::parse('switch '.$content, 'switch', self::$parsedItem);
+		Printer::log($data);
 		
 		self::parseCases($childrenList, $child);
 		$switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);

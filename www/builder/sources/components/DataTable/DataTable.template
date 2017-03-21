@@ -1,11 +1,13 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-1
-{let &a = [1,2,6,7,8,9,0,-3]}
-4343
-{foreach &a as &i => &f while $i >= 0}
-	<div>{&f}</div>
-{/foreach}
-
-534
+	{let &v = 1234}
+	{&v}
+	{switch &a}
+		{case true}
+			it's true
+		{/case}
+		{case false}
+			it's false
+		{/case}
+	{/switch}
 </div>

@@ -322,7 +322,7 @@ class TemplateValidator
 	}
 
 	private	static function isOperator($tag) {
-		return $tag == 'if' || $tag == 'switch' || $tag == 'foreach'|| $tag == 'else' || $tag == 'ifempty' || $tag == 'case' || $tag == 'default';
+		return $tag == 'if' || $tag == 'switch' || $tag == 'foreach'|| $tag == 'else' || $tag == 'ifempty' || $tag == 'case' || $tag == 'default' || $tag == 'let';
 	}
 
 	private	static function getTagTypeName($tag, $ending = '') {
