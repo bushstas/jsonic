@@ -183,38 +183,43 @@ class TemplateParser
 		return false;
 	}
 
-	private static function parseLetOperator($content) {
+	private static function parseLetOperator(&$content) {
 		$lets = array();
 		$data = Splitter::split('/\{\s*let([\s&][^\}]+)\}/', $content, 1);
 		$names = array();
 		$globals = array();
-		foreach ($data['delimiters'] as $i => $delmr) {
-			$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names, $globals));
-			if (preg_match('/\[/', $delmr)) {
-				$d = Splitter::split('/[\[\]]/', $delmr);
-				$open = 0;
-				$delmr = '';
-				foreach ($d['items'] as $j => $it) {
-					if ($open > 0) {
-						$it = str_replace(',', '_#_comma_#_', $it);
-						$it = str_replace('=', '_#_equal_#_', $it);
-					}
-					$delmr .= $it;
-					if (isset($d['delimiters'][$j])) {
-						if ($d['delimiters'][$j] == '[') {
-							$open++;
-						} else {
-							$open--;
+		$content = '';
+		foreach ($data['items'] as $i => $item) {
+			$content .= $item;
+			$delmr = $data['delimiters'][$i];
+			if (!empty($delmr)) {
+				$delmr = str_replace('<nq>', '', self::processCode('{let '.$delmr.'}', 'let', $names, $globals));
+				if (preg_match('/\[/', $delmr)) {
+					$d = Splitter::split('/[\[\]]/', $delmr);
+					$open = 0;
+					$delmr = '';
+					foreach ($d['items'] as $j => $it) {
+						if ($open > 0) {
+							$it = str_replace(',', '_#_comma_#_', $it);
+							$it = str_replace('=', '_#_equal_#_', $it);
 						}
-						$delmr .= $d['delimiters'][$j];
+						$delmr .= $it;
+						if (isset($d['delimiters'][$j])) {
+							if ($d['delimiters'][$j] == '[') {
+								$open++;
+							} else {
+								$open--;
+							}
+							$delmr .= $d['delimiters'][$j];
+						}
 					}
 				}
-			}
-			$parts = explode(',', $delmr);
-			foreach ($parts as $part) {
-				$p = explode('=', $part);
-				$key = str_replace('&', '', trim($p[0]));
-				$lets[$key] = trim($p[1]);
+				$parts = explode(',', $delmr);
+				foreach ($parts as $part) {
+					$p = explode('=', $part);
+					$key = str_replace('&', '', trim($p[0]));
+					$lets[$key] = trim($p[1]);
+				}
 			}
 		}
 		return $lets;
@@ -232,7 +237,6 @@ class TemplateParser
 					if (preg_match('/\{\s*let\b/', $item['content'])) {
 						$lets = self::parseLetOperator($item['content']);
 						$letsKey = $ofElse ? 'elseLets' : 'lets';
-						$parentalChild[$letsKey.'Content'] = $item['content'];
 						if (!empty($lets)) {
 							if (!isset($parentalChild[$letsKey])) {
 								$parentalChild[$letsKey] = $lets;
@@ -240,7 +244,6 @@ class TemplateParser
 								$parentalChild[$letsKey] = array_merge($parentalChild[$letsKey], $lets);
 							}
 						}
-						$item['content'] = '';
 					}
 				}
 				if (!empty($item['content'])) {
@@ -573,7 +576,7 @@ class TemplateParser
 		
 		$children = array('c' => array());
 		self::parseChildren($list, $children['c'], $children);
-		//Printer::log($children);
+		Printer::log($children);
 		$finishedChildren = array();
 		self::finish($children['c'], $finishedChildren);
 		//Printer::log($finishedChildren);
@@ -1349,9 +1352,6 @@ class TemplateParser
 	}
 
 	private static function parseSwitch($content, $childrenList, &$child, $source) {
-		if (!empty($source['letsContent'])) {
-			new Error(self::$errors['operatorInSwitch'], array('let', self::$templateName, self::$className, $source['letsContent'], '{switch '.$content.'}'));
-		}
 		$data = TemplateCodeParser::parse('switch '.$content, 'switch', self::$parsedItem);
 		
 		self::parseCases($childrenList, $child);
