@@ -2,7 +2,7 @@ component DataTable
 
 initial props = {
 	a: 2,
-	i: 1
+	i: 2
 
 }
 

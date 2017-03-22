@@ -205,8 +205,8 @@ class TemplateValidator
 			$error = self::getSwitchError($tag);
 			new Error(self::$errors[$error], array(self::$templateName, self::$className, $tag, $item['content']));
 		}
-		if (($tag == 'case' || $tag == 'default') && $last != 'switch') {
-			new Error(self::$errors['operatorOutOfPlace'], array($tag, 'switch', self::$templateName, self::$className, $item['content']));
+		if (($tag == 'case' || $tag == 'default') && $last != 'switch' && $last != 'if') {
+			new Error(self::$errors['operatorOutOfPlace'], array($tag, 'switch / if', self::$templateName, self::$className, $item['content']));
 		}
 		if (in_array($tag, self::$forbiddenElements)) {
 			new Error(self::$errors['forbiddenTag'], array($tag, self::$templateName, self::$className, $item['content']));

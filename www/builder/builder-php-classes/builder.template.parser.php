@@ -200,7 +200,8 @@ class TemplateParser
 		$list = array();
 		for ($j = 0; $j < count($parts); $j++) {
 			$part = $parts[$j];
-			if (!empty($part)) {
+			
+			if (is_numeric($part) || !empty($part)) {
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
 			if (isset($tags[$j]) && !empty($tags[$j])) {
@@ -257,8 +258,10 @@ class TemplateParser
 		for ($i = 0; $i < count($list); $i++) {
 			$item = $list[$i];
 			$lets = array();
-			if ($item['type'] == 'text' && !empty($item['content'])) {
-				$children[] = $item['content'];			
+			if ($item['type'] == 'text') {
+				if (!empty($item['content']) || is_numeric($item['content'])) {
+					$children[] = $item['content'];
+				}
 			} else {
 				self::$parsedItem = $item['content'];
 				$tag = $item['tagName'];
@@ -344,7 +347,7 @@ class TemplateParser
 				
 				if ($child['content'][0] == '{') {
 					if (preg_match('/\{\s*if\s*\}/', $child['content'])) {
-						$chld['ifswitch'] = 1;	
+						$chld['ifswitch'] = 1;							
 					} elseif ($child['tagName'] == 'switch') {
 						$chld['switch'] = trim(preg_replace('/^\s*{\s*switch */', '', $child['content']), '}');
 						if (empty($chld['switch'])) {
@@ -432,7 +435,7 @@ class TemplateParser
 			return; 
 		}
 		foreach ($children as $child) {
-			if (is_string($child)) {
+			if (is_string($child) || is_numeric($child)) {
 				self::parseTextNode($child, $finishedChildren);
 			} else {
 				$ch = array();
@@ -491,11 +494,17 @@ class TemplateParser
 					$finishedChildren[] = $ch;
 					continue;
 				}
+				elseif (!empty($child['ifswitch']))
+				{
+					$ch['c'] = array();
+					self::parseSwitch('', $child['children'], $ch, $child, true);
+					$finishedChildren[] = $ch;
+					continue;
+				}
 				elseif (!empty($child['switch']))
 				{
 					$ch['c'] = array();
 					self::parseSwitch($child['switch'], $child['children'], $ch, $child);
-					Printer::log($ch);
 					$finishedChildren[] = $ch;
 					continue;
 				}
@@ -1337,7 +1346,7 @@ class TemplateParser
 	}
 
 	private static function parseTextNode($content, &$children, &$let = 0, $place = 'textNode', &$names = null) {		
-		if (!empty($content)) {
+		if (!empty($content) || is_numeric($content)) {
 			$regexp = '/\{([^\}]+)\}/';
 			preg_match_all($regexp, $content, $matches);
 			$codes = $matches[1];
@@ -1411,55 +1420,46 @@ class TemplateParser
 		}
 	}
 
-	private static function parseSwitch($content, $children, &$child, $source) {
+	private static function parseSwitch($content, $children, &$child, $source, $ifSwitch = false) {
 		if (empty($children)) {
-			new Error(self::$errors['emptySwitch'], array(self::$templateName, self::$className, '{switch '.trim($content).'}'));
-		}
-		
+			new Error(self::$errors['emptySwitch'], array(self::$templateName, self::$className, !$ifSwitch ? '{switch '.trim($content).'}' : '{if}'));
+		}		
 		$globals = array();
 		$names = array();
-		$code = self::processCode('{switch '.$content.'}', 'switch', $names, $globals);
-		
-		
-		
-		
+		if (!$ifSwitch) {
+			$code = self::processCode('{switch '.$content.'}', 'switch', $names, $globals);
+		}		
 		$cases = array();
 		$default = '';
-		self::parseCases($cases, $children, $names, $globals, $default, false);
-		$child['sw'] = $code;
-		$child['cs'] = self::getProperChildren($cases);
+		self::parseCases($cases, $children, $names, $globals, $default, $ifSwitch);
+		if (!$ifSwitch) {
+			$key = 'sw';
+			$child[$key] = $code;
+			$child['cs'] = self::getProperChildren($cases);
+		} else {
+			$key = 'is';
+			$child[$key] = self::getProperChildren($cases);
+		}
 		$child['c'] = self::getProperChildren($children);
 		if (!empty($default)) {
 			$child['d'] = self::getProperChildren($default);
 		}
 		if (!empty($names) || !empty($globals)) {
 			self::wrapInFunction($child);
-			$child = array('sw' => $child);
-			if (!empty($names)) $child['n'] = self::getProperChildren($names);
-			if (!empty($globals)) $child['g'] = self::getProperChildren($globals);
-
+			$child = array($key => $child);
+			if (!empty($names)) {
+				$names = array_unique($names);
+				sort($names);
+				$child['n'] = self::getProperChildren($names);
+			}
+			if (!empty($globals)) {
+				$globals = array_unique($globals);
+				sort($globals);
+				$child['g'] = self::getProperChildren($globals);
+			}
 		} else {
 			
 		}
-
-
-		// $switch = '[<nq>'.$data['code'].'<nq>,'.self::getProperChildren($child['is'], true).','.self::getProperChildren($child['c'], true);
-		// if (!empty($child['d'])) {
-		// 	$switch .= ','.self::getProperChildren($child['d'], true);
-		// }
-		// $switch .= ']';
-		// if (!empty($data['reactNames'])) {
-		// 	$child['n'] = self::getProperChildren($data['reactNames']);
-		// 	$child['sw'] = '<nq>function(){return'.$switch.'}<nq>';			
-		// 	if (!empty(self::$componentsOpen)) {
-		// 		$child['$'] = '<nq>$<nq>';
-		// 	}
-		// } else {
-		// 	$child['sw'] = '<nq>'.$switch.'<nq>';
-		// }
-		// unset($child['d']);
-		// unset($child['c']);
-		// unset($child['is']);
 	}
 
 	private	static function parseCases(&$cases, &$children, &$names, &$globals, &$default, $isIfSwitch) {
