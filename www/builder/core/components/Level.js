@@ -152,18 +152,15 @@
 			registerChild(swtch);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), swtch, props);
 		} else {
-			props = props['sw'];
-			if (!isArray(props[1])) {
-				props[1] = [props[1]];
-				props[2] = [props[2]];
-			}
-			for (var i = 0; i < props[1].length; i++) {					
-				if (props[0] === props[1][i]) {
-					renderItems(props[2][i]);
+			if (!isArray(props['cs'])) props['cs'] = [props['cs']];
+			if (!isArray(props['c'])) props['c'] = [props['c']];
+			for (var i = 0; i < props['cs'].length; i++) {
+				if (props['sw'] === props['cs'][i]) {
+					renderItems(props['c'][i]);
 					return;
 				}
-			}
-			if (!isUndefined(props[3])) renderItems(props[3]);
+			}			
+			if (!isUndefined(props['d'])) renderItems(props['d']);
 		}
 	};
 

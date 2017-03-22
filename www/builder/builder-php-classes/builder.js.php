@@ -55,7 +55,7 @@ class JSCompiler
 		'diffClassType' => 'Класс {??} имеет тип {??}, однако вызывается с типом {??} в шаблоне класса {??}',
 		'noRouteController' => 'Контроллер {??} упомянутый в конфигурации роутера не найден',
 		'noTooltipClass' => 'Класс {??} указанный в параметре конфигурации <b>tooltipClass</b> не найден',
-		'noMethodFound' => 'Ошибка вызова метода {??} класса {??} из его шаблона. Метод не найден',
+		'noMethodFound' => 'В одном из шаблонов класса {??} обнаружен вызов неизвестного метода {??}',
 		'noMethodFound2' => 'Обработчик события {??} не найден среди методов класса {??}',
 		'noMethodFound3' => 'Ошибка вызова {??} из метода {??} в коде класса {??}. Метод не найден',
 		'noMethodFound4' => 'Обработчик события {??}, указанный в одном из initial параметров, не найден среди методов класса {??}',
@@ -866,7 +866,7 @@ class JSCompiler
 				if (is_array($class['tmpCallbacks'])) {
 					foreach ($class['tmpCallbacks'] as $callback) {
 						if (!$this->hasComponentMethod($callback, $class)) {
-							new Error($this->errors['noMethodFound'], array($callback, $className));
+							new Error($this->errors['noMethodFound'], array($className, $callback));
 						}
 					}
 				}

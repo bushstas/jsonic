@@ -1,14 +1,13 @@
 component DataTable
 
 initial props = {
-	a: 'Hello',
+	a: 2,
 	i: 1
 
 }
 
 function handleClick() {
-	$i = 25;
-	$a = 'Пока'
+	$a = 1
 }
 
 function aaa(i) {

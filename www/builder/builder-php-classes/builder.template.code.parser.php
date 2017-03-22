@@ -154,6 +154,7 @@ class TemplateCodeParser
 		self::$quoted = false;
 		self::$foreachKeyword = false;
 		self::$expectedKeywords = array();
+		self::$thereWasWord = false;
 	}
 
 	public static function parse($code, $place, $element = null) {
@@ -307,7 +308,7 @@ class TemplateCodeParser
 									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$templateName, self::$className, self::$code, self::$element));
 								}
 								self::$isSwitch = true;
-								self::$expected = array('~', '&', '$', '.', 'a', self::$space);
+								self::$expected = array('~', '&', '$', '.', 'a', self::$space, 'notend');
 							break;
 							case 'case':
 								if (self::$context != 'ifswitch' && self::$context != 'switch') {
@@ -315,9 +316,9 @@ class TemplateCodeParser
 								}
 								self::$isCase = true;
 								if (self::$place != 'ifcase') {
-									self::$expected = array('"', "'", 'b', '0', '~', '@', '&', self::$space);
+									self::$expected = array('"', "'", 'b', '0', '~', '@', '&', '$', '.', 'a', '-', '(', self::$space, 'notend');
 								} else {
-									self::$expected = array('!', '"', "'", 'b', '0', '~', '@', '&', '$', self::$space);
+									self::$expected = array('!', '"', "'", 'b', '0', '~', '@', '&', '$', '.', 'a', '(', self::$space, 'notend');
 								}
 							break;
 							case 'default':
@@ -813,7 +814,7 @@ class TemplateCodeParser
 			self::set('math', '');
 			self::set('or', 0);
 		}
-		if (self::$isCase && !self::$open['quote']) {
+		if (self::$isCase && !self::$open['quote'] && !self::$open['func'] && !self::$open['parenthesis'] && !self::$open['bracket']) {
 			self::off('case');
 			self::$expected = array('end', self::$space);
 		}
@@ -1380,15 +1381,17 @@ class TemplateCodeParser
 			case 'else':
 			case 'templateAttribute':
 			case 'elementAttribute':
-				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '%');
+				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '%', '(');
 			break;
 			case 'componentAttribute':
-				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%');
+				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', '&', '$', '~', '@', '#', '^', '%', '(');
 			break;
 			case 'let':
 			case 'textNode':
-				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%');
+				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%', '(');
 			break;
+			case 'default':
+			case 'case':
 			case 'switch':
 			case 'ifcase':
 			case 'foreach':
@@ -1598,9 +1601,13 @@ class TemplateCodeParser
 		}
 		elseif (self::$isLet)
 		{
-			if (self::$open['letvalue']) self::$expected = $expecteds;
-			else if (self::$open['letvarname']) self::$expected = $expecteds;
+			if (!self::$thereWasWord || self::$open['letvalue'] || self::$open['letvarname']) self::$expected = $expecteds;
 		}
+		elseif (self::$isSwitch || self::$isCase)
+		{
+			if (!self::$thereWasWord) self::$expected = $expecteds;
+		}
+
 		if (is_array(self::$expected))
 		{
 			self::error('unexpectedEnd', array($code, '<b>&nbsp;}</b>', self::getExpected()), true);

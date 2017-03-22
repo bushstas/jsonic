@@ -3,7 +3,7 @@
 
 	this.createLevels = function(isUpdating) {
 		var p = params['sw']();
-		var v = p[0], vs = p[1], ch = p[2], d = p[3];
+		var v = p['sw'], vs = p['cs'], ch = p['c'], d = p['d'];
 		if (!isArray(vs)) {
 			vs = [vs]; ch = [ch];
 		}
