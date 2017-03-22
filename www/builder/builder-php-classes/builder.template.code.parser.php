@@ -433,7 +433,7 @@ class TemplateCodeParser
 		self::$data['code'] = self::getParsedData(self::$parsedCode);
 		
 		// logging
-		if (self::$logging) Printer::log(self::$data['code']);
+		//if (self::$logging) Printer::log(self::$data['code']);
 		return self::$data;
 
 	}
@@ -719,7 +719,12 @@ class TemplateCodeParser
 				self::off('functionResult');
 				self::off('recentQuote');
 			} else {
-				self::$expected = array('a', '0', '~', '&', '.', '@', '#', '+', '-', '!', '(', "'", '"', '=', self::$space);
+				if (self::$open['letvarname'] || self::$prevSign == '=' || self::$open['placeholder']) {
+					self::$expected = array('a', '0', '~', '&', '.', '@', '#', '+', '-', '!', '(', "'", '"', '=', self::$space);
+					self::maybeAddDollar();
+				} else {
+					self::$expected = array('=');	
+				}
 				if (!self::$open['doubleEqual'] && !self::$open['greater'] && !self::$open['notEqual']) {
 					if (self::$prevSign == '!') {
 						self::on('notEqual');
@@ -738,7 +743,6 @@ class TemplateCodeParser
 					self::off('doubleEqual');
 					self::on('tripleEqual');
 				}
-				self::maybeAddDollar();
 				if (self::$isLet) {
 					self::$expected[] = self::$space;
 					if (!self::$open['greater'] && !self::$open['doubleEqual'] && !self::$open['tripleEqual']) {
@@ -1477,12 +1481,12 @@ class TemplateCodeParser
 				$o[$k] = $v;
 			}
 		}
-		Printer::log($o);
+		//Printer::log($o);
 	}
 
 	private static function log() {
 		self::printOpen();
-		Printer::log(self::$expected);
+		//Printer::log(self::$expected);
 	}
 
 	//checking

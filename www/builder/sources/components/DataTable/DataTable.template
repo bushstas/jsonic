@@ -1,6 +1,10 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	{let &v = $a, &i = $:aaa}
-	{&v}
-	<div>{&i}</div>
+	{&a == 2 ? 2 : 3}
+	{let &a = 1}
+	{foreach ~a as &ia => &i}
+	{/foreach}
+	{switch}
+		
+	{/switch}
 </div>

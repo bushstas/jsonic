@@ -61,7 +61,9 @@ class TemplateParser
 		'fewSameOperators' => 'Обнаружено дублирование оператора {??} внутри оператора {??} в шаблоне {??} класса {??}',
 		'loadingOperatorWithoutLoader' => 'Обнаружено использование одного из операторов <b>loading, loader</b> в шаблоне {??} класса {??}. У данного класса отсутствует initial параметр <b>loader</b>',
 		'invalidTagName' => 'Некорректное имя тега {??} в шаблоне {??} класса {??}<br><br>Теги элементов DOM должны иметь вид:<xmp><div>, <h1>, <table></xmp>Теги компонентов должны иметь вид:<xmp><Select>, <TableColumn></xmp>Теги вызова шаблона класса:<xmp><:content>, <:innerContent></xmp>Теги вызова свободного шаблона:<xmp><::checkbox>, <::userArea></xmp>',
-		'includeNotFound' => 'Обнаружен вызов несуществующего include шаблона {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
+		'includeNotFound' => 'Обнаружен вызов несуществующего include шаблона {??} в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'foreachVarsConflict' => 'Обнаружен конфликт имен переменных в операторе <b>foreach</b> в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>',
+		'emptySwitch' => 'Обнаружен оператор <b>switch</b>, который не содержит ни одного оператора <b>case</b>, в шаблоне {??} класса {??}<br><br>Код в котором произошла ошибка: <xmp>{?}</xmp>'
 	);
 
 	public static function init($params) {
@@ -731,6 +733,17 @@ class TemplateParser
 		if (isset($data['key'])) {
 			$args[] = $data['key'];
 		}
+		$vars = array($child['p'], $data['value'], $data['key']);
+		if (!empty($vars[0])) {
+			if ($vars[0] == $vars[1] || $vars[0] == $vars[2]) {
+				new Error(self::$errors['foreachVarsConflict'], array(self::$templateName, self::$className, '{'.$content.'}'));
+			}
+		}
+		if (!empty($vars[1])) {
+			if ($vars[1] == $vars[2]) {
+				new Error(self::$errors['foreachVarsConflict'], array(self::$templateName, self::$className, '{'.$content.'}'));
+			}
+		}
 		if ($data['right']) {
 			$child['r'] = 1;
 		} elseif ($data['random']) {
@@ -1391,6 +1404,9 @@ class TemplateParser
 	}
 
 	private static function parseSwitch($content, $childrenList, &$child, $source) {
+		if (empty($childrenList)) {
+			new Error(self::$errors['emptySwitch'], array(self::$templateName, self::$className, '{switch '.trim($content).'}'));
+		}
 		$data = TemplateCodeParser::parse('switch '.$content, 'switch', self::$parsedItem);
 		
 		self::parseCases($childrenList, $child);
