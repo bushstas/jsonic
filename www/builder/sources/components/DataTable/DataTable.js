@@ -1,13 +1,14 @@
 component DataTable
 
 initial props = {
-	a: 2,
-	i: 2
+	a: 23,
+	i: 1
 
 }
 
 function handleClick() {
 	$a = 1
+	$i = 2
 }
 
 function aaa(i) {

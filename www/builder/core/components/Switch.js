@@ -1,21 +1,34 @@
 {{GLOBAL}}.set({{COMPONENT}} = function(params) {
+	var cur = null;
 	this.levels = [];
-
-	this.createLevels = function(isUpdating) {
+	isChanged();
+	function isChanged() {
 		var p = params['sw']();
-		var v = p['sw'], vs = p['cs'], ch = p['c'], d = p['d'];
-		if (!isArray(vs)) {
-			vs = [vs]; ch = [ch];
-		}
+		var v = p['sw'], vs = p['cs'], c = cur;
 		for (var i = 0; i < vs.length; i++) {
 			if (v === vs[i]) {
-				for (var j = 0; j < ch[i].length; j++) this.createLevel(ch[i][j], isUpdating);
-				return;
+				cur = i;
+				return i !== c;
 			}
 		}
-		if (!isUndefined(d)) this.createLevel(d, isUpdating);
+		cur = null;
+		return c !== null;
+	}
+	this.createLevels = function(isUpdating) {
+		var p = params['sw']();
+		var c = p['c'], d = p['d'];
+		if (cur !== null) {
+			this.createLevel(c[cur], isUpdating);
+		} else if (!isUndefined(d)) {
+			this.createLevel(d, isUpdating);
+		}
 	};
-
+	this.update = function() {
+		if (isChanged()) {
+			this.disposeLevels();
+			this.createLevels(true);
+		}
+	};
 	this.dispose = function() {
 		this.disposeLinks();
 		this.disposeLevels();
@@ -27,8 +40,3 @@
 		params = null;
 	};
 }, 'Switch');
-{{PROTO}}={{COMPONENT}}.prototype;
-{{PROTO}}.update = function() {
-	this.disposeLevels();
-	this.createLevels(true);
-};

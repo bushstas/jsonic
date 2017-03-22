@@ -1,14 +1,14 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	{if}
-		{case $i == 0}
-			0
+	{switch $i}
+		{case 1}
+			1
 		{/case}
-		{case $i == 2}
+		{case 2}
 			2
 		{/case}
 		{default}
 			default
 		{/default}
-	{/if}
+	{/switch}
 </div>
