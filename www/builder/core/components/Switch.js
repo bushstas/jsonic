@@ -5,10 +5,13 @@
 	function isChanged() {
 		var p = params['sw']();
 		var v = p['sw'], vs = p['cs'], c = cur;
-		for (var i = 0; i < vs.length; i++) {
-			if (v === vs[i]) {
-				cur = i;
-				return i !== c;
+		if (!isUndefined(vs)) {
+			if (!isArray(vs)) vs = [vs];
+			for (var i = 0; i < vs.length; i++) {
+				if (v === vs[i]) {
+					cur = i;
+					return i !== c;
+				}
 			}
 		}
 		cur = null;

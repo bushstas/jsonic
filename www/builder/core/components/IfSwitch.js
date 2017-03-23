@@ -4,6 +4,7 @@
 	isChanged();
 	function isChanged() {
 		var v = params['is']()['is'], c = cur;
+		if (!isArray(v)) v = [v];
 		for (var i = 0; i < v.length; i++) {
 			if (!!v[i]) {
 				cur = i;
@@ -16,6 +17,7 @@
 	this.createLevels = function(isUpdating) {
 		var p = params['is']();
 		var c = p['c'], d = p['d'];
+		if (!isArray(c)) c = [c];
 		if (cur !== null) {
 			this.createLevel(c[cur], isUpdating);
 		} else if (!isUndefined(d)) {

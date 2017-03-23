@@ -1432,6 +1432,10 @@ class TemplateParser
 		$cases = array();
 		$default = '';
 		self::parseCases($cases, $children, $names, $globals, $default, $ifSwitch);
+		if (empty($cases)) {
+			$child = $default;
+			return;
+		}
 		if (!$ifSwitch) {
 			$key = 'sw';
 			$child[$key] = $code;
@@ -1474,6 +1478,9 @@ class TemplateParser
 				$casesList[] = $code;
 				$ch = array();
 				self::finish($item['children'], $ch);
+				if (!empty($item['lets'])) {
+					self::wrapInFunction($ch, '', 'lets', $item);
+				}
 				$childrenList[] = $ch;
 			}
 			elseif (isset($item['default']))
@@ -1481,6 +1488,9 @@ class TemplateParser
 				self::processCode('{default '.$item['default'].'}', 'default', $names, $globals);
 				$ch = array();
 				self::finish($item['children'], $ch);
+				if (!empty($item['lets'])) {
+					self::wrapInFunction($ch, '', 'lets', $item);
+				}
 				$default = $ch;
 			}
 		}
