@@ -192,7 +192,7 @@ class TemplateParser
 				$html .= $matches[$i];
 			}
 		}
-		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*\/*default\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\}|\{\s*\/*let\b[^\}]*\})/i";
+		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*from\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*\/*default\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\}|\{\s*\/*let\b[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
 		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
 		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
@@ -353,6 +353,11 @@ class TemplateParser
 						if (empty($chld['switch'])) {
 							$chld['switch'] = ' ';
 						}
+					} elseif ($child['tagName'] == 'from') {
+						$chld['from'] = trim(preg_replace('/^\s*{\s*from */', '', $child['content']), '}');
+						if (empty($chld['from'])) {
+							$chld['from'] = ' ';
+						}
 					} elseif ($child['tagName'] == 'if') {
 						$chld['if'] = trim(preg_replace('/^\s*{\s*if */', '', $child['content']), '}');
 						if (empty($chld['if'])) {
@@ -491,6 +496,14 @@ class TemplateParser
 					}
 					self::finish($child['children'], $ch['c']);
 					self::parseForeach('foreach '.$child['foreach'], $ch, $child);
+					$finishedChildren[] = $ch;
+					continue;
+				}
+				elseif (!empty($child['from']))
+				{
+					$ch['c'] = array();
+					self::finish($child['children'], $ch['c']);
+					self::parseFrom('from '.$child['from'], $ch, $child);
 					$finishedChildren[] = $ch;
 					continue;
 				}
@@ -708,6 +721,21 @@ class TemplateParser
 
 	private static function enquote(&$text) {
 		$text = '<quote>'.$text.'<quote>';
+	}
+
+	private static function parseFrom($content, &$child, $source) {
+		if (is_string($child['c']) && !preg_match('/^<nq>/', $child['c'])) {
+			self::enquote($child['c']);
+		}
+		$child['f'] = $child['c'];
+		if (!empty($source['lets'])) {
+			self::wrapInFunction($child['f'], '', 'lets', $source);
+		}
+		unset($child['c']);
+		$content = ltrim(rtrim($content, '}'), '{');
+		$data = TemplateCodeParser::parse($content, 'from', $content);
+		self::addTemplateCallbacks($data['callbacks']);
+		Printer::log($data);
 	}
 
 	private static function parseForeach($content, &$child, $source) {
@@ -1461,8 +1489,6 @@ class TemplateParser
 				sort($globals);
 				$child['g'] = self::getProperChildren($globals);
 			}
-		} else {
-			
 		}
 	}
 

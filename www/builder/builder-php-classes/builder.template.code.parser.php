@@ -13,7 +13,7 @@ class TemplateCodeParser
 				   $notTextOrComp, $isKey, $anyVar, $objVar, $decOpen, $reactName,
 				   $prevSign, $isCase, $notLetValue, $isStart, $quoted, $isSwitch,
 				   $thereWasWord, $place, $parsedCode, $element, $context, $nextPart,
-				   $isForeach, $foreach, $foreachKeyword;
+				   $isForeach, $foreach, $foreachKeyword, $isFrom;
 
 
 	private static $signs = array(
@@ -106,7 +106,7 @@ class TemplateCodeParser
 	);
 
 	private static $operators = array(
-		'case', 'switch', 'if', 'foreach', 'let', 'default'
+		'case', 'switch', 'if', 'foreach', 'let', 'default', 'from'
 	);
 
 	//logging
@@ -303,6 +303,13 @@ class TemplateCodeParser
 								self::$isLet = true;
 								self::$expected = array('&', self::$space);
 							break;
+							case 'from':
+								if (self::$place != 'from') {
+									new Error(self::$errors['operatorInAppropPlace'], array('from', self::$templateName, self::$className, self::$code, self::$element));
+								}
+								self::$isFrom = true;
+								self::$expected = array('&', self::$space, 'notend');
+							break;
 							case 'switch':
 								if (self::$place != 'switch') {
 									new Error(self::$errors['operatorInAppropPlace'], array('switch', self::$templateName, self::$className, self::$code, self::$element));
@@ -330,7 +337,7 @@ class TemplateCodeParser
 								self::$expected = array('end', self::$space);
 							break;
 						}						
-						if (self::$isCase || $isDefault || self::$isLet || self::$isSwitch || self::$isForeach) continue;
+						if (self::$isCase || $isDefault || self::$isLet || self::$isSwitch || self::$isForeach || self::$isFrom) continue;
 					}
 					if (self::$quoted) {
 						self::$expected = '*';
@@ -666,6 +673,9 @@ class TemplateCodeParser
 			if (self::$open['bracket'] > 0) {
 				self::$expected[] = ']';
 			}
+			if (!empty(self::$varType)) {
+				self::$expected[] = '.';
+			}
 			if (self::$varType == 'r') {
 				self::on('react2');
 			} elseif (!empty(self::$varType)) {
@@ -711,7 +721,9 @@ class TemplateCodeParser
 					return;
 				}
 			}
-			if (self::$open['foreachAs']) {
+			if (self::$open['fromVar']) {
+				self::$expected = array('a', '0', '-', '&', '~', '$', '.', self::$space);
+			} elseif (self::$open['foreachAs']) {
 				self::on('equal');
 				self::$expected = array('>');
 				self::$expectedKeywords = array();
@@ -957,6 +969,9 @@ class TemplateCodeParser
 			} else {
 				self::on('var2');
 			}
+			if (self::$open['fromVar2']) {
+				die('423');
+			}
 			if (self::isForeachContext()) {
 				self::removeExpected('?');
 				self::$expected = array('a', self::$space);
@@ -1033,6 +1048,21 @@ class TemplateCodeParser
 			}
 			self::$expected = array('end');
 			return false;
+		}
+
+		if (self::$isFrom) {
+			if (!self::$open['fromVar']) {
+				self::on('fromVar');
+				self::$expected = array('=', self::$space);
+				return false;
+			} elseif (!self::$open['toVar'] && (self::$isNum || (!self::$open['method'] && !self::$open['func'] && !self::$open['parenthesis']))) {
+				self::$expected = array('a', self::$space);
+				self::on('fromVar2');
+				die('234');
+				self::$expectedKeywords = array('to');
+				return false;
+			}
+			
 		}
 
 		$isForeach = (self::$open['foreachAs'] || self::$open['foreachAs2']) && self::$open['foreachAsVar'];
@@ -1365,6 +1395,9 @@ class TemplateCodeParser
 
 			case 'let':
 				return 'let оператора';
+
+			case 'from':
+				return 'from оператора';
 			
 			default:
 				return '';
@@ -1391,6 +1424,7 @@ class TemplateCodeParser
 				self::$expected = array("'", '"', '0', '+', '-', '!', 'a', '.', ':', '&', '$', '~', '@', '%', '(');
 			break;
 			case 'default':
+			case 'from':
 			case 'case':
 			case 'switch':
 			case 'ifcase':

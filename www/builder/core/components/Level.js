@@ -141,7 +141,7 @@
 					return;
 				}
 			}
-			if (isArray(props['d'])) renderItems(props['d']);
+			if (!isUndefined(props['d'])) renderItems(props['d']);
 		}
 	};
 

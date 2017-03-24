@@ -38,6 +38,10 @@ class TemplateValidator
 		'closingSimpleTag' => 'ќбнаружен закрывающийс€ тег {??} в шаблоне {??} класса {??}<xmp>{?}</xmp>'
 	);
 
+	private static $operators = array(
+		'if', 'switch', 'foreach', 'else', 'ifempty', 'case', 'default', 'let', 'let', 'from'
+	);
+
 	private static $onlyParentalElements = array(
 		'command' => array('menu'),
 		'tbody' => array('table'),
@@ -322,7 +326,7 @@ class TemplateValidator
 	}
 
 	private	static function isOperator($tag) {
-		return $tag == 'if' || $tag == 'switch' || $tag == 'foreach'|| $tag == 'else' || $tag == 'ifempty' || $tag == 'case' || $tag == 'default' || $tag == 'let';
+		return in_array($tag, self::$operators);
 	}
 
 	private	static function getTagTypeName($tag, $ending = '') {

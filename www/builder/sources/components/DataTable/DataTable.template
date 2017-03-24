@@ -1,13 +1,10 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
-	{if}
-		{case $i == 1}
-			{let &aaa = 4}
-			<span>{&aaa*5}</span>
-		{/case}
-		{default}
-			{let &aaa = 4}
-			<span style="background-color:#aaa;">{&aaa*2}</span>
-		{/default}
-	{/if}
+	<ul>
+	{from &a = .a($s) to 10 step 2}
+		<li>
+			{&i}
+		</li>
+	{/from}	
+	</ul>
 </div>
