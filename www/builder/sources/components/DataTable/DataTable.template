@@ -1,7 +1,7 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
 	<ul>
-	{foreach $a as &i}
+	{foreach $a as &i => &f limit 3}
 	{/foreach}
 	{from &a = .a($s) to 10 step 2}
 		<li>
