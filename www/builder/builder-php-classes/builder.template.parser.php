@@ -755,6 +755,7 @@ class TemplateParser
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
 		$data = ForeachCodeParser::parse($content, self::$templateName, self::$className);
+		die();
 		$data = TemplateCodeParser::parse($content, 'foreach', $content);
 		self::addTemplateCallbacks($data['callbacks']);
 		$child['p'] = $data['items'];

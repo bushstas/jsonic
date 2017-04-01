@@ -28,24 +28,28 @@ class ForeachCodeParser
 	private static function parseItems($items) {
 		$data = TemplateSyntaxParser::parse($items, array('$', '~', '&', '.', 'a'), self::$code);		 
 		self::$code .= $items.' as ';
+		Printer::log($data);
 	}
 
 	private static function parseKey($key) {
 		if (!empty($key)) {
 			$data = TemplateSyntaxParser::parse($key, array('&'), self::$code);
 			self::$code .= $key.' => ';
+			Printer::log($data);
 		}
 	}
 
 	private static function parseValue($value) {
 		$data = TemplateSyntaxParser::parse($value, array('&'), self::$code);
 		self::$code .= $value.' ';
+		Printer::log($data);
 	}
 
 	private static function parseWhile($while) {
 		if (!empty($while)) {
 			self::$code .= 'while ';
 			$data = TemplateSyntaxParser::parse($while, array('$', '~', '&', '.', 'a', '0', '!', '(', '-'), self::$code);
+			Printer::log($data);
 		}
 	}
 
@@ -53,6 +57,7 @@ class ForeachCodeParser
 		if (!empty($limit)) {
 			self::$code .= 'limit ';
 			$data = TemplateSyntaxParser::parse($limit, array('$', '~', '&', '.', 'a', '0', '!', '(', '-'), self::$code);
+			Printer::log($data);
 		}
 	}
 
