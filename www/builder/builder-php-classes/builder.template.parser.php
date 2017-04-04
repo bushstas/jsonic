@@ -755,13 +755,13 @@ class TemplateParser
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
 		$data = ForeachCodeParser::parse($content, self::$templateName, self::$className);
-		die();
-		$data = TemplateCodeParser::parse($content, 'foreach', $content);
-		self::addTemplateCallbacks($data['callbacks']);
+		
+		//$data = TemplateCodeParser::parse($content, 'foreach', $content);
+		self::addTemplateCallbacks($data['m']);
 		$child['p'] = $data['items'];
 		
-		$hasReactNames = !empty($data['reactNames']);
-		$hasGlobalNames = !empty($data['globalNames']);
+		$hasReactNames = !empty($data['r']);
+		$hasGlobalNames = !empty($data['g']);
 		$reactName = !empty($data['reactName']);
 		$globalName = !empty($data['globalName']);
 		if ($hasReactNames || $hasGlobalNames) {

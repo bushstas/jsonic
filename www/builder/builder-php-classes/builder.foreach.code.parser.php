@@ -4,7 +4,7 @@ class ForeachCodeParser
 {	
 	private static $code;
 	private static $D = '-||-';
-	private static $items, $key, $value, $limit, $while;
+	private static $items, $key, $value, $limit, $while, $data = array();
 
 	public static function parse($content, $templateName, $className) {
 		TemplateSyntaxParser::init('foreach', $templateName, $className);
@@ -16,6 +16,13 @@ class ForeachCodeParser
 		self::parseValue();
 		self::parseWhile();
 		self::parseLimit();
+
+		self::$data['items'] = self::$items;
+		self::$data['key'] = self::$key;
+		self::$data['value'] = self::$value;
+		self::$data['while'] = self::$while;
+		self::$data['limit'] = self::$limit;
+		return self::$data;
 	}
 
 	private static function prepareData($content) {
@@ -45,28 +52,32 @@ class ForeachCodeParser
 	private static function parseItems() {
 		$data = TemplateSyntaxParser::parse(self::$items, array('$', '~', '&', '.', 'a', '(', '!'), self::$code);		 
 		self::$code .= self::$items.' as ';
-		Printer::log($data);
+		self::addData($data);
+		self::$items = $data['c'];
 	}
 
 	private static function parseKey() {
 		if (!empty(self::$key)) {
 			$data = TemplateSyntaxParser::parse(self::$key, array('&'), self::$code);
 			self::$code .= self::$key.' => ';
-			Printer::log($data);
+			self::addData($data);
+			self::$key = $data['c'];
 		}
 	}
 
 	private static function parseValue() {
 		$data = TemplateSyntaxParser::parse(self::$value, array('&'), self::$code);
 		self::$code .= self::$value.' ';
-		Printer::log($data);
+		self::addData($data);
+		self::$value = $data['c'];
 	}
 
 	private static function parseWhile() {
 		if (!empty(self::$while)) {
 			self::$code .= 'while ';
 			$data = TemplateSyntaxParser::parse(self::$while, array('$', '~', '&', '.', 'a', '0', '!', '(', '-'), self::$code);
-			Printer::log($data);
+			self::addData($data);
+			self::$while = $data['c'];
 		}
 	}
 
@@ -74,7 +85,23 @@ class ForeachCodeParser
 		if (!empty(self::$limit)) {
 			self::$code .= 'limit ';
 			$data = TemplateSyntaxParser::parse(self::$limit, array('$', '~', '&', '.', 'a', '0', '!', '(', '-'), self::$code);
-			Printer::log($data);
+			self::addData($data);
+			self::$limit = $data['c'];
+		}
+	}
+
+	private static function addData($data) {
+		foreach ($data as $k => $v) {
+			if ($k == 'c') continue;
+			if (!is_array(self::$data[$k])) {
+				self::$data[$k] = $v;
+			} else {
+				foreach ($v as $i) {
+					if (!in_array($i, self::$data[$k])) {
+						self::$data[$k][] = $i;
+					}
+				}
+			}
 		}
 	}
 
