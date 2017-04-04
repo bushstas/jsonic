@@ -65,6 +65,8 @@ class TextParser
 					} else {
 						$currentText .= $matches[$i];
 					}
+				} else {
+					$content .= $currentText;
 				}
 			}
 		}

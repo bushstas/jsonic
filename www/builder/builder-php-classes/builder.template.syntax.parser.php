@@ -7,11 +7,13 @@ class TemplateSyntaxParser
 				   $code, $currentCode, $place, $templateName, $className,
 				   $reactNames, $globalNames, $openBrackets, $openParens,
 				   $methodNames, $functionNames, $openTernaryQuestions,
-				   $openTernaryColons, $ternaries, $queue;
+				   $openTernaryColons, $ternaries, $queue, $openFuncs,
+				   $fullCode;
 
 	private static $errors = array(
-		'unexpectedSign' => 'Неожиданный символ: {{?}{??} ...}',
-		'unexpectedEnd' => 'Неожиданный конец выражения: {{?}{??}}<br><br>Ожидается:<xmp>{?}</xmp>'
+		'unexpectedSign' => 'Неожиданный символ: {{?}{??} ...}<br><br>Ожидается:<xmp>{?}</xmp>',
+		'unexpectedEnd' => 'Неожиданный конец выражения: {{?}{??}}<br><br>Ожидается:<xmp>{?}</xmp>',
+		'incorrectName' => 'Некорректный код {{?}{??} ...} '
 	);
 
 	private static $keywords = array(
@@ -23,7 +25,6 @@ class TemplateSyntaxParser
 		'b' => 'false, true, null или undefined',
 		'.' => 'точка',
 		'&' => 'знак &',
-		'&&' => 'знак &',
 		'$' => 'знак $',
 		'~' => 'знак ~',
 		'^' => 'знак ^',
@@ -45,7 +46,6 @@ class TemplateSyntaxParser
 		'>' => 'знак >',
 		'<' => 'знак <',
 		'|' => 'знак |',
-		'||' => 'знак |',
 		'*' => 'знак *',
 		'/' => 'знак /',
 		'%' => 'знак %',
@@ -78,6 +78,7 @@ class TemplateSyntaxParser
 		self::$expected = $expected;
 		self::$open = array();
 		self::$code = '';
+		self::$fullCode = '';
 		self::$prevSign = '';
 		self::$isQuoted = false;
 		self::$currentQuote = '';
@@ -87,6 +88,7 @@ class TemplateSyntaxParser
 		self::$methodNames = array();
 		self::$functionNames = array();
 		self::$openBrackets = 0;
+		self::$openFuncs = 0;
 		self::$openTernaryQuestions = 0;
 		self::$openTernaryColons = 0;
 		self::$openParens = array();
@@ -95,7 +97,7 @@ class TemplateSyntaxParser
 
 		$text = preg_replace('/\s+/', self::$space, $text);
 		$parts = preg_split('/\b/', $text);
-		
+
 		foreach ($parts as $part) {
 			if ($part !== '') {
 				if (is_numeric($part)) {
@@ -103,11 +105,15 @@ class TemplateSyntaxParser
 					self::addCode($part);
 				} elseif (preg_match('/[a-z]/i', $part[0])) {
 					if (!in_array($part, self::$keywords)) {
-						self::handleName($part);	
+						self::handleName($part);
+						self::addName($part);
 					} else {
-						self::handleKeyword($part);	
-					}					
-					self::addCode($part);
+						self::handleKeyword($part);
+						self::addCode($part);
+					}
+					self::$prevSign = 'a';
+				} elseif (is_numeric($part[0])) {
+					self::throwIncorrectNameError($part);
 				} else {
 					for ($i = 0; $i < strlen($part); $i++) {
 						self::handleSymbol($part[$i]);
@@ -124,27 +130,33 @@ class TemplateSyntaxParser
 			'g' => self::$globalNames,
 			'm' => self::$methodNames,
 			'f' => self::$functionNames,
-			'c' => self::getCode()
+			'c' => self::$code
 		);
+	}
+
+	private static function addName($name) {
+		if (self::$prevSign == '$') {
+			self::$code = self::$code.".g('".$name."')";
+		} elseif (self::$prevSign == '~') {
+			self::$code = trim(self::$code, '~')."_['".$name."']";
+		} elseif (self::$prevSign == '&') {
+			self::$code = trim(self::$code, '&').$name;
+		} elseif (self::$prevSign == '.' && !self::$open['field']) {
+			self::$code = trim(self::$code, '.').'$.'.$name;
+		} else {
+			self::$code .= $name;
+		}
+		self::$fullCode .= $name;
 	}
 
 	private static function addCode($code) {
 		if ($code == self::$space) {
+			self::$fullCode .= ' ';
 			if (!$isQuoted) return;
 			$code = ' ';
 		}
+		self::$fullCode .= $code;
 		self::$code .= $code;
-	}
-
-	private static function getCode() {
-		$c = self::$code;
-		$c = preg_replace('/\.([a-z]\w*)/i', "\$.$1", $c);
-		$c = preg_replace('/&(\w+)/', "$1", $c);
-		$c = preg_replace('/~(\w+)/', "_['$1']", $c);
-		$c = preg_replace('/\$:(\w+)/', '$'.".a('$1')", $c);
-		$c = preg_replace('/\$(\w+)/', '$'.".g('$1')", $c);
-		
-		return $c;
 	}
 
 	private static function handleNumber($number) {
@@ -153,6 +165,14 @@ class TemplateSyntaxParser
 			self::throwUnexpectedSignError($number);
 		}
 		self::on('number');
+		self::$expected = array('+', '-', '*', '/', '%', '>', '<', '=', '!', '?', self::$space);
+		self::handleStandartSituation();
+		if (!self::$open['decimal']) {
+			self::$expected[] = '.';
+		} else {
+			self::off('decimal');
+		}
+		self::$prevSign = '0';
 	}
 
 	private static function handleKeyword($keyword) {
@@ -162,7 +182,7 @@ class TemplateSyntaxParser
 	private static function handleName($name) {
 		if (self::$isQuoted) return;
 		if (!self::isExpected('a')) {
-			self::throwUnexpectedSignError($keyword);
+			self::throwUnexpectedSignError($name);
 		}
 		$signs = array('&', '~', '$', '@', '#');
 		if (self::$open['globalVar']) {
@@ -181,85 +201,154 @@ class TemplateSyntaxParser
 			}
 			self::$expected = array(self::$space);
 			if (self::$prevSign != '@') {
-				array_push(self::$expected, '[', '+', '-', '*', '/', '%', '?');
+				array_push(self::$expected, '.', '[', '+', '-', '*', '/', '%', '?');
 			}
 			if (!empty(self::$openParens)) {
 				array_push(self::$expected, ',', ')');
 			}
-
+			self::handleStandartSituation();
+		} elseif (self::$open['field']) {
+			self::$expected = array(self::$space, '.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');			
+			self::handleStandartSituation();
 		} elseif (self::$prevSign == '.') {
 			self::on('methodName');
+			self::$openFuncs++;
 			self::$expected = array('(');
 			self::$methodNames[] = $name;
 		} else {
-			self::$expected = array('(');
 			self::on('functionName');
+			self::$openFuncs++;
+			self::$expected = array('(');
 			self::$functionNames[] = $name;
 		}
 	}
 
 	private static function handleSymbol($symbol) {
-		if (self::$isQuoted) return;
+		if (self::$isQuoted && self::$currentQuote != $symbol) return;
 		if (!self::isExpected($symbol)) {
 			self::throwUnexpectedSignError($symbol);
 		}	
 		switch ($symbol) {
-			case "[":
-				self::handleLeftBracket();
-			break;
-			case "]":
-				self::handleRightBracket();
-			break;
-			case "'":
-				self::handleQuote();
-			break;
-			case '"':
-				self::handleDoubleQuote();
-			break;
-			case ',':
-				self::handleComma();
-			break;
-			case '(':
-				self::handleLeftParen();
-			break;
-			case ')':
-				self::handleRightParen();
-			break;
-			case '?':
-				self::handleQuestion();
-			break;
-			case ':':
-				self::handleColon();
-			break;
-			case '$':
-				self::handleDollar();
-			break;
-			case '&':
-				self::handleAmpersand();
-			break;
+			case self::$space  : self::handleSpace();           break;
+			case '|'           : self::handleVerticalBar();     break;
+			case ':'           : self::handleColon();           break;
+			case '='           : self::handleEqual();           break;
+			case '$'           : self::handleDollar();          break;
+			case ','           : self::handleComma();           break;
+			case '.'           : self::handleDot();             break;
+			case '?'           : self::handleQuestion();        break;
+			case '!'           : self::handleExclamation();     break;
+			case '['           : self::handleLeftBracket();     break;
+			case ']'           : self::handleRightBracket();    break;
+			case '+'           : self::handleMathSign($symbol); break;
+			case '-'           : self::handleMathSign($symbol); break;
+			case '*'           : self::handleMathSign($symbol); break;
+			case '%'           : self::handleMathSign($symbol); break;
+			case '/'           : self::handleMathSign($symbol); break;
+			case "'"           : self::handleQuote();           break;
+			case '"'           : self::handleDoubleQuote();     break;
+			case '~'           : self::handleTilde();           break;
+			case '@'           : self::handleAtSign();          break;
+			case '#'           : self::handleNumberSign();      break;
+			case '&'           : self::handleAmpersand();       break;
+			case '('           : self::handleLeftParens();      break;
+			case ')'           : self::handleRightParens();     break;
+			case '>'           : self::handleGreaterSign();     break;
+			case '<'           : self::handleGreaterSign();     break;
+			default            : self::handleDefaultSign();
 		}
 		self::$prevSign = $symbol;
+	}
+
+	private static function handleSpace() {
+		self::off('number');
+		self::off('field');
+	}
+
+	private static function handleDefaultSign() {
+		
+	}
+
+	private static function handleVerticalBar() {
+		if (self::$prevSign == '|') {
+			self::$expected = array('.', 'a', '0', '$', '~', '@', '#', '&', '+', '-', '"', "'", '!');
+		} else {
+			self::$expected = array('|');
+		}
+		self::off('var');
+		self::off('number');
+	}
+
+	private static function handleEqual() {
+		
+	}
+
+	private static function handleExclamation() {
+		
+	}
+
+	private static function handleMathSign($sign) {
+		self::$expected = array('a', '0', '$', '~', '&', '@', '.', '-', '(', self::$space);
+		if ($sign == '+') {
+			array_push(self::$expected, '"', "'");
+		}
+		self::off('globalVar');
+		self::off('var');
+		self::off('number');
+		self::on('field');
+	}
+
+	private static function handleTilde() {
+		
+	}
+
+	private static function handleAtSign() {
+		
+	}
+
+	private static function handleNumberSign() {
+		
+	}
+
+	private static function handleGreaterSign() {
+		
+	}	
+
+	private static function handleDot() {
+		if (self::$open['number']) {
+			self::$expected = array('0');
+			self::on('decimal');
+		} else {
+			if (self::$prevSign != 'a' && self::$prevSign != ']') {
+				self::on('method');
+			} else {
+				self::on('field');
+			}
+			self::$expected = array('a');
+		}
 	}
 
 	private static function handleLeftBracket() {
 		self::$openBrackets++;
 		self::$queue[] = 'b';
+		self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '!', '+', '-', '(', '"', "'", self::$space);
+		if (self::$prevSign == 'a') {
+			self::on('varbracket');
+		}
 	}
 
 	private static function handleRightBracket() {
 		self::tryToCloseTernary();
-		array_pop(self::$queue);
+		array_pop(self::$queue);			
+		self::$openBrackets--;
+		self::$expected = array('.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');			
+		self::handleStandartSituation();
+		self::off('number');
 	}
 
 	private static function handleQuote() {
 		if (self::$isQuoted && self::$currentQuote == "'") {
-			self::$isQuoted = false;
-			if (!empty(self::$openParens)) {
-				array_push(self::$expected, ',', ')');
-			}
-			if (empty(self::$openTernaryQuestions)) {
-
-			}
+			self::handleQuoteClosing();
 		} elseif (!self::$isQuoted) {
 			self::$isQuoted = true;
 			self::$currentQuote = "'";
@@ -267,36 +356,62 @@ class TemplateSyntaxParser
 	}
 
 	private static function handleDoubleQuote() {
-		if (self::$isQuoted && self::$currentQuote == '"') {
-			self::$isQuoted = false;
-			if (!empty(self::$openParens)) {
-				array_push(self::$expected, ',', ')');
-			}
+		if (self::$isQuoted && self::$currentQuote == '"') {			
+			self::handleQuoteClosing();
 		} elseif (!self::$isQuoted) {
 			self::$isQuoted = true;
 			self::$currentQuote = '"';
 		}
 	}
 
+	private static function handleQuoteClosing() {
+		self::$isQuoted = false;
+		self::$expected = array( '?', '+', '&', '|', '=', '!', self::$space);		
+		self::handleStandartSituation();
+	}
+
+	private static function handleStandartSituation() {
+		$lastInQueue = self::$queue[count(self::$queue) - 1];
+		if (!empty(self::$openTernaryQuestions) && self::$openTernaryQuestions > self::$openTernaryColons) {
+			self::$expected[] = ':';
+		}
+		if (!empty(self::$openBrackets) && $lastInQueue == 'b') {
+			self::$expected[] = ']';
+		}
+		if (!empty(self::$openFuncs)) {
+			self::$expected[] = ',';
+		}
+		if (!empty(self::$openParens) && $lastInQueue == 'p') {
+			self::$expected[] = ')';
+		}
+	}
+
 	private static function handleComma() {
 		self::tryToCloseTernary();
 		self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '!', '+', '-', '(', '"', "'", self::$space);
+		self::off('field');
+		self::off('var');
+		self::off('number');
 	}
 
-	private static function handleLeftParen() {
+	private static function handleLeftParens() {
+		self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '!', '+', '-', '(', '"', "'", self::$space);
 		if (self::$open['methodName'] || self::$open['functionName']) {
 			self::off('methodName');
 			self::off('functionName');
-			self::$openParens[] = 'f';
-			self::$queue[] = 'p';
-		}
-		self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '!', '+', '-', '(', '"', "'", self::$space);
+			self::$expected[] = ')';
+		}		
+		self::$openParens[] = 'f';
+		self::$queue[] = 'p';
 	}
 
-	private static function handleRightParen() {
+	private static function handleRightParens() {
 		self::tryToCloseTernary();
+		self::$openFuncs--;
 		array_pop(self::$openParens);
 		array_pop(self::$queue);
+		self::$expected = array('&', '|', '+', '-', '?', '/', '*', '%', '[', '=', '>', '<', '!', self::$space);
+		self::handleStandartSituation();
 	}
 
 	private static function handleQuestion() {
@@ -306,13 +421,13 @@ class TemplateSyntaxParser
 			'b' => self::$openBrackets,
 			'p' => count(self::$openParens)
 		);
-		if (!self::$open['bracket'] && !self::$open['parenthesis'] && !self::$open['func']) {
+		if (empty(self::$openBrackets) && empty(self::$openParens) && empty(self::$openFuncs)) {
 			if (self::$open['outerTernary']) {
-				new Error(self::$errors['fewOuterTernaries'], array(self::$className, self::$templateName, self::$code));
+				new Error(self::$errors['fewOuterTernaries'], array(self::$className, self::$templateName, self::$fullCode));
 			}
 			self::on('outerTernary');
 		}
-		self::$expected = array('a', '0', '!', '$', '~', '&', '#', '@', '(', '"', "'", self::$space);
+		self::$expected = array('.', 'a', '0', '!', '$', '~', '&', '#', '@', '(', '"', "'", self::$space);
 		self::off('var');
 		self::off('number');
 		self::off('greater');
@@ -331,6 +446,7 @@ class TemplateSyntaxParser
 			self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '-', '+', '!', '(', '"', "'", self::$space);
 			self::off('var');
 			self::off('number');
+			self::off('field');
 		}
 	}
 
@@ -376,14 +492,11 @@ class TemplateSyntaxParser
 	}
 
 	private static function throwUnexpectedSignError($sign) {
-		new Error(self::$errors['unexpectedSign'], array(self::$currentCode.self::$code, $sign));
+		new Error(self::$errors['unexpectedSign'], array(self::$currentCode.self::$fullCode, $sign, self::getExpected()));
 	}
 
-		private static function checkCompleteness() {
-		extract(self::$open);
-		if (!empty($methodName)) {
-			new Error(self::$errors['unexpectedEnd'], array(self::$currentCode.self::$code, '&nbsp;', self::getExpected()));
-		}
+	private static function throwIncorrectNameError($name) {
+		new Error(self::$errors['incorrectName'], array(self::$currentCode.self::$fullCode, $name));
 	}
 
 	private static function getExpected() {
@@ -412,5 +525,12 @@ class TemplateSyntaxParser
 			return self::$names['m'];
 		}
 		return self::$names['f'];
+	}
+
+	private static function checkCompleteness() {
+		extract(self::$open);
+		if (!empty($methodName) || !empty(self::$openParens) || !empty(self::$openBrackets)) {
+			new Error(self::$errors['unexpectedEnd'], array(self::$currentCode.self::$fullCode, '&nbsp;', self::getExpected()));
+		}
 	}
 }
