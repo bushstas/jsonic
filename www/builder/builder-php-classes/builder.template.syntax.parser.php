@@ -8,7 +8,7 @@ class TemplateSyntaxParser
 				   $reactNames, $globalNames, $openBrackets, $openParens,
 				   $methodNames, $functionNames, $openTernaryQuestions,
 				   $openTernaryColons, $ternaries, $queue, $openFuncs,
-				   $fullCode;
+				   $fullCode, $fields, $localNames;
 
 	private static $errors = array(
 		'unexpectedSign' => 'Неожиданный символ: {{?}{??} ...}<br><br>Ожидается:<xmp>{?}</xmp>',
@@ -94,6 +94,8 @@ class TemplateSyntaxParser
 		self::$openParens = array();
 		self::$ternaries = array();
 		self::$queue = array();
+		self::$fields = array();
+		self::$localNames = array();
 
 		$text = preg_replace('/\s+/', self::$space, $text);
 		$parts = preg_split('/\b/', $text);
@@ -130,6 +132,7 @@ class TemplateSyntaxParser
 			'g' => self::$globalNames,
 			'm' => self::$methodNames,
 			'f' => self::$functionNames,
+			'l' => self::$localNames,
 			'c' => self::$code
 		);
 	}
@@ -141,7 +144,7 @@ class TemplateSyntaxParser
 			self::$code = trim(self::$code, '~')."_['".$name."']";
 		} elseif (self::$prevSign == '&') {
 			self::$code = trim(self::$code, '&').$name;
-		} elseif (self::$prevSign == '.' && !self::$open['field']) {
+		} elseif (self::$prevSign == '.' && !self::isField()) {
 			self::$code = trim(self::$code, '.').'$.'.$name;
 		} else {
 			self::$code .= $name;
@@ -192,11 +195,20 @@ class TemplateSyntaxParser
 			self::on('var');
 			switch (self::$prevSign) {
 				case '$':
-					self::$reactNames[] = $name;
+					if (!in_array($name, self::$reactNames)) {
+						self::$reactNames[] = $name;
+					}
 				break;
 				case ':':
-					self::$globalNames[] = $name;
+					if (!in_array($name, self::$globalNames)) {
+						self::$globalNames[] = $name;
+					}
 					self::off('globalVar');
+				break;
+				case '&':
+					if (!in_array($name, self::$localNames)) {
+						self::$localNames[] = $name;
+					}
 				break;
 			}
 			self::$expected = array(self::$space);
@@ -207,19 +219,35 @@ class TemplateSyntaxParser
 				array_push(self::$expected, ',', ')');
 			}
 			self::handleStandartSituation();
-		} elseif (self::$open['field']) {
-			self::$expected = array(self::$space, '.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');			
-			self::handleStandartSituation();
-		} elseif (self::$prevSign == '.') {
-			self::on('methodName');
-			self::$openFuncs++;
-			self::$expected = array('(');
-			self::$methodNames[] = $name;
-		} else {
-			self::on('functionName');
-			self::$openFuncs++;
-			self::$expected = array('(');
-			self::$functionNames[] = $name;
+		} else {			
+			if (self::isField()) {
+				self::$expected = array(self::$space, '.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');			
+				self::handleStandartSituation();
+				self::addField($name);
+			} elseif (self::$prevSign == '.') {
+				self::on('methodName');
+				self::$openFuncs++;
+				self::$expected = array('(');
+				self::$methodNames[] = $name;
+			} else {
+				self::on('functionName');
+				self::$openFuncs++;
+				self::$expected = array('(');
+				self::$functionNames[] = $name;
+			}
+		}
+	}
+
+	private static function isField() {
+		return is_array(self::$fields[self::$openBrackets]);
+	}
+
+	private static function addField($value = null) {
+		if (!is_array(self::$fields[self::$openBrackets])) {
+			self::$fields[self::$openBrackets] = array();
+		}
+		if (!empty($value)) {
+			self::$fields[self::$openBrackets][] = $value;
 		}
 	}
 
@@ -322,19 +350,17 @@ class TemplateSyntaxParser
 			if (self::$prevSign != 'a' && self::$prevSign != ']') {
 				self::on('method');
 			} else {
-				self::on('field');
+				self::addField();
 			}
 			self::$expected = array('a');
 		}
 	}
 
 	private static function handleLeftBracket() {
-		self::$openBrackets++;
 		self::$queue[] = 'b';
 		self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '!', '+', '-', '(', '"', "'", self::$space);
-		if (self::$prevSign == 'a') {
-			self::on('varbracket');
-		}
+		self::addField();
+		self::$openBrackets++;
 	}
 
 	private static function handleRightBracket() {
