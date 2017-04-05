@@ -17,6 +17,7 @@
 		}
 	};
 	var getItems = function() {
+		if (isFunction(list)) return list();
 		return list || (isGlobal ? params['$'].a(params['gn']) : params['$'].g(params['rn']));
 	};
 	var getLimit = function() {

@@ -162,6 +162,7 @@ class TemplateParser
 				$data = preg_replace("/''\+|\+''/", "", $data);
 				$data = str_replace("_#_comma_#_", ",", $data);
 				$data = str_replace("_#_equal_#_", "=", $data);
+				$data = preg_replace("/\{\s*return\s*\}/", "{}", $data);
 				$data = preg_replace("/return\[(\d+)\]/", "return $1", $data);
 			}
 			$templateFunctions[] = array('content' => $data, 'name' => $template['name'], 'let' => $template['let']);
@@ -755,20 +756,18 @@ class TemplateParser
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
 		$data = ForeachCodeParser::parse($content, self::$templateName, self::$className);
-		
-		//$data = TemplateCodeParser::parse($content, 'foreach', $content);
 		self::addTemplateCallbacks($data['m']);
 		$child['p'] = $data['items'];
 		
 		$hasReactNames = !empty($data['r']);
 		$hasGlobalNames = !empty($data['g']);
-		$reactName = !empty($data['reactName']);
-		$globalName = !empty($data['globalName']);
+		$reactName = !empty($data['rn']);
+		$globalName = !empty($data['gn']);
 		if ($hasReactNames || $hasGlobalNames) {
-			if ($reactName) $child['rn'] = $data['reactName'];
-			if ($globalName) $child['gn'] = $data['globalName'];
-			if ($hasGlobalNames) $child['g'] = self::getProperChildren($data['globalNames']);
-			if ($hasReactNames) $child['n'] = self::getProperChildren($data['reactNames']);
+			if ($reactName) $child['rn'] = $data['rn'];
+			if ($globalName) $child['gn'] = $data['gn'];
+			if ($hasGlobalNames) $child['g'] = self::getProperChildren($data['g']);
+			if ($hasReactNames) $child['n'] = self::getProperChildren($data['r']);
 			$child['$'] = '<nq>$<nq>';
 			if ($reactName || $globalName) {
 				unset($child['p']);
@@ -807,6 +806,8 @@ class TemplateParser
 		} else {
 			self::wrapInFunction($child['h'], $args);
 		}
+		Printer::log($data);
+		Printer::log($child, 1);
 		return $child;
 	}
 

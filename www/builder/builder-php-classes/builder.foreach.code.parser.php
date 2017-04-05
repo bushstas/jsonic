@@ -4,10 +4,11 @@ class ForeachCodeParser
 {	
 	private static $code;
 	private static $D = '-||-';
-	private static $items, $key, $value, $limit, $while, $data = array();
+	private static $items, $key, $value, $limit, $while, $isReactiveItems, $data;
 
 	public static function parse($content, $templateName, $className) {
 		TemplateSyntaxParser::init('foreach', $templateName, $className);
+		self::$data = array();
 		self::$code = 'foreach ';
 		self::prepareData($content);
 
@@ -28,6 +29,15 @@ class ForeachCodeParser
 	private static function prepareData($content) {
 		TextParser::encode($content, 'foreach');		
 		$content = preg_replace('/^foreach\s*/', '', $content);
+		self::$data['right'] = preg_match('/^right\b/', $content);
+		if (self::$data['right']) {
+			$content = preg_replace('/^right\s*/', '', $content);
+		}
+		self::$data['random'] = preg_match('/^random\b/', $content);
+		if (self::$data['random']) {
+			$content = preg_replace('/^random\s*/', '', $content);
+		}
+
 		list($items, $rest) = self::select('\sas\b', $content);
 		list($rest, $while) = self::select('\swhile\b', $rest);
 		list($rest, $limit) = self::select('\slimit\b', $rest);
@@ -52,6 +62,8 @@ class ForeachCodeParser
 	private static function parseItems() {
 		$data = TemplateSyntaxParser::parse(self::$items, array('$', '~', '&', '.', 'a', '(', '!'), self::$code);		 
 		self::$code .= self::$items.' as ';
+		self::$data['rn'] = $data['r'];
+		self::$data['gn'] = $data['g'];
 		self::addData($data);
 		self::$items = $data['c'];
 	}
@@ -87,6 +99,7 @@ class ForeachCodeParser
 			$data = TemplateSyntaxParser::parse(self::$limit, array('$', '~', '&', '.', 'a', '0', '!', '(', '-'), self::$code);
 			self::addData($data);
 			self::$limit = $data['c'];
+			self::$data['reactiveLimit'] = !empty($data['r']) || !empty($data['g']);
 		}
 	}
 
