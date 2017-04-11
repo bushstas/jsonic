@@ -1,12 +1,9 @@
 {template .main}
 <div class="@outer-container" onCLick="handleClick">
 	<ul>
-	{foreach right $a.a as &i => &f limit 3}
+	{foreach right & as &i => &f from 6 limit 4}
+		11
 	{/foreach}
-	{from &a = .a($s) to 10 step 2}
-		<li>
-			{&i}
-		</li>
-	{/from}	
+
 	</ul>
 </div>

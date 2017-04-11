@@ -154,8 +154,10 @@ class TemplateSyntaxParser
 
 	private static function addCode($code) {
 		if ($code == self::$space) {
-			self::$fullCode .= ' ';
-			if (!$isQuoted) return;
+			if (!$isQuoted) {
+				self::$fullCode .= ' ';
+				return;
+			}
 			$code = ' ';
 		}
 		self::$fullCode .= $code;
@@ -518,6 +520,9 @@ class TemplateSyntaxParser
 	}
 
 	private static function throwUnexpectedSignError($sign) {
+		if ($sign == self::$space) {
+			$sign = '&nbsp;';
+		}
 		new Error(self::$errors['unexpectedSign'], array(self::$currentCode.self::$fullCode, $sign, self::getExpected()));
 	}
 

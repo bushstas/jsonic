@@ -757,21 +757,19 @@ class TemplateParser
 		$content = ltrim(rtrim($content, '}'), '{');
 		$data = ForeachCodeParser::parse($content, self::$templateName, self::$className);
 		self::addTemplateCallbacks($data['m']);
-		$child['p'] = $data['items'];
-		
+		$child['p'] = '<nq>'.$data['items'].'<nq>';
 		$hasReactNames = !empty($data['r']);
 		$hasGlobalNames = !empty($data['g']);
 		$reactName = !empty($data['rn']);
 		$globalName = !empty($data['gn']);
+
 		if ($hasReactNames || $hasGlobalNames) {
-			if ($reactName) $child['rn'] = $data['rn'];
-			if ($globalName) $child['gn'] = $data['gn'];
 			if ($hasGlobalNames) $child['g'] = self::getProperChildren($data['g']);
 			if ($hasReactNames) $child['n'] = self::getProperChildren($data['r']);
 			$child['$'] = '<nq>$<nq>';
-			if ($reactName || $globalName) {
-				unset($child['p']);
-			}
+		}
+		if ($reactName || $globalName) {
+			self::wrapInFunction($child['p']);
 		}
 		
 		$args = array($data['value']);
@@ -795,6 +793,9 @@ class TemplateParser
 			$child['ra'] = 1;
 		}
 		if (!empty($data['limit'])) {
+			if (is_numeric($data['limit'])) {
+				$data['limit'] = (int)$data['limit'];
+			}
 			if ($data['reactiveLimit']) {
 				self::wrapInFunction($data['limit']);
 			}
@@ -806,8 +807,6 @@ class TemplateParser
 		} else {
 			self::wrapInFunction($child['h'], $args);
 		}
-		Printer::log($data);
-		Printer::log($child, 1);
 		return $child;
 	}
 

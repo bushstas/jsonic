@@ -5,8 +5,16 @@ class ForeachCodeParser
 	private static $code;
 	private static $D = '-||-';
 	private static $items, $key, $value, $limit, $while, $isReactiveItems, $data;
+	private static $templateName, $className;
+
+	private static $errors = array(
+		'noItems' => 'Ошибка парсинга оператора <b>foreach</b> в шаблоне {??} класса {??}<xmp>{foreach {?}}</xmp>'
+	);
 
 	public static function parse($content, $templateName, $className) {
+		self::$templateName = $templateName;
+		self::$className = $className;
+
 		TemplateSyntaxParser::init('foreach', $templateName, $className);
 		self::$data = array();
 		self::$code = 'foreach ';
@@ -38,7 +46,13 @@ class ForeachCodeParser
 			$content = preg_replace('/^random\s*/', '', $content);
 		}
 
-		list($items, $rest) = self::select('\sas\b', $content);
+		
+		list($items, $rest) = self::select('\sas\b|^as\b', $content);
+		if (empty($items) || $items == ' ') {
+			new Error(self::$errors['noItems'], array(self::$templateName, self::$className, $content));
+		}
+
+
 		list($rest, $while) = self::select('\swhile\b', $rest);
 		list($rest, $limit) = self::select('\slimit\b', $rest);
 		list($key, $value) = self::select('=>', $rest);
