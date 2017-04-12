@@ -677,6 +677,17 @@ class TemplateParser
 		return is_array($children) ? '<nq>'.preg_replace('/\\\(?=[\'"])/', '', json_encode($children)).'<nq>' : $children;
 	}
 
+	private static function wrapInNQ($content) {
+		if ($content[0] != '"' && $content[0] != "'") {
+			$content = '<nq>'.$content;
+		}
+		$lastLetter = strlen($content) - 1;
+		if ($content[$lastLetter] != '"' && $content[$lastLetter] != "'") {
+			$content .= '<nq>';
+		}
+		return $content;
+	}
+
 	private static function wrapInFunction(&$children, $args = '', $mode = '', $data = null) {
 		$c = preg_replace('/^<nq>/', '', self::getProperChildren($children));
 		$space = ' ';
@@ -734,7 +745,8 @@ class TemplateParser
 		}
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
-		$data = TemplateCodeParser::parse($content, 'from', $content);
+		$parser = new FromCodeParser();
+		$data = $parser->parse($content, self::$templateName, self::$className);
 		self::addTemplateCallbacks($data['callbacks']);
 		Printer::log($data);
 	}
@@ -755,28 +767,60 @@ class TemplateParser
 		}
 		unset($child['c']);
 		$content = ltrim(rtrim($content, '}'), '{');
-		$data = ForeachCodeParser::parse($content, self::$templateName, self::$className);
+		$parser = new ForeachCodeParser();
+		$data = $parser->parse($content, self::$templateName, self::$className);
 		self::addTemplateCallbacks($data['m']);
-		$child['p'] = '<nq>'.$data['items'].'<nq>';
-		$hasReactNames = !empty($data['r']);
-		$hasGlobalNames = !empty($data['g']);
-		$reactName = !empty($data['rn']);
-		$globalName = !empty($data['gn']);
 
-		if ($hasReactNames || $hasGlobalNames) {
-			if ($hasGlobalNames) $child['g'] = self::getProperChildren($data['g']);
-			if ($hasReactNames) $child['n'] = self::getProperChildren($data['r']);
+		$isReactive = !empty($data['r']) || !empty($data['g']);
+		if ($isReactive) {
+			if (!empty($data['r'])) {
+				$child['n'] = self::getProperChildren($data['r']);
+			}
+			if (!empty($data['g'])) {
+				$child['g'] = self::getProperChildren($data['g']);
+			}			
 			$child['$'] = '<nq>$<nq>';
+			$child['p'] = array();
+			$ch = &$child['p'];
+		} else {
+			$ch = &$child;
 		}
-		if ($reactName || $globalName) {
-			self::wrapInFunction($child['p']);
+
+		$ch['p'] = self::wrapInNQ($data['items']);
+		if ($data['right']) {
+			$child['r'] = 1;
+		} elseif ($data['random']) {
+			$child['ra'] = 1;
 		}
-		
+		if (!empty($data['limit'])) {
+			if (is_numeric($data['limit'])) {
+				$data['limit'] = (int)$data['limit'];
+			}
+			$ch['l'] = self::wrapInNQ($data['limit']);
+		}
+		if (!empty($data['from'])) {
+			if (is_numeric($data['from'])) {
+				$data['from'] = (int)$data['from'];
+			}
+			$ch['fr'] = self::wrapInNQ($data['from']);
+		}
+		if (!empty($data['to'])) {
+			if (is_numeric($data['to'])) {
+				$data['to'] = (int)$data['to'];
+			}
+			$ch['to'] = self::wrapInNQ($data['to']);
+		}
 		$args = array($data['value']);
 		if (isset($data['key'])) {
 			$args[] = $data['key'];
 		}
-		$vars = array($child['p'], $data['value'], $data['key']);
+		$args = implode(',', $args);
+		if (!empty($data['while'])) {
+			self::wrapInFunction($child['h'], $args, 'while', $data);
+		} else {
+			self::wrapInFunction($child['h'], $args);
+		}
+		$vars = array($ch['p'], $data['value'], $data['key']);
 		if (!empty($vars[0])) {
 			if ($vars[0] == $vars[1] || $vars[0] == $vars[2]) {
 				new Error(self::$errors['foreachVarsConflict'], array(self::$templateName, self::$className, '{'.$content.'}'));
@@ -787,26 +831,10 @@ class TemplateParser
 				new Error(self::$errors['foreachVarsConflict'], array(self::$templateName, self::$className, '{'.$content.'}'));
 			}
 		}
-		if ($data['right']) {
-			$child['r'] = 1;
-		} elseif ($data['random']) {
-			$child['ra'] = 1;
-		}
-		if (!empty($data['limit'])) {
-			if (is_numeric($data['limit'])) {
-				$data['limit'] = (int)$data['limit'];
-			}
-			if ($data['reactiveLimit']) {
-				self::wrapInFunction($data['limit']);
-			}
-			$child['l'] = $data['limit'];
-		}
-		$args = implode(',', $args);
-		if (!empty($data['while'])) {
-			self::wrapInFunction($child['h'], $args, 'while', $data);
-		} else {
-			self::wrapInFunction($child['h'], $args);
-		}
+
+		if ($isReactive) {
+			self::wrapInFunction($ch);
+		}		
 		return $child;
 	}
 

@@ -1,5 +1,4 @@
 {{GLOBAL}}.set({{COMPONENT}} = function(params) {
-	var list = params['p'];
 	var handler = params['h'];
 	var isRight = !!params['r'];
 	var isRandom = !!params['ra'];
@@ -7,7 +6,7 @@
 	var isGlobal = !!params['gn'];
 	this.levels = [];
 	var getKeysInRandomOrder = function() {
-		var keys = Objects.getKeys(getItems());
+		var keys = Objects.getKeys(getParam('p'));
 		keys.shuffle();
 		return keys;
 	};
@@ -16,19 +15,12 @@
 			this.createLevel(ifEmpty);
 		}
 	};
-	var getItems = function() {
-		return isFunction(list) ? list() : list;
-	};
-	var getLimit = function() {
-		if (isFunction(params['l'])) {
-			return params['l']();
-		} 
-		return ~~params['l'];
+	var getParam = function(p) {
+		return (isFunction(params['p']) ? params['p']() : params)[p];
 	};
 	this.createLevels = function(isUpdating) {
-		var items = getItems();
-		var limit = getLimit();
-		var r;
+		var items = getParam('p'), limit = getParam('l'), r;
+
 		if (isArrayLike(items)) {
 			if (isRandom) {
 				if (!Objects.empty(items)) {
@@ -42,19 +34,25 @@
 					return;
 				}
 			} else if (isArray(items)) {
+				var from = getParam('fr'), to = getParam('to');
 				if (!items.isEmpty()) {
+					var start;
 					if (!isRight) {
-						for (var i = 0; i < items.length; i++) {
+						start = isNumber(from) ? from : 0;
+						for (var i = start; i < items.length; i++) {
 							if (limit && i + 1 > limit) break;
+							if (isNumber(to) && i > to) break;
 							r = handler(items[i], i);
 							if (r == '{{BREAK}}') break;
 							this.createLevel(r, isUpdating);
 						}
 					} else {
 						var j = 0;
-						for (var i = items.length - 1; i >= 0; i--) {
+						start = isNumber(from) ? from : items.length - 1;
+						for (var i = start; i >= 0; i--) {
 							j++;
 							if (limit && j > limit) break;
+							if (isNumber(to) && i < to) break;
 							r = handler(items[i], i);
 							if (r == '{{BREAK}}') break;
 							this.createLevel(r, isUpdating);

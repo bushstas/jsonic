@@ -1,14 +1,22 @@
 <?php
 
-class ForeachCodeParser extends OperatorParser
+class FromCodeParser extends OperatorParser
 {	
-	protected $keywords = array('as', 'limit', 'while', 'from', 'to', 'right', 'random', 'foreach');
-	protected $properKeywords = array('as', 'limit', 'while', 'from', 'to');
-	protected $improperKeywords = array('right', 'random', 'foreach');
-	protected $mustHaveKeywords = array('as');
-	protected $firstKeyword = 'as';
+	protected $keywords = array('from', 'to', 'step');
+	protected $properKeywords = array('to', 'step');
+	protected $improperKeywords = array('from');
+	protected $mustHaveKeywords = array('to');
+	protected $firstKeyword = 'to';
 
-	protected $operator = 'foreach';
+	protected $operator = 'from';
+
+	protected $errors = array(
+		'noItems' => 'Ошибка парсинга оператора <b>foreach</b> в шаблоне {??} класса {??}<xmp>{?}</xmp>Отсутсвует сущность для перебора в цикле',
+		'unknownKeyword' => 'Неизвестное ключевое слово {??} в операторе <b>foreach</b> в шаблоне {??} класса {??}<xmp>{{?}}</xmp>',
+		'improperKeyword' => 'Ключевое слово {??} в неподходящем месте в операторе <b>foreach</b> в шаблоне {??} класса {??}<xmp>{{?}}</xmp>',
+		'extraKeyword' => 'Лишнее повторяющееся ключевое слово {??} в операторе <b>foreach</b> в шаблоне {??} класса {??}<xmp>{{?}}</xmp>',
+		'shouldHaveKeyword' => 'Обязательное ключевое слово {??} отсутствует в операторе <b>foreach</b> в шаблоне {??} класса {??}<xmp>{{?}}</xmp>'
+	);
 
 	protected function _parse() {
 		$this->parseCode('items', array('$', '~', '&', '.', 'a', '(', '!'), '', 'as');
@@ -38,7 +46,7 @@ class ForeachCodeParser extends OperatorParser
 		$data = Splitter::split('/\b('.implode('|', $this->properKeywords).')\b/', trim($content));
 		$this->data['items'] = $data['items'][0];
 		if (empty($this->data['items'])) {
-			new Error($this->errors['noItems'], array($this->operator, $this->templateName, $this->className, $this->content));
+			new Error($this->errors['noItems'], array($this->templateName, $this->className, $this->content));
 		}
 		$keywords = $data['delimiters'];
 		for ($i = 1; $i < count($data['items']); $i++) {

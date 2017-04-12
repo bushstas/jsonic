@@ -71,6 +71,7 @@ class TemplateSyntaxParser
 	}
 	
 	public static function parse($text, $expected, $currentCode) {
+		$text = trim($text);
 		if (!is_array($expected)) {
 			$expected = array();
 		}
@@ -138,14 +139,16 @@ class TemplateSyntaxParser
 	}
 
 	private static function addName($name) {
-		if (self::$prevSign == '$') {
+		if (self::$prevSign == ':') {
+			self::$code = rtrim(self::$code, ':').".a('".$name."')";
+		} elseif (self::$prevSign == '$') {
 			self::$code = self::$code.".g('".$name."')";
 		} elseif (self::$prevSign == '~') {
-			self::$code = trim(self::$code, '~')."_['".$name."']";
+			self::$code = rtrim(self::$code, '~')."_['".$name."']";
 		} elseif (self::$prevSign == '&') {
-			self::$code = trim(self::$code, '&').$name;
+			self::$code = rtrim(self::$code, '&').$name;
 		} elseif (self::$prevSign == '.' && !self::isField()) {
-			self::$code = trim(self::$code, '.').'$.'.$name;
+			self::$code = rtrim(self::$code, '.').'$.'.$name;
 		} else {
 			self::$code .= $name;
 		}
@@ -215,7 +218,7 @@ class TemplateSyntaxParser
 			}
 			self::$expected = array(self::$space);
 			if (self::$prevSign != '@') {
-				array_push(self::$expected, '.', '[', '+', '-', '*', '/', '%', '?');
+				array_push(self::$expected, '.', '[', '+', '-', '*', '/', '%', '?', '<', '>', '!', '=');
 			}
 			if (!empty(self::$openParens)) {
 				array_push(self::$expected, ',', ')');
@@ -292,7 +295,6 @@ class TemplateSyntaxParser
 
 	private static function handleSpace() {
 		self::off('number');
-		self::off('field');
 	}
 
 	private static function handleDefaultSign() {
@@ -325,7 +327,6 @@ class TemplateSyntaxParser
 		self::off('globalVar');
 		self::off('var');
 		self::off('number');
-		self::on('field');
 	}
 
 	private static function handleTilde() {
@@ -341,7 +342,10 @@ class TemplateSyntaxParser
 	}
 
 	private static function handleGreaterSign() {
-		
+		self::$expected = array('=', '+', '-', 'a', '0', '$', '~', '&', '#', self::$space);
+		self::off('globalVar');
+		self::off('var');
+		self::off('number');
 	}	
 
 	private static function handleDot() {
@@ -417,7 +421,6 @@ class TemplateSyntaxParser
 	private static function handleComma() {
 		self::tryToCloseTernary();
 		self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '!', '+', '-', '(', '"', "'", self::$space);
-		self::off('field');
 		self::off('var');
 		self::off('number');
 	}
@@ -474,7 +477,6 @@ class TemplateSyntaxParser
 			self::$expected = array('a', '0', '.', '$', '~', '&', '@', '#', '-', '+', '!', '(', '"', "'", self::$space);
 			self::off('var');
 			self::off('number');
-			self::off('field');
 		}
 	}
 
@@ -560,7 +562,7 @@ class TemplateSyntaxParser
 
 	private static function checkCompleteness() {
 		extract(self::$open);
-		if (!empty($methodName) || !empty(self::$openParens) || !empty(self::$openBrackets)) {
+		if (!empty($methodName) || !empty(self::$openParens) || !empty(self::$openBrackets) || !in_array(self::$prevSign, array(')', ']', 'a', '0'))) {
 			new Error(self::$errors['unexpectedEnd'], array(self::$currentCode.self::$fullCode, '&nbsp;', self::getExpected()));
 		}
 	}

@@ -1,9 +1,8 @@
 {template .main}
-<div class="@outer-container" onCLick="handleClick">
+<div class="@outer-container" onClick="handleClick">
 	<ul>
-	{foreach right & as &i => &f from 6 limit 4}
-		11
+	{foreach ~a as &i => &f while &i < 4}
+		<li>{&f}</li>
 	{/foreach}
-
 	</ul>
 </div>

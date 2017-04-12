@@ -1,19 +1,12 @@
 component DataTable
 
 initial props = {
-	a: 23,
-	i: 1
+	a: [0,1,2,3,4,5,6,7,8,9,10]
 
 }
 
 function handleClick() {
-	$a = 1
-	$i = 2
-}
+	$a = [10, 20, 30, 40, 50, 60, 70]
+	$i = 4
 
-function aaa(i) {
-	if (i == 1) {
-		return 'one'
-	}
-	return 'twenty five'
 }

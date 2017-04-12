@@ -167,6 +167,10 @@ class TextParser
 		return self::$texts[$key];
 	}
 
+	public static function getMark() {
+		return self::$mark;
+	}
+
 	public static function setTexts($texts, $key) {
 		return self::$texts[$key] = $texts;
 	}

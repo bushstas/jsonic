@@ -19,7 +19,8 @@ $includes = array(
 	'data', 'tags', 'props', 'events', 'template.parser', 'css.obfuscator', 'printer', 'js.interpreter',
 	'splitter', 'template.code.parser', 'utils', 'controllers.parser', 'tag.classname.parser',
 	'template.callback.validator', 'state.parser', 'class.analyzer', 'js.obfuscator',
-	'dialogs.parser', 'template.validator', 'foreach.code.parser', 'template.syntax.parser'
+	'dialogs.parser', 'template.validator', 'template.syntax.parser',
+	'operator.parser', 'foreach.code.parser', 'from.code.parser'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
