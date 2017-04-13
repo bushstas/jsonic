@@ -7,6 +7,11 @@ class ForeachCodeParser extends OperatorParser
 	protected $improperKeywords = array('right', 'random', 'foreach');
 	protected $mustHaveKeywords = array('as');
 	protected $firstKeyword = 'as';
+	protected $codeExample = "Оператор может иметь вид:<xmp>{foreach ~items as &item}\n{foreach \$items as &idx => &item}\n{foreach .getItems() as &i => &item limit 10}\n{foreach &items as &i => &item from 2 to 7}\n{foreach right \$a as &i => &item while &i > 6}\n{foreach random \$items as &idx => &item}</xmp>";
+
+	private $ownErrors = array(
+		'noItems' => 'Ошибка парсинга оператора {??} в шаблоне {??} класса {??}<xmp>{{?}}</xmp>Отсутсвует сущность для перебора в цикле'
+	);
 
 	protected $operator = 'foreach';
 
@@ -24,7 +29,6 @@ class ForeachCodeParser extends OperatorParser
 	protected function prepareData() {
 		$content = &$this->content;
 		TextParser::encode($content, 'foreach');
-		$content = preg_replace('/^foreach\s*/', '', $content);
 		if (preg_match('/^right\b/', $content)) {
 			$this->data['right'] = true;
 			$content = preg_replace('/^right\s*/', '', $content);
@@ -38,7 +42,7 @@ class ForeachCodeParser extends OperatorParser
 		$data = Splitter::split('/\b('.implode('|', $this->properKeywords).')\b/', trim($content));
 		$this->data['items'] = $data['items'][0];
 		if (empty($this->data['items'])) {
-			new Error($this->errors['noItems'], array($this->operator, $this->templateName, $this->className, $this->content));
+			new Error($this->ownErrors['noItems'], array($this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content));
 		}
 		$keywords = $data['delimiters'];
 		for ($i = 1; $i < count($data['items']); $i++) {

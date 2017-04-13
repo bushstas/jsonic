@@ -747,8 +747,32 @@ class TemplateParser
 		$content = ltrim(rtrim($content, '}'), '{');
 		$parser = new FromCodeParser();
 		$data = $parser->parse($content, self::$templateName, self::$className);
-		self::addTemplateCallbacks($data['callbacks']);
-		Printer::log($data);
+		self::addTemplateCallbacks($data['m']);
+
+		$args = array($data['var']);
+		$args = implode(',', $args);
+		self::wrapInFunction($child['f'], $args);
+
+		$isReactive = !empty($data['r']) || !empty($data['g']);
+		$child['p'] = array(
+			self::wrapInNQ($data['from']),
+			self::wrapInNQ($data['to'])
+		);
+		if (!empty($data['step'])) {
+			$child['p'][] = self::wrapInNQ($data['step']);
+		}
+		if ($isReactive) {
+			if (!empty($data['r'])) {
+				$child['n'] = self::getProperChildren($data['r']);
+			}
+			if (!empty($data['g'])) {
+				$child['g'] = self::getProperChildren($data['g']);
+			}
+			if (!empty(self::$componentsOpen)) {
+				$child['$'] = '<nq>$<nq>';
+			}
+			self::wrapInFunction($child['p']);
+		}
 	}
 
 	private static function parseForeach($content, &$child, $source) {
@@ -779,7 +803,9 @@ class TemplateParser
 			if (!empty($data['g'])) {
 				$child['g'] = self::getProperChildren($data['g']);
 			}			
-			$child['$'] = '<nq>$<nq>';
+			if (!empty(self::$componentsOpen)) {
+				$child['$'] = '<nq>$<nq>';
+			}
 			$child['p'] = array();
 			$ch = &$child['p'];
 		} else {
@@ -937,6 +963,7 @@ class TemplateParser
 		$names = array();
 		$globals = array();
 		if ($ifCondition[0] != '{') $ifCondition = '{'.$ifCondition.'}';
+
 		$ifCondition = self::processCode($ifCondition, 'if', $names, $globals);
 		$isStringC = is_string($child['c']);
 		if (is_array($child['c'])) {
@@ -1486,6 +1513,10 @@ class TemplateParser
 		$names = array();
 		if (!$ifSwitch) {
 			$code = self::processCode('{switch '.$content.'}', 'switch', $names, $globals);
+			$parser = new SwitchCodeParser();
+			$data = $parser->parse($content, self::$templateName, self::$className);
+			$code = self::wrapInNQ($data['switch']);
+			self::addTemplateCallbacks($data['m']);
 		}		
 		$cases = array();
 		$default = '';

@@ -34,6 +34,7 @@
 		else if (i.hasOwnProperty('sw'))  createSwitch(i);
 		else if (i.hasOwnProperty('pl'))  createPlaceholder(i);
 		else if (i.hasOwnProperty('l'))   createLet(i);
+		else if (i.hasOwnProperty('f'))   createFrom(i);
 	};
 
 	var createLevel = function(items, pe) {
@@ -119,12 +120,21 @@
 		}
 	};
 
-	var createForeach = function(props) {		
+	var createForeach = function(props) {
 		var foreach = new ({{GLOBAL}}.get('Foreach'))(props);
 		foreach.render(parentElement, self);
 		if (props['n'] || props['g']) {
 			registerChild(foreach);
 			createUpdater({{GLOBAL}}.get('OperatorUpdater'), foreach, props);
+		}
+	};
+
+	var createFrom = function(props) {
+		var fr = new ({{GLOBAL}}.get('From'))(props);
+		fr.render(parentElement, self);
+		if (props['n'] || props['g']) {
+			registerChild(fr);
+			createUpdater({{GLOBAL}}.get('OperatorUpdater'), fr, props);
 		}
 	};
 

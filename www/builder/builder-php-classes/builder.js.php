@@ -993,7 +993,7 @@ class JSCompiler
 		if (empty($route)) {
 			$inherited = array(
 				'Component' => array('Application', 'View', 'Control', 'Menu'),
-				'Foreach' => array('Switch', 'IfSwitch', 'Let')
+				'Foreach' => array('Switch', 'IfSwitch', 'Let', 'From')
 			);
 		} else {
 			$inherited = array(

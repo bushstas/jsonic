@@ -20,7 +20,7 @@ $includes = array(
 	'splitter', 'template.code.parser', 'utils', 'controllers.parser', 'tag.classname.parser',
 	'template.callback.validator', 'state.parser', 'class.analyzer', 'js.obfuscator',
 	'dialogs.parser', 'template.validator', 'template.syntax.parser',
-	'operator.parser', 'foreach.code.parser', 'from.code.parser'
+	'operator.parser', 'foreach.code.parser', 'from.code.parser', 'switch.code.parser'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	

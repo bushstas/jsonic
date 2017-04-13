@@ -5,4 +5,9 @@
 		<li>{&f}</li>
 	{/foreach}
 	</ul>
+	{switch .a($a, &s)}
+		{case 1}
+			111
+		{/case}
+	{/switch}
 </div>
