@@ -8,7 +8,7 @@ class TemplateSyntaxParser
 				   $reactNames, $globalNames, $openBrackets, $openParens,
 				   $methodNames, $functionNames, $openTernaryQuestions,
 				   $openTernaryColons, $ternaries, $queue, $openFuncs,
-				   $fullCode, $fields, $localNames;
+				   $fullCode, $fields, $localNames, $prevSign2;
 
 	private static $errors = array(
 		'unexpectedSign' => 'Неожиданный символ: {{?}{??} ...}<br><br>Ожидается:<xmp>{?}</xmp>',
@@ -81,6 +81,7 @@ class TemplateSyntaxParser
 		self::$code = '';
 		self::$fullCode = '';
 		self::$prevSign = '';
+		self::$prevSign2 = '';
 		self::$isQuoted = false;
 		self::$currentQuote = '';
 		self::$currentCode = $currentCode;
@@ -114,7 +115,7 @@ class TemplateSyntaxParser
 						self::handleKeyword($part);
 						self::addCode($part);
 					}
-					self::$prevSign = 'a';
+					self::setPrevSign('a');
 				} elseif (is_numeric($part[0])) {
 					self::throwIncorrectNameError($part);
 				} else {
@@ -136,6 +137,13 @@ class TemplateSyntaxParser
 			'l' => self::$localNames,
 			'c' => self::$code
 		);
+	}
+
+	private static function setPrevSign($sign) {
+		if ($sign != self::$space) {
+			self::$prevSign2 = self::$prevSign;
+			self::$prevSign = $sign;
+		}
 	}
 
 	private static function addName($name) {
@@ -180,7 +188,7 @@ class TemplateSyntaxParser
 		} else {
 			self::off('decimal');
 		}
-		self::$prevSign = '0';
+		self::setPrevSign('0');
 	}
 
 	private static function handleKeyword($keyword) {
@@ -290,7 +298,7 @@ class TemplateSyntaxParser
 			case '<'           : self::handleGreaterSign();     break;
 			default            : self::handleDefaultSign();
 		}
-		self::$prevSign = $symbol;
+		self::setPrevSign($symbol);
 	}
 
 	private static function handleSpace() {
@@ -312,11 +320,23 @@ class TemplateSyntaxParser
 	}
 
 	private static function handleEqual() {
-		
+		self::off('var');
+		self::off('number');
+		self::$expected = array();
+		if (self::$prevSign == '=' || self::$prevSign == '!') {
+			array_push(self::$expected, 'a', '0', '$', '~', '&', '.', '@', '#', '+', '-', '!', '(', "'", '"', self::$space);
+		}
+		if (self::$prevSign != '=' || (self::$prevSign2 != '=' && self::$prevSign2 != '!')) {
+			self::$expected[] = '=';
+		}
 	}
 
 	private static function handleExclamation() {
-		
+		if (!empty(self::$prevSign) && in_array(self::$prevSign, array('a', '0', ']', ')'))) {
+			self::$expected = array('=');
+		} else {
+			self::$expected = array('a', '0', '.', '$', '~', '&', '#', '-', '+', '!', '(', self::$space);
+		}
 	}
 
 	private static function handleMathSign($sign) {
@@ -373,7 +393,7 @@ class TemplateSyntaxParser
 		self::tryToCloseTernary();
 		array_pop(self::$queue);			
 		self::$openBrackets--;
-		self::$expected = array('.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=');			
+		self::$expected = array('.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=', self::$space);			
 		self::handleStandartSituation();
 		self::off('number');
 	}
@@ -534,7 +554,11 @@ class TemplateSyntaxParser
 
 	private static function getExpected() {
 		$items = array();
-		self::$expected = array_unique(self::$expected);
+		if (self::$isQuoted) {
+			self::$expected = array(self::$currentQuote);
+		} else {
+			self::$expected = array_unique(self::$expected);
+		}
 		foreach (self::$expected as $exp) {
 			if ($exp == self::$space) continue;
 			if ($exp == 'a') {
@@ -562,8 +586,12 @@ class TemplateSyntaxParser
 
 	private static function checkCompleteness() {
 		extract(self::$open);
-		if (!empty($methodName) || !empty(self::$openParens) || !empty(self::$openBrackets) || !in_array(self::$prevSign, array(')', ']', 'a', '0'))) {
+		if (!empty($methodName) || !empty($functionName) || !empty(self::$openParens) || !empty(self::$openBrackets) || !in_array(self::$prevSign, array(')', ']', 'a', '0'))) {
 			new Error(self::$errors['unexpectedEnd'], array(self::$currentCode.self::$fullCode, '&nbsp;', self::getExpected()));
 		}
+	}
+
+	public static function getKeywords() {
+		return self::$keywords;
 	}
 }

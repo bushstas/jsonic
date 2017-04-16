@@ -1,7 +1,7 @@
 {template .main}
 <div class="@outer-container" onClick="handleClick">
 	<ul>
-	{foreach ~a as &i => &f while &i < 4}
+	{foreach ~a as &i => &f limit 2 while .a() + false 2}
 		<li>{&f}</li>
 	{/foreach}
 	</ul>

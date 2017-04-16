@@ -50,7 +50,7 @@ class OperatorParser
 		$item = &$this->data[$param];
 		if (!empty($item)) {
 			if (!empty($before)) {
-				$this->code .= ' '.$before;
+				$this->code .= ' '.$before.' ';
 			}
 			$data = TemplateSyntaxParser::parse($item, $symbols, $this->code);
 			$this->code .= ' '.$item.(!empty($after) ? $after.' ' : '');
@@ -63,8 +63,10 @@ class OperatorParser
 		$content = ' '.$this->content.' ';
 		preg_match_all('/[\s\)\]]([a-z]{2,})(?=[^_a-z\d\(])/i', $content, $matches);
 		$foundKeywords = $matches[1];
+		$jsKeywords = TemplateSyntaxParser::getKeywords();
+		$foundKeywords = array_diff($foundKeywords, $jsKeywords);
 		foreach ($foundKeywords as $kw) {
-			if (!in_array($kw, $this->keywords) && $kw != $textMark) {
+			if (!in_array($kw, $this->keywords)) {
 				new Error($this->errors['unknownKeyword'], array($kw, $this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content, $this->codeExample));
 			}
 		}
@@ -76,7 +78,6 @@ class OperatorParser
 		if ($foundKeywords[0] != $this->firstKeyword) {
 			new Error($this->errors['improperKeyword'], array($foundKeywords[0], $this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content, $this->codeExample));
 		}
-		$textMark = TextParser::getMark();
 		$used = array();
 		foreach ($foundKeywords as $kw) {
 			if (in_array($kw, $this->improperKeywords)) {
