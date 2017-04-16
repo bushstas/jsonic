@@ -193,6 +193,7 @@ class TemplateSyntaxParser
 
 	private static function handleKeyword($keyword) {
 		if (self::$isQuoted) return;
+		self::$expected = array('=', '!', '?', self::$space);
 	}
 
 	private static function handleName($name) {
