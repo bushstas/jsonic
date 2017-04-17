@@ -1512,22 +1512,21 @@ class TemplateParser
 		$globals = array();
 		$names = array();
 		if (!$ifSwitch) {
-			$code = self::processCode('{switch '.$content.'}', 'switch', $names, $globals);
 			$parser = new SwitchCodeParser();
 			$data = $parser->parse($content, self::$templateName, self::$className);
-			$code = self::wrapInNQ($data['switch']);
+			$data['switch'] = self::wrapInNQ($data['switch']);
 			self::addTemplateCallbacks($data['m']);
 		}		
 		$cases = array();
 		$default = '';
-		self::parseCases($cases, $children, $names, $globals, $default, $ifSwitch);
+		self::parseCases($cases, $children, $data['r'], $data['g'], $default, $ifSwitch);
 		if (empty($cases)) {
 			$child = $default;
 			return;
 		}
 		if (!$ifSwitch) {
 			$key = 'sw';
-			$child[$key] = $code;
+			$child[$key] = $data['switch'];
 			$child['cs'] = self::getProperChildren($cases);
 		} else {
 			$key = 'is';

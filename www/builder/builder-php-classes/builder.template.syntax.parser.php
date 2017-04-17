@@ -307,7 +307,7 @@ class TemplateSyntaxParser
 	}
 
 	private static function handleDefaultSign() {
-		
+		self::$expected = array();
 	}
 
 	private static function handleVerticalBar() {

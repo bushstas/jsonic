@@ -15,6 +15,7 @@ class JSChecker
 		'addOneTo' => '',
 		'addTo' => '',
 		'g' => '',
+		'a' => '',
 		'get' => '',
 		'showElement' => '',
 		'setStyle' => '',

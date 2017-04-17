@@ -11,3 +11,8 @@ function handleClick() {
 	$i = 40
 
 }
+
+
+function isDisabled() {
+	
+}
