@@ -33,7 +33,7 @@ class HTMLCompiler
 		foreach ($replacements as $k => $v) {
 			$blankIndexFileContent = str_replace('{$'.$k.'}', $v, $blankIndexFileContent);
 		}
-		Gatherer::createFile(DEFAULT_PATH.$this->config['index'], $blankIndexFileContent);
+		FileManager::createFile(DEFAULT_PATH.$this->config['index'], $blankIndexFileContent);
 
 		if ($this->configProvider->needToCreateEnvironment()) {
 			$this->createEnvironment();

@@ -10,7 +10,8 @@ class ForeachCodeParser extends OperatorParser
 	protected $codeExample = "Оператор может иметь вид:<xmp>{foreach ~items as &item}\n{foreach \$items as &idx => &item}\n{foreach .getItems() as &i => &item limit 10}\n{foreach &items as &i => &item from 2 to 7}\n{foreach right \$a as &i => &item while &i > 6}\n{foreach random \$items as &idx => &item}</xmp>";
 
 	private $ownErrors = array(
-		'noItems' => 'Ошибка парсинга оператора {??} в шаблоне {??} класса {??}<xmp>{{?}}</xmp>Отсутсвует сущность для перебора в цикле'
+		'noItems' => "Ошибка парсинга оператора {??} в шаблоне {??} класса {??}<xmp>{{?}}</xmp>Отсутсвует сущность для перебора в цикле\n{?}",
+		'incorrectVar' => 'Ошибка парсинга оператора {??} в шаблоне {??} класса {??}<xmp>{{?}}</xmp>Некорректное обозначение переменной<xmp>{?}</xmp>{?}'
 	);
 
 	protected $operator = 'foreach';
@@ -21,7 +22,7 @@ class ForeachCodeParser extends OperatorParser
 		$this->parseCode('value', array('&'));
 
 		foreach ($this->order as $kw) {
-			$this->parseCode($kw, array('$', '~', '&', '.', 'a', '0', '!', '(', '-'), $kw);
+			$this->parseCode($kw, array('0', 'a', '$', '~', '&', '.', '!', '(', '-'), $kw);
 		}
 		return $this->data;
 	}
@@ -42,7 +43,7 @@ class ForeachCodeParser extends OperatorParser
 		$data = Splitter::split('/\b('.implode('|', $this->properKeywords).')\b/', trim($content));
 		$this->data['items'] = $data['items'][0];
 		if (empty($this->data['items'])) {
-			new Error($this->ownErrors['noItems'], array($this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content));
+			new Error($this->ownErrors['noItems'], array($this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content, $this->codeExample));
 		}
 		$keywords = $data['delimiters'];
 		for ($i = 1; $i < count($data['items']); $i++) {
@@ -60,6 +61,12 @@ class ForeachCodeParser extends OperatorParser
 				$vals[] = $parts[$i];
 			}
 			$this->data['value'] = implode('=>', $vals);
+		}
+		if (!empty($this->data['key']) && !preg_match('/^[&\$~\#@][a-z]\w*$/i', trim($this->data['key']))) {
+			new Error($this->ownErrors['incorrectVar'], array($this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content, $this->data['key'], $this->codeExample));
+		}
+		if (!empty($this->data['value']) && !preg_match('/^[&\$~\#@][a-z]\w*$/i', trim($this->data['value']))) {
+			new Error($this->ownErrors['incorrectVar'], array($this->operator, $this->templateName, $this->className, $this->operator.' '.$this->content, $this->data['value'], $this->codeExample));
 		}
 
 		$parts = array($this->data['items']);

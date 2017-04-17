@@ -720,9 +720,9 @@ class JSCompiler
 		$jsOutput = preg_replace('/\{\s+\}/', '{}', $jsOutput);
 		$jsOutput .= "\n".implode("\n", $bottomOutput);
 		$pathToCompiledJs = DEFAULT_PATH.$fileName;
-		Gatherer::emptyFolder(DEFAULT_PATH.$this->config['folder']);
+		FileManager::emptyFolder(DEFAULT_PATH.$this->config['folder']);
 		if ($this->configProvider->isAdvancedMode()) {		
-			Gatherer::createFile('temp.js', $jsOutput);
+			FileManager::createFile('temp.js', $jsOutput);
 			exec('java -jar compiler.jar --js temp.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file temp2.js 2>&1', $output);	
 			if (!empty($output[0]) && preg_match('/ERROR/', $output[0])) {
 				new Error($this->errors['obfuscatorError'], array($output[0], $output[1]));
@@ -730,7 +730,7 @@ class JSCompiler
 			unlink('temp.js');
 			rename('temp2.js', $pathToCompiledJs);
 		} else {
-			Gatherer::createFile($pathToCompiledJs, $jsOutput);
+			FileManager::createFile($pathToCompiledJs, $jsOutput);
 		}
 	}
 

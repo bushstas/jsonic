@@ -351,15 +351,15 @@ class TemplateSyntaxParser
 	}
 
 	private static function handleTilde() {
-		
+		self::$expected = array('a');
 	}
 
 	private static function handleAtSign() {
-		
+		self::$expected = array('a');
 	}
 
 	private static function handleNumberSign() {
-		
+		self::$expected = array('a');
 	}
 
 	private static function handleGreaterSign() {
@@ -587,7 +587,7 @@ class TemplateSyntaxParser
 
 	private static function checkCompleteness() {
 		extract(self::$open);
-		if (!empty($methodName) || !empty($functionName) || !empty(self::$openParens) || !empty(self::$openBrackets) || !in_array(self::$prevSign, array(')', ']', 'a', '0'))) {
+		if (!empty($methodName) || !empty($functionName) || !empty(self::$openParens) || !empty(self::$openBrackets) || !in_array(self::$prevSign, array(')', ']', 'a', '0', "'", '"'))) {
 			new Error(self::$errors['unexpectedEnd'], array(self::$currentCode.self::$fullCode, '&nbsp;', self::getExpected()));
 		}
 	}

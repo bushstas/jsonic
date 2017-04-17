@@ -238,7 +238,7 @@ class CSSCompiler
 			$css = str_replace(";}", "}", $css);
 			$css = preg_replace('/;{2,}/', ';', $css);
 			$css = str_replace('__N__', "\n", $css);
-			Gatherer::createFile(DEFAULT_PATH.$this->config['path'].'.css', $css);
+			FileManager::createFile(DEFAULT_PATH.$this->config['path'].'.css', $css);
 		}
 	}
 

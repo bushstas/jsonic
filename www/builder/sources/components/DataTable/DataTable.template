@@ -1,10 +1,12 @@
 {template .main}
 <div class="@outer-container" onClick="handleClick">
 	<ul>
-	{foreach ~a as &i => &f limit 2 while .a() + false 2}
+	{foreach ~a as &i => &f limit 2}
 		<li>{&f}</li>
 	{/foreach}
 	</ul>
+	{from &i = 3 to 3}
+	{/from}
 	{switch .setScope($a, &s)}
 		{case 1}
 			111
