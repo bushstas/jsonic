@@ -67,5 +67,8 @@
 		'nobr' => 'border-right: 0;',
 		'nosh' => 'box-shadow: none;',
 		'nomaxh' => 'max-height: none;',
-		'nomaxw' => 'max-width: none;'
+		'nomaxw' => 'max-width: none;',
+		'nosel' => '-moz-user-select: none;-webkit-user-select: none;-ms-user-select: none;',
+		'nor' => 'resize: none',
+		'nodec' => 'text-decoration: none;'
 	);

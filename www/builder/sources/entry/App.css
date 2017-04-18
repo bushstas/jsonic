@@ -1,8 +1,10 @@
+$imgsrc = 'buttons';
+
 @charset "windows-1251";
 @font-face {
-  $ptsans = ptsans;
-  $ptsansbold = ptsansbold;
-  $segoesemibold = seguisb;
+    $ptsans = ptsans;
+    $ptsansbold = ptsansbold;
+    $segoesemibold = seguisb;
 }
 
 *::-webkit-scrollbar { $wh10 } 
@@ -24,58 +26,50 @@ h1 {
 	$normal
 }
 a {
-	$pointer $c#505b6e
-	text-decoration: none;
+    $(pointer c#505b6e nodec)
 }
 textarea {
-  resize: none;
+    $nor
 }
 b {
-  $(bold normal)
+    $(bold normal)
 }
 .app-view-container {
 	$(abs p0 z1 t43 l r b)
 }
-.bold {
-  $bold
+.bold { 
+    $bold
 }
 .standart-button {
-  $(rel block lh38 fs14 bc#5c729e white bold br3 center pointer box)
-  background-image: url(../images/buttons/blue.png);
-  background-position: 0 0;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-.standart-button:hover {
-  background-position: 0 100% $i;
-}
-.standart-button.green-button {
-  $bc#38986a
-  background-image: url(../images/buttons/green.png);
-}
-.standart-button.red-button {
-  $bc#b65f5f
-  background-image: url(../images/buttons/red.png);
-}
-.standart-button.gray-button {
-  $(noimg bc#e1e1e2 c#40434e bo#b7b6b6 lh36)
-}
-.standart-button.gray-button:hover {
-  $(bo#919498 bc#d3d5dd c#2c3b5a)
-}
-.standart-button.white-button {
-  $(noimg c#535f77 bgwhite  bo#a6b3cb lh36 regular)
-}
-.standart-button.white-button:hover {
-  $(bo#677CA7 c#3D485F)
-}
-.standart-button.disabled {
-  $bc#aaa
+    $(rel block lh38 fs14 bc#5c729e white bold br3 center pointer box nosel bp0_0 png=blue)
+    &:hover {
+        $bp0_100%  
+    }
+    &.green-button {
+        $(bc#38986a png=green)  
+    }
+    &.red-button {
+        $(bc#b65f5f png=red)  
+    }
+    &.gray-button {
+        $(noimg bc#e1e1e2 c#40434e bo#b7b6b6 lh36)
+        &:hover {
+        $(bo#919498 bc#d3d5dd c#2c3b5a)
+        }
+    }
+    &.white-button {
+        $(noimg c#535f77 bgwhite  bo#a6b3cb lh36 regular)
+        &:hover {
+        $(bo#677CA7 c#3D485F)
+        }  
+    }
+    &.disabled {
+        $bc#aaa
+    }
 }
 .float-left {
-  $fleft
+    $fleft
 }
 .float-right {
-  $fright
+    $fright
 }

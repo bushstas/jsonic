@@ -19,8 +19,9 @@ $includes = array(
 	'data', 'tags', 'props', 'events', 'template.parser', 'css.obfuscator', 'printer', 'js.interpreter',
 	'splitter', 'template.code.parser', 'utils', 'controllers.parser', 'tag.classname.parser',
 	'template.callback.validator', 'state.parser', 'class.analyzer', 'js.obfuscator',
-	'dialogs.parser', 'template.validator', 'template.syntax.parser', 'file.manager',
-	'operator.parser', 'foreach.code.parser', 'from.code.parser', 'switch.code.parser'
+	'dialogs.parser', 'template.validator', 'template.syntax.parser', 'file.manager', 'js.core.renderer',
+	'operator.parser', 'foreach.code.parser', 'from.code.parser', 'switch.code.parser',
+	'auto.correction.constants'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
@@ -28,13 +29,17 @@ foreach ($includes as $inc) {
 
 class Builder 
 {
-	private $config, $gatherer, $testsCompiler,
+	private $config, $gatherer, $testsCompiler, $coreRenderer,
 			$cssCompiler, $jsCompiler, $htmlCompiler,
 			$templateCompiler, $dataCompiler, $utilsCompiler;
 
 	private $files;
 	
 	public function run() {
+		AutoCorrectionParams::init();
+		$this->coreRenderer = new JSCoreRenderer();
+		$this->coreRenderer->run();
+
 		$this->config = new Config();
 		$this->config->init($this);
 

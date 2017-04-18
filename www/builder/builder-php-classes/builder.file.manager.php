@@ -37,6 +37,7 @@ class FileManager
 						$path = $dir."/".$file;
 						if (is_dir($path)) {
 							self::emptyFolder($path);
+							rmdir($path);
 						} elseif (file_exists($path)) {
 							unlink($path);
 						}
@@ -46,8 +47,18 @@ class FileManager
 		}
 	}
 
-	public static function getItems($dir) {
-
+	public static function getDirContent($dir, $extensions = null, $onlyFolders = false) {
+		if (is_dir($dir)) {
+			$items = scandir($dir);
+			$properItems = array();
+			foreach ($items as $item) {
+				if ($item != '.' && $item != '..') {
+					$properItems[] = $item;
+				}
+			}
+			return $properItems;
+		}
+		return array();
 	}
 }
 
