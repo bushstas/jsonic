@@ -52,6 +52,9 @@ class JSCoreRenderer
 		$class['templateCallableMethods'] = $templateCallableMethods;
 		
 		$content = array();
+		if (!empty($beforeCondition)) {
+			$content[] = $this->correctContent($beforeCondition);
+		}
 		if (!empty($condition)) {
 			$content[] = 'if('.$condition.'){';
 		}

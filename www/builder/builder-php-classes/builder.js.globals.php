@@ -45,7 +45,8 @@ class JSGlobals
 		'loadurl'          => '__LU',
 		'callback'         => '__CB',
 		'data'             => '__DT',
-		'break'            => '_brk'
+		'break'            => '_brk',
+		'getfunc'          => '__F'
 	);
 	
 	private static $varKeys = array(
@@ -60,7 +61,8 @@ class JSGlobals
 		'objects' => 'Objects',
 		'popuper' => 'Popuper',
 		'state' => 'State',
-		'dictionary' => 'Dictionary'
+		'dictionary' => 'Dictionary',
+		'getfunc' => '_fnc'
 	);
 
 	private static $errors = array(
@@ -111,6 +113,7 @@ class JSGlobals
 		self::addNullFunction();
 		self::addStopPropagationFunction();
 		self::addPreventDefaultFunction();
+		self::addGetFuncFunction();
 
 		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
 		self::parseTextConstants($jsOutput, $data['texts']);
@@ -379,5 +382,9 @@ class JSGlobals
 
 	private static function addPreventDefaultFunction() {
 		self::add('prevent', 'function(e){e.preventDefault()}'.self::addGlobalAddingCall('prevent'));
+	}
+
+	private static function addGetFuncFunction() {
+		self::add('getfunc', 'function(){return new Function}'.self::addGlobalAddingCall('getfunc'));	
 	}
 }

@@ -1,61 +1,63 @@
 <?php
 
 	$data = array(
-		'mode' => 2,
 		'name' => 'Condition',
 		'args' => array('params'),
-		'before' => "		
-			var isTrue = !!params['i'](), level, parentElement, parentLevel;
+		'beforeCondition' => "
+			this.params = params;
+			this.isTrue = !!params['i']();
 		",
+		'condition' => '!this||this==window',
 		'privateMethods' => array(
 			'createLevel' => array(
 				'args' => array('isUpdating'),
 				'body' => "
 					var l = {{".AUTOCRR_GLOBAL."}}.get('Level');
-					level = new l(parentLevel.getComponent());
+					this.level = new l(this.parentLevel.getComponent());
 					var nextSiblingChild = isUpdating ? {{".AUTOCRR_GLOBAL."}}.get('Core').getNextSiblingChild.call(this) : null;
-					level.render(getChildren.call(this), parentElement, parentLevel, nextSiblingChild);
+					this.level.render(getChildren.call(this), this.parentElement, this.parentLevel, nextSiblingChild);
 				"
 			),
 			'disposeLevel' => array(
 				'body' => "
-					if (level) level.dispose();
-					level = null;
+					if (this.level) this.level.dispose();
+					this.level = null;
 				"
 			),
 			'getChildren' => array(
 				'body' => "
-					if (isTrue) return isFunction(params['c']) ? params['c']() : params['c'];
-					return isFunction(params['e']) ? params['e']() : params['e'];
+					var p = this.params;
+					if (this.isTrue) return isFunction(p['c']) ? p['c']() : p['c'];
+					return isFunction(p['e']) ? p['e']() : p['e'];
 				"
 			)
 		),
-		'thisMethods' => array(
+		'methods' => array(
 			'render' => array(
 				'args' => array('pe', 'pl'),
 				'body' => "
-					parentElement = pe;
-					parentLevel = pl;
+					this.parentElement = pe;
+					this.parentLevel = pl;
 					createLevel.call(this);
 				"
 			),
 			'update' => array(
 				'body' => "
-					var i = !!params['i']();
-					if (i != isTrue) {
-						isTrue = i;
-						disposeLevel();
-						createLevel.call(this, true);
+					var i = !!this.params['i']();
+					if (i != this.isTrue) {
+						this.isTrue = i;
+						disposeLevel.call(this);
+						createLevel.call(this, 1);
 					}
 				"
 			),
 			'dispose' => array(
 				'body' => "
 					{{".AUTOCRR_GLOBAL."}}.get('Core').disposeLinks.call(this);
-					disposeLevel();
-					parentElement = null;
-					parentLevel = null;
-					params = null;
+					disposeLevel.call(this);
+					this.parentElement = null;
+					this.parentLevel = null;
+					this.params = null;
 				"
 			)
 		)

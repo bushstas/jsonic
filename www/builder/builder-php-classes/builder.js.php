@@ -1114,16 +1114,24 @@ class JSCompiler
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
 		$routerMenuClasses = $this->config['routerMenu'];
-		$output[] = $g.".set(".$globals['component'].'=function(){';
-		if ($isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses)) {
-			$output[] = "\tRouter.addMenu(this);";
-			$output[] = "\tthis.isRouteMenu=true;";
+		$isRouterMenu = $isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses);
+		$fnc = $globals['getfunc'].'()';
+		$fnc2 = '';
+		if ($isRouterMenu) {
+			$fnc = 'function(){';
+			$fnc2 = "}\n";
+		}
+		$content = $g.".set(".$globals['component'].'='.$fnc;
+		if ($isRouterMenu) {
+			$content .= "\nRouter.addMenu(this);";
+			$content .= "\nthis.isRouteMenu=true;";
 		}
 		$isSingleton = '';
 		if ($type == 'corrector') {
 			$isSingleton = ',1';
 		}
-		$output[] = "},'".$className."'".$isSingleton.");";
+		$content .= $fnc2.",'".$className."'".$isSingleton.");";
+		$output[] = $content;
 	}
 
 	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
