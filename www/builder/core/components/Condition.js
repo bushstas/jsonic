@@ -1,41 +1,13 @@
-{{GLOBAL}}.set(({{COMPONENT}} = function(params) {
-	this.params = params;
-	this.isTrue = !!this.params['i']();
-}), 'Condition');
-{{PROTO}}={{COMPONENT}}.prototype;
-{{PROTO}}.render = function(parentElement, parentLevel) {
-	this.parentElement = parentElement;
-	this.parentLevel = parentLevel;
-	this.createLevel(false);
-};
-{{PROTO}}.createLevel = function(isUpdating) {
-	this.level = new ({{GLOBAL}}.get('Level'))(this.parentLevel.getComponent());
-	var nextSiblingChild = isUpdating ? {{GLOBAL}}.get('Core').getNextSiblingChild.call(this) : null;
-	this.level.render(this.getChildren(), this.parentElement, this.parentLevel, nextSiblingChild);
-};
-{{PROTO}}.update = function() {
-	var isTrue = !!this.params['i']();
-	if (isTrue != this.isTrue) {
-		this.isTrue = isTrue;
-		this.disposeLevel();
-		this.createLevel(true);
-	}
-};
-{{PROTO}}.getChildren = function() {
-	if (this.isTrue) return isFunction(this.params['c']) ? this.params['c']() : this.params['c'];
-	return isFunction(this.params['e']) ? this.params['e']() : this.params['e'];
-};
-{{PROTO}}.disposeLevel = function() {
-	if (this.level) {
-		this.level.dispose();
-		this.level = null;
-	}
-};
-{{PROTO}}.dispose = function() {
-	{{GLOBAL}}.get('Core').disposeLinks.call(this);
-	this.disposeLevel();
-	this.parentElement = null;
-	this.parentLevel = null;
-	this.params = null;
-	this.nextSiblingChild = null;
-};
+_G_.set((c=function(params){
+if(!this||this==window){
+var createLevel=function(isUpdating){var l=_G_.get('Level');this.level=new l(this.parentLevel.getComponent());var nextSiblingChild=isUpdating?_G_.get('Core').getNextSiblingChild.call(this):null;this.level.render(getChildren.call(this),this.parentElement,this.parentLevel,nextSiblingChild)};
+var disposeLevel=function(){if(this.level)this.level.dispose();this.level=null};
+var getChildren=function(){var p=this.params;if(this.isTrue)return isFunction(p['c'])?p['c']():p['c'];return isFunction(p['e'])?p['e']():p['e']};
+p=c.prototype;
+p.render=function(pe,pl){this.parentElement=pe;this.parentLevel=pl;createLevel.call(this)};
+p.update=function(){var i=!!this.params['i']();if(i!=this.isTrue){this.isTrue=i;disposeLevel.call(this);createLevel.call(this,1)}};
+p.dispose=function(){_G_.get('Core').disposeLinks.call(this);disposeLevel.call(this);this.parentElement=null;this.parentLevel=null;this.params=null};
+return c;
+}
+this.params=params;this.isTrue=!!params['i']();
+})(),'Condition');

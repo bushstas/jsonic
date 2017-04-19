@@ -233,7 +233,7 @@
 			if (isObject(p)) {
 				if (p['p'] || p['ap']) props = initComponentProps(p['p'], p['ap']);
 				if (isString(p['i'])) {
-					cmp.setId(p['i']);
+					{{GLOBAL}}.get('Core').setId.call(cmp, p['i']);
 					var waiting = {{GLOBAL}}.get('Core').getWaitingChild.call(component, p['i']);
 					if (isArray(waiting)) {
 						for (i = 0; i < waiting.length; i++) {

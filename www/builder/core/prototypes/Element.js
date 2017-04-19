@@ -115,6 +115,11 @@ var __StyleNameCache = {};
 {{PROTO}}.getLeft = function() {
 	return this.getRect().left;
 };
+{{PROTO}}.setPosition = function(x, y) {
+	if (isNumeric(x)) x += 'px';
+	if (isNumeric(y)) y += 'px';
+	this.css({'left': x, 'top': y});
+};
 {{PROTO}}.css = function(style) {
 	var element = this;
 	var set = function(value, style) {

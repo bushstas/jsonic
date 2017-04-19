@@ -1309,6 +1309,7 @@ class JSCompiler
 	}
 
 	private function checkSuperClassesCallings(&$class) {
+		$globals = JSGlobals::getVarNames();
 		foreach ($class['functions'] as &$func) {
 			$regExp = '/\bsuper\((.*)\)/';
 			$parts = preg_split($regExp, $func['code']);
@@ -1327,7 +1328,7 @@ class JSCompiler
 						$superClass = $callOpts['superClass'];
 						$method = $callOpts['method'];
 					}
-					$call = $superClass.'.prototype.'.$method.'.call(this'.$arguments.')';
+					$call = $globals['global'].".get('".$superClass."').prototype.".$method.'.call(this'.$arguments.')';
 				}
 				$func['code'] = '';
 				foreach ($parts as $i => $part) {

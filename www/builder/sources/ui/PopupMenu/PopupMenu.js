@@ -28,13 +28,13 @@ function show() {
 	var innerElement = <.@inner-container>;
 	var rect = innerElement.getRect();
 	var height = Math.min(rect.height, $(this.options, 'maxHeight', 400));
-	this.setStyle({maxHeight: height + 'px', height: height + 'px'});
+	<>.css({maxHeight: height + 'px', height: height + 'px'});
     this.button.addClass('active');
     Popuper.watch(this);
 }
 
 function hide() {
-	this.setStyle({maxHeight: '0', height: '0'});
+	<>.css({maxHeight: '0', height: '0'});
 	this.button.removeClass('active');
 }
 

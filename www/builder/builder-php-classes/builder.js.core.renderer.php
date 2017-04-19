@@ -30,7 +30,9 @@ class JSCoreRenderer
 			$path = $dir.'/'.$item;
 			$outputPath = $outputDir.'/'.$item;
 			if (is_dir($path)) {
-				mkdir($outputPath);
+				if (!is_dir($outputPath)) {
+					mkdir($outputPath);
+				}
 				$this->handleDir($path, $outputPath);
 			} elseif (file_exists($path)) {
 				$outputPath = $this->correctOutputFileName($outputPath);
@@ -88,6 +90,9 @@ class JSCoreRenderer
 		}
 		if (!empty($condition)) {
 			$content[] = '}';
+		}
+		if (!empty($afterCondition)) {
+			$content[] = $this->correctContent($afterCondition);
 		}
 		$content = implode("\n", $content);
 		list($topContent, $bottomContent) = $this->getTopAndBottomContent($mode, $name, $args);

@@ -3,7 +3,7 @@
 	$data = array(
 		'name' => 'Condition',
 		'args' => array('params'),
-		'beforeCondition' => "
+		'afterCondition' => "
 			this.params = params;
 			this.isTrue = !!params['i']();
 		",

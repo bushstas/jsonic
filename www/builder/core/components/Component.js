@@ -8,7 +8,7 @@ var doRendering=function(){var lvl=_G_.get('Level');this.level=new lvl(this);var
 var propagatePropertyChange=function(changedProps){if(!this.updaters)return;var updated=[];for(var k in changedProps){if(this.updaters[k]){for(var i=0;i<this.updaters[k].length;i++){if(updated.indexOf(this.updaters[k][i])==-1){this.updaters[k][i].react(changedProps);updated.push(this.updaters[k][i])}}}}updated=null;callFollowers.call(this,changedProps)};
 var callFollowers=function(changedProps){for(var k in changedProps){callFollower.call(this,k,changedProps[k])}};
 var callFollower=function(propName,propValue){if(Objects.has(this.followers,propName))this.followers[propName].call(this,propValue)};
-var updateForeach=function(propName,index,item){var updaters=this.updaters[propName],o;if(isArray(updaters)){for(i=0;i<updaters.length;i++){if(updaters[i]instanceof _G_.get('OperatorUpdater')){o=updaters[i].getOperator();if(o instanceof _G_.get('Foreach')){if(!isUndefined(item))o.add(item,index);else o.remove(index)}}}}};
+var updateForeach=function(propName,index,item){var updaters=this.updaters[propName],o;if(isArray(updaters)){for(var i=0;i<updaters.length;i++){if(updaters[i]instanceof _G_.get('OperatorUpdater')){o=updaters[i].getOperator();if(o instanceof _G_.get('Foreach')){if(!isUndefined(item))o.add(item,index);else o.remove(index)}}}}};
 var unrender=function(){this.elements=null;_G_.get('Core').disposeLinks.call(this);this.disposeInternal();this.level.dispose();this.level=this.listeners=null};
 p=c.prototype;
 p.render=function(parentElement){this.parentElement=parentElement;load.call(this)};
@@ -25,9 +25,6 @@ p.plusTo=function(propName,add,sign){var prop=this.get(propName);if(!sign||sign=
 p.addOneTo=function(propName,item,index){this.addTo(propName,[item],index)};
 p.addTo=function(propName,items,index){var prop=this.get(propName);if(!isArray(items))items=[items];if(isArray(prop)){for(var j=0;j<items.length;j++){if(!isNumber(index))prop.push(items[j]);else if(index==0)prop.unshift(items[j]);else prop.insertAt(items[j],index);updateForeach.call(this,propName,index,items[j]);if(isNumber(index))index++}callFollower.call(this,propName,prop)}};
 p.get=function(propName){var prop=this.props[propName];if(isUndefined(arguments[1])||!isArrayLike(prop))return prop;var end;for(var i=1;i<arguments.length;i++){prop=prop[arguments[i]];if(isUndefined(prop))return '';end=arguments.length==i+1;if(end||!isArrayLike(prop))break}return end?prop||'':''};
-p.showElement=function(element,isShown){if(isString(element))element=this.findElement(element);if(isElement(element))element.show(isShown)};
-p.setStyle=function(styles){if(this.isRendered())this.getElement().css(styles)};
-p.setPosition=function(x,y){this.setStyle({'top':y+'px','left':x+'px'})};
 p.setVisible=function(isVisible){if(this.isRendered()&&!this.isDisposed())this.getElement().show(isVisible)};
 p.addClass=function(className,isAdding){if(this.isRendered()){if(isAdding||isUndefined(isAdding))this.getElement().addClass(className);else this.getElement().removeClass(className)}};
 p.each=function(propName,callback){var ar=this.get(propName);if(isArrayLike(ar)&&isFunction(callback)){if(isArray(ar))for(var i=0;i<ar.length;i++)callback.call(this,ar[i],i,ar);else for(var k in ar)callback.call(this,ar[k],k,ar)}};
@@ -50,7 +47,6 @@ p.getChildAt=function(index){return Objects.getByIndex(this.children,index)};
 p.getChildIndex=function(child,same){var idx=-1;this.forEachChild(function(ch){if(!same||(same&&ch.constructor==child.constructor))idx++;if(ch==child)return true});return idx};
 p.getChildren=function(className){if(!isString(className))return this.children;var children=[];this.forEachChild(function(child){if(isComponentLike(child)&&child.instanceOf(className))children.push(child)});return children};
 p.getChild=function(id){return Objects.get(this.children,id)};
-p.setId=function(id){this.componentId=id};
 p.getId=function(){return this.componentId};
 p.getElement=function(id){if(isString(id))return Objects.get(this.elements,id);else return this.scope||this.parentElement};
 p.findElement=function(selector,scopeElement){return(scopeElement||this.getElement()).querySelector(selector)};

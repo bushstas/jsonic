@@ -273,4 +273,7 @@
 			}
 		}
 	};
+	this.setId = function(id) {
+		this.componentId = id;
+	};
 })(), 'Core');

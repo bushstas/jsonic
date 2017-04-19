@@ -109,7 +109,7 @@
 				'body' => "
 					var updaters = this.updaters[propName], o;
 					if (isArray(updaters)) {
-						for (i = 0; i < updaters.length; i++) {
+						for (var i = 0; i < updaters.length; i++) {
 							if (updaters[i] instanceof {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater')) {
 								o = updaters[i].getOperator();
 								if (o instanceof {{".AUTOCRR_GLOBAL."}}.get('Foreach')) {
@@ -126,6 +126,9 @@
 					this.elements = null;
 					{{".AUTOCRR_GLOBAL."}}.get('Core').disposeLinks.call(this);
 					this.disposeInternal();
+					for (var i = 0; i < this.inheritedSuperClasses.length - 1; i++) {
+						this.inheritedSuperClasses[i].prototype.disposeInternal.call(this);
+					}
 					this.level.dispose();
 					this.level = this.listeners = null;
 				"
@@ -265,25 +268,6 @@
 						if (end || !isArrayLike(prop)) break;
 					}
 					return end ? prop || '' : '';
-				"
-			),
-			'showElement' => array(
-				'args' => array('element', 'isShown'),
-				'body' => "
-					if (isString(element)) element = this.findElement(element);
-					if (isElement(element)) element.show(isShown);
-				"
-			),
-			'setStyle' => array(
-				'args' => array('styles'),
-				'body' => "
-					if (this.isRendered()) this.getElement().css(styles);
-				"
-			),
-			'setPosition' => array(
-				'args' => array('x', 'y'),
-				'body' => "
-					this.setStyle({'top': y + 'px', 'left': x + 'px'});
 				"
 			),
 			'setVisible' => array(
@@ -493,12 +477,6 @@
 					return Objects.get(this.children, id);
 				"
 			),
-			'setId' => array(
-				'args' => array('id'),
-				'body' => "
-					this.componentId = id;
-				"
-			),
 			'getId' => array(
 				'body' => "
 					return this.componentId;	
@@ -588,7 +566,6 @@
 					this.updaters = null;
 					this.parentElement = null;
 					this.props = null;
-					this.provider = null;
 					this.children = null;
 					this.disposed = true;
 					this.initials = null;
@@ -630,7 +607,11 @@
 			)
 		),
 		'overridableMethods' => array(),
-		'templateCallableMethods' => array()
+		'templateCallableMethods' => array(),
+		'checker' => array(
+			'render' => 'onRendered',
+			'dispose' => 'onDisposed'
+		)
 	);
 
 ?>

@@ -14,7 +14,7 @@ function edit(element) {
 function reposition(text) {
 	this.placeTo(document.body);
 	var rect = this.editedElement.getRect();
-	this.setPosition(rect.left, rect.top);
+	<>.setPosition(rect.left, rect.top);
 }
 
 function onChangeText(text) {
