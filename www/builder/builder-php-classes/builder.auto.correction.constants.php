@@ -5,6 +5,7 @@ class AutoCorrectionParams
 	private static $list = array(
 		'FUNCS'           => 'FUNCS',
 		'GLOBAL'          => 'GLOBAL',
+		'CORE'            => 'CORE',
 		'ATTRIBUTES'      => 'ATTRIBUTES',
 		'EVENTTYPES'      => 'EVENTTYPES',
 		'TAGS'            => 'TAGS',

@@ -1,4 +1,4 @@
-{{GLOBAL}}.set(new (function() {
+{{GLOBAL}}.set({{CORE}} = new (function() {
 	var extendInitials = function(initials1, initials2) {
 		if (isNull(initials1)) {
 			initials1 = initials2;
@@ -272,5 +272,38 @@
 				this.updaters[t].splice(i, 1);
 			}
 		}
+	};
+	this.setId = function(id) {
+		this.componentId = id;
+	};
+	this.createLevel = function(items, isUpdating, index) {
+		var level = new ({{GLOBAL}}.get('Level'))(this.parentLevel.getComponent());
+		var nextSiblingChild;
+		if (isNumber(index) && this.levels[index]) {
+			nextSiblingChild = this.levels[index].getFirstNodeChild();
+		} else {
+			nextSiblingChild = isUpdating ? {{GLOBAL}}.get('Core').getNextSiblingChild.call(this) : null;
+		}
+		level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
+		this.levels.insertAt(level, index);
+	};
+	this.initOperator = function(pe, pl) {
+		this.parentElement = pe;
+		this.parentLevel = pl;
+		this.levels = [];
+	};
+	this.disposeLevels = function() {
+		for (var i = 0; i < this.levels.length; i++) {
+			this.levels[i].dispose();
+		}
+		this.levels = [];
+	};
+	this.disposeOperator = function() {
+		{{GLOBAL}}.get('Core').disposeLinks.call(this);
+		{{GLOBAL}}.get('Core').disposeLevels();
+		this.levels = null;
+		this.parentElement = null;
+		this.parentLevel = null;
+		this.params = null;
 	};
 })(), 'Core');

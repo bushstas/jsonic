@@ -60,7 +60,7 @@
 				'args' => array('view', 'isSameView'),
 				'body' => "
 					if (!view) return;
-					var parentElement = {{".AUTOCRR_GLOBAL."}}.get('Core').getParentElement.call(view);
+					var parentElement = {{".AUTOCRR_CORE."}}.getParentElement.call(view);
 					var params = getViewParams.call(this, this.currentRoute);
 					if (isObject(params)) {
 						view.set(params);
@@ -75,7 +75,7 @@
 				'body' => "
 					var view = this.views[this.currentView];
 					if (view) {
-						var parentElement = {{".AUTOCRR_GLOBAL."}}.get('Core').getParentElement.call(view);			
+						var parentElement = {{".AUTOCRR_CORE."}}.getParentElement.call(view);			
 						this.viewContainer.removeChild(parentElement);
 						view.activate(false);
 					}
@@ -90,7 +90,7 @@
 					}
 					var view = this.views[route['name']] = new route['view']();
 					var viewParams = getViewParams.call(this, route, true);
-					{{".AUTOCRR_GLOBAL."}}.get('Core').initiate.call(view, viewParams);
+					{{".AUTOCRR_CORE."}}.initiate.call(view, viewParams);
 					view.setOnReadyHandler(onViewReady.bind(this));
 					var viewContentElement = createViewContentElement.call(this, route['name']);
 					view.render(viewContentElement);

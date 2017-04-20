@@ -10,7 +10,8 @@ class JSCoreRenderer
 	private $autoCorrect = array(
 		'cmp' => AUTOCRR_COMPONENT,
 		'glb' => AUTOCRR_GLOBAL,
-		'prt' => AUTOCRR_PROTO
+		'prt' => AUTOCRR_PROTO,
+		'core' => AUTOCRR_CORE
 	);
 
 	public function run() {
@@ -138,8 +139,8 @@ class JSCoreRenderer
 		switch ((int)$mode) {
 			case 2:
 				return array(
-					$this->getConst('glb').'.set(function('.$this->getArgs($args).'){',
-					"},'".$name."');"
+					$this->getConst('glb').'.set('.$this->getConst('core').'=new(function('.$this->getArgs($args).'){',
+					"})(),'".$name."');"
 				);
 			default:
 				return array(

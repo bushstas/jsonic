@@ -1,15 +1,11 @@
 {template .main}
 <div class="@outer-container" onClick="handleClick">
 	<ul>
-	{foreach ~a as &i => &f limit 2}
+	{foreach $a as &i => &f limit 2}
 		<li>{&f}</li>
 	{/foreach}
 	</ul>
-	{from &i = 3 to 3}
+	{from &i = -100 to 3}
+		<div>{&i}</div>
 	{/from}
-	{switch .setScope($a, &s)}
-		{case 1}
-			111
-		{/case}
-	{/switch}
 </div>

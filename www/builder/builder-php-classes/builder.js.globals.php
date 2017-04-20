@@ -36,6 +36,7 @@ class JSGlobals
 		'prevent'          => '__PD',
 		'dialoger'         => '__DI',
 		'global'           => '_G_',
+		'core'             => '_C_',
 		'funcs'            => '_F_',
 		'objects'          => '__O',
 		'popuper'          => '__P',
@@ -128,6 +129,7 @@ class JSGlobals
 		return array(
 			AUTOCRR_FUNCS           => self::$varNames['funcs'],
 			AUTOCRR_GLOBAL          => self::$varNames['global'],
+			AUTOCRR_CORE            => self::$varNames['core'],
 			AUTOCRR_ATTRIBUTES      => self::$varNames['props'],
 			AUTOCRR_EVENTTYPES      => self::$varNames['events'],
 			AUTOCRR_TAGS            => self::$varNames['tags'],

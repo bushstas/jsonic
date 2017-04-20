@@ -14,7 +14,7 @@
 				'body' => "
 					var l = {{".AUTOCRR_GLOBAL."}}.get('Level');
 					this.level = new l(this.parentLevel.getComponent());
-					var nextSiblingChild = isUpdating ? {{".AUTOCRR_GLOBAL."}}.get('Core').getNextSiblingChild.call(this) : null;
+					var nextSiblingChild = isUpdating ? {{".AUTOCRR_CORE."}}.getNextSiblingChild.call(this) : null;
 					this.level.render(getChildren.call(this), this.parentElement, this.parentLevel, nextSiblingChild);
 				"
 			),
@@ -53,7 +53,7 @@
 			),
 			'dispose' => array(
 				'body' => "
-					{{".AUTOCRR_GLOBAL."}}.get('Core').disposeLinks.call(this);
+					{{".AUTOCRR_CORE."}}.disposeLinks.call(this);
 					disposeLevel.call(this);
 					this.parentElement = null;
 					this.parentLevel = null;

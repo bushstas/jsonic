@@ -47,24 +47,27 @@
 			'onReadyToRender' => array(
 				'body' => "
 					if (!this.isRendered()) {
-						doRendering.call(this);
+						render.call(this);
 						if (this.tempPlaceholder) {
 							this.parentElement.removeChild(this.tempPlaceholder);
 							this.tempPlaceholder = null;
 						}
-						{{".AUTOCRR_GLOBAL."}}.get('Core').processPostRenderInitials.call(this);
+						{{".AUTOCRR_CORE."}}.processPostRenderInitials.call(this);
 					}
 				"
 			),
-			'doRendering' => array(
+			'render' => array(
 				'body' => "
 					var lvl = {{".AUTOCRR_GLOBAL."}}.get('Level');
 					this.level = new lvl(this);
 					var content = this.getTemplateMain(this.props, this);
 					if (content) this.level.render(content, this.parentElement, this, this.tempPlaceholder);
 					this.rendered = true;
-					this.onRendered();
+					this.onRendered();					
 					this.onRenderComplete();
+					for (var i = 0; i < this.inheritedSuperClasses.length - 1; i++) {
+						this.inheritedSuperClasses[i].prototype.onRenderComplete.call(this);
+					}
 					this.forEachChild(function(child) {
 						if (isFunction(child.onParentRendered)) child.onParentRendered.call(child);
 					});
@@ -120,19 +123,7 @@
 						}
 					}
 				"
-			),
-			'unrender' => array(
-				'body' => "
-					this.elements = null;
-					{{".AUTOCRR_GLOBAL."}}.get('Core').disposeLinks.call(this);
-					this.disposeInternal();
-					for (var i = 0; i < this.inheritedSuperClasses.length - 1; i++) {
-						this.inheritedSuperClasses[i].prototype.disposeInternal.call(this);
-					}
-					this.level.dispose();
-					this.level = this.listeners = null;
-				"
-			),
+			)
 		),
 		'methods' => array(
 			'render' => array(
@@ -557,21 +548,27 @@
 			'dispose' => array(
 				'args' => array(''),
 				'body' => "
-					{{".AUTOCRR_GLOBAL."}}.get('State').dispose(this);
-					unrender.call(this);
+					{{".AUTOCRR_GLOBAL."}}.get('State').dispose(this);					
+					var core = {{".AUTOCRR_CORE."}};
+					core.disposeLinks.call(this);
+					core.disposeInternal.call(this);					
 					if (this.mouseHandler) {
 						this.mouseHandler.dispose();
 						this.mouseHandler = null;
 					}
+					this.level.dispose();
+					this.elements = null;
+					this.level = null;
+					this.listeners = null;
 					this.updaters = null;
 					this.parentElement = null;
 					this.props = null;
 					this.children = null;
-					this.disposed = true;
 					this.initials = null;
 					this.followers = null;
 					this.correctors = null;
 					this.controls = null;
+					this.disposed = true;
 				"
 			),
 			'a' => array(
