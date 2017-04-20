@@ -684,7 +684,7 @@ class JSCompiler
 			$this->decodeTexts($jsOutput, $route);
 		}		
 		if ($route === null) {
-			$jsOutput = "'use strict';\nvar ".$globals['global'].",".$globals['core'].($isSplitted ? ",".$globals['funcs']."={}" : '').";\nnew (function() {\n(function(){\nvar cs={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return cs[k]}\nthis.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}\n}).call(".$globals['global']."=this);\n;(function(){var ".$globals['component'].",".$globals['proto'].";\n".$jsOutput;
+			$jsOutput = "'use strict';\nvar ".$globals['global'].($isSplitted ? ",".$globals['funcs']."={}" : '').";\nnew (function() {\n(function(){\nvar cs={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return cs[k]}\nthis.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}\n}).call(".$globals['global']."=this);\n;(function(){var ".$globals['core'].",".$globals['component'].",".$globals['proto'].";\n".$jsOutput;
 		} else {
 			$varname = 'g';
 			$top = "'use strict';\n(function(){\nvar ".$varname.'='.$globals['global'].'.get,';

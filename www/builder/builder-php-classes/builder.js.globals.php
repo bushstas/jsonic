@@ -63,7 +63,8 @@ class JSGlobals
 		'popuper' => 'Popuper',
 		'state' => 'State',
 		'dictionary' => 'Dictionary',
-		'getfunc' => '_fnc'
+		'getfunc' => '_fnc',
+		'core' => 'Core'
 	);
 
 	private static $errors = array(

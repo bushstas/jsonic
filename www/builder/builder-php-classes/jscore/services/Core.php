@@ -2,6 +2,7 @@
 
 	$data = array(
 		'mode' => 2,
+		'var' => AUTOCRR_CORE,
 		'name' => 'Core',
 		'privateMethods' => array(
 			'extendInitials' => array(

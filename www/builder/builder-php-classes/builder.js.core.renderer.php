@@ -5,15 +5,7 @@ class JSCoreRenderer
 	private $dir = 'jscore';
 	private $outputDir = 'core_';
 	private $classes = array();
-	private $autoCorrectionList;
-
-	private $autoCorrect = array(
-		'cmp' => AUTOCRR_COMPONENT,
-		'glb' => AUTOCRR_GLOBAL,
-		'prt' => AUTOCRR_PROTO,
-		'core' => AUTOCRR_CORE
-	);
-
+	
 	public function run() {
 		$this->dir = FOLDER.'/'.$this->dir;
 		$this->outputDir = FOLDER.'/../'.$this->outputDir;
@@ -78,13 +70,13 @@ class JSCoreRenderer
 		}
 		if (is_array($methods) && !empty($methods)) {
 			$class['methods'] = array_keys($methods);
-			$content[] = $this->getConst('prt').'='.$this->getConst('cmp').'.prototype;';
+			$content[] = $this->getConst(AUTOCRR_PROTO).'='.$this->getConst(AUTOCRR_COMPONENT).'.prototype;';
 			foreach ($methods as $methodName => $methodData) {
 				$this->addMethod($methodName, $methodData, $content, 3);
 			}
 		}
 		if (empty($mode) || $mode == 1) {
-			$content[] = 'return '.$this->getConst('cmp').';';
+			$content[] = 'return '.$this->getConst(AUTOCRR_COMPONENT).';';
 		}
 		if (!empty($after)) {
 			$content[] = $this->correctContent($after);
@@ -96,8 +88,11 @@ class JSCoreRenderer
 			$content[] = $this->correctContent($afterCondition);
 		}
 		$content = implode("\n", $content);
-		list($topContent, $bottomContent) = $this->getTopAndBottomContent($mode, $name, $args);
+		list($topContent, $bottomContent) = $this->getTopAndBottomContent($mode, $name, $args, $var);
 		$fileContent = $this->correctFinalContent($topContent."\n".$content."\n".$bottomContent);
+		if (!empty($define) && !empty($var)) {
+			$fileContent = 'var '.$this->getConst($var).';'.$fileContent;
+		}
 		FileManager::createFile($outputPath, $fileContent);
 	}
 
@@ -112,7 +107,7 @@ class JSCoreRenderer
 			} elseif ($type == 2) {
 				$content[] = 'this.'.$methodName.'='.$value.';';
 			} else {
-				$content[] = $this->getConst('prt').'.'.$methodName.'='.$value.';';
+				$content[] = $this->getConst(AUTOCRR_PROTO).'.'.$methodName.'='.$value.';';
 			}
 		} else {
 			$args = $this->getArgs($data['args']);
@@ -121,7 +116,7 @@ class JSCoreRenderer
 			} elseif ($type == 2) {
 				$function = 'this.'.$methodName.'=function('.$args.'){';
 			} else {
-				$function = $this->getConst('prt').'.'.$methodName.'=function('.$args.'){';
+				$function = $this->getConst(AUTOCRR_PROTO).'.'.$methodName.'=function('.$args.'){';
 			}
 			if (!empty($data['body'])) {
 				$body = $this->correctContent($data['body']);
@@ -135,16 +130,16 @@ class JSCoreRenderer
 		}
 	}
 
-	private function getTopAndBottomContent($mode, $name, $args) {
+	private function getTopAndBottomContent($mode, $name, $args, $var) {
 		switch ((int)$mode) {
 			case 2:
 				return array(
-					$this->getConst('glb').'.set('.$this->getConst('core').'=new(function('.$this->getArgs($args).'){',
+					$this->getConst(AUTOCRR_GLOBAL).'.set('.$this->getConst($var).'=new(function('.$this->getArgs($args).'){',
 					"})(),'".$name."');"
 				);
 			default:
 				return array(
-					$this->getConst('glb').'.set(('.$this->getConst('cmp').'=function('.$this->getArgs($args).'){',
+					$this->getConst(AUTOCRR_GLOBAL).'.set(('.$this->getConst(AUTOCRR_COMPONENT).'=function('.$this->getArgs($args).'){',
 					"})(),'".$name."');"
 				);
 		}
@@ -152,7 +147,7 @@ class JSCoreRenderer
 
 	private function getConst($key) {
 		$usedGlobalNames = JSGlobals::getUsedNames();
-		return $usedGlobalNames[$this->autoCorrect[$key]];
+		return $usedGlobalNames[$key];
 	}
 
 	private function correctOutputFileName($outputPath) {
