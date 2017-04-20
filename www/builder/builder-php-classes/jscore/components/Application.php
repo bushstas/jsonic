@@ -5,11 +5,11 @@
 		'condition' => '!this||this==window',
 		'before' => "
 			var controllers, router, dictionary;
-			var routes = {{".AUTOCRR_ROUTES."}};
-			var errorRoutes = {{".AUTOCRR_ERRORROUTES."}};
-			var viewContainerClass = {{".AUTOCRR_VIEWCONTAINER."}};
-			var defaultPagetitle = {{".AUTOCRR_PAGETITLE."}};
-			var parentalContainerClass = {{".AUTOCRR_PARENTALVIEWCNT."}};
+			var routes = {{".CONST_ROUTES."}};
+			var errorRoutes = {{".CONST_ERRORROUTES."}};
+			var viewContainerClass = {{".CONST_VIEWCONTAINER."}};
+			var defaultPagetitle = {{".CONST_PAGETITLE."}};
+			var parentalContainerClass = {{".CONST_PARENTALVIEWCNT."}};
 		",
 		'privateMethods' => array(
 			'getViewParams' => array(
@@ -44,7 +44,7 @@
 				'args' => array('route'),
 				'body' => "
 					var script = document.createElement('script');
-					script.src = '/js/{{".AUTOCRR_JSBASE."}}_' + route['name'] + '_chunk.js';
+					script.src = '/js/{{".CONST_JSBASE."}}_' + route['name'] + '_chunk.js';
 					document.body.appendChild(script);
 					script.onload = onViewLoaded.bind(this, route);
 				"
@@ -52,7 +52,7 @@
 			'onViewLoaded' => array(
 				'args' => array('route'),
 				'body' => "
-					route['view'] = {{".AUTOCRR_GLOBAL."}}.get(route['view']);
+					route['view'] = {{".CONST_GLOBAL."}}.get(route['view']);
 					renderView.call(this, route);
 				"
 			),
@@ -60,7 +60,7 @@
 				'args' => array('view', 'isSameView'),
 				'body' => "
 					if (!view) return;
-					var parentElement = {{".AUTOCRR_CORE."}}.getParentElement.call(view);
+					var parentElement = {{".CONST_CORE."}}.getParentElement.call(view);
 					var params = getViewParams.call(this, this.currentRoute);
 					if (isObject(params)) {
 						view.set(params);
@@ -75,7 +75,7 @@
 				'body' => "
 					var view = this.views[this.currentView];
 					if (view) {
-						var parentElement = {{".AUTOCRR_CORE."}}.getParentElement.call(view);			
+						var parentElement = {{".CONST_CORE."}}.getParentElement.call(view);			
 						this.viewContainer.removeChild(parentElement);
 						view.activate(false);
 					}
@@ -90,7 +90,7 @@
 					}
 					var view = this.views[route['name']] = new route['view']();
 					var viewParams = getViewParams.call(this, route, true);
-					{{".AUTOCRR_CORE."}}.initiate.call(view, viewParams);
+					{{".CONST_CORE."}}.initiate.call(view, viewParams);
 					view.setOnReadyHandler(onViewReady.bind(this));
 					var viewContentElement = createViewContentElement.call(this, route['name']);
 					view.render(viewContentElement);
@@ -113,7 +113,7 @@
 					this.currentView = route['name'];
 					var view = this.views[route['name']];
 					if (!view) {
-						view = {{".AUTOCRR_GLOBAL."}}.get(route['view']);
+						view = {{".CONST_GLOBAL."}}.get(route['view']);
 						if (!view) {
 							loadView.call(this, route);
 						} else {
@@ -193,9 +193,9 @@
 			),
 			'run' => array(
 				'body' => "
-					dictionary = {{".AUTOCRR_GLOBAL."}}.get('Dictionary');
-					router = {{".AUTOCRR_GLOBAL."}}.get('Router');
-					controllers = {{".AUTOCRR_GLOBAL."}}.get('Controllers');
+					dictionary = {{".CONST_GLOBAL."}}.get('Dictionary');
+					router = {{".CONST_GLOBAL."}}.get('Router');
+					controllers = {{".CONST_GLOBAL."}}.get('Controllers');
 					defineViews.call(this);
 					router.setNavigationHandler(handleNavigation.bind(this));
 					router.init();

@@ -47,7 +47,8 @@ class JSGlobals
 		'callback'         => '__CB',
 		'data'             => '__DT',
 		'break'            => '_brk',
-		'getfunc'          => '__F'
+		'getfunc'          => '__F',
+		'logger'           => 'Logger'
 	);
 	
 	private static $varKeys = array(
@@ -160,8 +161,9 @@ class JSGlobals
 			AUTOCRR_COMPONENT       => self::$varNames['component'],
 			AUTOCRR_PROTO           => self::$varNames['proto'],
 			AUTOCRR_LOADURL         => self::$varNames['loadurl'],
-			AUTOCRR_BREAK           => self::$varNames['break']
-		);
+			AUTOCRR_BREAK           => self::$varNames['break'],
+			AUTOCRR_LOGGER          => self::$varNames['logger']
+ 		);
 	}
 
 	public static function exclude($varKey) {

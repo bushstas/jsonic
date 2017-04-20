@@ -132,6 +132,11 @@ class JSCoreRenderer
 
 	private function getTopAndBottomContent($mode, $name, $args, $var) {
 		switch ((int)$mode) {
+			case 3:
+				return array(
+					$this->getConst(AUTOCRR_GLOBAL).'.set(function('.$this->getArgs($args).'){',
+					"},'".$name."');"
+				);
 			case 2:
 				return array(
 					$this->getConst(AUTOCRR_GLOBAL).'.set('.$this->getConst($var).'=new(function('.$this->getArgs($args).'){',
