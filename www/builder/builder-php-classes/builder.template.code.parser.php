@@ -2,7 +2,7 @@
 
 class TemplateCodeParser
 {	
-	private static $code, $templateName, $className, $globalNames, $reservedNames,
+	private static $code, $templateName, $className, $reservedNames,
 				   $utilsFuncs;
 	private static $expected = array();
 	private static $expectedKeywords = array();
@@ -117,8 +117,7 @@ class TemplateCodeParser
 		self::$context = $context;
 	}
 
-	public static function setGlobalNames($names, $reserved, $utilsFuncs, $userUtilsFuncs) {
-		self::$globalNames = $names;
+	public static function setGlobalNames($reserved, $utilsFuncs, $userUtilsFuncs) {
 		self::$reservedNames = $reserved;
 		self::$utilsFuncs = array_merge($utilsFuncs, $userUtilsFuncs);
 	}
@@ -263,7 +262,7 @@ class TemplateCodeParser
 							self::$parsedCode = rtrim(self::$parsedCode, '&').$part;
 						}
 					} elseif (self::$open['text']) {
-						self::$parsedCode = rtrim(self::$parsedCode, '@').self::$globalNames['CONSTANTS'].'.'.$part;
+						self::$parsedCode = rtrim(self::$parsedCode, '@').CONST_CONSTANTS.'.'.$part;
 					} elseif (self::$open['data']) {
 						self::$parsedCode = rtrim(self::$parsedCode, '#').'<data>'.$part;
 					} else {

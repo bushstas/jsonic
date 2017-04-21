@@ -15,7 +15,7 @@
 					p = (isFunction(p['p']) ? p['p']() : p['p']) || [];
 					var a = ~~p[0], b = ~~p[1], s = ~~p[2] || 1;
 					for (var i = a; i <= b; i += s) {
-						{{".AUTOCRR_CORE."}}.createLevel.call(this, f(i), isUpdating);
+						".CONST_CORE.".createLevel.call(this, f(i), isUpdating);
 					}
 				"
 			)
@@ -24,20 +24,20 @@
 			'render' => array(
 				'args' => array('pe', 'pl'),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.initOperator.call(this, pe, pl);					
+					".CONST_CORE.".initOperator.call(this, pe, pl);					
 					createLevels.call(this, false);
 				"
 			),
 			'update' => array(
 				'args' => array(''),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeLevels.call(this);
+					".CONST_CORE.".disposeLevels.call(this);
 					createLevels.call(this, true);
 				"
 			),
 			'dispose' => array(
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeOperator.call(this);
+					".CONST_CORE.".disposeOperator.call(this);
 				"
 			)
 		)

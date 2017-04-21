@@ -45,7 +45,7 @@
 			'createLevel' => array(
 				'args' => array('items', 'pe'),
 				'body' => "
-					var lvl = {{".AUTOCRR_GLOBAL."}}.get('Level');
+					var lvl = ".CONST_GLOBAL.".get('Level');
 					var level = new lvl(this.cmp);
 					level.render(items, pe, this);
 					this.children.push(level);
@@ -62,8 +62,8 @@
 				'args' => array('u', 's', 'p'),
 				'body' => "
 					this.updaters = this.updaters || [];
-					if (p['n']) {{".AUTOCRR_CORE."}}.createUpdater(u, p['$'] || this.cmp, s, p, this.updaters);
-					if (p['g']) {{".AUTOCRR_GLOBAL."}}.get('State').createUpdater(u, p['$'] || this.cmp, s, p);
+					if (p['n']) ".CONST_CORE.".createUpdater(u, p['$'] || this.cmp, s, p, this.updaters);
+					if (p['g']) ".CONST_GLOBAL.".get('State').createUpdater(u, p['$'] || this.cmp, s, p);
 				"
 			),
 			'createPropertyNode' => array(
@@ -74,34 +74,34 @@
 					if (!isUndefined(pv)) v = pv;
 					var node = document.createTextNode(v);
 					appendChild.call(this, node);
-					createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('NodeUpdater'), node, props);
+					createUpdater.call(this, ".CONST_GLOBAL.".get('NodeUpdater'), node, props);
 				"
 			),
 			'createElement' => array(
 				'args' => array('props'),
 				'body' => "
-					var element = document.createElement({{".AUTOCRR_TAGS."}}[props['t']] || 'span');
+					var element = document.createElement(".CONST_TAGS."[props['t']] || 'span');
 					appendChild.call(this, element);
 					if (props['p']) {
 						var pr = isFunction(props['p']) ? props['p']() : props['p'];
 						var a;
 						for (var k in pr) {
-							a = {{".AUTOCRR_ATTRIBUTES."}}[k] || k;
+							a = ".CONST_ATTRIBUTES."[k] || k;
 							if (a == 'scope') this.cmp.setScope(element);
-							else if (a == 'as') {{".AUTOCRR_CORE."}}.registerElement.call(this.cmp, element, pr[k]);
+							else if (a == 'as') ".CONST_CORE.".registerElement.call(this.cmp, element, pr[k]);
 							else if (isPrimitive(pr[k]) && pr[k] !== '') {
 								element.attr(a, pr[k]);
 							}
 						}
 						if (props['n'] || props['g']) {
-							createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('ElementUpdater'), element, props);
+							createUpdater.call(this, ".CONST_GLOBAL.".get('ElementUpdater'), element, props);
 						}
 					}
 					if (isArray(props['e'])) {
 						var eventType, callback, isOnce, i;
-						this.eventHandler = this.eventHandler || new ({{".AUTOCRR_GLOBAL."}}.get('EventHandler'))();
+						this.eventHandler = this.eventHandler || new (".CONST_GLOBAL.".get('EventHandler'))();
 						for (i = 0; i < props['e'].length; i++) {
-							eventType = {{".AUTOCRR_EVENTTYPES."}}[props['e'][i]] || eventType;
+							eventType = ".CONST_EVENTTYPES."[props['e'][i]] || eventType;
 							callback = props['e'][i + 1];
 							isOnce = props['e'][i + 2] === true;
 							if (isString(eventType) && isFunction(callback)) {					
@@ -128,10 +128,10 @@
 				'args' => array('props'),
 				'body' => "
 					if (isFunction(props['i'])) {
-						var condition = new ({{".AUTOCRR_GLOBAL."}}.get('Condition'))(props);
+						var condition = new (".CONST_GLOBAL.".get('Condition'))(props);
 						condition.render(this.parentElement, this);
 						registerChild.call(this, condition);
-						createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater'), condition, props);
+						createUpdater.call(this, ".CONST_GLOBAL.".get('OperatorUpdater'), condition, props);
 					} else if (!!props['i']) {
 						renderItems.call(this, props['c']);
 					} else if (!isUndefined(props['e'])) {
@@ -142,22 +142,22 @@
 			'createForeach' => array(
 				'args' => array('props'),
 				'body' => "
-					var foreach = new ({{".AUTOCRR_GLOBAL."}}.get('Foreach'))(props);
+					var foreach = new (".CONST_GLOBAL.".get('Foreach'))(props);
 					foreach.render(this.parentElement, this);
 					if (props['n'] || props['g']) {
 						registerChild.call(this, foreach);
-						createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater'), foreach, props);
+						createUpdater.call(this, ".CONST_GLOBAL.".get('OperatorUpdater'), foreach, props);
 					}
 				"
 			),
 			'createFrom' => array(
 				'args' => array('props'),
 				'body' => "
-					var fr = new ({{".AUTOCRR_GLOBAL."}}.get('From'))(props);
+					var fr = new (".CONST_GLOBAL.".get('From'))(props);
 					fr.render(this.parentElement, this);
 					if (props['n'] || props['g']) {
 						registerChild.call(this, fr);
-						createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater'), fr, props);
+						createUpdater.call(this, ".CONST_GLOBAL.".get('OperatorUpdater'), fr, props);
 					}
 				"
 			),
@@ -165,10 +165,10 @@
 				'args' => array('props'),
 				'body' => "
 					if (props['n'] || props['g']) {
-						var swtch = new ({{".AUTOCRR_GLOBAL."}}.get('IfSwitch'))(props);
+						var swtch = new (".CONST_GLOBAL.".get('IfSwitch'))(props);
 						swtch.render(this.parentElement, this);
 						registerChild.call(this, swtch);
-						createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater'), swtch, props);
+						createUpdater.call(this, ".CONST_GLOBAL.".get('OperatorUpdater'), swtch, props);
 					} else {
 						for (var i = 0; i < props['is'].length; i++) {
 							if (!!props['is'][i]) {
@@ -184,10 +184,10 @@
 				'args' => array('props'),
 				'body' => "
 					if (props['n'] || props['g']) {
-						var swtch = new ({{".AUTOCRR_GLOBAL."}}.get('Switch'))(props);
+						var swtch = new (".CONST_GLOBAL.".get('Switch'))(props);
 						swtch.render(this.parentElement, this);
 						registerChild.call(this, swtch);
-						createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater'), swtch, props);
+						createUpdater.call(this, ".CONST_GLOBAL.".get('OperatorUpdater'), swtch, props);
 					} else {
 						if (!isArray(props['cs'])) props['cs'] = [props['cs']];
 						if (!isArray(props['c'])) props['c'] = [props['c']];
@@ -205,10 +205,10 @@
 				'args' => array('props'),
 				'body' => "
 					if (props['n'] || props['g']) {
-						var l = new ({{".AUTOCRR_GLOBAL."}}.get('Let'))(props);
+						var l = new (".CONST_GLOBAL.".get('Let'))(props);
 						l.render(this.parentElement, this);
 						registerChild.call(this, l);
-						createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater'), l, props);
+						createUpdater.call(this, ".CONST_GLOBAL.".get('OperatorUpdater'), l, props);
 					}
 				"
 			),
@@ -225,14 +225,14 @@
 				'args' => array('child', 'isComponent'),
 				'body' => "
 					var isNodeChild = isNode(child);
-					if (this.prevChild) {{".AUTOCRR_CORE."}}.setNextSiblingChild.call(this.prevChild, child);
+					if (this.prevChild) ".CONST_CORE.".setNextSiblingChild.call(this.prevChild, child);
 					this.prevChild = isNodeChild ? null : child;
 					if (!this.firstChild) this.firstChild = child;
 					if (isNodeChild) {
 						if (!this.firstNodeChild) this.firstNodeChild = child;
 						this.lastNodeChild = child;
 					} else this.children.push(child);
-					if (isComponent) {{".AUTOCRR_CORE."}}.registerChildComponent.call(this.cmp, child);
+					if (isComponent) ".CONST_CORE.".registerChildComponent.call(this.cmp, child);
 				"
 			),
 			'includeTemplate' => array(
@@ -249,8 +249,8 @@
 						props = props || {};
 						props['children'] = item['c'];
 					}
-					if (isNumber(item['tmp'])) item['tmp'] = {{".AUTOCRR_GLOBAL."}}.get('i_' + item['tmp']);
-					else if (isString(item['tmp'])) item['tmp'] = {{".AUTOCRR_CORE."}}.getTemplateById.call(this.cmp, item['tmp']);
+					if (isNumber(item['tmp'])) item['tmp'] = ".CONST_GLOBAL.".get('i_' + item['tmp']);
+					else if (isString(item['tmp'])) item['tmp'] = ".CONST_CORE.".getTemplateById.call(this.cmp, item['tmp']);
 					if (isFunction(item['tmp'])) {		
 						var items = item['tmp'].call(this.cmp, props, this.cmp);
 						renderItems.call(this, items);
@@ -261,7 +261,7 @@
 				'args' => array('item', 'pe'),
 				'body' => "
 					pe = pe || this.parentElement;
-					item['cmp'] = {{".AUTOCRR_GLOBAL."}}.get(item['cmp']);
+					item['cmp'] = ".CONST_GLOBAL.".get(item['cmp']);
 					if (isFunction(item['cmp'])) {
 						var cmp = new item['cmp']();
 						var ir = isFunction(item['p']);
@@ -270,8 +270,8 @@
 						if (isObject(p)) {
 							if (p['p'] || p['ap']) props = initComponentProps.call(this, p['p'], p['ap']);
 							if (isString(p['i'])) {
-								{{".AUTOCRR_CORE."}}.setId.call(cmp, p['i']);
-								var waiting = {{".AUTOCRR_CORE."}}.getWaitingChild.call(this.cmp, p['i']);
+								".CONST_CORE.".setId.call(cmp, p['i']);
+								var waiting = ".CONST_CORE.".getWaitingChild.call(this.cmp, p['i']);
 								if (isArray(waiting)) {
 									for (i = 0; i < waiting.length; i++) {
 										waiting[i][0].set(waiting[i][1], cmp);
@@ -279,26 +279,26 @@
 								}
 							}				
 						}
-						if (ir) createUpdater.call(this, {{".AUTOCRR_GLOBAL."}}.get('ComponentUpdater'), cmp, item);
+						if (ir) createUpdater.call(this, ".CONST_GLOBAL.".get('ComponentUpdater'), cmp, item);
 						if (isArray(item['w'])) {
 							for (i = 0; i < item['w'].length; i += 2) {
-								{{".AUTOCRR_CORE."}}.provideWithComponent.call(this.cmp, item['w'][i], item['w'][i + 1], cmp);
+								".CONST_CORE.".provideWithComponent.call(this.cmp, item['w'][i], item['w'][i + 1], cmp);
 							}
 						}
 						if (item['c']) {
 							props = props || {};
 							props['children'] = item['c'];
 						}
-						{{".AUTOCRR_CORE."}}.initiate.call(cmp, props);
+						".CONST_CORE.".initiate.call(cmp, props);
 						cmp.render(pe);
 						registerChild.call(this, cmp, true);
 						if (isArray(item['e'])) {
 							for (i = 0; i < item['e'].length; i++) {
-								{{".AUTOCRR_CORE."}}.subscribe.call(cmp, item['e'][i], item['e'][i + 1], this.cmp);
+								".CONST_CORE.".subscribe.call(cmp, item['e'][i], item['e'][i + 1], this.cmp);
 								i++;	
 							}
 						}
-						if (item['nm']) {{".AUTOCRR_CORE."}}.registerControl.call(this.cmp, cmp, item['nm']);
+						if (item['nm']) ".CONST_CORE.".registerControl.call(this.cmp, cmp, item['nm']);
 					} else if (item && isObject(item)) {
 						if (!item.isRendered()) item.render(pe);
 						registerChild.call(this, item, true);
@@ -362,10 +362,10 @@
 				'body' => "
 					if (isNode(this.firstChild)) return this.firstChild;
 					var firstLevel = this.children[0];
-					if (firstLevel instanceof {{".AUTOCRR_GLOBAL."}}.get('Level')) {
-						return {{".AUTOCRR_CORE."}}.getParentElement.call(firstLevel);
+					if (firstLevel instanceof ".CONST_GLOBAL.".get('Level')) {
+						return ".CONST_CORE.".getParentElement.call(firstLevel);
 					} else if (firstLevel) {
-						return {{".AUTOCRR_CORE."}}.getFirstNodeChild.call(firstLevel);
+						return ".CONST_CORE.".getFirstNodeChild.call(firstLevel);
 					}
 					return null;
 				"
@@ -387,7 +387,7 @@
 						this.parentElement = p || document.createElement('div'); 
 						for (var i = 0; i < elements.length; i++) this.parentElement.appendChild(elements[i]);
 					} else {
-						this.nextSiblingChild = {{".AUTOCRR_CORE."}}.getNextSiblingChild.call(this.parentLevel);
+						this.nextSiblingChild = ".CONST_CORE.".getNextSiblingChild.call(this.parentLevel);
 						this.parentElement = this.realParentElement;
 						this.realParentElement = null;
 						for (var i = 0; i < elements.length; i++) appendChild.call(this, elements[i]);
@@ -404,14 +404,14 @@
 				'body' => "
 					if (this.updaters) {
 						for (var i = 0; i < this.updaters.length; i++) {
-							{{".AUTOCRR_CORE."}}.disposeUpdater.call(this.cmp, this.updaters[i], this.updaters[i + 1]);
+							".CONST_CORE.".disposeUpdater.call(this.cmp, this.updaters[i], this.updaters[i + 1]);
 							this.updaters[i + 1] = null;
 							i++;
 						}
 					}
 					for (var i = 0; i < this.children.length; i++) {
 						if (isComponentLike(this.children[i])) {
-							{{".AUTOCRR_CORE."}}.unregisterChildComponent.call(this.cmp, this.children[i]);
+							".CONST_CORE.".unregisterChildComponent.call(this.cmp, this.children[i]);
 						}
 						this.children[i].dispose();
 						this.children[i] = null;

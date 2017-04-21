@@ -11,7 +11,7 @@
 			'createLevels' => array(
 				'args' => array('isUpdating'),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.createLevel.call(this, this.params['l'](), isUpdating);
+					".CONST_CORE.".createLevel.call(this, this.params['l'](), isUpdating);
 				"
 			)
 		),
@@ -19,20 +19,20 @@
 			'render' => array(
 				'args' => array('pe', 'pl'),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.initOperator.call(this, pe, pl);
+					".CONST_CORE.".initOperator.call(this, pe, pl);
 					createLevels.call(this, false);
 				"
 			),
 			'update' => array(
 				'args' => array(''),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeLevels.call(this);
+					".CONST_CORE.".disposeLevels.call(this);
 					createLevels.call(this, true);
 				"
 			),
 			'dispose' => array(
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeOperator.call(this);
+					".CONST_CORE.".disposeOperator.call(this);
 				"
 			)
 		)

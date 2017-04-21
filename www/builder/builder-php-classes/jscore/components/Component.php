@@ -52,13 +52,13 @@
 							this.parentElement.removeChild(this.tempPlaceholder);
 							this.tempPlaceholder = null;
 						}
-						{{".AUTOCRR_CORE."}}.processPostRenderInitials.call(this);
+						".CONST_CORE.".processPostRenderInitials.call(this);
 					}
 				"
 			),
 			'render' => array(
 				'body' => "
-					var lvl = {{".AUTOCRR_GLOBAL."}}.get('Level');
+					var lvl = ".CONST_GLOBAL.".get('Level');
 					this.level = new lvl(this);
 					var content = this.getTemplateMain(this.props, this);
 					if (content) this.level.render(content, this.parentElement, this, this.tempPlaceholder);
@@ -113,9 +113,9 @@
 					var updaters = this.updaters[propName], o;
 					if (isArray(updaters)) {
 						for (var i = 0; i < updaters.length; i++) {
-							if (updaters[i] instanceof {{".AUTOCRR_GLOBAL."}}.get('OperatorUpdater')) {
+							if (updaters[i] instanceof ".CONST_GLOBAL.".get('OperatorUpdater')) {
 								o = updaters[i].getOperator();
-								if (o instanceof {{".AUTOCRR_GLOBAL."}}.get('Foreach')) {
+								if (o instanceof ".CONST_GLOBAL.".get('Foreach')) {
 									if (!isUndefined(item)) o.add(item, index);
 									else o.remove(index);
 								}
@@ -151,7 +151,7 @@
 			'instanceOf' => array(
 				'args' => array('classFunc'),
 				'body' => "
-					if (isString(classFunc)) classFunc = {{".AUTOCRR_GLOBAL."}}.get(classFunc);
+					if (isString(classFunc)) classFunc = ".CONST_GLOBAL.".get(classFunc);
 					return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 				"
 			),
@@ -170,7 +170,7 @@
 					if (isArray(this.listeners)) {
 						for (var i = 0; i < this.listeners.length; i++) {
 							l = this.listeners[i];
-							if (isNumber(l['type'])) l['type'] = {{".AUTOCRR_EVENTTYPES."}}[l['type']];
+							if (isNumber(l['type'])) l['type'] = ".CONST_EVENTTYPES."[l['type']];
 							if (l['type'] == eventType) {
 								l['handler'].apply(l['subscriber'], args);
 							}
@@ -182,7 +182,7 @@
 				'args' => array('target', 'eventType', 'handler'),
 				'body' => "
 					if (isElement(target)) {
-			 			var eh = {{".AUTOCRR_GLOBAL."}}.get('EventHandler');
+			 			var eh = ".CONST_GLOBAL.".get('EventHandler');
 			 			this.eventHandler = this.eventHandler || new eh();
 			 			this.eventHandler.listen(target, eventType, handler.bind(this));
 			 		} else target.subscribe(eventType, handler, this);
@@ -548,8 +548,8 @@
 			'dispose' => array(
 				'args' => array(''),
 				'body' => "
-					{{".AUTOCRR_GLOBAL."}}.get('State').dispose(this);					
-					var core = {{".AUTOCRR_CORE."}};
+					".CONST_GLOBAL.".get('State').dispose(this);					
+					var core = ".CONST_CORE.";
 					core.disposeLinks.call(this);
 					core.disposeInternal.call(this);					
 					if (this.mouseHandler) {
@@ -574,7 +574,7 @@
 			'a' => array(
 				'args' => array('n'),
 				'body' => "
-					return {{".AUTOCRR_GLOBAL."}}.get('State').get(n);
+					return ".CONST_GLOBAL.".get('State').get(n);
 				",
 				'after' => 'var f=function(){return};'
 			),
@@ -597,10 +597,10 @@
 				'value' => 'f'
 			),
 			'g' => array(
-				'value' => "{{".AUTOCRR_PROTO."}}.get"
+				'value' => CONST_PROTO.".get"
 			),
 			'd' => array(
-				'value' => "{{".AUTOCRR_PROTO."}}.dispatchEvent"
+				'value' => CONST_PROTO.".dispatchEvent"
 			)
 		),
 		'overridableMethods' => array(),

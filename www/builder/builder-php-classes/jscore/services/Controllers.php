@@ -2,21 +2,21 @@
 
 	$data = array(
 		'mode' => 2,
-		'var' => AUTOCRR_CONTROLLER,
+		'var' => CONST_CONTROLLER,
 		'define' => true,
 		'name' => 'Controllers',
 		'thisMethods' => array(
 			'get' => array(
 				'args' => array('id'),
 				'body' => "
-					if (isString({{".AUTOCRR_CONTROLLERS."}}[id])) {
-						{{".AUTOCRR_CONTROLLERS."}}[id] = {{GLOBAL}}.get({{".AUTOCRR_CONTROLLERS."}}[id]);
+					if (isString(".CONST_CONTROLLERS."[id])) {
+						".CONST_CONTROLLERS."[id] = ".CONST_GLOBAL.".get(".CONST_CONTROLLERS."[id]);
 					}
-					if (isFunction({{".AUTOCRR_CONTROLLERS."}}[id])) {
-						{{".AUTOCRR_CONTROLLERS."}}[id] = new {{".AUTOCRR_CONTROLLERS."}}[id]();
-						{{".AUTOCRR_CORE."}}.initiate.call({{".AUTOCRR_CONTROLLERS."}}[id]);
+					if (isFunction(".CONST_CONTROLLERS."[id])) {
+						".CONST_CONTROLLERS."[id] = new ".CONST_CONTROLLERS."[id]();
+						".CONST_CORE.".initiate.call(".CONST_CONTROLLERS."[id]);
 					}
-					return {{".AUTOCRR_CONTROLLERS."}}[id];
+					return ".CONST_CONTROLLERS."[id];
 				"
 			),
 			'load' => array(

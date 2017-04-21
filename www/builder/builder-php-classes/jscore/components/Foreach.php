@@ -18,7 +18,7 @@
 			'createIfEmptyLevel' => array(
 				'body' => "
 					if (!isUndefined(this.params['ie'])) {
-						{{".AUTOCRR_CORE."}}.createLevel.call(this, this.params['ie']);
+						".CONST_CORE.".createLevel.call(this, this.params['ie']);
 					}
 				"
 			),
@@ -40,8 +40,8 @@
 								for (var i = 0; i < keys.length; i++) {
 									if (limit && i + 1 > limit) break;
 									r = p['h'](items[keys[i]], keys[i]);
-									if (r == '{{".AUTOCRR_BREAK."}}') break;
-									{{".AUTOCRR_CORE."}}.createLevel.call(this, r, isUpdating);
+									if (r == '".CONST_BREAK."') break;
+									".CONST_CORE.".createLevel.call(this, r, isUpdating);
 								}
 								return;
 							}
@@ -55,8 +55,8 @@
 										if (limit && i + 1 > limit) break;
 										if (isNumber(to) && i > to) break;
 										r = p['h'](items[i], i);
-										if (r == '{{".AUTOCRR_BREAK."}}') break;
-										{{".AUTOCRR_CORE."}}.createLevel.call(this, r, isUpdating);
+										if (r == '".CONST_BREAK."') break;
+										".CONST_CORE.".createLevel.call(this, r, isUpdating);
 									}
 								} else {
 									var j = 0;
@@ -66,8 +66,8 @@
 										if (limit && j > limit) break;
 										if (isNumber(to) && i < to) break;
 										r = p['h'](items[i], i);
-										if (r == '{{".AUTOCRR_BREAK."}}') break;
-										{{".AUTOCRR_CORE."}}.createLevel.call(this, r, isUpdating);
+										if (r == '".CONST_BREAK."') break;
+										".CONST_CORE.".createLevel.call(this, r, isUpdating);
 									}
 								}
 								return;
@@ -80,8 +80,8 @@
 										i++;
 										if (limit && i > limit) break;
 										r = p['h'](items[k], k);
-										if (r == '{{".AUTOCRR_BREAK."}}') break;
-										{{".AUTOCRR_CORE."}}.createLevel.call(this, r, isUpdating);
+										if (r == '".CONST_BREAK."') break;
+										".CONST_CORE.".createLevel.call(this, r, isUpdating);
 									}
 								} else {
 									var keys = Objects.getKeys(items);
@@ -89,8 +89,8 @@
 									for (var i = 0; i < keys.length; i++) {
 										if (limit && i + 1 > limit) break;
 										r = p['h'](items[keys[i]], keys[i]);
-										if (r == '{{".AUTOCRR_BREAK."}}') break;
-										{{".AUTOCRR_CORE."}}.createLevel.call(this, r, isUpdating);
+										if (r == '".CONST_BREAK."') break;
+										".CONST_CORE.".createLevel.call(this, r, isUpdating);
 									}
 								}
 								return;
@@ -105,14 +105,14 @@
 			'render' => array(
 				'args' => array('pe', 'pl'),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.initOperator.call(this, pe, pl);					
+					".CONST_CORE.".initOperator.call(this, pe, pl);					
 					createLevels.call(this, false);
 				"
 			),
 			'update' => array(
 				'args' => array(''),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeLevels.call(this);
+					".CONST_CORE.".disposeLevels.call(this);
 					createLevels.call(this, true);
 				"
 			),
@@ -120,7 +120,7 @@
 				'args' => array('item', 'index'),
 				'body' => "
 					var r = this.params['h'](item, ~~index);
-					if (r != '{{".AUTOCRR_BREAK."}}') {{".AUTOCRR_CORE."}}.createLevel.call(this, r, false, index);	
+					if (r != '".CONST_BREAK."') ".CONST_CORE.".createLevel.call(this, r, false, index);	
 				"
 			),
 			'remove' => array(
@@ -134,7 +134,7 @@
 			),
 			'dispose' => array(
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeOperator.call(this);
+					".CONST_CORE.".disposeOperator.call(this);
 				"
 			)
 		)

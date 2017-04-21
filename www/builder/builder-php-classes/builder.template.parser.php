@@ -18,9 +18,7 @@ class TemplateParser
 	
 	private static $class, $className, $tmpids, $propsShortcuts,
 				   $eventTypesShortcuts, $obfuscate, $tagShortcuts,
-				   $templateName, $globalNames,
-				   $parsedItem, $globalVarNames, $initials,
-				   $componentsOpen = 0;
+				   $templateName, $parsedItem, $initials, $componentsOpen = 0;
 
 	private static $errors = array(
 		'noMainTemplate' => 'Шаблон <b>main</b> класса {??} не найден среди прочих',
@@ -76,10 +74,8 @@ class TemplateParser
 		self::$eventTypesShortcuts = Events::getList();
 		self::$tagShortcuts = Tags::getList();
 		self::$obfuscate = $params['obfuscateCss'];
-		self::$globalNames = JSGlobals::getUsedNames();
-		self::$globalVarNames = JSGlobals::getVarNames();
-		$varNames = array_values(self::$globalVarNames);
-		TemplateCodeParser::setGlobalNames(self::$globalNames, $varNames, $params['utilsFuncs'], $params['userUtilsFuncs']);
+		$varNames = JSGlobals::getAllReservedVarNames();
+		TemplateCodeParser::setGlobalNames($varNames, $params['utilsFuncs'], $params['userUtilsFuncs']);
 	}
 
 	public static function getTextNodes() {
@@ -723,9 +719,8 @@ class TemplateParser
 					$after = ')()';
 				}
 			} elseif ($mode == 'while') {
-				$globals = JSGlobals::getVarNames();
 				$innerBefore = 'if('.$data['while'].'){';
-				$innerAfter = "}else{return'".$globals['break']."'}";
+				$innerAfter = "}else{return'".CONST_BREAK."'}";
 			}
 		}
 		$children = '<nq>'.$before.'function('.$args.'){'.$innerBefore.'return'.$space.$c.$innerAfter.'}'.$after.'<nq>';
@@ -1352,7 +1347,11 @@ class TemplateParser
 				$callback .= '.b($)';
 			}
 		}
-		$child['e'][] = '<nq>'.(!$isSpecial ? '$.'.$callback : self::$globalVarNames[$callback]).'<nq>';
+		$specials = array(
+			'prevent' => CONST_PREVENT,
+			'stop' => CONST_STOP
+		);
+		$child['e'][] = '<nq>'.(!$isSpecial ? '$.'.$callback : $specials[$callback]).'<nq>';
 		if ($once) {
 			$child['e'][] = true;
 		}
@@ -1395,12 +1394,11 @@ class TemplateParser
 	}
 
 	private static function hasComponentMethod($method, $class) {
-		$globals = JSGlobals::getVarNames();
 		if (is_array($class['functionList']) && in_array($method, $class['functionList'])) return true;
 		$parents = $class['extends'];
 		if (is_array($parents)) {
 			foreach ($parents as $parent) {
-				if (is_array(self::$sources[$parent]) && preg_match('/\b'.$globals['proto'].'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
+				if (is_array(self::$sources[$parent]) && preg_match('/\b'.CONST_PROTO.'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', self::$sources[$parent]['content'])) {
 					return true;
 				}
 				if (self::hasComponentMethod($method, self::$classes[$parent])) {
@@ -1609,7 +1607,7 @@ class TemplateParser
 
 	private static function getTextNode($text) {
 		if (strlen($text) > 5) {
-			$text = '<nq>'.self::$globalNames['TEXTS'].'['.self::addTextNode($text).']<nq>';
+			$text = '<nq>'.CONST_TEXTS.'['.self::addTextNode($text).']<nq>';
 		}
 		return $text;
 	}

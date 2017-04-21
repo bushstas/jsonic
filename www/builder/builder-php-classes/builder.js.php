@@ -296,7 +296,6 @@ class JSCompiler
 		if (!is_array($coreFiles) || empty($coreFiles)) {
 			new Error($this->errors['coreFilesNotFound']);
 		}
-		$usedGlobalNames = JSGlobals::getUsedNames();
 		foreach ($coreFiles as $coreFile) {
 			if (preg_match('/\bhelpers\//', $coreFile['path'])) {
 				$this->helpers[] = $coreFile['name'];
@@ -304,9 +303,6 @@ class JSCompiler
 			}
 			if (preg_match('/[A-Z]\w*/', $coreFile['name'])) {
 				$this->reservedNames[] = $coreFile['name'];
-			}
-			foreach ($usedGlobalNames as $key => $value) {
-				$coreFile['content'] = str_replace('{{'.$key.'}}', $value, $coreFile['content']);
 			}
 			$this->sources[$coreFile['name']] = $coreFile;
 		}
@@ -362,7 +358,7 @@ class JSCompiler
 		foreach ($missingUtils as $utilsClass) {
 			if (isset($this->sources[$utilsClass])) {
 				if ($utilsClass == 'Decliner') {
-					JSGlobals::exclude('decls');
+					JSGlobals::exclude(CONST_WORDS);
 				}
 				unset($this->sources[$utilsClass]);
 			}
@@ -562,12 +558,12 @@ class JSCompiler
 		if (!empty($tooltipClass) && !isset($this->classes[$tooltipClass])) {
 			new Error($this->errors['noTooltipClass'], $tooltipClass);
 		}
-		$globals = array_values(JSGlobals::getVarNames());
+		$ñonstants = JSGlobals::getAllReservedVarNames();
 		foreach ($this->classes as $className => &$class) {
 			if (in_array($className, $this->reservedNames)) {
 				new Error($this->errors['nameReserved'], $className);
 			}
-			if (in_array($className, $globals)) {
+			if (in_array($className, $ñonstants)) {
 				new Error($this->errors['varNameReserved'], $className);
 			}
 			if (is_array($class['controllers'])) {
@@ -670,7 +666,7 @@ class JSCompiler
 	private function finish($route = null) {
 		$this->configProvider->createAppLoader();
 		$isSplitted = $this->configProvider->isSplitMode();
-		$globals = JSGlobals::getVarNames();
+
 		if ($route === null) {
 			$bottomOutput = $this->bottomOutput['_'];
 			$jsOutput = $this->jsOutput;
@@ -684,15 +680,15 @@ class JSCompiler
 			$this->decodeTexts($jsOutput, $route);
 		}		
 		if ($route === null) {
-			$jsOutput = "'use strict';\nvar ".$globals['global'].($isSplitted ? ",".$globals['funcs']."={}" : '').";\nnew (function() {\n(function(){\nvar cs={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return cs[k]}\nthis.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}\n}).call(".$globals['global']."=this);\n;(function(){var ".$globals['core'].",".$globals['component'].",".$globals['proto'].";\n".$jsOutput;
+			$jsOutput = "'use strict';\nvar ".CONST_GLOBAL.($isSplitted ? ",".CONST_FUNCS."={}" : '').";\nnew (function() {\n(function(){\nvar cs={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return cs[k]}\nthis.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}\n}).call(".CONST_GLOBAL."=this);\n;(function(){var ".CONST_CORE.",".CONST_COMPONENT.",".CONST_PROTO.";\n".$jsOutput;
 		} else {
 			$varname = 'g';
-			$top = "'use strict';\n(function(){\nvar ".$varname.'='.$globals['global'].'.get,';
-			$keys = JSGlobals::getVarKeys();
-			foreach ($keys as $k => $v) {
-				$top .= $globals[$k].'='.$varname."('".$v."'),";
+			$top = "'use strict';\n(function(){\nvar ".$varname.'='.CONST_GLOBAL.'.get,';
+			$list = JSGlobals::getConstantsListToDefineInChunks();
+			foreach ($list as $name) {
+				$top .= $name.'='.$varname."('".$name."'),";
 			}
-			$jsOutput = $top.$globals['component'].",".$globals['proto'].";\n".$jsOutput;
+			$jsOutput = $top.CONST_COMPONENT.",".CONST_PROTO.";\n".$jsOutput;
 		}
 		$jsOutput = preg_replace("/, *\)/", ')', $jsOutput);
 		$jsOutput = preg_replace("/'<nq>/", '', $jsOutput);
@@ -701,9 +697,9 @@ class JSCompiler
 		$jsOutput = preg_replace("/;{2,}/", ';', $jsOutput);
 		$jsOutput = preg_replace("/ {2,}/", ' ', $jsOutput);
 		$jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $jsOutput);
-		$jsOutput = preg_replace("/".$globals['component']."\s*=\s*function/", $globals['component'].'=fnc_', $jsOutput);
-		$jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", JSGlobals::getVarName('nullFunction'), $jsOutput);
-		$jsOutput = str_replace($globals['component']."=fnc_", $globals['component'].'=function', $jsOutput);
+		$jsOutput = preg_replace("/".CONST_COMPONENT."\s*=\s*function/", CONST_COMPONENT.'=fnc_', $jsOutput);
+		$jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", CONST_FUNCTION, $jsOutput);
+		$jsOutput = str_replace(CONST_COMPONENT."=fnc_", CONST_COMPONENT.'=function', $jsOutput);
 
 		if ($this->configProvider->needCssObfuscation()) {
 			$this->cssCompiler->obfuscateJs($jsOutput);
@@ -749,33 +745,30 @@ class JSCompiler
 		$customFuncs = $this->utilsCompiler->getFunctionsList();
 		$utilsFuncs = array_merge($utilsFuncs, $customFuncs);
 		if ($isBase) {
-			$globals = JSGlobals::getVarNames();
 			$jsOutput .= "\n";
 			$jsOutput .= 'var a=['.implode(',', $utilsFuncs)."];\n";
-			$jsOutput .= "for(var i=0;i<a.length;i++){".$globals['funcs']."[i]=a[i]}";
+			$jsOutput .= "for(var i=0;i<a.length;i++){".CONST_FUNCS."[i]=a[i]}";
 		} else {
-			$globals = JSGlobals::getVarNames();
 			$regexp = implode('|', $utilsFuncs);
 			preg_match_all('/[^\w\.]('.$regexp.')(?=[\s;,\(])/', $jsOutput, $matches);
 			$matches = array_unique($matches[1]);
 			foreach ($matches as $match) {
 				$index = array_search($match, $utilsFuncs);
-				$jsOutput = preg_replace('/([^\w\.])'.$match.'(?=[\s;,\(])/', "$1".$globals['funcs'].'['.$index.']', $jsOutput);
+				$jsOutput = preg_replace('/([^\w\.])'.$match.'(?=[\s;,\(])/', "$1".CONST_FUNCS.'['.$index.']', $jsOutput);
 			}
 		}
 	}
 
 	private function parseObjectsCallngs(&$jsOutput) {
-		$globals = JSGlobals::getVarNames();
-		$list = array(
-			'objects' => 'Objects',
-			'popuper' => 'Popuper',
-			'state' => 'State',
-			'dictionary' => 'Dictionary'
+		$list = array(			
+			CONST_OBJECTS => 'Objects',
+			CONST_POPUPER => 'Popuper',
+			CONST_STATE => 'State',
+			CONST_DICTIONARY => 'Dictionary'
 		);
 		foreach ($list as $k => $v) {
 			if (preg_match('/[^\w\.]'.$v.'\b/', $jsOutput)) {
-				$jsOutput = preg_replace('/([^\w\.])'.$v.'(?=[\s;,\.\[])/', "$1".$globals[$k], $jsOutput);
+				$jsOutput = preg_replace('/([^\w\.])'.$v.'(?=[\s;,\.\[])/', "$1".$k, $jsOutput);
 			}
 		}
 	}
@@ -809,7 +802,6 @@ class JSCompiler
 
 	private function addClasses($route = null) {
 		$isSplitted = $this->configProvider->isSplitMode();
-		$globals = JSGlobals::getVarNames();
 		if (is_array($route)) {
 			if (!$isFirstTime) {
 				$isFirstTime = true;
@@ -820,11 +812,10 @@ class JSCompiler
 		} else {
 			$output = &$this->jsOutput;
 			if ($this->configProvider->isUsingDataLoader()) {
-				$output[] = "var ".$globals['callback']." = function(".$globals['data'].") {\n__T = ".$globals['data']."['texts'];\n__ = ".$globals['data']."['textsConstants'];\n__V = __V();";
-				$keys = JSGlobals::getVarKeys();
-				$ks = array('textConstants' => $keys['textConstants'], 'textNodes' => $keys['textNodes'], 'dataConstants' => $keys['dataConstants']);
-				foreach ($ks as $k => $v) {
-					$output[] = $globals['global'].".set(".$globals[$k].",'".$v."');";
+				$output[] = "var ".CONST_CALLBACK." = function(".CONST_LOADEDDATA.") {\n__T = ".CONST_LOADEDDATA."['texts'];\n__ = ".CONST_LOADEDDATA."['textsConstants'];\n__V = __V();";
+				$list = array(CONST_TEXTS, CONST_CONSTANTS, CONST_DATA);
+				foreach ($list as $name) {
+					$output[] = CONST_GLOBAL.".set(".$name.",'".$name."');";
 				}
 			}
 			$usedClasses = ClassAnalyzer::getUsedClasses($isSplitted ? true : null);
@@ -857,7 +848,7 @@ class JSCompiler
 						$this->addPrototypeFunction($className, $func['name'], $args, $func['code']);
 					} else {
 						$this->addConstructorFunction($className, in_array($type, $this->componentLikeClassTypes), $type);
-						$output[] = "\n".$globals['proto']."=".$globals['component'].".prototype;";
+						$output[] = "\n".CONST_PROTO."=".CONST_COMPONENT.".prototype;";
 					}						
 				}
 			}
@@ -952,7 +943,6 @@ class JSCompiler
 	}
 
 	private function addInheritance($route = null) {
-		$globals = JSGlobals::getVarNames();
 		$isSplitted = $this->configProvider->isSplitMode();
 		if ($route === null) {
 			$this->bottomOutput['_'] = array();
@@ -1032,19 +1022,18 @@ class JSCompiler
 				$inheritance[] = "['".implode("','", $childClasses)."']";
 			}
 		}	
-		$core = $globals['global'];
 		if (empty($route)) {
-			$bottomOutput[] = $core.".get('Core').inherits([".implode(",", $inheritance)."]);";
+			$bottomOutput[] = CONST_CORE.".inherits([".implode(",", $inheritance)."]);";
 		} else {
-			$bottomOutput[] = $core.".get('Core').inherits([".implode(",", $inheritance)."]);";
+			$bottomOutput[] = CONST_CORE.".inherits([".implode(",", $inheritance)."]);";
 		}
 		if (empty($route)) {
 			$entry = $this->config['entry'];
 			if ($this->configProvider->isUsingDataLoader()) {
-				$bottomOutput[] = "if (isObject(".$globals['data']."['user'])) User.setData(".$globals['data']."['user']);";
-				$bottomOutput[] = "if (isObject(".$globals['data']."['dictionary'])) Dictionary.setData(Router.getCurrentRoute()['name'], ".$globals['data']."['dictionary']);";
-				$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
-				$bottomOutput[] = $core.".get('Core').initiate.call(".$entry.");";
+				$bottomOutput[] = "if (isObject(".CONST_LOADEDDATA."['user'])) User.setData(".CONST_LOADEDDATA."['user']);";
+				$bottomOutput[] = "if (isObject(".CONST_LOADEDDATA."['dictionary'])) Dictionary.setData(Router.getCurrentRoute()['name'], ".CONST_LOADEDDATA."['dictionary']);";
+				$bottomOutput[] = "var ".$entry."=".CONST_GLOBAL.".get('".$entry."',1);";
+				$bottomOutput[] = CONST_CORE.".initiate.call(".$entry.");";
 				$bottomOutput[] = $entry.".run();";
 				$bottomOutput[] = "};";
 			}
@@ -1054,20 +1043,20 @@ class JSCompiler
 					if ($controller == 'User' && !$this->config['hasUser']) {
 						continue;
 					}
-					$bottomOutput[] = "var ".$controller."=".$core.".get('".$controller."',1);";
+					$bottomOutput[] = "var ".$controller."=".CONST_GLOBAL.".get('".$controller."',1);";
 				}
 				
 			}
 			if (!$this->configProvider->isUsingDataLoader()) {
-				$bottomOutput[] = "var ".$entry."=".$core.".get('".$entry."',1);";
-				$bottomOutput[] = $core.".get('Core').initiate.call(".$entry.");";
+				$bottomOutput[] = "var ".$entry."=".CONST_GLOBAL.".get('".$entry."',1);";
+				$bottomOutput[] = CONST_CORE.".initiate.call(".$entry.");";
 				if ($this->config['hasUser']) {
 					$bottomOutput[] = "User.load(".$entry.");";
 				} else {
 					$bottomOutput[] = $entry.".run();";
 				}
 			} else {
-				$bottomOutput[] = "Loader.get(__LU, {'route': Router.getCurrentRoute()['name']},".$globals['callback'].");";
+				$bottomOutput[] = "Loader.get(__LU, {'route': Router.getCurrentRoute()['name']},".CONST_CALLBACK.");";
 			}
 			$bottomOutput[] = "})();\n});";
 		} else {
@@ -1076,7 +1065,6 @@ class JSCompiler
 	}
 
 	private function hasComponentMethod($method, $class) {
-		$globals = JSGlobals::getVarNames();
 		if (is_array($class['functionList']) && in_array($method, $class['functionList'])) return true;
 		$parents = $class['extends'];
 		if (is_array($parents)) {
@@ -1084,10 +1072,10 @@ class JSCompiler
 				if (is_array($this->classes[$parent]) && $this->hasComponentMethod($method, $this->classes[$parent])) {
 					return true;
 				}
-				if (is_array($this->sources[$parent]) && preg_match('/\b'.$globals['proto'].'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
+				if (is_array($this->sources[$parent]) && preg_match('/\b'.CONST_PROTO.'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources[$parent]['content'])) {
 					return true;	
 				}
-				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\b'.$globals['proto'].'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
+				if (in_array($parent, self::$componentLikeClasses) && preg_match('/\b'.CONST_PROTO.'\.'.$method.'\s*=\s*function\s*\(([^\)]*)\)/', $this->sources['Component']['content'])) {
 					return true;
 				}
 			}
@@ -1105,8 +1093,6 @@ class JSCompiler
 	}
 
 	private function addConstructorFunction($className, $isComponent, $type) {
-		$globals = JSGlobals::getVarNames();
-		$g = $globals['global'];
 		if (empty($this->currentRoute)) {
 			$output = &$this->jsOutput;
 		} else {
@@ -1114,13 +1100,13 @@ class JSCompiler
 		}
 		$routerMenuClasses = $this->config['routerMenu'];
 		$isRouterMenu = $isComponent && is_array($routerMenuClasses) && in_array($className, $routerMenuClasses);
-		$fnc = $globals['getfunc'].'()';
+		$fnc = CONST_GETFUNC.'()';
 		$fnc2 = '';
 		if ($isRouterMenu) {
 			$fnc = 'function(){';
 			$fnc2 = "}\n";
 		}
-		$content = $g.".set(".$globals['component'].'='.$fnc;
+		$content = CONST_GLOBAL.".set(".CONST_COMPONENT.'='.$fnc;
 		if ($isRouterMenu) {
 			$content .= "\nRouter.addMenu(this);";
 			$content .= "\nthis.isRouteMenu=true;";
@@ -1134,19 +1120,17 @@ class JSCompiler
 	}
 
 	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
-		$globals = JSGlobals::getVarNames();
 		if (empty($this->currentRoute)) {
 			$output = &$this->jsOutput;
 		} else {
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
-		$output[] = $globals['proto'].'.'.$method.'=function('.$args.'){';
+		$output[] = CONST_PROTO.'.'.$method.'=function('.$args.'){';
 		$output[] = $code;
 		$output[] = '};';
 	}
 
 	private	function addTemplateFunction($className, $templateContent, &$class) {
-		$globals = JSGlobals::getVarNames();
 		if (empty($this->currentRoute)) {
 			$output = &$this->jsOutput;
 		} else {
@@ -1176,25 +1160,23 @@ class JSCompiler
 			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content);
 		}
 		if (!empty($tmpids)) {
-			foreach ($tmpids as $k => &$v) $v = '<nq>'.$globals['proto'].'.getTemplate'.ucfirst($v).'<nq>';
-			$output[] = $globals['proto'].'.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
+			foreach ($tmpids as $k => &$v) $v = '<nq>'.CONST_PROTO.'.getTemplate'.ucfirst($v).'<nq>';
+			$output[] = CONST_PROTO.'.templatesById='.str_replace('"', "'", preg_replace('/"<nq>|<nq>"/', '', json_encode($tmpids))).';';
 		}
 	}
 
 	private	function addIncludeFunction($templateContent, $file) {
 		$idx = &$this->includesTemplateIndexCount;
-		$globals = JSGlobals::getVarNames();
 		$templateFunctions = TemplateParser::parse($templateContent, $file);
 		foreach ($templateFunctions as $templateFunction) {
 			$this->includesTemplateIndex[$templateFunction['name']] = $idx;
-			$this->jsOutput[] = $globals['global'].'.set(function(_,$){';
+			$this->jsOutput[] = CONST_GLOBAL.'.set(function(_,$){';
 			$this->jsOutput[] = "\n\treturn ".$templateFunction['content']."\n},'i_".$idx."');";
 			$idx++;
 		}
 	}
 
 	private function addGetInitialsFunction($className, $initials) {
-		$globals = JSGlobals::getVarNames();
 		if (empty($this->currentRoute)) {
 			$output = &$this->jsOutput;
 		} else {
@@ -1217,7 +1199,7 @@ class JSCompiler
 		$objCode = implode(",\n", $objCode);
 		ControllersParser::parseInitialsCode($objCode);
 		if (!empty($objCode)) {
-			$output[] = $globals['proto'].".getInitials=function(){";
+			$output[] = CONST_PROTO.".getInitials=function(){";
 			$output[] = "\n\treturn {\n";
 			$output[] = $objCode;
 			$output[] = "\t};\n};";
@@ -1240,18 +1222,22 @@ class JSCompiler
 	private function parseClasses() {
 		ControllersParser::init($this->classes, $this->sources, $this->classesByTypes['controller'], $this->initialsParser);
 		DialogsParser::init($this->classes, $this->sources, $this->classesByTypes['dialog'], $this->initialsParser);
-		$globals = JSGlobals::getVarNames();
 		$classNames = array_keys($this->classes);
 		$coreClassNames = $this->reservedNames;
 		$classNames = array_merge($classNames, $coreClassNames);
 		$utilsFuncs = $this->validator->getUtilsFunctionNames();
-
 		$implodedClasses = implode('|', array_values($classNames));
-		$implodedGlobals = implode('|', array_values($globals));
-		$regexp1 = '/[^\w\$]('.$implodedGlobals.')\b/';
+
+		$privateConstants = JSGlobals::getReservedPrivateVarNames();
+		$implodedPrivateConstants = implode('|', $privateConstants);
+
+		$allConstants = JSGlobals::getReservedPublicVarNames();
+		$implodedConstants = implode('|', $allConstants);
+
+		$regexp1 = '/[^\w\$]('.$implodedPrivateConstants.')\b/';
 		$regexp2 = '/[^\w\$]new\s+('.$implodedClasses.')\b/';
 		$regexp3 = '/[^\w\$]('.$implodedClasses.')\s*=(?!=)/';
-		$regexp4 = '/[^\w\$]('.$implodedGlobals.')\s*=(?!=)/';
+		$regexp4 = '/[^\w\$]('.$implodedConstants.')\s*=(?!=)/';
 		$regexp5 = '/[^\w\$]('.implode('|', $utilsFuncs).')\s*=(?!=)/';
 		foreach ($this->classes as $className => &$class) {
 			preg_match_all($regexp4, $class['content'], $matches);
@@ -1287,7 +1273,7 @@ class JSCompiler
 			if (!empty($matches[1])) {
 				new Error($this->errors['overrideUtilsFunc'], array($matches[1][0], $className));
 			}
-			JSParser::init($this->correctors, JSGlobals::getUsedNames());
+			JSParser::init($this->correctors);
 			JSParser::parse($class);
 			JSChecker::check($class);
 			ControllersParser::parse($class);
@@ -1308,7 +1294,6 @@ class JSCompiler
 	}
 
 	private function checkSuperClassesCallings(&$class) {
-		$globals = JSGlobals::getVarNames();
 		foreach ($class['functions'] as &$func) {
 			$regExp = '/\bsuper\((.*)\)/';
 			$parts = preg_split($regExp, $func['code']);
@@ -1327,7 +1312,7 @@ class JSCompiler
 						$superClass = $callOpts['superClass'];
 						$method = $callOpts['method'];
 					}
-					$call = $globals['global'].".get('".$superClass."').prototype.".$method.'.call(this'.$arguments.')';
+					$call = CONST_GLOBAL.".get('".$superClass."').prototype.".$method.'.call(this'.$arguments.')';
 				}
 				$func['code'] = '';
 				foreach ($parts as $i => $part) {

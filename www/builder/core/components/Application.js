@@ -1,9 +1,9 @@
 _G_.set((c=function(){
 if(!this||this==window){
-var controllers,router,dictionary;var routes=__ROUTES;var errorRoutes=__ERRORROUTES;var viewContainerClass=__VIEWCONTAINER;var defaultPagetitle=__PAGETITLE;var parentalContainerClass=__VIEWCONTAINER2;
+var controllers,router,dictionary;var routes=__RT;var errorRoutes=__ER;var viewContainerClass=__VC;var defaultPagetitle=__PT;var parentalContainerClass=__PV;
 var getViewParams=function(route,allParams){var params;if(isObject(route['dynamicParams'])){params={};for(var k in route['dynamicParams']){params[k]=router.getPathPartAt(route['dynamicParams'][k])}}if(allParams){if(isObject(params)){Objects.merge(params,route['params'])}else{params=route['params']}}return params};
 var loadControllers=function(route){if(isArray(route['load'])||isNumber(route['load'])){controllers.load(route['load'])}};
-var loadView=function(route){var script=document.createElement('script');script.src='/js/_'+route['name']+'_chunk.js';document.body.appendChild(script);script.onload=onViewLoaded.bind(this,route)};
+var loadView=function(route){var script=document.createElement('script');script.src='/js/__JS_'+route['name']+'_chunk.js';document.body.appendChild(script);script.onload=onViewLoaded.bind(this,route)};
 var onViewLoaded=function(route){route['view']=_G_.get(route['view']);renderView.call(this,route)};
 var activateView=function(view,isSameView){if(!view)return;var parentElement=_C_.getParentElement.call(view);var params=getViewParams.call(this,this.currentRoute);if(isObject(params)){view.set(params)}if(!isSameView){this.viewContainer.appendChild(parentElement)}view.activate(true)};
 var disactivateView=function(){var view=this.views[this.currentView];if(view){var parentElement=_C_.getParentElement.call(view);this.viewContainer.removeChild(parentElement);view.activate(false)}};

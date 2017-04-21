@@ -1,5 +1,5 @@
 _G_.set(function(){
-var userOptions=__USEROPTIONS;var app,status={},attributes={},settings={},loaded=false,loadRequest,saveRequest;
+var userOptions=__UO;var app,status={},attributes={},settings={},loaded=false,loadRequest,saveRequest;
 var initOptions=function(){if(isObject(userOptions)){if(userOptions['login']&&isString(userOptions['login'])){var ajr=_G_.get('AjaxRequest');loadRequest=new ajr(userOptions['login'],this.setData.bind(this))}}};
 var getDefaultAttributes=function(){return{'type':'guest','accessLevel':0}};
 this.load=function(application){if(!loaded){initOptions.call(this);app=application;if(loadRequest){loadRequest.execute();return}}onLoad(getDefaultAttributes())};

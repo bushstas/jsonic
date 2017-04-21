@@ -2,7 +2,7 @@
 
 	$data = array(
 		'name' => 'Logger',
-		'var' => AUTOCRR_LOGGER,
+		'var' => CONST_LOGGER,
 		'define' => true,
 		'mode' => 2,
 		'thisMethods' => array(

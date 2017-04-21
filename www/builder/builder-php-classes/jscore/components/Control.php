@@ -36,7 +36,7 @@
 			'registerControl' => array(
 				'args' => array('control', 'name'),
 				'body' => "
-					{{".AUTOCRR_GLOBAL."}}.get('Component').prototype.registerControl.call(this, control, name);
+					".CONST_GLOBAL.".get('Component').prototype.registerControl.call(this, control, name);
 		 			this.addListener(control, 'change', onChangeChildControl.bind(this));
 				"
 			),

@@ -5,11 +5,11 @@
 		'mode' => 3,
 		'before' => "
 			var properRoutes = {},
-				routes = {{".AUTOCRR_ROUTES."}},
-				isHashRouter = !!{{".AUTOCRR_HASHROUTER."}},
-				defaultRoute = {{".AUTOCRR_DEFAULTROUTE."}},
-				indexRoute = {{".AUTOCRR_INDEXROUTE."}},
-				errorRoutes = {{".AUTOCRR_ERRORROUTES."}},
+				routes = ".CONST_ROUTES.",
+				isHashRouter = !!".CONST_HASHROUTER.",
+				defaultRoute = ".CONST_DEFAULTROUTE.",
+				indexRoute = ".CONST_INDEXROUTE.",
+				errorRoutes = ".CONST_ERRORROUTES.",
 				handler, bodyElement, menues, currentRoute,
 				subscribers, pathParts;
 		",

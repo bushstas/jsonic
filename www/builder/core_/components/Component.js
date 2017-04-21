@@ -16,7 +16,7 @@ p.isRendered=function(){return!!this.rendered};
 p.isDisposed=function(){return!!this.disposed};
 p.instanceOf=function(classFunc){if(isString(classFunc))classFunc=_G_.get(classFunc);return this instanceof classFunc||(this.inheritedSuperClasses&&this.inheritedSuperClasses.indexOf(classFunc)>-1)};
 p.disable=function(isDisabled){this.disabled=isDisabled;this.addClass('->> disabled',!isDisabled)};
-p.dispatchEvent=function(eventType){var args=Array.prototype.slice.call(arguments),l;args.splice(0,1);if(isArray(this.listeners)){for(var i=0;i<this.listeners.length;i++){l=this.listeners[i];if(isNumber(l['type']))l['type']=__EVENTTYPES[l['type']];if(l['type']==eventType){l['handler'].apply(l['subscriber'],args)}}}};
+p.dispatchEvent=function(eventType){var args=Array.prototype.slice.call(arguments),l;args.splice(0,1);if(isArray(this.listeners)){for(var i=0;i<this.listeners.length;i++){l=this.listeners[i];if(isNumber(l['type']))l['type']=__ET[l['type']];if(l['type']==eventType){l['handler'].apply(l['subscriber'],args)}}}};
 p.addListener=function(target,eventType,handler){if(isElement(target)){var eh=_G_.get('EventHandler');this.eventHandler=this.eventHandler||new eh();this.eventHandler.listen(target,eventType,handler.bind(this))}else target.subscribe(eventType,handler,this)};
 p.removeValueFrom=function(propName,value){var prop=this.get(propName);if(isArray(prop))this.removeByIndexFrom(propName,prop.indexOf(value))};
 p.removeByIndexFrom=function(propName,index){var prop=this.get(propName);if(isString(index)&&isNumeric(index))index=~~index;if(isArray(prop)&&isNumber(index)&&index>-1&&!isUndefined(prop[index])){prop.splice(index,1);updateForeach.call(this,propName,index);callFollower.call(this,propName,prop)}};

@@ -5,11 +5,6 @@
 		'condition' => '!this||this==window',
 		'before' => "
 			var controllers, router, dictionary;
-			var routes = {{".CONST_ROUTES."}};
-			var errorRoutes = {{".CONST_ERRORROUTES."}};
-			var viewContainerClass = {{".CONST_VIEWCONTAINER."}};
-			var defaultPagetitle = {{".CONST_PAGETITLE."}};
-			var parentalContainerClass = {{".CONST_PARENTALVIEWCNT."}};
 		",
 		'privateMethods' => array(
 			'getViewParams' => array(
@@ -44,7 +39,7 @@
 				'args' => array('route'),
 				'body' => "
 					var script = document.createElement('script');
-					script.src = '/js/{{".CONST_JSBASE."}}_' + route['name'] + '_chunk.js';
+					script.src = '/js/".CONST_JSBASE."_' + route['name'] + '_chunk.js';
 					document.body.appendChild(script);
 					script.onload = onViewLoaded.bind(this, route);
 				"
@@ -52,7 +47,7 @@
 			'onViewLoaded' => array(
 				'args' => array('route'),
 				'body' => "
-					route['view'] = {{".CONST_GLOBAL."}}.get(route['view']);
+					route['view'] = ".CONST_GLOBAL.".get(route['view']);
 					renderView.call(this, route);
 				"
 			),
@@ -60,7 +55,7 @@
 				'args' => array('view', 'isSameView'),
 				'body' => "
 					if (!view) return;
-					var parentElement = {{".CONST_CORE."}}.getParentElement.call(view);
+					var parentElement = ".CONST_CORE.".getParentElement.call(view);
 					var params = getViewParams.call(this, this.currentRoute);
 					if (isObject(params)) {
 						view.set(params);
@@ -75,7 +70,7 @@
 				'body' => "
 					var view = this.views[this.currentView];
 					if (view) {
-						var parentElement = {{".CONST_CORE."}}.getParentElement.call(view);			
+						var parentElement = ".CONST_CORE.".getParentElement.call(view);			
 						this.viewContainer.removeChild(parentElement);
 						view.activate(false);
 					}
@@ -90,7 +85,7 @@
 					}
 					var view = this.views[route['name']] = new route['view']();
 					var viewParams = getViewParams.call(this, route, true);
-					{{".CONST_CORE."}}.initiate.call(view, viewParams);
+					".CONST_CORE.".initiate.call(view, viewParams);
 					view.setOnReadyHandler(onViewReady.bind(this));
 					var viewContentElement = createViewContentElement.call(this, route['name']);
 					view.render(viewContentElement);
@@ -113,7 +108,7 @@
 					this.currentView = route['name'];
 					var view = this.views[route['name']];
 					if (!view) {
-						view = {{".CONST_GLOBAL."}}.get(route['view']);
+						view = ".CONST_GLOBAL.".get(route['view']);
 						if (!view) {
 							loadView.call(this, route);
 						} else {
@@ -127,14 +122,14 @@
 			),
 			'defineViews' => array(
 				'body' => "
-					for (var i = 0; i < routes.length; i++) {
-						this.views[routes[i]['name']] = null;
-						if (isArray(routes[i]['children'])) {
-							this.defineViews(routes[i]['children']);
+					for (var i = 0; i < ".CONST_ROUTES.".length; i++) {
+						this.views[".CONST_ROUTES."[i]['name']] = null;
+						if (isArray(".CONST_ROUTES."[i]['children'])) {
+							this.defineViews(".CONST_ROUTES."[i]['children']);
 						}
 					}
-					if (isObject(errorRoutes)) {
-						for (var k in errorRoutes) {
+					if (isObject(".CONST_ERRORROUTES.")) {
+						for (var k in ".CONST_ERRORROUTES.") {
 							this.views[k] = null;
 						}
 					}
@@ -143,13 +138,13 @@
 			'createViewContainer' => array(
 				'body' => "
 					var viewContainer;
-					if (viewContainerClass) {
-						viewContainer = document.body.querySelector('.' + viewContainerClass);
+					if (".CONST_VIEWCONTAINER.") {
+						viewContainer = document.body.querySelector('.' + ".CONST_VIEWCONTAINER.");
 					}
 					if (!viewContainer) {
 					 	viewContainer = document.createElement('div');
-						if (viewContainerClass) {
-							viewContainer.className = viewContainerClass;
+						if (".CONST_VIEWCONTAINER.") {
+							viewContainer.className = ".CONST_VIEWCONTAINER.";
 						}
 						this.element.appendChild(viewContainer);
 					}
@@ -170,7 +165,7 @@
 								}
 							}
 						}
-						this.setPageTitle(title || defaultPagetitle || '');
+						this.setPageTitle(title || ".CONST_PAGETITLE." || '');
 					}
 				"
 			),
@@ -178,7 +173,7 @@
 				'args' => array('name'),
 				'body' => "
 					var element = document.createElement('div');
-					element.className = parentalContainerClass;
+					element.className = ".CONST_PARENTALVIEWCNT.";
 					element.setData('name', name);
 					this.viewContainer.appendChild(element);
 					return element;
@@ -193,9 +188,9 @@
 			),
 			'run' => array(
 				'body' => "
-					dictionary = {{".CONST_GLOBAL."}}.get('Dictionary');
-					router = {{".CONST_GLOBAL."}}.get('Router');
-					controllers = {{".CONST_GLOBAL."}}.get('Controllers');
+					dictionary = ".CONST_GLOBAL.".get('Dictionary');
+					router = ".CONST_GLOBAL.".get('Router');
+					controllers = ".CONST_GLOBAL.".get('Controllers');
 					defineViews.call(this);
 					router.setNavigationHandler(handleNavigation.bind(this));
 					router.init();

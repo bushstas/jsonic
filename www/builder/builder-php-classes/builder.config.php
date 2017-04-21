@@ -52,6 +52,8 @@ class Config
 		}
 		$this->validatePathNames();
 		$this->validateUserConfig();
+
+		define('CONST_JSBASE', $this->config['compiledJs']);
 	}
 
 	public function createAppLoader() {

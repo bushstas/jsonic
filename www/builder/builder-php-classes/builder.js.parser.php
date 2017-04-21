@@ -2,7 +2,7 @@
 
 class JSParser
 {
-	private static $correctors, $globals;
+	private static $correctors;
 	private static $usedCorrectors = array();
 	private static $usedCorrectorsByClass = array();
 
@@ -17,9 +17,8 @@ class JSParser
 		'doubleDollarSign' => 'Ошибка парсинга метода {??} класса {??}. Обнаружены два или более символа <b>$</b> подряд'
 	);
 
-	public static function init($correctors, $globals) {
+	public static function init($correctors) {
 		self::$correctors = $correctors;
-		self::$globals = $globals;
 	}
 
 	public static function parse(&$class) {
@@ -58,7 +57,7 @@ class JSParser
 				$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
 				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
 				JSInterpreter::parse($code, $class['name']);
-				$code = preg_replace("/@(\w+)/", self::$globals['CONSTANTS'].".$1", $code);	
+				$code = preg_replace("/@(\w+)/", CONST_CONSTANTS.".$1", $code);	
 				$functions[] = array(
 					'name' => $functionName, 
 					'args' => $arguments,
@@ -265,7 +264,7 @@ class JSParser
 				if (!in_array($crrName, self::$correctors)) {
 					new Error(self::$errors['unknownCorr'], array($crr, $name, $class));
 				}
-				$code = $k."=".self::$globals['GLOBAL'].".get('".$crr."Crr').correct(".$k.");\n".$code;
+				$code = $k."=".CONST_GLOBAL.".get('".$crr."Crr').correct(".$k.");\n".$code;
 				if (!in_array($crrName, self::$usedCorrectors)) {
 					self::$usedCorrectors[] = $crrName;
 					if (!isset(self::$usedCorrectorsByClass[$class])) {

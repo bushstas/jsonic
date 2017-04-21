@@ -7,7 +7,6 @@ class ControllersParser
 	private static $sources;
 	private static $controllers;
 	private static $ctrs;
-	private static $globals;
 	private static $class;
 	private static $initialsParser;
 	private static $regexp;
@@ -24,7 +23,6 @@ class ControllersParser
 		self::$sources = $sources;
 		self::$controllers = $controllers;
 		self::$ctrs = array_keys(self::$controllers);
-		self::$globals = JSGlobals::getUsedNames();
 		self::$initialsParser = $initialsParser;
 		self::$regexp = '/\b('.implode('|', self::$ctrs).')\b/';
 	}
@@ -48,7 +46,7 @@ class ControllersParser
 				$actions = self::$initialsParser->getControllerActions($ctr);
 				if (is_array($actions) && !empty($actions)) {
 					$regexp  = '/\b'.$ctr.'\.('.implode('|', $actions).')\(/';
-					$code = preg_replace($regexp, self::$globals['CONTROLLER'].'.get('.$i.')'.".doAction(this,'$1',", $code);
+					$code = preg_replace($regexp, CONST_CONTROLLERS.'.get('.$i.')'.".doAction(this,'$1',", $code);
 				}
 			}
 		}
@@ -83,7 +81,7 @@ class ControllersParser
 	public static function parseInitialsCode(&$code) {
 		if (preg_match(self::$regexp, $code)) {
 			foreach (self::$ctrs as $i => $ctr) {
-				$code = preg_replace('/\b'.$ctr.'\b/', self::$globals['CONTROLLER'].'.get('.$i.')', $code);
+				$code = preg_replace('/\b'.$ctr.'\b/', CONST_CONTROLLERS.'.get('.$i.')', $code);
 			}
 		}
 	}

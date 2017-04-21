@@ -12,9 +12,9 @@
 			'createLevel' => array(
 				'args' => array('isUpdating'),
 				'body' => "
-					var l = {{".AUTOCRR_GLOBAL."}}.get('Level');
+					var l = ".CONST_GLOBAL.".get('Level');
 					this.level = new l(this.parentLevel.getComponent());
-					var nextSiblingChild = isUpdating ? {{".AUTOCRR_CORE."}}.getNextSiblingChild.call(this) : null;
+					var nextSiblingChild = isUpdating ? ".CONST_CORE.".getNextSiblingChild.call(this) : null;
 					this.level.render(getChildren.call(this), this.parentElement, this.parentLevel, nextSiblingChild);
 				"
 			),
@@ -53,7 +53,7 @@
 			),
 			'dispose' => array(
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeLinks.call(this);
+					".CONST_CORE.".disposeLinks.call(this);
 					disposeLevel.call(this);
 					this.parentElement = null;
 					this.parentLevel = null;

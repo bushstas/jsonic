@@ -6,7 +6,7 @@
 		'methods' => array(
 			'onRenderComplete' => array(
 				'body' => "
-					var router = {{".AUTOCRR_GLOBAL."}}.get('Router');
+					var router = ".CONST_GLOBAL.".get('Router');
 					if (router.hasMenu(this)) {
 						this.onNavigate(router.getCurrentRouteName());
 					}

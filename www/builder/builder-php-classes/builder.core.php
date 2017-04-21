@@ -21,7 +21,7 @@ $includes = array(
 	'template.callback.validator', 'state.parser', 'class.analyzer', 'js.obfuscator',
 	'dialogs.parser', 'template.validator', 'template.syntax.parser', 'file.manager', 'js.core.renderer',
 	'operator.parser', 'foreach.code.parser', 'from.code.parser', 'switch.code.parser',
-	'auto.correction.constants'
+	'constants'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	
@@ -36,12 +36,12 @@ class Builder
 	private $files;
 	
 	public function run() {
-		AutoCorrectionParams::init();
-		$this->coreRenderer = new JSCoreRenderer();
-		$this->coreRenderer->run();
-
 		$this->config = new Config();
 		$this->config->init($this);
+
+		Constants::init();
+		$this->coreRenderer = new JSCoreRenderer();
+		$this->coreRenderer->run();
 
 		$this->coreValidator = new CoreValidator();
 		$this->coreValidator->validate($this->config->getPathToCore());
@@ -76,7 +76,6 @@ class Builder
 		
 
 		$this->coreValidator->validateUtilsFunction($this->files['core']);
-		JSGlobals::init($this->config->getJsConfig());
 		$this->runCompilers();
 	}
 

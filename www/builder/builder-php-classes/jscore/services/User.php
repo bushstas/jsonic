@@ -4,7 +4,7 @@
 		'name' => 'User',
 		'mode' => 3,
 		'before' => "
-			var userOptions = {{".AUTOCRR_USEROPTIONS."}};
+			var userOptions = ".CONST_USEROPTIONS.";
 			var app, status = {},
 			attributes = {}, settings = {}, loaded = false, 
 			loadRequest, saveRequest;
@@ -14,7 +14,7 @@
 				'body' => "
 					if (isObject(userOptions)) {
 						if (userOptions['login'] && isString(userOptions['login'])) {
-							var ajr = {{".AUTOCRR_GLOBAL."}}.get('AjaxRequest');
+							var ajr = ".CONST_GLOBAL.".get('AjaxRequest');
 							loadRequest = new ajr(userOptions['login'], this.setData.bind(this));
 						}
 					}

@@ -32,9 +32,9 @@
 					var p = this.params['sw']();
 					var c = p['c'], d = p['d'];
 					if (this.cur !== null) {
-						{{".AUTOCRR_CORE."}}.createLevel.call(this, c[this.cur], isUpdating);
+						".CONST_CORE.".createLevel.call(this, c[this.cur], isUpdating);
 					} else if (!isUndefined(d)) {
-						{{".AUTOCRR_CORE."}}.createLevel.call(this, d, isUpdating);
+						".CONST_CORE.".createLevel.call(this, d, isUpdating);
 					}
 				"
 			)
@@ -43,7 +43,7 @@
 			'render' => array(
 				'args' => array('pe', 'pl'),
 				'body' => "
-					{{".AUTOCRR_CORE."}}.initOperator.call(this, pe, pl);
+					".CONST_CORE.".initOperator.call(this, pe, pl);
 					isChanged.call(this);
 					createLevels.call(this, false);
 				"
@@ -52,14 +52,14 @@
 				'args' => array(''),
 				'body' => "
 					if (isChanged.call(this)) {
-						{{".AUTOCRR_CORE."}}.disposeLevels.call(this);
+						".CONST_CORE.".disposeLevels.call(this);
 						createLevels.call(this, true);
 					}
 				"
 			),
 			'dispose' => array(
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeOperator.call(this);
+					".CONST_CORE.".disposeOperator.call(this);
 					this.cur = null;
 				"
 			)

@@ -2,7 +2,7 @@
 
 	$data = array(
 		'mode' => 2,
-		'var' => AUTOCRR_CORE,
+		'var' => CONST_CORE,
 		'name' => 'Core',
 		'privateMethods' => array(
 			'extendInitials' => array(
@@ -92,7 +92,7 @@
 			'subscribeToHelper' => array(
 				'args' => array('options'),
 				'body' => "
-					var helper = {{".AUTOCRR_GLOBAL."}}.get(options['helper']);
+					var helper = ".CONST_GLOBAL.".get(options['helper']);
 					if (helper && isObject(options['options'])) helper.subscribe(this, options['options']);
 				"
 			),
@@ -121,7 +121,7 @@
 				'body' => "
 					var events = getInitial.call(this, 'events');
 					if (isObject(events)) {
-						var mh = {{".AUTOCRR_GLOBAL."}}.get('MouseHandler');
+						var mh = ".CONST_GLOBAL.".get('MouseHandler');
 						this.mouseHandler = new mh(this, events);
 					}
 					var helpers = getInitial.call(this, 'helpers');
@@ -129,7 +129,7 @@
 						for (var i = 0; i < helpers.length; i++) subscribeToHelper.call(this, helpers[i]);
 					}
 					var listeners = getInitial.call(this, 'listeners');
-					var s = {{".AUTOCRR_GLOBAL."}}.get('State');
+					var s = ".CONST_GLOBAL.".get('State');
 					if (isObject(listeners)) {			
 						for (var j in listeners) s.listen(this, j, listeners[j]);
 					} 
@@ -144,10 +144,10 @@
 				'body' => "
 					var children, parent, child, initials, sc;
 					for (var k = 0; k < list.length; k++) {
-						parent = {{".AUTOCRR_GLOBAL."}}.get(list[k]);
+						parent = ".CONST_GLOBAL.".get(list[k]);
 						children = list[++k];
 						for (var i = 0; i < children.length; i++) {
-							child = {{".AUTOCRR_GLOBAL."}}.get(children[i]);
+							child = ".CONST_GLOBAL.".get(children[i]);
 							if (!child.prototype.inheritedSuperClasses) {
 								child.prototype.inheritedSuperClasses = [];
 							}
@@ -211,16 +211,16 @@
 				'body' => "
 					if (!this.nextSiblingChild) return null;
 					if (this.nextSiblingChild instanceof Node) return this.nextSiblingChild;
-					var firstNodeChild = {{".AUTOCRR_CORE."}}.getFirstNodeChild.call(this.nextSiblingChild);
+					var firstNodeChild = ".CONST_CORE.".getFirstNodeChild.call(this.nextSiblingChild);
 					if (firstNodeChild) return firstNodeChild;
-					return {{".AUTOCRR_CORE."}}.getNextSiblingChild.call(this.nextSiblingChild, this);
+					return ".CONST_CORE.".getNextSiblingChild.call(this.nextSiblingChild, this);
 				"
 			),
 			'setNextSiblingChild' => array(
 				'args' => array('nextSiblingChild'),
 				'body' => "
 					this.nextSiblingChild = nextSiblingChild;
-					if (!(nextSiblingChild instanceof Node)) {{".AUTOCRR_CORE."}}.setPrevSiblingChild.call(this.nextSiblingChild, this);
+					if (!(nextSiblingChild instanceof Node)) ".CONST_CORE.".setPrevSiblingChild.call(this.nextSiblingChild, this);
 				"
 			),
 			'setPrevSiblingChild' => array(
@@ -231,7 +231,7 @@
 			),
 			'disposeLinks' => array(
 				'body' => "
-					if (this.prevSiblingChild) {{".AUTOCRR_CORE."}}.setNextSiblingChild.call(this.prevSiblingChild, this.nextSiblingChild);
+					if (this.prevSiblingChild) ".CONST_CORE.".setNextSiblingChild.call(this.prevSiblingChild, this.nextSiblingChild);
 					this.prevSiblingChild = null;
 					this.nextSiblingChild = null;
 				"
@@ -289,7 +289,7 @@
 			'unregisterChildComponent' => array(
 				'args' => array('child'),
 				'body' => "
-					if (isControl(child)) {{".AUTOCRR_CORE."}}.unregisterControl.call(this, child);
+					if (isControl(child)) ".CONST_CORE.".unregisterControl.call(this, child);
 					var id = child.getId();		
 					if (!id) {
 						for (var k in this.children) {
@@ -374,12 +374,12 @@
 			'createLevel' => array(
 				'args' => array('items', 'isUpdating', 'index'),
 				'body' => "
-					var level = new ({{".AUTOCRR_GLOBAL."}}.get('Level'))(this.parentLevel.getComponent());
+					var level = new (".CONST_GLOBAL.".get('Level'))(this.parentLevel.getComponent());
 					var nextSiblingChild;
 					if (isNumber(index) && this.levels[index]) {
 						nextSiblingChild = this.levels[index].getFirstNodeChild();
 					} else {
-						nextSiblingChild = isUpdating ? {{".AUTOCRR_CORE."}}.getNextSiblingChild.call(this) : null;
+						nextSiblingChild = isUpdating ? ".CONST_CORE.".getNextSiblingChild.call(this) : null;
 					}
 					level.render(items, this.parentElement, this.parentLevel, nextSiblingChild);
 					this.levels.insertAt(level, index);
@@ -403,8 +403,8 @@
 			),
 			'disposeOperator' => array(
 				'body' => "
-					{{".AUTOCRR_CORE."}}.disposeLinks.call(this);
-					{{".AUTOCRR_CORE."}}.disposeLevels();
+					".CONST_CORE.".disposeLinks.call(this);
+					".CONST_CORE.".disposeLevels();
 					this.levels = null;
 					this.parentElement = null;
 					this.parentLevel = null;

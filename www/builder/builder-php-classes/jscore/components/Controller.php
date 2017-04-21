@@ -165,7 +165,7 @@
 			'getNewRequest' => array(
 				'args' => array(''),
 				'body' => "
-					var ajr = {{GLOBAL}}.get('AjaxRequest');
+					var ajr = ".CONST_GLOBAL.".get('AjaxRequest');
 					return new ajr();
 				"
 			),
@@ -259,7 +259,7 @@
 			'instanceOf' => array(
 				'args' => array('classFunc'),
 				'body' => "
-					if (isString(classFunc)) classFunc = {{GLOBAL}}.get(classFunc);
+					if (isString(classFunc)) classFunc = ".CONST_GLOBAL.".get(classFunc);
 					return this instanceof classFunc || (this.inheritedSuperClasses && this.inheritedSuperClasses.indexOf(classFunc) > -1);
 				"
 			),

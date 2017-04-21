@@ -15,9 +15,9 @@
 				'args' => array('u'),
 				'body' => "
 					u = u.replace(/^[\.\/]+/, '');
-					if (isString({{".AUTOCRR_APIDIR."}})) {
-						var regExp = new RegExp('^' + {{".AUTOCRR_APIDIR."}} + \"\/\");
-						u = {{".AUTOCRR_APIDIR."}} + '/' + u.replace(regExp, '');
+					if (isString(".CONST_APIDIR.")) {
+						var regExp = new RegExp('^' + ".CONST_APIDIR." + \"\/\");
+						u = ".CONST_APIDIR." + '/' + u.replace(regExp, '');
 					}
 					return '/' + u;
 				"
