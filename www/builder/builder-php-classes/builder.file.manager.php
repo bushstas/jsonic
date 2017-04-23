@@ -11,6 +11,7 @@ class FileManager
 				self::createDir($pathToFolder);
 			}
 		}
+
 		file_put_contents($path, $content);
 	}
 

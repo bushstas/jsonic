@@ -14,13 +14,13 @@ class CoreValidator
 			'Application', 'Component', 'Condition', 'Control', 'Controller', 'Foreach', 'IfSwitch', 'Level', 'Menu', 'Switch', 'View', 'Let'
 		),
 		'helpers' => array(
-			'State'
+			
 		),
 		'prototypes' => array(
 			'Array', 'Element', 'MouseEvent', 'String', 'Function'
 		),
 		'services' => array(
-			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator', 'Controllers', 'Logger'
+			'Core', 'AjaxRequest', 'EventHandler', 'Router', 'Tester', 'User', 'Validator', 'Controllers', 'Logger', 'State', 'Loader'
 		),
 		'utils' => array(
 			'utils', 'Objects'

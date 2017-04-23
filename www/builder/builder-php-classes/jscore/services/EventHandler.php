@@ -2,7 +2,7 @@
 
 	$data = array(
 		'name' => 'EventHandler',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'afterCondition' => "
 			this.listeners = [];
 		",

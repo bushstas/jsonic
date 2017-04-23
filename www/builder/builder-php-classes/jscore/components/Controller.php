@@ -2,7 +2,7 @@
 
 	$data = array(
 		'name' => 'Controller',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'privateMethods' => array(
 			'makeUrl' => array(
 				'args' => array('url', 'options'),
@@ -122,13 +122,13 @@
 					this.currentRouteOptions = {};
 					var routeOptions = {};
 					for (var k in action['routeOptions']) {
-						value = Router.getPathPartAt(action['routeOptions'][k]);
+						value = ".CONST_ROUTER.".getPathPartAt(action['routeOptions'][k]);
 						if (isString(value)) {
 							routeOptions[k] = value;
 						}
 					}
 					setCurrentRouteOptions.call(this, routeOptions, action);
-					Router.subscribe(action['routeOptions'], this);
+					".CONST_ROUTER.".subscribe(action['routeOptions'], this);
 				"
 			),
 			'setCurrentRouteOptions' => array(

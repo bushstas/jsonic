@@ -2,7 +2,7 @@
 
 	$data = array(
 		'name' => 'View',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'methods' => array(
 			'onRenderComplete' => array(
 				'body' => "

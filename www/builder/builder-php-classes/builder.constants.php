@@ -3,9 +3,8 @@
 class Constants
 {
 	private static $privateVarList = array(
-		'GLOBAL'          => '_G_',
-		'FUNCS'           => '_F_',		
-		'CORE'            => '_C_',
+		'GLOBAL'          => '__G',
+		'FUNCS'           => '__B',		
 		'ATTRIBUTES'      => '__AT',
 		'EVENTTYPES'      => '__ET',
 		'TAGS'            => '__TG',
@@ -27,20 +26,22 @@ class Constants
 		'TEXTS'           => '__T',
 		'CONSTANTS'       => '__',
 		'DATA'            => '__V',
-		'CONTROLLERS'     => '__CT',
-		'CONTROLLER'      => '__C',
-		'DIALOGER'        => '__DI',
-		'JSBASE'          => '__JS',
-		'OBJECTS'         => '__O',
 		'LOADURL'         => '__LU',
 		'PREVENT'         => '__PD',
 		'STOP'            => '__SP',
-		'STATE'           => '__S',
-		'POPUPER'         => '__P',
 		'CALLBACK'        => '__CB',
 		'GETFUNC'         => '__F',
 		'FUNCTION'        => '__FN',
-		'LOADEDDATA'      => '__DT'
+		'LOADEDDATA'      => '__DT',		
+		
+		
+		'STATE'           => '__S',
+		'POPUPER'         => '__P',
+		'CORE'            => '__A',
+		'CONTROLLERS'     => '__CT',
+		'CONTROLLER'      => '__C',
+		'OBJECTS'         => '__O',
+		'DIALOGER'        => '__DI'
 	);
 
 	private static $publicVarList = array(
@@ -50,10 +51,11 @@ class Constants
 		'USER'      => 'User'
 	);
 
-	private static $definitionsList = array(		
+	private static $definitionsList = array(
+		'ENTERCOND' => '!this||this==window',
 		'BREAK'     => '_brk',
 		'COMPONENT' => 'c',
-		'PROTO'     => 'p'		
+		'PROTO'     => 'p'
 	);
 
 	public static function init() {

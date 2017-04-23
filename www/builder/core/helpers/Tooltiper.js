@@ -44,7 +44,7 @@
 	};
 	var createPopup = function() {
 		tooltip = new tooltip();
-		Core.initiate.call(tooltip);
+		{{CORE}}.initiate.call(tooltip);
 		tooltip.render(document.body);
 		tooltipElement = tooltip.getElement();
 	};

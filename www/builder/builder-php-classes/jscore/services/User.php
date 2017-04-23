@@ -1,7 +1,7 @@
 <?php
 
 	$data = array(
-		'name' => 'User',
+		'name' => CONST_USER,
 		'mode' => 3,
 		'before' => "
 			var userOptions = ".CONST_USEROPTIONS.";

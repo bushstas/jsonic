@@ -2,13 +2,12 @@
 
 	$data = array(
 		'name' => 'Menu',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'methods' => array(
 			'onRenderComplete' => array(
 				'body' => "
-					var router = ".CONST_GLOBAL.".get('Router');
-					if (router.hasMenu(this)) {
-						this.onNavigate(router.getCurrentRouteName());
+					if (".CONST_ROUTER.".hasMenu(this)) {
+						this.onNavigate(".CONST_ROUTER.".getCurrentRouteName());
 					}
 				"
 			),

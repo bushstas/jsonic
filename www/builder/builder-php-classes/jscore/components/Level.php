@@ -3,7 +3,7 @@
 	$data = array(
 		'name' => 'Level',
 		'args' => array('component'),
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'afterCondition' => "
 			this.children = [];
 			this.cmp = component;

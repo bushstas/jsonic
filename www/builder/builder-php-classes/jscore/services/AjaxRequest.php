@@ -3,7 +3,7 @@
 	$data = array(
 		'name' => 'AjaxRequest',
 		'args' => array('url', 'callback', 'params', 'thisObj'),
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'afterCondition' => "
 			this.url = url;
 			this.callback = callback;

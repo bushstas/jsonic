@@ -7,7 +7,7 @@
 			this.params = params;
 			this.cur = null;
 		",
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'privateMethods' => array(
 			'isChanged' => array(
 				'body' => "

@@ -1,6 +1,6 @@
-_G_.set(function(){
+__G.set(function(){
 var userOptions=__UO;var app,status={},attributes={},settings={},loaded=false,loadRequest,saveRequest;
-var initOptions=function(){if(isObject(userOptions)){if(userOptions['login']&&isString(userOptions['login'])){var ajr=_G_.get('AjaxRequest');loadRequest=new ajr(userOptions['login'],this.setData.bind(this))}}};
+var initOptions=function(){if(isObject(userOptions)){if(userOptions['login']&&isString(userOptions['login'])){var ajr=__G.get('AjaxRequest');loadRequest=new ajr(userOptions['login'],this.setData.bind(this))}}};
 var getDefaultAttributes=function(){return{'type':'guest','accessLevel':0}};
 this.load=function(application){if(!loaded){initOptions.call(this);app=application;if(loadRequest){loadRequest.execute();return}}onLoad(getDefaultAttributes())};
 this.setData=function(data){status=data['status'];attributes=data['attributes'];settings=data['settings'];loaded=true;if(isComponentLike(app)){app.run()}};

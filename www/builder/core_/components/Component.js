@@ -1,23 +1,23 @@
-_G_.set((c=function(){
+__G.set((c=function(){
 if(!this||this==window){
 var load=function(){var loader=Objects.get(this.initials,'loader');if(isObject(loader)&&isObject(loader['controller'])){this.preset('__loading',true);var isAsync=!!loader['async'];var options=loader['options'];if(isFunction(options))options=options();loader['controller'].addSubscriber('load',{'initiator':this,'callback':onDataLoad.bind(this,isAsync)},!!loader['private']);loader['controller'].doAction(this,'load',options);if(!isAsync){renderTempPlaceholder.call(this);return}}onReadyToRender.call(this)};
 var renderTempPlaceholder=function(){this.tempPlaceholder=document.createElement('span');this.parentElement.appendChild(this.tempPlaceholder)};
 var onDataLoad=function(isAsync,data){this.toggle('__loading');this.onLoaded(data);var loader=this.initials['loader'];if(isFunction(loader['callback'])){loader['callback'].call(this)}if(!isAsync)onReadyToRender.call(this)};
-var onReadyToRender=function(){if(!this.isRendered()){render.call(this);if(this.tempPlaceholder){this.parentElement.removeChild(this.tempPlaceholder);this.tempPlaceholder=null}_C_.processPostRenderInitials.call(this)}};
-var render=function(){var lvl=_G_.get('Level');this.level=new lvl(this);var content=this.getTemplateMain(this.props,this);if(content)this.level.render(content,this.parentElement,this,this.tempPlaceholder);this.rendered=true;this.onRendered();this.onRenderComplete();for(var i=0;i<this.inheritedSuperClasses.length-1;i++){this.inheritedSuperClasses[i].prototype.onRenderComplete.call(this)}this.forEachChild(function(child){if(isFunction(child.onParentRendered))child.onParentRendered.call(child)});delete this.waiting};
+var onReadyToRender=function(){if(!this.isRendered()){render.call(this);if(this.tempPlaceholder){this.parentElement.removeChild(this.tempPlaceholder);this.tempPlaceholder=null}__A.processPostRenderInitials.call(this)}};
+var render=function(){var lvl=__G.get('Level');this.level=new lvl(this);var content=this.getTemplateMain(this.props,this);if(content)this.level.render(content,this.parentElement,this,this.tempPlaceholder);this.rendered=true;this.onRendered();this.onRenderComplete();for(var i=0;i<this.inheritedSuperClasses.length-1;i++){this.inheritedSuperClasses[i].prototype.onRenderComplete.call(this)}this.forEachChild(function(child){if(isFunction(child.onParentRendered))child.onParentRendered.call(child)});delete this.waiting};
 var propagatePropertyChange=function(changedProps){if(!this.updaters)return;var updated=[];for(var k in changedProps){if(this.updaters[k]){for(var i=0;i<this.updaters[k].length;i++){if(updated.indexOf(this.updaters[k][i])==-1){this.updaters[k][i].react(changedProps);updated.push(this.updaters[k][i])}}}}updated=null;callFollowers.call(this,changedProps)};
 var callFollowers=function(changedProps){for(var k in changedProps){callFollower.call(this,k,changedProps[k])}};
 var callFollower=function(propName,propValue){if(Objects.has(this.followers,propName))this.followers[propName].call(this,propValue)};
-var updateForeach=function(propName,index,item){var updaters=this.updaters[propName],o;if(isArray(updaters)){for(var i=0;i<updaters.length;i++){if(updaters[i]instanceof _G_.get('OperatorUpdater')){o=updaters[i].getOperator();if(o instanceof _G_.get('Foreach')){if(!isUndefined(item))o.add(item,index);else o.remove(index)}}}}};
+var updateForeach=function(propName,index,item){var updaters=this.updaters[propName],o;if(isArray(updaters)){for(var i=0;i<updaters.length;i++){if(updaters[i]instanceof __G.get('OperatorUpdater')){o=updaters[i].getOperator();if(o instanceof __G.get('Foreach')){if(!isUndefined(item))o.add(item,index);else o.remove(index)}}}}};
 p=c.prototype;
 p.render=function(parentElement){this.parentElement=parentElement;load.call(this)};
 p.isDisabled=function(){return!!this.disabled};
 p.isRendered=function(){return!!this.rendered};
 p.isDisposed=function(){return!!this.disposed};
-p.instanceOf=function(classFunc){if(isString(classFunc))classFunc=_G_.get(classFunc);return this instanceof classFunc||(this.inheritedSuperClasses&&this.inheritedSuperClasses.indexOf(classFunc)>-1)};
+p.instanceOf=function(classFunc){if(isString(classFunc))classFunc=__G.get(classFunc);return this instanceof classFunc||(this.inheritedSuperClasses&&this.inheritedSuperClasses.indexOf(classFunc)>-1)};
 p.disable=function(isDisabled){this.disabled=isDisabled;this.addClass('->> disabled',!isDisabled)};
 p.dispatchEvent=function(eventType){var args=Array.prototype.slice.call(arguments),l;args.splice(0,1);if(isArray(this.listeners)){for(var i=0;i<this.listeners.length;i++){l=this.listeners[i];if(isNumber(l['type']))l['type']=__ET[l['type']];if(l['type']==eventType){l['handler'].apply(l['subscriber'],args)}}}};
-p.addListener=function(target,eventType,handler){if(isElement(target)){var eh=_G_.get('EventHandler');this.eventHandler=this.eventHandler||new eh();this.eventHandler.listen(target,eventType,handler.bind(this))}else target.subscribe(eventType,handler,this)};
+p.addListener=function(target,eventType,handler){if(isElement(target)){var eh=__G.get('EventHandler');this.eventHandler=this.eventHandler||new eh();this.eventHandler.listen(target,eventType,handler.bind(this))}else target.subscribe(eventType,handler,this)};
 p.removeValueFrom=function(propName,value){var prop=this.get(propName);if(isArray(prop))this.removeByIndexFrom(propName,prop.indexOf(value))};
 p.removeByIndexFrom=function(propName,index){var prop=this.get(propName);if(isString(index)&&isNumeric(index))index=~~index;if(isArray(prop)&&isNumber(index)&&index>-1&&!isUndefined(prop[index])){prop.splice(index,1);updateForeach.call(this,propName,index);callFollower.call(this,propName,prop)}};
 p.plusTo=function(propName,add,sign){var prop=this.get(propName);if(!sign||sign=='+'){if(isNumber(prop)||isString(prop))this.set(propName,prop+add)}else if(isNumber(prop)&&isNumber(add)){var v;if(sign=='-')v=prop-add;else if(sign=='*')v=prop*add;else if(sign=='/')v=prop/add;else if(sign=='%')v=prop%add;this.set(propName,v)}};
@@ -57,8 +57,8 @@ p.placeBack=function(){this.setAppended(true)};
 p.appendChild=function(child,isAppended){if(isString(child))child=this.getChild(child);if(isComponentLike(child))child.setAppended(isAppended)};
 p.setScope=function(scope){this.scope=scope};
 p.getUniqueId=function(){return this.uniqueId=this.uniqueId||generateRandomKey()};
-p.dispose=function(){_G_.get('State').dispose(this);var core=_C_;core.disposeLinks.call(this);core.disposeInternal.call(this);if(this.mouseHandler){this.mouseHandler.dispose();this.mouseHandler=null}this.level.dispose();this.elements=null;this.level=null;this.listeners=null;this.updaters=null;this.parentElement=null;this.props=null;this.children=null;this.initials=null;this.followers=null;this.correctors=null;this.controls=null;this.disposed=true};
-p.a=function(n){return _G_.get('State').get(n)};
+p.dispose=function(){__G.get('State').dispose(this);var core=__A;core.disposeLinks.call(this);core.disposeInternal.call(this);if(this.mouseHandler){this.mouseHandler.dispose();this.mouseHandler=null}this.level.dispose();this.elements=null;this.level=null;this.listeners=null;this.updaters=null;this.parentElement=null;this.props=null;this.children=null;this.initials=null;this.followers=null;this.correctors=null;this.controls=null;this.disposed=true};
+p.a=function(n){return __G.get('State').get(n)};
 var f=function(){return};
 p.initOptions=f;
 p.onRendered=f;

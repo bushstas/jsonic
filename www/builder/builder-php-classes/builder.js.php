@@ -190,6 +190,7 @@ class JSCompiler
 			}
 		}
 		$this->addGlobals();		
+		FileManager::emptyFolder(DEFAULT_PATH.$this->config['folder']);
 		$this->finish();
 		if ($this->configProvider->isSplitMode()) {
 			foreach ($routes as $route) {
@@ -665,9 +666,10 @@ class JSCompiler
 
 	private function finish($route = null) {
 		$this->configProvider->createAppLoader();
+		$isNoRoute = $route === null;
 		$isSplitted = $this->configProvider->isSplitMode();
 
-		if ($route === null) {
+		if ($isNoRoute) {
 			$bottomOutput = $this->bottomOutput['_'];
 			$jsOutput = $this->jsOutput;
 			$fileName = $this->config['path'].'.js';
@@ -679,16 +681,32 @@ class JSCompiler
 			$this->parseChunkConstants($jsOutput);
 			$this->decodeTexts($jsOutput, $route);
 		}		
-		if ($route === null) {
-			$jsOutput = "'use strict';\nvar ".CONST_GLOBAL.($isSplitted ? ",".CONST_FUNCS."={}" : '').";\nnew (function() {\n(function(){\nvar cs={};\nthis.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}\nthis.get=function(k,i){if(i){this.create(k)}return cs[k]}\nthis.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}\n}).call(".CONST_GLOBAL."=this);\n;(function(){var ".CONST_CORE.",".CONST_COMPONENT.",".CONST_PROTO.";\n".$jsOutput;
+		if ($isNoRoute) {
+			$top = array(
+				"'use strict';",
+				"var ".CONST_GLOBAL.";",
+				"new (function() {",
+				"(function(){",
+				"var cs={};",
+				"this.create=function(k){var c=this.get(k);if(c instanceof Function)cs[k]=new c()}",
+				"this.get=function(k,i){if(i){this.create(k)}return cs[k]}",
+				"this.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}",
+				"}).call(".CONST_GLOBAL."=this);",
+				"(function(){var ".CONST_CORE.($isSplitted ? ",".CONST_FUNCS : '').",".CONST_COMPONENT.",".CONST_PROTO.";"
+			);
+			$jsOutput = implode("\n", $top).$jsOutput;
 		} else {
-			$varname = 'g';
-			$top = "'use strict';\n(function(){\nvar ".$varname.'='.CONST_GLOBAL.'.get,';
+			$top = array(
+				"'use strict';",
+				"(function(){",
+				"var g=".CONST_GLOBAL.".get,"
+			);
 			$list = JSGlobals::getConstantsListToDefineInChunks();
+			$line = array(CONST_COMPONENT, CONST_PROTO);
 			foreach ($list as $name) {
-				$top .= $name.'='.$varname."('".$name."'),";
+				$line[] = $name."=g('".$name."')";
 			}
-			$jsOutput = $top.CONST_COMPONENT.",".CONST_PROTO.";\n".$jsOutput;
+			$jsOutput = implode("\n", $top).implode(",", $line).";\n".$jsOutput;
 		}
 		$jsOutput = preg_replace("/, *\)/", ')', $jsOutput);
 		$jsOutput = preg_replace("/'<nq>/", '', $jsOutput);
@@ -716,7 +734,6 @@ class JSCompiler
 		$jsOutput = preg_replace('/\{\s+\}/', '{}', $jsOutput);
 		$jsOutput .= "\n".implode("\n", $bottomOutput);
 		$pathToCompiledJs = DEFAULT_PATH.$fileName;
-		FileManager::emptyFolder(DEFAULT_PATH.$this->config['folder']);
 		if ($this->configProvider->isAdvancedMode()) {		
 			FileManager::createFile('temp.js', $jsOutput);
 			exec('java -jar compiler.jar --js temp.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file temp2.js 2>&1', $output);	
@@ -746,8 +763,7 @@ class JSCompiler
 		$utilsFuncs = array_merge($utilsFuncs, $customFuncs);
 		if ($isBase) {
 			$jsOutput .= "\n";
-			$jsOutput .= 'var a=['.implode(',', $utilsFuncs)."];\n";
-			$jsOutput .= "for(var i=0;i<a.length;i++){".CONST_FUNCS."[i]=a[i]}";
+			$jsOutput .= CONST_FUNCS.'=['.implode(',', $utilsFuncs)."];".CONST_GLOBAL.'.set('.CONST_FUNCS.",'".CONST_FUNCS."');";
 		} else {
 			$regexp = implode('|', $utilsFuncs);
 			preg_match_all('/[^\w\.]('.$regexp.')(?=[\s;,\(])/', $jsOutput, $matches);
@@ -1030,17 +1046,17 @@ class JSCompiler
 		if (empty($route)) {
 			$entry = $this->config['entry'];
 			if ($this->configProvider->isUsingDataLoader()) {
-				$bottomOutput[] = "if (isObject(".CONST_LOADEDDATA."['user'])) User.setData(".CONST_LOADEDDATA."['user']);";
-				$bottomOutput[] = "if (isObject(".CONST_LOADEDDATA."['dictionary'])) Dictionary.setData(Router.getCurrentRoute()['name'], ".CONST_LOADEDDATA."['dictionary']);";
+				$bottomOutput[] = "if (isObject(".CONST_LOADEDDATA."['user'])) ".CONST_USER.".setData(".CONST_LOADEDDATA."['user']);";
+				$bottomOutput[] = "if (isObject(".CONST_LOADEDDATA."['dictionary'])) Dictionary.setData(".CONST_ROUTER.".getCurrentRoute()['name'], ".CONST_LOADEDDATA."['dictionary']);";
 				$bottomOutput[] = "var ".$entry."=".CONST_GLOBAL.".get('".$entry."',1);";
 				$bottomOutput[] = CONST_CORE.".initiate.call(".$entry.");";
 				$bottomOutput[] = $entry.".run();";
 				$bottomOutput[] = "};";
 			}
-			$controllers = array('Router', 'User');
+			$controllers = array(CONST_ROUTER, CONST_USER);
 			if (!empty($controllers)) {
 				foreach ($controllers as $controller) {
-					if ($controller == 'User' && !$this->config['hasUser']) {
+					if ($controller == CONST_USER && !$this->config['hasUser']) {
 						continue;
 					}
 					$bottomOutput[] = "var ".$controller."=".CONST_GLOBAL.".get('".$controller."',1);";
@@ -1051,12 +1067,12 @@ class JSCompiler
 				$bottomOutput[] = "var ".$entry."=".CONST_GLOBAL.".get('".$entry."',1);";
 				$bottomOutput[] = CONST_CORE.".initiate.call(".$entry.");";
 				if ($this->config['hasUser']) {
-					$bottomOutput[] = "User.load(".$entry.");";
+					$bottomOutput[] = CONST_USER.".load(".$entry.");";
 				} else {
 					$bottomOutput[] = $entry.".run();";
 				}
 			} else {
-				$bottomOutput[] = "Loader.get(__LU, {'route': Router.getCurrentRoute()['name']},".CONST_CALLBACK.");";
+				$bottomOutput[] = "Loader.get(__LU, {'route': ".CONST_ROUTER.".getCurrentRoute()['name']},".CONST_CALLBACK.");";
 			}
 			$bottomOutput[] = "})();\n});";
 		} else {
@@ -1108,7 +1124,7 @@ class JSCompiler
 		}
 		$content = CONST_GLOBAL.".set(".CONST_COMPONENT.'='.$fnc;
 		if ($isRouterMenu) {
-			$content .= "\nRouter.addMenu(this);";
+			$content .= "\n".CONST_ROUTER.".addMenu(this);";
 			$content .= "\nthis.isRouteMenu=true;";
 		}
 		$isSingleton = '';

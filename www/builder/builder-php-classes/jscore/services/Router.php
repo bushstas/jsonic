@@ -1,7 +1,7 @@
 <?php
 
 	$data = array(
-		'name' => 'Router',
+		'name' => CONST_ROUTER,
 		'mode' => 3,
 		'before' => "
 			var properRoutes = {},
@@ -90,7 +90,7 @@
 					var route = getRoute();
 					bodyElement.setClass(route['name'] + '-page');
 					var accessLevel = route['accessLevel'];
-					if (isNumber(accessLevel) && !User.hasAccessLevel(accessLevel)) {
+					if (isNumber(accessLevel) && !".CONST_USER.".hasAccessLevel(accessLevel)) {
 						route = getErrorRoute(401);
 					}
 					changeRoute(route, true);

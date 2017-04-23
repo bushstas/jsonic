@@ -6,7 +6,7 @@
 		'afterCondition' => "
 			this.params = params;
 		",
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'privateMethods' => array(
 			'createLevels' => array(
 				'args' => array('isUpdating'),

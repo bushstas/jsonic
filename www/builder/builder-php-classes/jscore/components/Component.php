@@ -2,7 +2,7 @@
 
 	$data = array(
 		'name' => 'Component',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'privateMethods' => array(
 			'load' => array(
 				'args' => array(''),

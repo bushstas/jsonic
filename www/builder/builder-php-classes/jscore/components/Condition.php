@@ -7,7 +7,7 @@
 			this.params = params;
 			this.isTrue = !!params['i']();
 		",
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'privateMethods' => array(
 			'createLevel' => array(
 				'args' => array('isUpdating'),

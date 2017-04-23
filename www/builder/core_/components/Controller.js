@@ -1,4 +1,4 @@
-_G_.set((c=function(){
+__G.set((c=function(){
 if(!this||this==window){
 var makeUrl=function(url,options){var regExp,tmpUrl;for(var k in options){if(isString(options[k])||isNumber(options[k])){regExp=new RegExp('\$'+k);tmpUrl=url;url=url.replace(regExp,options[k]);if(tmpUrl!=url)delete options[k]}}return url};
 var gotFromStore=function(actionName,options,initiator){if(actionName=='load'&&shouldStore.call(this)){var storeAs=getStoreAs.call(this,options);if(isString(storeAs)&&typeof StoreKeeper!='undefined'){var storedData=StoreKeeper.getActual(storeAs,Objects.get(this.options,'storePeriod'));if(isArrayLike(storedData)){onActionComplete.call(this,actionName,true,initiator,storedData);return true}}}return false};
@@ -12,7 +12,7 @@ var getPrimaryKey=function(){return Objects.get(this.options,'key','id')};
 var initActionRouteOptions=function(action){var value;this.currentRouteOptions={};var routeOptions={};for(var k in action['routeOptions']){value=Router.getPathPartAt(action['routeOptions'][k]);if(isString(value)){routeOptions[k]=value}}setCurrentRouteOptions.call(this,routeOptions,action);Router.subscribe(action['routeOptions'],this)};
 var setCurrentRouteOptions=function(routeOptions,action){this.currentRouteOptions=routeOptions;if(!isObject(action['options'])){action['options']={}}for(var k in routeOptions){action['options'][k]=routeOptions[k]}};
 var getAction=function(actionName){var actions=Objects.get(this.initials,'actions');if(isObject(actions)){var action=actions[actionName];if(isObject(action)){if(!isString(action['name'])){if(isObject(action['routeOptions'])&&actionName=='load'){initActionRouteOptions.call(this,action)}action['name']=actionName}return action}}return null};
-var getNewRequest=function(){var ajr=_G_.get('AjaxRequest');return new ajr()};
+var getNewRequest=function(){var ajr=__G.get('AjaxRequest');return new ajr()};
 var getRequest=function(action){return this.requests[action['name']]=this.requests[action['name']]||getNewRequest()};
 var getOptions=function(options,action,initiator){if(!isObject(options))options={};if(isObject(action['options']))Objects.merge(options,action['options']);if(isPrivate.call(this,initiator)){Objects.merge(options,getPrivateOptions.call(this,initiator))}return options};
 var getPrivateOptions=function(initiator){return this.privateOptions[initiator.getUniqueId()]};
@@ -22,7 +22,7 @@ p.initiate=function(){this.subscribers={};this.requests={};this.activeRequests=[
 p.addSubscriber=function(actionName,data,isPriv,options){this.subscribers[actionName]=this.subscribers[actionName]||[];this.subscribers[actionName].push(data);if(isPriv){var uid=data['initiator'].getUniqueId();this.privateSubscribers.push(uid);if(options)this.privateOptions[uid]=options}};
 p.removeSubscriber=function(initiator){this.privateSubscribers.removeItem(initiator.getUniqueId());var done=false;for(var actionName in this.subscribers){for(var i=0;i<this.subscribers[actionName].length;i++){if(this.subscribers[actionName][i]['initiator']==initiator){this.subscribers[actionName].splice(i,1);break}}}};
 p.dispatchEvent=function(actionName,data,initiator){var dataToDispatch=data;if(Objects.has(this.options,'clone',true))dataToDispatch=Objects.clone(data);var s=this.subscribers[actionName],i,p;if(isArray(s)){for(i=0;i<s.length;i++){p=(!initiator&&!isPrivate.call(this,s[i]['initiator']))||initiator==s[i]['initiator'];if(p&&isFunction(s[i]['callback'])){s[i]['callback'].call(s[i]['initiator'],dataToDispatch,this)}}}};
-p.instanceOf=function(classFunc){if(isString(classFunc))classFunc=_G_.get(classFunc);return this instanceof classFunc||(this.inheritedSuperClasses&&this.inheritedSuperClasses.indexOf(classFunc)>-1)};
+p.instanceOf=function(classFunc){if(isString(classFunc))classFunc=__G.get(classFunc);return this instanceof classFunc||(this.inheritedSuperClasses&&this.inheritedSuperClasses.indexOf(classFunc)>-1)};
 p.getData=function(actionName){return!!action&&!!this.data&&isObject(this.data)?this.data[action]:this.data};
 p.getItemById=function(id){var primaryKey=getPrimaryKey.call(this);var data=this.data['load'];if(isArray(data)){for(var i=0;i<data.length;i++){if(Objects.has(data[i],primaryKey,id))return data[i]}}return null};
 p.getItem=function(nameOrIndex,actionName){actionName=actionName||'load';return isArrayLike(this.data[actionName])?this.data[actionName][nameOrIndex]:null};

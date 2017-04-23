@@ -2,7 +2,7 @@
 
 	$data = array(
 		'name' => 'Control',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'privateMethods' => array(
 			'onChangeChildControl' => array(
 				'args' => array('e'),

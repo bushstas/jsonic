@@ -2,9 +2,9 @@
 
 	$data = array(
 		'name' => 'Application',
-		'condition' => '!this||this==window',
+		'condition' => CONST_ENTERCOND,
 		'before' => "
-			var controllers, router, dictionary;
+			var controllers, dictionary;
 		",
 		'privateMethods' => array(
 			'getViewParams' => array(
@@ -14,7 +14,7 @@
 					if (isObject(route['dynamicParams'])) {
 						params = {};
 						for (var k in route['dynamicParams']) {
-							params[k] = router.getPathPartAt(route['dynamicParams'][k]);
+							params[k] = ".CONST_ROUTER.".getPathPartAt(route['dynamicParams'][k]);
 						}
 					}
 					if (allParams) {
@@ -189,16 +189,15 @@
 			'run' => array(
 				'body' => "
 					dictionary = ".CONST_GLOBAL.".get('Dictionary');
-					router = ".CONST_GLOBAL.".get('Router');
 					controllers = ".CONST_GLOBAL.".get('Controllers');
 					defineViews.call(this);
-					router.setNavigationHandler(handleNavigation.bind(this));
-					router.init();
+					".CONST_ROUTER.".setNavigationHandler(handleNavigation.bind(this));
+					".CONST_ROUTER.".init();
 					this.element = document.createElement('div');
 					document.body.appendChild(this.element);
 					this.render(this.element);
 					createViewContainer.call(this);
-					router.run();
+					".CONST_ROUTER.".run();
 				"
 			),
 			'setPageTitle' => array(
