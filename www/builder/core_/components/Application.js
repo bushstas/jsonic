@@ -1,7 +1,7 @@
 __G.set((c=function(){
 if(!this||this==window){
 var controllers,dictionary;
-var getViewParams=function(route,allParams){var params;if(isObject(route['dynamicParams'])){params={};for(var k in route['dynamicParams']){params[k]=Router.getPathPartAt(route['dynamicParams'][k])}}if(allParams){if(isObject(params)){Objects.merge(params,route['params'])}else{params=route['params']}}return params};
+var getViewParams=function(route,allParams){var params;if(isObject(route['dynamicParams'])){params={};for(var k in route['dynamicParams']){params[k]=Router.getPathPartAt(route['dynamicParams'][k])}}if(allParams){if(isObject(params)){__O.merge(params,route['params'])}else{params=route['params']}}return params};
 var loadControllers=function(route){if(isArray(route['load'])||isNumber(route['load'])){controllers.load(route['load'])}};
 var loadView=function(route){var script=document.createElement('script');script.src='/js/base_'+route['name']+'_chunk.js';document.body.appendChild(script);script.onload=onViewLoaded.bind(this,route)};
 var onViewLoaded=function(route){route['view']=__G.get(route['view']);renderView.call(this,route)};

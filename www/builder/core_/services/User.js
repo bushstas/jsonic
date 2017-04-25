@@ -4,8 +4,8 @@ var initOptions=function(){if(isObject(userOptions)){if(userOptions['login']&&is
 var getDefaultAttributes=function(){return{'type':'guest','accessLevel':0}};
 this.load=function(application){if(!loaded){initOptions.call(this);app=application;if(loadRequest){loadRequest.execute();return}}onLoad(getDefaultAttributes())};
 this.setData=function(data){status=data['status'];attributes=data['attributes'];settings=data['settings'];loaded=true;if(isComponentLike(app)){app.run()}};
-this.hasFullAccess=function(){var fullAccess=Objects.get(userOptions,'fullAccess',null);var accessLevel=~~status['accessLevel'];return!isNumber(fullAccess)||accessLevel>=fullAccess};
-this.isAdmin=function(){var adminAccess=Objects.get(userOptions,'adminAccess',null);var accessLevel=~~status['accessLevel'];return!isNumber(adminAccess)||accessLevel>=adminAccess};
+this.hasFullAccess=function(){var fullAccess=__O.get(userOptions,'fullAccess',null);var accessLevel=~~status['accessLevel'];return!isNumber(fullAccess)||accessLevel>=fullAccess};
+this.isAdmin=function(){var adminAccess=__O.get(userOptions,'adminAccess',null);var accessLevel=~~status['accessLevel'];return!isNumber(adminAccess)||accessLevel>=adminAccess};
 this.isBlocked=function(){return!!status['isBlocked']};
 this.getBlockedReason=function(){return status['blockReason']};
 this.hasAccessLevel=function(accessLevel,isEqual){if(!isEqual){return status['accessLevel']>=accessLevel}return status['accessLevel']==accessLevel};

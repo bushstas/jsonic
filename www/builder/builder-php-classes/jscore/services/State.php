@@ -55,7 +55,7 @@
 					var changed = {}, isChanged = false;
 					for (var k in data) {
 						if (vars[k] == data[k]) continue;
-						if (isArray(vars[k]) && isArray(data[k]) && Objects.equals(vars[k], data[k])) continue;
+						if (isArray(vars[k]) && isArray(data[k]) && ".CONST_OBJECTS.".equals(vars[k], data[k])) continue;
 						isChanged = true;
 						changed[k] = data[k];
 					}

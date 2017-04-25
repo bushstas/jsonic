@@ -139,7 +139,7 @@ class JSCoreRenderer
 				);
 			case 2:
 				return array(
-					CONST_GLOBAL.'.set('.$var.'=new(function('.$this->getArgs($args).'){',
+					CONST_GLOBAL.'.set('.(!empty($var) ? $var.'=' : '').'new(function('.$this->getArgs($args).'){',
 					"})(),'".$name."');"
 				);
 			default:

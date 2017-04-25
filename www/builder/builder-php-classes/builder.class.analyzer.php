@@ -84,7 +84,7 @@ class ClassAnalyzer
 				new Error(self::$errors['unknownClass'], array($fileName, $className));	
 			}
 		}
-		//Printer::log(self::$usedClasses, true);
+		//Printer::log(self::$usedClasses, 0);
 		//Printer::log(self::$usedCorrectors);
 	}
 

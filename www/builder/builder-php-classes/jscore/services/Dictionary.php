@@ -42,7 +42,7 @@
 			'get' => array(
 				'args' => array('key', 'callbackOrPropName', 'thisObj'),
 				'body' => "
-					var item = Objects.get(items, key);
+					var item = ".CONST_OBJECTS.".get(items, key);
 					if (item) return item;
 					callbacks = callbacks || [];
 					callbacks.push([callbackOrPropName, thisObj, key]);

@@ -25,7 +25,7 @@
 					if (actionName == 'load' && shouldStore.call(this)) {
 						var storeAs = getStoreAs.call(this, options);
 						if (isString(storeAs) && typeof StoreKeeper != 'undefined') {
-							var storedData = StoreKeeper.getActual(storeAs, Objects.get(this.options, 'storePeriod'));
+							var storedData = StoreKeeper.getActual(storeAs, ".CONST_OBJECTS.".get(this.options, 'storePeriod'));
 							if (isArrayLike(storedData)) {
 								onActionComplete.call(this, actionName, true, initiator, storedData);
 								return true;
@@ -78,9 +78,9 @@
 			),
 			'shouldStore' => array(
 				'body' => "
-					var should = Objects.get(this.options, 'store');
+					var should = ".CONST_OBJECTS.".get(this.options, 'store');
 					if (should === false) return false;
-					return Objects.has(this.options, 'storeAs');
+					return ".CONST_OBJECTS.".has(this.options, 'storeAs');
 				"
 			),
 			'store' => array(
@@ -98,7 +98,7 @@
 			'getStoreAs' => array(
 				'args' => array('data'),
 				'body' => "
-					var storeAs = Objects.get(this.options, 'storeAs');
+					var storeAs = ".CONST_OBJECTS.".get(this.options, 'storeAs');
 					if (isArrayLike(data) && isString(storeAs) && (/\$[a-z_]/i).test(storeAs)) {
 						var parts = storeAs.split('$');
 						storeAs = parts[0];
@@ -112,7 +112,7 @@
 			),
 			'getPrimaryKey' => array(
 				'body' => "
-					return Objects.get(this.options, 'key', 'id');
+					return ".CONST_OBJECTS.".get(this.options, 'key', 'id');
 				"
 			),
 			'initActionRouteOptions' => array(
@@ -146,7 +146,7 @@
 			'getAction' => array(
 				'args' => array('actionName'),
 				'body' => "
-					var actions = Objects.get(this.initials, 'actions');
+					var actions = ".CONST_OBJECTS.".get(this.initials, 'actions');
 					if (isObject(actions)) {
 						var action = actions[actionName];
 						if (isObject(action)) {
@@ -179,9 +179,9 @@
 				'args' => array('options', 'action', 'initiator'),
 				'body' => "
 					if (!isObject(options)) options = {};
-					if (isObject(action['options'])) Objects.merge(options, action['options']);
+					if (isObject(action['options'])) ".CONST_OBJECTS.".merge(options, action['options']);
 					if (isPrivate.call(this, initiator)) {
-						Objects.merge(options, getPrivateOptions.call(this, initiator));
+						".CONST_OBJECTS.".merge(options, getPrivateOptions.call(this, initiator));
 					}
 					return options;
 				"
@@ -244,7 +244,7 @@
 				'args' => array('actionName', 'data', 'initiator'),
 				'body' => "
 					var dataToDispatch = data;
-					if (Objects.has(this.options, 'clone', true)) dataToDispatch = Objects.clone(data);
+					if (".CONST_OBJECTS.".has(this.options, 'clone', true)) dataToDispatch = ".CONST_OBJECTS.".clone(data);
 					var s = this.subscribers[actionName], i, p;
 					if (isArray(s)) {
 						for (i = 0; i < s.length; i++) {
@@ -276,7 +276,7 @@
 					var data = this.data['load'];
 					if (isArray(data)) {
 						for (var i = 0; i < data.length; i++) {
-							if (Objects.has(data[i], primaryKey, id)) return data[i];
+							if (".CONST_OBJECTS.".has(data[i], primaryKey, id)) return data[i];
 						}
 					}
 					return null;
@@ -303,7 +303,7 @@
 			'handleRouteOptionsChange' => array(
 				'args' => array('routeOptions'),
 				'body' => "
-					if (!Objects.equals(routeOptions, this.currentRouteOptions)) {
+					if (!".CONST_OBJECTS.".equals(routeOptions, this.currentRouteOptions)) {
 						setCurrentRouteOptions.call(this, routeOptions, getAction.call(this, 'load'));
 						this.doAction(null, 'load');
 					}

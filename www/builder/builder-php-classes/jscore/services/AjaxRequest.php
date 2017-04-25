@@ -32,7 +32,7 @@
 			'getRequestContent' => array(
 				'args' => array('method', 'pars'),
 				'body' => "
-					if (Objects.empty(pars)) return '';
+					if (".CONST_OBJECTS.".empty(pars)) return '';
 					if (!isObject(pars)) {
 						return pars.toString();
 					} else if (pars instanceof FormData) {

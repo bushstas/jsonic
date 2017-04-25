@@ -317,7 +317,7 @@ class JSCompiler
 			$isMissing = false;
 			if (!preg_match('/\b'.$helper.'\b/', $this->jsCode)) {
 				$isMissing = true;
-				if ($helper == 'Tooltiper') {
+				if ($helper == 'Tooltiper') {					
 					$isMissing = empty($this->config['tooltipClass']);
 				} elseif ($helper == 'State') {
 					$isMissing = !$this->isStatesUsed();

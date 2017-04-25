@@ -10,7 +10,7 @@
 		'privateMethods' => array(
 			'getKeysInRandomOrder' => array(
 				'body' => "
-					var keys = Objects.getKeys(getParam.call(this, 'p'));
+					var keys = ".CONST_OBJECTS.".getKeys(getParam.call(this, 'p'));
 					keys.shuffle();
 					return keys;
 				"
@@ -35,7 +35,7 @@
 					var items = getParam.call(this, 'p'), limit = getParam.call(this, 'l'), r;
 					if (isArrayLike(items)) {
 						if (p['ra']) {
-							if (!Objects.empty(items)) {
+							if (!".CONST_OBJECTS.".empty(items)) {
 								var keys = getKeysInRandomOrder();
 								for (var i = 0; i < keys.length; i++) {
 									if (limit && i + 1 > limit) break;
@@ -73,7 +73,7 @@
 								return;
 							}
 						} else if (isObject(items)) {
-							if (!Objects.empty(items)) {
+							if (!".CONST_OBJECTS.".empty(items)) {
 								if (!p['r']) {
 									var i = 0;
 									for (var k in items) {
@@ -84,7 +84,7 @@
 										".CONST_CORE.".createLevel.call(this, r, isUpdating);
 									}
 								} else {
-									var keys = Objects.getKeys(items);
+									var keys = ".CONST_OBJECTS.".getKeys(items);
 									keys.reverse();
 									for (var i = 0; i < keys.length; i++) {
 										if (limit && i + 1 > limit) break;

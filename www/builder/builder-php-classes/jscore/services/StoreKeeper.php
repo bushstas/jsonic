@@ -70,14 +70,14 @@
 				'args' => array('k'),
 				'body' => "
 					var i = gi(k);
-					return Objects.has(i, 'data') ? i['data'] : null;
+					return ".CONST_OBJECTS.".has(i, 'data') ? i['data'] : null;
 				"
 			),
 			'getActual' => array(
 				'args' => array('k', 'p'),
 				'body' => "
 					var i = gi(k);
-					return Objects.has(i, 'data') && ia(i['timestamp'], p) ? i['data'] : null;
+					return ".CONST_OBJECTS.".has(i, 'data') && ia(i['timestamp'], p) ? i['data'] : null;
 				"
 			),
 			'remove' => array(

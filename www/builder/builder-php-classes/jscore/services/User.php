@@ -58,14 +58,14 @@
 			),
 			'hasFullAccess' => array(
 				'body' => "
-					var fullAccess = Objects.get(userOptions, 'fullAccess', null);
+					var fullAccess = ".CONST_OBJECTS.".get(userOptions, 'fullAccess', null);
 					var accessLevel = ~~status['accessLevel'];
 					return !isNumber(fullAccess) || accessLevel >= fullAccess;
 				"
 			),
 			'isAdmin' => array(
 				'body' => "
-					var adminAccess = Objects.get(userOptions, 'adminAccess', null);
+					var adminAccess = ".CONST_OBJECTS.".get(userOptions, 'adminAccess', null);
 					var accessLevel = ~~status['accessLevel'];
 					return !isNumber(adminAccess) || accessLevel >= adminAccess;
 				"

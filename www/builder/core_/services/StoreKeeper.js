@@ -5,7 +5,7 @@ var gm=function(p){var n=~~p.replace(/[^\d]/g,'');var m=p.replace(/\d/g,'');if(!
 var gi=function(k){var lk=g(k);var i=localStorage.getItem(lk);if(!i)return null;try{i=JSON.parse(i)}catch(e){return null}return i};
 var ia=function(sm,p){var nm=Date.now(),pm=gm(p);if(isString(sm))sm=stringToNumber(sm);return pm&&sm&&nm-sm<pm};
 this.set=function(k,v){var lk=g(k);var i=JSON.stringify({'data':v,'timestamp':Date.now().toString()});localStorage.setItem(lk,i)};
-this.get=function(k){var i=gi(k);return Objects.has(i,'data')?i['data']:null};
-this.getActual=function(k,p){var i=gi(k);return Objects.has(i,'data')&&ia(i['timestamp'],p)?i['data']:null};
+this.get=function(k){var i=gi(k);return __O.has(i,'data')?i['data']:null};
+this.getActual=function(k,p){var i=gi(k);return __O.has(i,'data')&&ia(i['timestamp'],p)?i['data']:null};
 this.remove=function(k){var lk=g(k);localStorage.removeItem(lk)};
 })(),'StoreKeeper');

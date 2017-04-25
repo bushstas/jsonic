@@ -7,7 +7,7 @@
 			'load' => array(
 				'args' => array(''),
 				'body' => "
-					var loader = Objects.get(this.initials, 'loader');
+					var loader = ".CONST_OBJECTS.".get(this.initials, 'loader');
 					if (isObject(loader) && isObject(loader['controller'])) {
 						this.preset('__loading', true);
 						var isAsync = !!loader['async'];
@@ -104,7 +104,7 @@
 			'callFollower' => array(
 				'args' => array('propName', 'propValue'),
 				'body' => "
-					if (Objects.has(this.followers, propName)) this.followers[propName].call(this, propValue);	
+					if (".CONST_OBJECTS.".has(this.followers, propName)) this.followers[propName].call(this, propValue);	
 				"
 			),
 			'updateForeach' => array(
@@ -308,10 +308,10 @@
 					var changedProps = {};
 					var currentValue;
 					for (var k in props) {
-						if (Objects.has(this.correctors, k)) props[k] = this.correctors[k].call(this, props[k], props);
+						if (".CONST_OBJECTS.".has(this.correctors, k)) props[k] = this.correctors[k].call(this, props[k], props);
 						currentValue = this.props[k];
 						if (currentValue == props[k]) continue;
-						if (isArray(currentValue) && isArray(props[k]) && Objects.equals(currentValue, props[k])) continue;
+						if (isArray(currentValue) && isArray(props[k]) && ".CONST_OBJECTS.".equals(currentValue, props[k])) continue;
 						isChanged = true;
 						this.props[k] = props[k];
 						changedProps[k] = props[k];
@@ -348,7 +348,7 @@
 					if (!child) return;
 					var childId = child;
 					if (isString(child)) child = this.getChild(child);
-					else childId = Objects.getKey(this.children, child);
+					else childId = ".CONST_OBJECTS.".getKey(this.children, child);
 					if (isComponentLike(child)) child.dispose();
 					if ((isString(childId) || isNumber(childId)) && isObject(this.children)) {
 						this.children[childId] = null;
@@ -383,7 +383,7 @@
 			'getControl' => array(
 				'args' => array('name'),
 				'body' => "
-					return Objects.get(this.controls, name) || this.forEachChild(function(child) {
+					return ".CONST_OBJECTS.".get(this.controls, name) || this.forEachChild(function(child) {
 						return child.getControl(name);
 					});
 				"
@@ -405,12 +405,12 @@
 			'forEachControl' => array(
 				'args' => array('callback'),
 				'body' => "
-					if (isObject(this.controls)) Objects.each(this.controls, callback, this);
+					if (isObject(this.controls)) ".CONST_OBJECTS.".each(this.controls, callback, this);
 				"
 			),
 			'hasControls' => array(
 				'body' => "
-					return !Objects.empty(this.controls);
+					return !".CONST_OBJECTS.".empty(this.controls);
 				"
 			),
 			'getControlsData' => array(
@@ -437,7 +437,7 @@
 			'getChildAt' => array(
 				'args' => array('index'),
 				'body' => "
-					return Objects.getByIndex(this.children, index);
+					return ".CONST_OBJECTS.".getByIndex(this.children, index);
 				"
 			),
 			'getChildIndex' => array(
@@ -465,7 +465,7 @@
 			'getChild' => array(
 				'args' => array('id'),
 				'body' => "
-					return Objects.get(this.children, id);
+					return ".CONST_OBJECTS.".get(this.children, id);
 				"
 			),
 			'getId' => array(
@@ -476,7 +476,7 @@
 			'getElement' => array(
 				'args' => array('id'),
 				'body' => "
-					if (isString(id)) return Objects.get(this.elements, id);
+					if (isString(id)) return ".CONST_OBJECTS.".get(this.elements, id);
 					else return this.scope || this.parentElement;
 				"
 			),

@@ -19,7 +19,7 @@
 					}
 					if (allParams) {
 						if (isObject(params)) {
-							Objects.merge(params, route['params']);
+							".CONST_OBJECTS.".merge(params, route['params']);
 						} else {
 							params = route['params'];
 						}

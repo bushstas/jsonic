@@ -50,20 +50,20 @@
 				'args' => array('rts', 'parents'),
 				'body' => "
 					parents = parents || [];
-					var tempParents = Objects.clone(parents);
+					var tempParents = ".CONST_OBJECTS.".clone(parents);
 					var name, path;
 					for (var i = 0; i < rts.length; i++) {
 						name = rts[i]['name'];
 						tempParents.push(name);
-						var children = Objects.clone(rts[i]['children']);
+						var children = ".CONST_OBJECTS.".clone(rts[i]['children']);
 						delete rts[i]['children'];
 						path = rts[i]['path'] = tempParents.join('/');
 						initRouteParams(rts[i]);
 						properRoutes[path] = rts[i];
 						if (isArray(children)) {
-							initRoutes(children, Objects.clone(tempParents));
+							initRoutes(children, ".CONST_OBJECTS.".clone(tempParents));
 						}
-						tempParents = Objects.clone(parents);
+						tempParents = ".CONST_OBJECTS.".clone(parents);
 					}
 				"
 			),

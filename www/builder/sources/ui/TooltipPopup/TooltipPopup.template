@@ -10,8 +10,10 @@
 						{&item}
 					</div>
 				{/foreach}
+			{/case}
 			{default}
 				{$text}
+			{/default}
 		{/switch}
 	</div>
 </div>

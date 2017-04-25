@@ -13,8 +13,8 @@
 					} else {
 						for (var k in initials2) {
 							if (isUndefined(initials1[k])) initials1[k] = initials2[k];
-							else if (isObject(initials1[k]) || isObject(initials2[k])) Objects.merge(initials1[k], initials2[k]);
-							else if (isArray(initials1[k]) || isArray(initials2[k])) Objects.concat(initials1[k], initials2[k]);				
+							else if (isObject(initials1[k]) || isObject(initials2[k])) ".CONST_OBJECTS.".merge(initials1[k], initials2[k]);
+							else if (isArray(initials1[k]) || isArray(initials2[k])) ".CONST_OBJECTS.".concat(initials1[k], initials2[k]);				
 						}
 					}
 					return initials1;
@@ -56,7 +56,7 @@
 			'getInitial' => array(
 				'args' => array('initialName'),
 				'body' => "
-					return Objects.get(this.initials, initialName);
+					return ".CONST_OBJECTS.".get(this.initials, initialName);
 				"
 			),
 			'attachController' => array(
@@ -66,7 +66,7 @@
 						var data, ctr;
 						for (var actionName in options['on']) {
 							data = {'initiator': this, 'callback': options['on'][actionName]};
-							options['controller'].addSubscriber(actionName, data, !!options['private'], Objects.get(options['options'], actionName));
+							options['controller'].addSubscriber(actionName, data, !!options['private'], ".CONST_OBJECTS.".get(options['options'], actionName));
 						}
 					}
 				"
@@ -198,7 +198,7 @@
 					if (isArray(this.inheritedSuperClasses)) {
 						initiateParental(this.inheritedSuperClasses, this);
 					}
-					if (isObject(this.props)) Objects.merge(this.props, props);
+					if (isObject(this.props)) ".CONST_OBJECTS.".merge(this.props, props);
 					else this.props = props || {};
 					if (isFunction(proto.initiate)) {
 						proto.initiate.call(this);
@@ -246,7 +246,7 @@
 			'getWaitingChild' => array(
 				'args' => array('componentName'),
 				'body' => "
-					return Objects.get(this.waiting, componentName);
+					return ".CONST_OBJECTS.".get(this.waiting, componentName);
 				"
 			),
 			'getTemplateById' => array(
