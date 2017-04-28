@@ -39,12 +39,15 @@ class JSCoreRenderer
 		if (is_array($data)) {
 			extract($data);
 		}
-		if (empty($name)) return;
+		if (empty($name) && empty($prototypeOf) && empty($functions)) return;
 
-		$classes[$name] = array();
-		$class = &$classes[$name];
-		$class['overridableMethods'] = $overridableMethods;
-		$class['templateCallableMethods'] = $templateCallableMethods;
+		
+		if (!empty($name) || !empty($prototypeOf)) {
+			$this->classes[!empty($name) ? $name : $prototypeOf] = array();
+			$class = &$this->classes[!empty($name) ? $name : $prototypeOf];
+			$class['overridableMethods'] = $overridableMethods;
+			$class['templateCallableMethods'] = $templateCallableMethods;
+		}
 		
 		$content = array();
 		if (!empty($beforeCondition)) {
@@ -55,6 +58,11 @@ class JSCoreRenderer
 		}
 		if (!empty($before)) {
 			$content[] = $this->correctContent($before);
+		}
+		if (is_array($functions) && !empty($functions)) {
+			foreach ($functions as $methodName => $methodData) {
+				$this->addMethod($methodName, $methodData, $content, 4);
+			}
 		}
 		if (is_array($privateMethods) && !empty($privateMethods)) {
 			$class['privateMethods'] = array_keys($privateMethods);
@@ -70,7 +78,10 @@ class JSCoreRenderer
 		}
 		if (is_array($methods) && !empty($methods)) {
 			$class['methods'] = array_keys($methods);
-			$content[] = CONST_PROTO.'='.CONST_COMPONENT.'.prototype;';
+			if (empty($prototypeOf)) {
+				$prototypeOf = CONST_COMPONENT;
+			}
+			$content[] = CONST_PROTO.'='.$prototypeOf.'.prototype;';
 			foreach ($methods as $methodName => $methodData) {
 				$this->addMethod($methodName, $methodData, $content, 3);
 			}
@@ -106,7 +117,7 @@ class JSCoreRenderer
 				$content[] = 'var '.$methodName.'='.$value.';';
 			} elseif ($type == 2) {
 				$content[] = 'this.'.$methodName.'='.$value.';';
-			} else {
+			} elseif ($type == 3) {
 				$content[] = CONST_PROTO.'.'.$methodName.'='.$value.';';
 			}
 		} else {
@@ -115,8 +126,10 @@ class JSCoreRenderer
 				$function = 'var '.$methodName.'=function('.$args.'){';
 			} elseif ($type == 2) {
 				$function = 'this.'.$methodName.'=function('.$args.'){';
-			} else {
+			} elseif ($type == 3) {
 				$function = CONST_PROTO.'.'.$methodName.'=function('.$args.'){';
+			} else {
+				$function = 'function '.$methodName.'('.$args.'){';
 			}
 			if (!empty($data['body'])) {
 				$body = $this->correctContent($data['body']);
@@ -132,6 +145,14 @@ class JSCoreRenderer
 
 	private function getTopAndBottomContent($mode, $name, $args, $var) {
 		switch ((int)$mode) {
+			case 5:
+				return array('','');
+
+			case 4:
+				return array(
+					';(function(){',
+					"})();"
+				);
 			case 3:
 				return array(
 					CONST_GLOBAL.'.set(function('.$this->getArgs($args).'){',

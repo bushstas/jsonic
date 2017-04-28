@@ -48,7 +48,9 @@ class Constants
 		'CONFIG'    => 'CONFIG',
 		'LOGGER'    => 'Logger',
 		'ROUTER'    => 'Router',
-		'USER'      => 'User'
+		'USER'      => 'User',
+		'DATES'     => 'Dates',
+		'DECLINER'  => 'Decliner'
 	);
 
 	private static $definitionsList = array(

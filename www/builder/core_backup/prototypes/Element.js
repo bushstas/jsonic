@@ -1,4 +1,5 @@
-var __StyleNameCache = {};
+;(function(){
+var cache = {};
 {{PROTO}}=Element.prototype;
 {{PROTO}}.setClass = function(className) {
 	this.className = className.trim();
@@ -49,11 +50,9 @@ var __StyleNameCache = {};
 	return this.getClasses().indexOf(className) > -1;
 };
 {{PROTO}}.getClasses = function() {
-	var classNames = (this.className || '').trim().replace(/ {2,}/g, ' ');
-	if (classNames) {
-		return classNames.split(' ');
-	}
-	return [];
+	if (!this.className) return [];
+	var classNames = this.className.trim().replace(/ {2,}/g, ' ');
+	return classNames.split(' ');
 };
 {{PROTO}}.getAncestor = function(selector) {
 	if (isNone(selector) || !isString(selector)) {
@@ -124,10 +123,10 @@ var __StyleNameCache = {};
 		}
 	};
 	var getVendorJsStyleName = function(style) {
-		var propertyName = __StyleNameCache[style];
+		var propertyName = cache[style];
 		if (!propertyName) {
 			propertyName = toCamelCase(style);
-	    	__StyleNameCache[style] = propertyName;
+	    	cache[style] = propertyName;
 	  	}	
 		return propertyName;
 	};
@@ -202,3 +201,4 @@ var __StyleNameCache = {};
 {{PROTO}}.next = function() {
 	return this.nextSibling;
 };
+})();
