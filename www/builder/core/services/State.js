@@ -7,6 +7,6 @@ this.set=function(name,value){var updated,data=name;if(!isUndefined(value)){data
 this.listen=function(listener,name,callback){if(!isArray(listeners[name]))listeners[name]=[];listeners[name].push([callback,listener])};
 this.unlisten=function(name,listener){if(isArray(listeners[name])){var indexes=[];for(var i=0;i<listeners[name].length;i++){if(listeners[name][i][1]==listener)indexes.push(i)}listeners[name].removeIndexes(indexes)}};
 this.dispatchEvent=function(name,args){if(isArray(listeners[name])){for(var i=0;i<listeners[name].length;i++){if(isFunction(listeners[name][i][0])){listeners[name][i][0].apply(listeners[name][i][1]||null,args)}}}};
-this.createUpdater=function(updater,component,obj,props){var u=new updater(obj,props,props['g']);var keys=u.getKeys()for(var i=0;i<keys.length;i++){updaters[keys[i]]=updaters[keys[i]]||[];updaters[keys[i]].push(u)}};
+this.createUpdater=function(updater,component,obj,props){var u=new updater(obj,props,props['g']);var keys=u.getKeys();for(var i=0;i<keys.length;i++){updaters[keys[i]]=updaters[keys[i]]||[];updaters[keys[i]].push(u)}};
 this.dispose=function(subscriber){var k,i,s;for(k in subscribers){s=[];for(i=0;i<subscribers[k].length;i++){if(subscribers[k][i]!=subscriber)s.push(subscribers[k][i]);else alert(111222)}subscribers[k]=s}};
 })(),'State');

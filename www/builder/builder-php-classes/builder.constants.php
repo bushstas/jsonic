@@ -17,7 +17,6 @@ class Constants
 		'PARENTALVIEWCNT' => '__PV',
 		'PAGETITLE'       => '__PT',
 		'DICTURL'         => '__DU',
-		'DICTIONARY'      => '__D',
 		'TOOLTIPCLASS'    => '__TC',
 		'TOOLTIPAPI'      => '__TA',
 		'APIDIR'          => '__AD',		
@@ -34,30 +33,42 @@ class Constants
 		'FUNCTION'        => '__FN',
 		'LOADEDDATA'      => '__DT',		
 		
+		'DICTIONARY_SHORT'=> '__D',
+		'OBJECTS_SHORT'   => '__O',
+		'POPUPER_SHORT'   => '__P',
+		'DATES_SHORT'     => '__DA',
+		'ROUTER_SHORT'    => '__R',
+		'USER_SHORT'      => '__U',
+		'STATE_SHORT'     => '__S',
+		'DIALOGER_SHORT'  => '__DI',
 		
-		'STATE'           => '__S',
-		'POPUPER'         => '__P',
 		'CORE'            => '__A',
 		'CONTROLLERS'     => '__CT',
-		'CONTROLLER'      => '__C',
-		'OBJECTS'         => '__O',
-		'DIALOGER'        => '__DI'
+		'CONTROLLER'      => '__C'
+		
 	);
 
 	private static $publicVarList = array(
-		'CONFIG'    => 'CONFIG',
-		'LOGGER'    => 'Logger',
-		'ROUTER'    => 'Router',
-		'USER'      => 'User',
-		'DATES'     => 'Dates',
-		'DECLINER'  => 'Decliner'
+		'CONFIG'     => 'CONFIG',
+		'LOGGER'     => 'Logger',
+		'ROUTER'     => 'Router',
+		'USER'       => 'User',
+		'DATES'      => 'Dates',
+		'DECLINER'   => 'Decliner',
+		'OBJECTS'    => 'Objects',
+		'POPUPER'    => 'Popuper',
+		'DICTIONARY' => 'Dictionary',
+		'STATE'      => 'State',
+		'DIALOGER'   => 'Dialoger'
 	);
 
 	private static $definitionsList = array(
 		'ENTERCOND' => '!this||this==window',
 		'BREAK'     => '_brk',
 		'COMPONENT' => 'c',
-		'PROTO'     => 'p'
+		'PROTO'     => 'p',
+		'LESS'      => '_#_LESS_#_',
+		'MORE'      => '_#_MORE_#_'
 	);
 
 	public static function init() {

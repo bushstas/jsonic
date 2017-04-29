@@ -701,10 +701,13 @@ class JSCompiler
 				"(function(){",
 				"var g=".CONST_GLOBAL.".get,"
 			);
+			$jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", CONST_FUNCTION, $jsOutput);
 			$list = JSGlobals::getConstantsListToDefineInChunks();
 			$line = array(CONST_COMPONENT, CONST_PROTO);
 			foreach ($list as $name) {
-				$line[] = $name."=g('".$name."')";
+				if (in_array($name, array(CONST_CORE, CONST_FUNCS)) || preg_match('/\b'.$name.'\b/', $jsOutput)) {
+					$line[] = $name."=g('".$name."')";
+				}
 			}
 			$jsOutput = implode("\n", $top).implode(",", $line).";\n".$jsOutput;
 		}
@@ -715,9 +718,8 @@ class JSCompiler
 		$jsOutput = preg_replace("/;{2,}/", ';', $jsOutput);
 		$jsOutput = preg_replace("/ {2,}/", ' ', $jsOutput);
 		$jsOutput = preg_replace("/[\n\r]\s*[\n\r]/", "\n", $jsOutput);
-		$jsOutput = preg_replace("/".CONST_COMPONENT."\s*=\s*function/", CONST_COMPONENT.'=fnc_', $jsOutput);
-		$jsOutput = preg_replace("/function\s*\(\s*\)\s*\{\s*\}/", CONST_FUNCTION, $jsOutput);
-		$jsOutput = str_replace(CONST_COMPONENT."=fnc_", CONST_COMPONENT.'=function', $jsOutput);
+		$jsOutput = preg_replace("/".CONST_COMPONENT."\s*=\s*function/", CONST_COMPONENT.'=_=fnc=_', $jsOutput);
+		$jsOutput = str_replace(CONST_COMPONENT."=_=fnc=_", CONST_COMPONENT.'=function', $jsOutput);
 
 		if ($this->configProvider->needCssObfuscation()) {
 			$this->cssCompiler->obfuscateJs($jsOutput);
@@ -727,10 +729,8 @@ class JSCompiler
 		$this->parseIncludeTemplates($jsOutput);
 		if ($isSplitted) {
 			$this->parseUtilsFunctions($jsOutput, empty($route));
-			if (!empty($route)) {
-				$this->parseObjectsCallngs($jsOutput);
-			}
 		}
+		//$this->parseObjectsCallngs($jsOutput);
 		$jsOutput = preg_replace('/\{\s+\}/', '{}', $jsOutput);
 		$jsOutput .= "\n".implode("\n", $bottomOutput);
 		$pathToCompiledJs = DEFAULT_PATH.$fileName;
@@ -777,10 +777,14 @@ class JSCompiler
 
 	private function parseObjectsCallngs(&$jsOutput) {
 		$list = array(			
-			CONST_OBJECTS => 'Objects',
-			CONST_POPUPER => 'Popuper',
-			CONST_STATE => 'State',
-			CONST_DICTIONARY => 'Dictionary'
+			CONST_OBJECTS_SHORT => CONST_OBJECTS,
+			CONST_POPUPER_SHORT => CONST_POPUPER,
+			CONST_STATE_SHORT => CONST_STATE,
+			CONST_DICTIONARY_SHORT => CONST_DICTIONARY,
+			CONST_USER_SHORT => CONST_USER,
+			CONST_ROUTER_SHORT => CONST_ROUTER,
+			CONST_DATES_SHORT => CONST_DATES,
+			CONST_DIALOGER_SHORT => CONST_DIALOGER
 		);
 		foreach ($list as $k => $v) {
 			if (preg_match('/[^\w\.]'.$v.'\b/', $jsOutput)) {
@@ -1141,9 +1145,15 @@ class JSCompiler
 		} else {
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
-		$output[] = CONST_PROTO.'.'.$method.'=function('.$args.'){';
-		$output[] = $code;
-		$output[] = '};';
+		$func = $this->removeExtraSpaces(CONST_PROTO.'.'.$method.'=function('.$args.'){'.trim($code).'};');
+		$output[] = $func;
+	}
+
+	private function removeExtraSpaces($text) {
+		// $text = preg_replace('/([^\w])\s+/i', "$1", $text);
+		// $text = preg_replace('/\s+([^\w])/i', "$1", $text);
+		// $text = preg_replace('/;(?=\})/i', '', $text);
+		return trim($text);
 	}
 
 	private	function addTemplateFunction($className, $templateContent, &$class) {
@@ -1215,10 +1225,8 @@ class JSCompiler
 		$objCode = implode(",\n", $objCode);
 		ControllersParser::parseInitialsCode($objCode);
 		if (!empty($objCode)) {
-			$output[] = CONST_PROTO.".getInitials=function(){";
-			$output[] = "\n\treturn {\n";
-			$output[] = $objCode;
-			$output[] = "\t};\n};";
+			$func = $this->removeExtraSpaces(CONST_PROTO.".getInitials=function(){return{".trim($objCode)."}};");
+			$output[] = $func;
 		}
 	}
 	

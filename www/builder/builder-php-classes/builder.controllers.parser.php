@@ -46,7 +46,7 @@ class ControllersParser
 				$actions = self::$initialsParser->getControllerActions($ctr);
 				if (is_array($actions) && !empty($actions)) {
 					$regexp  = '/\b'.$ctr.'\.('.implode('|', $actions).')\(/';
-					$code = preg_replace($regexp, CONST_CONTROLLERS.'.get('.$i.')'.".doAction(this,'$1',", $code);
+					$code = preg_replace($regexp, CONST_CONTROLLER.'.get('.$i.')'.".doAction(this,'$1',", $code);
 				}
 			}
 		}
@@ -81,7 +81,7 @@ class ControllersParser
 	public static function parseInitialsCode(&$code) {
 		if (preg_match(self::$regexp, $code)) {
 			foreach (self::$ctrs as $i => $ctr) {
-				$code = preg_replace('/\b'.$ctr.'\b/', CONST_CONTROLLERS.'.get('.$i.')', $code);
+				$code = preg_replace('/\b'.$ctr.'\b/', CONST_CONTROLLER.'.get('.$i.')', $code);
 			}
 		}
 	}

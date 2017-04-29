@@ -100,7 +100,7 @@
 					if (!isNone(classes[0])) {
 						selectorTag = classes[0].toLowerCase();
 					}
-					Objects.removeAt(classes, 0);
+					classes.splice(0, 1);
 					var element = this, isSameTag, foundClasses, elementClasses;
 					while (element) {
 						elementClasses = element.getClasses();

@@ -1,22 +1,21 @@
-<div class="view-content main-view-content" scope>
-	<table class="mainpage-table" cellpadding="0px" cellspacing="0px">
+<div class="@ view-content" scope>
+	<table class="@table" cellpadding="0px" cellspacing="0px">
 		<tr>
-			<td class="mainpage-left-column">
-				<div class="mainpage-left-column-area">
-					<div class="mainpage-left-column-title">
+			<td class="@left-column">
+				<div class="@left-column-area">
+					<div class="@left-column-title">
 						{@personal}
 					</div>
 					<UserInfo/>
-					<div class="mainpage-leftcolumn-title bold">
+					<div class="@leftcolumn-title bold">
 						{@calendar}
 						<::tooltip props="{#calendarTooltip}"/>
 					</div>
 					<FavoritesCalendar/>
 				</div>
 			</td>
-			<td class="mainpage-content-column">
-				<TabPanel props="{#mainPageTabs}"/>
-				<div class="mainpage-content">
+			<td class="@content-column">
+				<TabPanel props="{#mainPageTabs}">
 					<div class="tab-content">
 						<FilterStatistics props="{#mainPageFilterStat}"/>
 					</div>
@@ -27,7 +26,7 @@
 					<div class="tab-content">
 						11111111
 					</div>
-				</div>
+				</TabPanel>
 			</td>
 		</tr>
 	</table>

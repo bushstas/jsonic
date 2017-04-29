@@ -6,7 +6,7 @@
 		'afterCondition' => "
 			this.subscribers = [];
 			this.options = [];
-			var eh = {{GLOBAL}}.get('EventHandler');
+			var eh = ".CONST_GLOBAL.".get('EventHandler');
 			this.eventHandler = new eh();
 		",
 		'privateMethods' => array(

@@ -13,7 +13,8 @@
 	],
 	'rest': {
 		'showCount': true
-	}
+	},
+	'containerClass': 'tab-content'
 }
 
 #mainPageFilterStat = {

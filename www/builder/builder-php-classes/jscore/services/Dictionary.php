@@ -1,12 +1,11 @@
 <?php
 
 	$data = array(
-		'name' => 'Dictionary',
-		'var' => 'Dictionary',
+		'name' => CONST_DICTIONARY,
+		'var' => CONST_DICTIONARY,
 		'define' => true,
 		'mode' => 2,
 		'before' => "
-			var dictionaryUrl = ".CONST_DICTURL.";
 			var items = {}, callbacks, loaded = {};
 		",
 		'privateMethods' => array(
@@ -33,8 +32,8 @@
 				'args' => array('routeName'),
 				'body' => "
 					if (loaded[routeName]) return;
-					if (!isNone(dictionaryUrl)) {
-						Loader.get(dictionaryUrl, {'route': routeName}, onLoad, this);
+					if (!isNone(".CONST_DICTURL.")) {
+						Loader.get(".CONST_DICTURL.", {'route': routeName}, onLoad, this);
 					}
 					loaded[routeName] = true;
 				"

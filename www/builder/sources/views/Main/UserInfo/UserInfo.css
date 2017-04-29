@@ -1,40 +1,47 @@
-.mainpage-user-info {
-	$mt10
-}
-.mainpage-user-info td {
-    $(lh14 vmid)
-    padding: 6px 0;
-}
-.mainpage-user-info td:first-child {
-    $(w55% c#7f828a)
-}
-.mainpage-user-info td:last-child {
-    $(w45% c#4c546b)
-}
-.mainpage-user-info td:last-child.red {
-	$(c#cd380a bold)
-}
-.mainpage-left-column .standart-button {
- 	$(w140 inb mt10)
-}
-.standart-button.access {
-    $mr10
-}
-.mainpage-manager-name {
-	$(c#4c546b fs14 pt5)
-}
-.mainpage-manager-phone {
-	$(rel pt5 c#4c546b fs14 lh14 pb5)
-}
-.mainpage-free-call {
-    $(abs r t5 w120)
-}
-.mainpage-manager-free {
-    $(fs12 c#8b8e97 pt7)
-}
-.mainpage-manager-email {
-    $(fs14 c#536b9f lh14 mb3 inb bob#c3ccde)
-}
-.mainpage-manager-phone small {
-    $(c#8b8e97 fs12)
+.@ {
+    $mt10
+
+    table {
+        width: 100%;
+    }
+    td {
+        $(lh14 vmid p6_0)
+
+        &:first-child {
+            $(w55% c#7f828a)
+        }
+        &:last-child {
+            $(w45% c#4c546b)
+
+            &.red {
+                $(c#cd380a bold)
+            }
+        }
+    }
+    .standart-button {
+        $(w140 inb mt10)
+
+        &.access {
+            $mr10
+        }
+    }
+    .@manager-name {
+        $(c#4c546b fs14 pt5)
+    }
+    .@manager-phone {
+        $(rel pt5 c#4c546b fs14 lh14 pb5)        
+        
+        small {
+            $(c#8b8e97 fs12)
+        }
+    }
+    .@free-call {
+        $(abs r t5 w120)
+    }
+    .@manager-free {
+        $(fs12 c#8b8e97 pt7)
+    }
+    .@manager-email {
+        $(fs14 c#536b9f lh14 mb3 inb bob#c3ccde)
+    }
 }

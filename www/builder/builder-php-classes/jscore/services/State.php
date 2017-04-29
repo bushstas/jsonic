@@ -120,7 +120,7 @@
 				'args' => array('updater', 'component', 'obj', 'props'),
 				'body' => "
 					var u = new updater(obj, props, props['g']);
-					var keys = u.getKeys()
+					var keys = u.getKeys();
 					for (var i = 0; i < keys.length; i++) {
 						updaters[keys[i]] = updaters[keys[i]] || [];
 						updaters[keys[i]].push(u);

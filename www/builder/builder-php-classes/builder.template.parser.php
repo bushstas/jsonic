@@ -167,7 +167,8 @@ class TemplateParser
 	}
 
 	private static function getParsedTemplate($content) {
-		$html = preg_replace(self::$regexp, '', $content);
+		$html = preg_replace('/<([\w:][^>]*)<([\w:])/i', CONST_LESS."$1<$2", $content);
+		$html = preg_replace(self::$regexp, '', $html);
 		$html = str_replace('->>', "#classobfus#", $html);
 		$html = preg_replace('/<('.implode('|', self::$simpleTags).') ([^\/>]*)\/>/', "<=$1 $2/>", $html);
 		$html = preg_replace('/<(:*\w+)([^>]*)\/>/', "<$1$2></$1>", $html);
@@ -179,7 +180,7 @@ class TemplateParser
 		preg_match_all($regexp, $html, $matches);
 		$matches = $matches[0];
 		foreach ($matches as &$match) {
-			$match = str_replace('>', '_#_MORE_#_', $match);
+			$match = str_replace('>', CONST_MORE, $match);
 		}
 		$parts = preg_split($regexp, $html);
 		$html = '';
@@ -192,12 +193,14 @@ class TemplateParser
 		$regexp = "/(<\/*:*[a-z]+[^>]*>|\{\s*\/*foreach\b[^\}]*\}|\{\s*\/*from\b[^\}]*\}|\{\s*\/*if\b[^\}]*\}|\{\s*\/*case\b[^\}]*\}|\{\s*\/*default\b[^\}]*\}|\{\s*else\s*\}|\{\s*ifempty\s*\}|\{\s*\/*switch\b[^\}]*\}|\{\s*\/*let\b[^\}]*\})/i";
 		preg_match_all($regexp, $html, $matches);
 		$tags = implode('_#_TMPDELIMITER_#_', $matches[1]);
-		$tags = explode('_#_TMPDELIMITER_#_', str_replace('_#_MORE_#_', '>', $tags));
+		$tags = explode('_#_TMPDELIMITER_#_', str_replace(CONST_MORE, '>', $tags));
 		$parts = preg_split($regexp, $html);
 		$list = array();
 		for ($j = 0; $j < count($parts); $j++) {
 			$part = $parts[$j];
-			
+			if (!empty($part)) {
+				$part = str_replace(CONST_LESS, "<", $part);
+			}
 			if (is_numeric($part) || !empty($part)) {
 				$list[] = array('type' => 'text', 'content' => $part);
 			}
@@ -403,7 +406,7 @@ class TemplateParser
 						}
 						$chld[$key] = $tmpName;
 					} elseif ($isComponent) {
-						$chld['component'] = $child['tagName'];
+						$chld['component'] = !empty($child['cmp']) ? $child['cmp'] : $child['tagName'];
 					} else {
 						$chld['element'] = $child['tagName'];
 					}

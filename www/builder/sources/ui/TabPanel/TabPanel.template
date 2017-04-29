@@ -1,15 +1,20 @@
 <div class="@" scope>
-	{foreach ~tabs as &idx => &tab}
-		<div class="@tab content-tab" data-index="{&idx}">
-			{&tab['title']}
-		</div>
-	{/foreach}
-	{if isObject(~rest)}
-		<div class="@tab tab-rest{$count?' ->>shown'}">
-			{~rest['title']||@restTabs}
-			{if ~rest['showCount']}
-				 ({$count})
-			{/if}
-		</div>
-	{/if}
+	<div class="@tabs">
+		{foreach ~tabs as &idx => &tab}
+			<div class="@tab content-tab" data-index="{&idx}">
+				{&tab['title']}
+			</div>
+		{/foreach}
+		{if isObject(~rest)}
+			<div class="@tab tab-rest{$count?' ->>shown'}">
+				{~rest['title']||@restTabs}
+				{if ~rest['showCount']}
+					 ({$count})
+				{/if}
+			</div>
+		{/if}
+	</div>
+	<div class="@contents">
+		{~children}
+	</div>
 </div>

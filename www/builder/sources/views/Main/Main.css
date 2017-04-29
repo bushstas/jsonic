@@ -1,42 +1,43 @@
 $imgsrc = ../images/mainpage
 
-.main-view-content {
+.@ {
 	& {
         $(rel width ma)
     }
     table {
         $w100%
     }
+    .@table {
+        & > tr > td {
+           $vtop
+        }
+        .@left-column {
+            $(w354 p12)
+        }
+        .@content-column {
+            $(pt12 rel)
+        }
+    }
+    .tab-panel_contents {
+        $(abs b12 t46 l r12 br3 ova p12_15 box)
+        box-shadow: 0 0 6px #c1c5d1;
+    }
 }
-.mainpage-table {
-    & > tr > td {
-	   $vtop
-    }
-    .mainpage-left-column {
-        $(w354 p12)
-    }
-    .mainpage-content-column {
-        $(pt12 rel)
-    }
-}
-.mainpage-left-column-area {
+
+.@left-column-area {
 	$(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
-.mainpage-left-column-title {
+.@left-column-title {
     $(abs l r t lh39 h37 c#edf0f4 bc#51648d pl43 bold norep png = person-icon br3_3_0_0 bp17_50%)
 }
-.mainpage-left-column > div:last-child {
+.@left-column > div:last-child {
     $(rel mih180 br3 fs14 p49_20_12_20)
     box-shadow: 0 0 6px #c1c5d1;
 }
-.mainpage-leftcolumn-title {
+.@leftcolumn-title {
     $(mt27 fs16 c#4c546b pb7)
     .tooltip {
        $fright
     }
-}
-.mainpage-content {
-    $(abs b12 t46 l r12 br3 ova p12_15 box)
-    box-shadow: 0 0 6px #c1c5d1;
 }

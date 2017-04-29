@@ -1,4 +1,4 @@
-_G_.set((c=function(){
+__G.set((c=function(){
 if(!this||this==window){
 p=c.prototype;
 p.onRenderComplete=function(){this.dispatchReadyEvent()};

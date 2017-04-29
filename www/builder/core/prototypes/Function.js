@@ -1,1 +1,4 @@
-Function.prototype.b = Function.prototype.bind;
+;(function(){
+p=Function.prototype;
+p.b=p.bind;
+})();

@@ -3,7 +3,7 @@
 	$data = array(
 		'mode' => 2,
 		'var' => CONST_CORE,
-		'name' => 'Core',
+		'name' => CONST_CORE,
 		'privateMethods' => array(
 			'extendInitials' => array(
 				'args' => array('initials1', 'initials2'),

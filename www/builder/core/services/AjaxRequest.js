@@ -1,4 +1,4 @@
-_G_.set((c=function(url,callback,params,thisObj){
+__G.set((c=function(url,callback,params,thisObj){
 if(!this||this==window){
 var correctUrl=function(u){u=u.replace(/^[\.\/]+/,'');if(isString(__AD)){var regExp=new RegExp('^'+__AD+"\/");u=__AD+'/'+u.replace(regExp,'')}return '/'+u};
 var createRequest=function(){this.request=new XMLHttpRequest();this.request.onreadystatechange=onReadyStateChange.bind(this)};

@@ -5,51 +5,9 @@ class JSGlobals
 	private static $usingLoader = false;
 	private static $dataForLoader;
 	private static $output	= array();
+	private static $globals	= array();
+	private static $sets = array();
 	private static $excluded = array();
-	private static $varNames = array(
-		'textConstants'    => '__',
-		'textNodes'        => '__T',
-		'apiConfig'        => 'CONFIG',
-		'dataConstants'    => '__V',
-		'pathToDictionary' => '__DICTURL',
-		'dictionary'       => '__D',
-		'tags'             => '__TAGS',
-		'props'            => '__A',
-		'decls'            => '__DW',
-		'events'           => '__EVENTTYPES',
-		'routes'           => '__ROUTES',
-		'errorRoutes'      => '__ERRORROUTES',
-		'hashRouter'       => '__HASHROUTER',
-		'indexRoute'       => '__INDEXROUTE',
-		'defaultRoute'     => '__DEFAULTROUTE',
-		'viewContainer'    => '__VIEWCONTAINER',
-		'viewContainer2'   => '__VIEWCONTAINER2',
-		'tooltipClass'     => '__TC',
-		'tooltipApi'       => '__TA',
-		'pathToApi'        => '__APIDIR',
-		'pagetitle'        => '__PAGETITLE',
-		'user'             => '__USEROPTIONS',
-		'nullFunction'     => '__FNC',
-		'controllers'      => '__CTR',
-		'controller'       => '__C',
-		'stop'             => '__SP',
-		'prevent'          => '__PD',
-		'dialoger'         => '__DI',
-		'global'           => '_G_',
-		'core'             => '_C_',
-		'funcs'            => '_F_',
-		'objects'          => '__O',
-		'popuper'          => '__P',
-		'state'            => '__S',
-		'proto'            => 'p',
-		'component'        => 'c',
-		'loadurl'          => '__LU',
-		'callback'         => '__CB',
-		'data'             => '__DT',
-		'break'            => '_brk',
-		'getfunc'          => '__F',
-		'logger'           => 'Logger'
-	);
 
 	private static $errors = array(
 		'invalidApiConfig' => "Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var {?} = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>",
@@ -68,7 +26,7 @@ class JSGlobals
 			self::addTextConstants($data['texts']);
 			self::addPathToDictionary($data['pathToDictionary']);
 		} else {
-			self::$output[] = 'var '.self::$varNames['textConstants'].','.self::$varNames['textNodes'].','.self::$varNames['pathToDictionary'].';';
+			self::$output[] = 'var '.CONST_CONSTANTS.','.CONST_TEXTS.','.CONST_DICTURL.';';
 			self::$dataForLoader = array(
 				'textConstants' => $data['texts'],
 				'textNodes' => TemplateParser::getTextNodes()
@@ -96,6 +54,8 @@ class JSGlobals
 		self::addStopPropagationFunction();
 		self::addPreventDefaultFunction();
 		self::addGetFuncFunction();
+		
+		self::addGlobals();
 
 		$jsOutput = implode("\n", self::$output)."\n".$jsOutput;
 		self::parseTextConstants($jsOutput, $data['texts']);
@@ -112,7 +72,7 @@ class JSGlobals
 
 	public static function getConstantsListToDefineInChunks() {
 		return array(
-			CONST_USER, CONST_ROUTER, CONST_CONFIG, CONST_CORE, CONST_FUNCS, CONST_TEXTS, CONST_CONSTANTS, CONST_DATA, CONST_FUNCTION, CONST_CONTROLLERS, CONST_STOP, CONST_PREVENT, CONST_GETFUNC, CONST_POPUPER, CONST_STATE, CONST_DICTIONARY, CONST_OBJECTS
+			CONST_USER, CONST_ROUTER, CONST_CONFIG, CONST_CORE, CONST_FUNCS, CONST_TEXTS, CONST_CONSTANTS, CONST_DATA, CONST_FUNCTION, CONST_CONTROLLERS, CONST_STOP, CONST_PREVENT, CONST_GETFUNC, CONST_POPUPER, CONST_STATE, CONST_DICTIONARY, CONST_OBJECTS, CONST_CONTROLLER, CONST_DATES, CONST_DIALOGER, CONST_DECLINER
 		);
 	}
 
@@ -130,13 +90,18 @@ class JSGlobals
 
 	private static function add($key, $content) {
 		if (!in_array($key, self::$excluded)) {
-			self::$output[] = self::normJsonStr("var ".$key." = ".$content.';');
+			self::$globals[] = self::normJsonStr($key." = ".$content);
 			return true;
 		}
 	}
 
+	private static function addGlobals() {		
+		self::$output[] = 'var '.implode(",\n", self::$globals).';';
+		self::$output[] = implode(";", self::$sets).';';
+	}
+
 	private static function addGlobalAddingCall($key) {
-		return ";".CONST_GLOBAL.".set(".$key.",'".$key."');";
+		self::$sets[] = CONST_GLOBAL.".set(".$key.",'".$key."')";
 	} 
 
 	public static function normJsonStr($str){
@@ -149,11 +114,13 @@ class JSGlobals
 
 	private static function addTextNodes() {
 		$textNodes = TemplateParser::getTextNodes();
-		self::add(CONST_TEXTS, preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))).self::addGlobalAddingCall(CONST_TEXTS));
+		self::add(CONST_TEXTS, preg_replace("/\\\{2,}/", '\\', str_replace('"', "'", json_encode($textNodes))));
+		self::addGlobalAddingCall(CONST_TEXTS);
 	}
 
 	private static function addTextConstants($data) {
-		self::add(CONST_CONSTANTS, str_replace('"', "'", json_encode($data['texts'])).self::addGlobalAddingCall(CONST_CONSTANTS));
+		self::add(CONST_CONSTANTS, str_replace('"', "'", json_encode($data['texts'])));
+		self::addGlobalAddingCall(CONST_CONSTANTS);
 	}
 
 	public static function parseTextConstants(&$jsOutput, $data) {
@@ -224,7 +191,8 @@ class JSGlobals
 			}
 		}
 		TextParser::createObjectString($apiConfig, array('/\\\/', ''));
-		self::add($cfg, $apiConfig.self::addGlobalAddingCall($cfg));
+		self::add($cfg, $apiConfig);
+		self::addGlobalAddingCall($cfg);
 	}
 
 	private static function addDataConstants($data, $usingLoader) {
@@ -232,7 +200,10 @@ class JSGlobals
 		if ($usingLoader) {
 			$data = 'function(){return '.$data.'}';
 		}
-		self::add(CONST_DATA, $data.($usingLoader ? '' : self::addGlobalAddingCall(CONST_DATA)));
+		self::add(CONST_DATA, $data);
+		if (!$usingLoader) {
+			self::addGlobalAddingCall(CONST_DATA);
+		}
 	}
 
 	private static function getDataConstants($data) {
@@ -321,7 +292,8 @@ class JSGlobals
 	}
 
 	private static function addNullFunction() {
-		self::add(CONST_FUNCTION, 'function(){return}'.self::addGlobalAddingCall(CONST_FUNCTION));
+		self::add(CONST_FUNCTION, 'function(){return}');
+		self::addGlobalAddingCall(CONST_FUNCTION);
 	}
 
 	private static function addControllers($controllers) {
@@ -329,14 +301,17 @@ class JSGlobals
 	}
 
 	private static function addStopPropagationFunction() {
-		self::add(CONST_STOP, 'function(e){e.stopPropagation()}'.self::addGlobalAddingCall(CONST_STOP));
+		self::add(CONST_STOP, 'function(e){e.stopPropagation()}');
+		self::addGlobalAddingCall(CONST_STOP);
 	}
 
 	private static function addPreventDefaultFunction() {
-		self::add(CONST_PREVENT, 'function(e){e.preventDefault()}'.self::addGlobalAddingCall(CONST_PREVENT));
+		self::add(CONST_PREVENT, 'function(e){e.preventDefault()}');
+		self::addGlobalAddingCall(CONST_PREVENT);
 	}
 
 	private static function addGetFuncFunction() {
-		self::add(CONST_GETFUNC, 'function(){return new Function}'.self::addGlobalAddingCall(CONST_GETFUNC));	
+		self::add(CONST_GETFUNC, 'function(){return new Function}');
+		self::addGlobalAddingCall(CONST_GETFUNC);
 	}
 }

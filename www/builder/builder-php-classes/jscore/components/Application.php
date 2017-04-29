@@ -188,8 +188,8 @@
 			),
 			'run' => array(
 				'body' => "
-					dictionary = ".CONST_GLOBAL.".get('Dictionary');
-					controllers = ".CONST_GLOBAL.".get('Controllers');
+					dictionary = ".CONST_GLOBAL.".get('".CONST_DICTIONARY."');
+					controllers = ".CONST_GLOBAL.".get('".CONST_CONTROLLER."');
 					defineViews.call(this);
 					".CONST_ROUTER.".setNavigationHandler(handleNavigation.bind(this));
 					".CONST_ROUTER.".init();

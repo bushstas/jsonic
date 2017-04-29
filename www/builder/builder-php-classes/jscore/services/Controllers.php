@@ -4,7 +4,7 @@
 		'mode' => 2,
 		'var' => CONST_CONTROLLER,
 		'define' => true,
-		'name' => 'Controllers',
+		'name' => CONST_CONTROLLER,
 		'thisMethods' => array(
 			'get' => array(
 				'args' => array('id'),

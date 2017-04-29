@@ -1,59 +1,61 @@
-<table class="mainpage-user-info" cellpadding="0px" cellspacing="0px" scope>
-	<tr>
-		<td>{@client}:</td>
-		<td>{$userName}</td>
-	</tr>
-	<tr>
-		<td>{@org}:</td>
-		<td>{$companyName}</td>
-	</tr>
-	<tr>
-		<td>{@email}:</td>
-		<td>{$userEmail}</td>
-	</tr>
-	<tr>
-		<td>{@tariff}:</td>
-		<td class=" bold">{$typeAccess}</td>
-	</tr>
-	<tr>
-		<td>{@from}:</td>
-		<td>{$beginAccessDate}</td>
-	</tr>
-	<tr>
-		<td>{@to}:</td>
-		<td class="{$needToProlong?'red'}">{$endAccessDate}</td>
-	</tr>
-</table>
-{if $prolongButtonText}
-	<a href="{@orderLink}" target="_blank" class="access standart-button red-button">
-		{$prolongButtonText}
+<div class="@" scope>
+	<table cellpadding="0px" cellspacing="0px">
+		<tr>
+			<td>{@client}:</td>
+			<td>{$userName}</td>
+		</tr>
+		<tr>
+			<td>{@org}:</td>
+			<td>{$companyName}</td>
+		</tr>
+		<tr>
+			<td>{@email}:</td>
+			<td>{$userEmail}</td>
+		</tr>
+		<tr>
+			<td>{@tariff}:</td>
+			<td class=" bold">{$typeAccess}</td>
+		</tr>
+		<tr>
+			<td>{@from}:</td>
+			<td>{$beginAccessDate}</td>
+		</tr>
+		<tr>
+			<td>{@to}:</td>
+			<td class="{$needToProlong?'red'}">{$endAccessDate}</td>
+		</tr>
+	</table>
+	{if $prolongButtonText}
+		<a href="{@orderLink}" target="_blank" class="access standart-button red-button">
+			{$prolongButtonText}
+		</a>
+	{/if}
+	<a href="{@tariffsLink}" target="_blank" class="tariffs standart-button white-button">
+		{@tariffs}
 	</a>
-{/if}
-<a href="{@tariffsLink}" target="_blank" class="tariffs standart-button white-button">
-	{@tariffs}
-</a>
-<div class="mainpage-leftcolumn-title bold">
-	{@manager}
-</div>
-<div class="mainpage-manager-info">
-	<div class="mainpage-manager-name">
-		{$managerName}
+	<div class="@leftcolumn-title bold">
+		{@manager}
 	</div>
-	<div class="mainpage-manager-phone">
-		<div class="mainpage-free-call"> 
-			<div class="mainpage-manager-large-phone">
-				{@managerPhone}
-			</div>
-			<div class="mainpage-manager-free">
-				{@freeCall}
-			</div>
+	<div class="@manager-info">
+		<div class="@manager-name">
+			{$managerName}
 		</div>
-		{$managerPhone} &nbsp; <small>{@or}</small>
+		<div class="@manager-phone">
+			<div class="@free-call"> 
+				<div class="@manager-large-phone">
+					{@managerPhone}
+				</div>
+				<div class="@manager-free">
+					{@freeCall}
+				</div>
+			</div>
+			{$managerPhone} &nbsp; <small>{@or}</small>
+		</div>
+		<div class="@manager-email">
+			{$managerEmail}
+		</div>
 	</div>
-	<div class="mainpage-manager-email">
-		{$managerEmail}
-	</div>
-</div>
-<div class="standart-button green-button" onClick="onOrderCallButtonClick">
-	{@orderCall}
+	<greenButton onClick="onOrderCallButtonClick">
+		{@orderCall}
+	</greenButton>
 </div>

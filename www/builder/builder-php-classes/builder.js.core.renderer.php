@@ -3,7 +3,7 @@
 class JSCoreRenderer
 {
 	private $dir = 'jscore';
-	private $outputDir = 'core_';
+	private $outputDir = 'core';
 	private $classes = array();
 	
 	public function run() {

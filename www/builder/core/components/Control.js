@@ -1,4 +1,4 @@
-_G_.set((c=function(){
+__G.set((c=function(){
 if(!this||this==window){
 var onChangeChildControl=function(e){this.dispatchChange()};
 p=c.prototype;
@@ -6,7 +6,7 @@ p.initiate=function(){this.preset('enabled',true)};
 p.onChange=function(e){};
 p.dispatchChange=function(){var params=this.getChangeEventParams();this.onChange(params);this.dispatchEvent('change',params)};
 p.getChangeEventParams=function(){return{value:this.getValue()}};
-p.registerControl=function(control,name){_G_.get('Component').prototype.registerControl.call(this,control,name);this.addListener(control,'change',onChangeChildControl.bind(this))};
+p.registerControl=function(control,name){__G.get('Component').prototype.registerControl.call(this,control,name);this.addListener(control,'change',onChangeChildControl.bind(this))};
 p.setName=function(name){this.name=name};
 p.getName=function(){return this.name};
 p.getValue=function(){var value;if(this.hasControls()){value={};for(var k in this.controls){if(isArray(this.controls[k])){value[k]=[];for(var i=0;i<this.controls[k].length;i++)value[k].push(this.controls[k][i].getValue())}else value[k]=this.controls[k].getValue()}}else value=this.getControlValue();return value};

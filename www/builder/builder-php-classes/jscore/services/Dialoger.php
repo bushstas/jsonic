@@ -23,7 +23,7 @@
 				'body' => "
 					if (isUndefined(ds[cid])) {
 						ds[cid] = new dc();
-						".CONST_GLOBAL.".get('Core').initiate.call(ds[cid]);
+						".CONST_CORE.".initiate.call(ds[cid]);
 						ds[cid].render(document.body);
 					}
 					d = ds[cid];

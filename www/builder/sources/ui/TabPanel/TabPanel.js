@@ -8,12 +8,10 @@ initial events = {
 }
 
 function onRendered() {
+	get tabs;
 	this.tabWidth = $tabWidth || 200;
 	this.tabMargin = $tabMargin || 4;
-}
 
-function onParentRendered() {
-	get tabs;
 	if (isArray(tabs)) {
 		each (tabs as tab) {
 			this.activateTab(idx, !!tab['active']);
@@ -21,6 +19,7 @@ function onParentRendered() {
 	}
 	this.redraw();
 }
+
 
 function redraw() {
 	this.hiddenTabs = [];
@@ -63,7 +62,9 @@ function onTabClick(target) {
 }
 
 function activateTab(tabIndex, isShown) {
-	var contents = <>.next().finds('.->>tab-content');
+
+	var contents = <>.finds('.->>' + ($containerClass || 'tab-content'));
+	console.log(contents)
 	@(contents[tabIndex]).show(isShown);
 	if (isShown) {
 		-->select (tabIndex)
