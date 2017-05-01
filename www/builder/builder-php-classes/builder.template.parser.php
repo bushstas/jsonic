@@ -167,6 +167,7 @@ class TemplateParser
 	}
 
 	private static function getParsedTemplate($content) {
+		$customTags = CustomTagsParser::get();
 		$html = preg_replace('/<([\w:][^>]*)<([\w:])/i', CONST_LESS."$1<$2", $content);
 		$html = preg_replace(self::$regexp, '', $html);
 		$html = str_replace('->>', "#classobfus#", $html);
@@ -208,18 +209,25 @@ class TemplateParser
 				preg_match('/^[<\{]\s*\/*(:*[a-z]\w*) */i', $tags[$j], $match);
 				$tagName = $match[1];
 				$tagContent = $tags[$j];
-				if (self::invalidTagName($tagName)) {
+				$customTag = null;
+				if (isset($customTags[$tagName])) {
+					$customTag = $customTags[$tagName];
+				} elseif (self::invalidTagName($tagName)) {
 					new Error(self::$errors['invalidTagName'], array($tagName, self::$templateName, self::$class['name'], $tagContent));
 				}
 				$isClosing = self::isTagClosing($tagName, $tagContent);
 				$tagContent = str_replace('#classobfus#', '->>', $tagContent);
-				$list[] = array(
+				$item = array(
 					'type' => 'tag',
 					'content' => $tagContent,
 					'tagName' => $tagName,
 					'isClosing' => $isClosing,
 					'isSingle' => self::isSingleTag($tagName) || self::isSimpleTag($tagName)
 				);
+				if (!empty($customTag)) {
+					$item['customTag'] = $customTag;
+				}
+				$list[] = $item;
 			}
 		}
 		$isLet = 0;
@@ -269,7 +277,7 @@ class TemplateParser
 					$children[] = '<br>';
 					continue;
 				}
-				$child = array('tagName' => $tag, 'content' => $item['content'], 'children' => array(), 'else' => array(), 'ifempty' => array());
+				$child = array('tagName' => $tag, 'content' => $item['content'], 'children' => array(), 'else' => array(), 'ifempty' => array(), 'customTag' => $item['customTag']);
 				$ch = array();
 				$ech = array();
 				$iech = array();
@@ -330,6 +338,11 @@ class TemplateParser
 				}
 				$isComponent = in_array($child['tagName'], $usedClasses) || $child['tagName'] == 'Component' || $child['tagName'] == 'Control';
 				$attributes = self::parseTagAttributes($child, $isComponent, $child['tagName']);
+				if (!empty($child['customTag']) && !empty($child['customTag']['tagName'])) {
+					$child['tagName'] = $child['customTag']['tagName'];
+					$attributes = self::mergeAttributes($attributes, $child['customTag']['attributes']);
+					unset($child['customTag']);
+				}
 				$child['attributes'] = $attributes;
 
 				if (!empty($child['reactProps'])) {
@@ -433,6 +446,25 @@ class TemplateParser
 		}
 	}
 
+	private static function mergeAttributes($attributes, $customAttributes) {
+		foreach ($customAttributes as $name => $value) {
+			if (!isset($attributes[$name])) {
+				$attributes[$name] = $value;
+			} else {
+				switch ($name) {
+					case 'class':
+						$attributes[$name] = $value.' '.trim($attributes[$name]);
+					break;
+					
+					case 'style':
+						$attributes[$name] = preg_replace('/;{2,}/', ';', $value.';'.trim($attributes[$name]));
+					break;
+				}
+			}
+		}
+		return $attributes;
+	}
+
 
 	private static function finish($children, &$finishedChildren) {
 		if (!is_array($children)) {
@@ -451,24 +483,22 @@ class TemplateParser
 				if ($isComponent) {
 					self::$componentsOpen++;
 				}
+				$if = null;
+				$else = null;
 				if (!empty($child['attributes'])) {
 					$ch['p'] = array();
 					$parsedPlace = $isComponent ? 'componentAttribute' : 'elementAttribute';
 					$attrs = $child['attributes'];
 					foreach ($attrs as $attrName => $attrValue) {
-						if (in_array($attrName, array('if', 'else'))) continue;
-						self::addProperTagAttribute($attrName, $attrValue, $ch['p'], $isElement);
-					}
-					if (!empty($attrs['if'])) {
-						$ch['c'] = array();
-						self::finish($child['children'], $ch['c']);
-						$else = array();
-						self::parseTextNode($attrs['else'], $else);
-						self::addIfConditionToChild($attrs['if'], $else, $ch);
-						unset($child['children']);
+						if ($attrName == 'if') {
+							$if = $attrValue;
+						} elseif ($attrName == 'else') {
+							$else = $attrValue;
+						} else {
+							self::addProperTagAttribute($attrName, $attrValue, $ch['p'], $isElement);
+						}
 					}
 				}
-
 				if ($isElement)
 				{
 					$idx = array_search($child['element'], self::$tagShortcuts);
@@ -562,6 +592,13 @@ class TemplateParser
 				}
 				if (!empty($child['lets'])) {
 					self::wrapInFunction($ch['c'], '', 'lets', $child);
+				}
+				if (!empty($if)) {
+					$elseChildren = array();
+					if (!empty($else)) {
+						self::parseTextNode($else, $elseChildren);
+					}
+					self::addIfConditionToChild($attrs['if'], $elseChildren, $ch);
 				}
 				$finishedChildren[] = $ch;
 				if ($isComponent) {
@@ -868,19 +905,15 @@ class TemplateParser
 		$regexp = '/\{([^\}]+)\}/';
 		$props = array();
 		$names = array();
-		$ifCondition = false;
-		$else = null;
 		list($propNames, $propValues) = self::getTagAttrs($html);	
 		
 		for ($i = 0; $i < count($propNames); $i++) {
 			$propName = $propNames[$i];
 			$propValue = trim($propValues[$i]);
 			if ($propName == 'if') {
-				$ifCondition = $propValue;
 				continue;
 			}
 			if ($propName == 'else') {
-				$else = $propValue;
 				continue;
 			}
 			$hasCode = self::hasCode($propValue);
@@ -926,8 +959,8 @@ class TemplateParser
 			}
 			$child['tmp'] = '<nq>__INC_TEMPLATE='.$tmpName.'__<nq>';
 		}
-		if (!empty($ifCondition) || !empty($else)) {
-			self::addIfConditionToChild(trim($ifCondition), $else, $child);
+		if (empty($child['p'])) {
+			unset($child['p']);
 		}
 	}
 
@@ -939,8 +972,8 @@ class TemplateParser
 			new Error(self::$errors['incorrectIf'], array(self::$templateName, self::$className, $ifCondition));
 		}
 		$child = array('c' => array($child));
-		if (!empty($else) && $else[0] == '{') {
-			$else = self::processCode($else, 'else');
+		if (empty($else)) {
+			$else = '';
 		}
 		self::parseIf($ifCondition, $child, $else);
 	}
@@ -1032,6 +1065,7 @@ class TemplateParser
 		$html = preg_replace('/="([^"]*)"(?!\s)/', "=\"$1\" ", $html);
 		$html = preg_replace('/=\'([^\']*)\'(?!\s)/', "='$1' ", $html);
 		$html = preg_replace('/\sscope([\s>])/', " scope=\"1\"$1", $html);
+		$html = preg_replace('/\s+>$/', '>', $html);
 		$regexp = "/ ([a-z][\w\-]*)=\"([^\"]+)\"/";
 		preg_match_all($regexp, $html, $matches1);
 		$regexp2 = "/ ([a-z][\w\-]*)='([^']+)'/";

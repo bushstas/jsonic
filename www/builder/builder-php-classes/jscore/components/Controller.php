@@ -24,8 +24,8 @@
 				'body' => "
 					if (actionName == 'load' && shouldStore.call(this)) {
 						var storeAs = getStoreAs.call(this, options);
-						if (isString(storeAs) && typeof StoreKeeper != 'undefined') {
-							var storedData = StoreKeeper.getActual(storeAs, ".CONST_OBJECTS.".get(this.options, 'storePeriod'));
+						if (isString(storeAs) && typeof ".CONST_STORE." != 'undefined') {
+							var storedData = ".CONST_STORE.".getActual(storeAs, ".CONST_OBJECTS.".get(this.options, 'storePeriod'));
 							if (isArrayLike(storedData)) {
 								onActionComplete.call(this, actionName, true, initiator, storedData);
 								return true;
@@ -86,12 +86,12 @@
 			'store' => array(
 				'args' => array('isAdding', 'data'),
 				'body' => "
-					if (typeof StoreKeeper == 'undefined') return;
+					if (typeof ".CONST_STORE." == 'undefined') return;
 					var storeAs = getStoreAs.call(this, data);
 					if (isAdding) {
-						StoreKeeper.set(storeAs, data);
+						".CONST_STORE.".set(storeAs, data);
 					} else {
-						StoreKeeper.remove(storeAs);
+						".CONST_STORE.".remove(storeAs);
 					}
 				"
 			),

@@ -1,5 +1,5 @@
-<div class="@" scope>
-	<table cellpadding="0px" cellspacing="0px">
+<scope class="@">
+	<table>
 		<tr>
 			<td>{@client}:</td>
 			<td>{$userName}</td>
@@ -26,13 +26,13 @@
 		</tr>
 	</table>
 	{if $prolongButtonText}
-		<a href="{@orderLink}" target="_blank" class="access standart-button red-button">
+		<standartLink href="{@orderLink}" class="access red-button">
 			{$prolongButtonText}
-		</a>
+		</standartLink>
 	{/if}
-	<a href="{@tariffsLink}" target="_blank" class="tariffs standart-button white-button">
+	<standartLink href="{@tariffsLink}" class="tariffs white-button">
 		{@tariffs}
-	</a>
+	</standartLink>
 	<div class="@leftcolumn-title bold">
 		{@manager}
 	</div>
@@ -58,4 +58,4 @@
 	<greenButton onClick="onOrderCallButtonClick">
 		{@orderCall}
 	</greenButton>
-</div>
+</scope>

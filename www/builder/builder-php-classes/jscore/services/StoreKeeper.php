@@ -1,8 +1,8 @@
 <?php
 
 	$data = array(
-		'name' => 'StoreKeeper',
-		'var' => 'StoreKeeper',
+		'name' => CONST_STORE,
+		'var' => CONST_STORE,
 		'define' => true,
 		'mode' => 2,
 		'before' => "

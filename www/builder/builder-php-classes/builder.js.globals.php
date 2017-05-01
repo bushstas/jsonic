@@ -3,6 +3,7 @@
 class JSGlobals
 {
 	private static $usingLoader = false;
+	private static $isSplitMode = false;
 	private static $dataForLoader;
 	private static $output	= array();
 	private static $globals	= array();
@@ -20,6 +21,7 @@ class JSGlobals
 
 	public static function run(&$jsOutput, $data) {
 		self::$usingLoader = $data['isDataLoader'];
+		self::$isSplitMode = $data['isSplitMode'];
 		self::addApiConfig($data['config'], $jsOutput);
 		if (!self::$usingLoader) {
 			self::addTextNodes();
@@ -72,7 +74,7 @@ class JSGlobals
 
 	public static function getConstantsListToDefineInChunks() {
 		return array(
-			CONST_USER, CONST_ROUTER, CONST_CONFIG, CONST_CORE, CONST_FUNCS, CONST_TEXTS, CONST_CONSTANTS, CONST_DATA, CONST_FUNCTION, CONST_CONTROLLERS, CONST_STOP, CONST_PREVENT, CONST_GETFUNC, CONST_POPUPER, CONST_STATE, CONST_DICTIONARY, CONST_OBJECTS, CONST_CONTROLLER, CONST_DATES, CONST_DIALOGER, CONST_DECLINER
+			CONST_USER, CONST_ROUTER, CONST_CONFIG, CONST_CORE, CONST_FUNCS, CONST_TEXTS, CONST_CONSTANTS, CONST_DATA, CONST_FUNCTION, CONST_CONTROLLERS, CONST_STOP, CONST_PREVENT, CONST_GETFUNC, CONST_POPUPER, CONST_STATE, CONST_DICTIONARY, CONST_OBJECTS, CONST_CONTROLLER, CONST_DATES, CONST_DIALOGER, CONST_DECLINER, CONST_STORE
 		);
 	}
 
@@ -97,7 +99,9 @@ class JSGlobals
 
 	private static function addGlobals() {		
 		self::$output[] = 'var '.implode(",\n", self::$globals).';';
-		self::$output[] = implode(";", self::$sets).';';
+		if (self::$isSplitMode) {
+			self::$output[] = implode(";", self::$sets).';';
+		}
 	}
 
 	private static function addGlobalAddingCall($key) {

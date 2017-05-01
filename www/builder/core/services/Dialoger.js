@@ -1,6 +1,6 @@
 var Dialoger;__G.set(Dialoger=new(function(){
 var ds={};var cid,dc,d,opts;
-var defineId=function(c,id){dc=c;if(!isFunction(c))return '_';cid=c.name+(isPrimitive(id)?'_'+id:'')};
+var defineId=function(c,id){dc=c;if(!isFunction(c))return'_';cid=c.name+(isPrimitive(id)?'_'+id:'')};
 var defineDialog=function(){if(isUndefined(ds[cid])){ds[cid]=new dc();__A.initiate.call(ds[cid]);ds[cid].render(document.body)}d=ds[cid]};
 var showDialog=function(){if(isObject(opts))d.set(opts);d.show()};
 var closeAll=function(){for(var k in ds)ds[k].hide()};

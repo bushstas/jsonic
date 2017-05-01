@@ -41,6 +41,7 @@ class Constants
 		'USER_SHORT'      => '__U',
 		'STATE_SHORT'     => '__S',
 		'DIALOGER_SHORT'  => '__DI',
+		'STORE_SHORT'     => '__ST',
 		
 		'CORE'            => '__A',
 		'CONTROLLERS'     => '__CT',
@@ -59,7 +60,8 @@ class Constants
 		'POPUPER'    => 'Popuper',
 		'DICTIONARY' => 'Dictionary',
 		'STATE'      => 'State',
-		'DIALOGER'   => 'Dialoger'
+		'DIALOGER'   => 'Dialoger',
+		'STORE'      => 'StoreKeeper'
 	);
 
 	private static $definitionsList = array(

@@ -180,7 +180,7 @@ class JSCompiler
 			}
 		}		
 		$this->addIncludes();
-		$this->addUtils($utilsFiles);
+		$this->addUtils();
 		$this->addInheritance();
 		if ($this->configProvider->isSplitMode()) {
 			foreach ($routes as $route) {
@@ -637,7 +637,8 @@ class JSCompiler
 			'user'             => $this->config['user'],
 			'controllers'      => array_keys($this->classesByTypes['controller']),
 			'isDataLoader'     => $this->configProvider->isUsingDataLoader(),
-			'pathToLoadAppApi' => $this->configProvider->getPathToLoadAppApi()
+			'pathToLoadAppApi' => $this->configProvider->getPathToLoadAppApi(),
+			'isSplitMode'      => $this->configProvider->isSplitMode()
 		);
 		JSGlobals::run($this->jsOutput, $data);
 	}
@@ -733,6 +734,7 @@ class JSCompiler
 		//$this->parseObjectsCallngs($jsOutput);
 		$jsOutput = preg_replace('/\{\s+\}/', '{}', $jsOutput);
 		$jsOutput .= "\n".implode("\n", $bottomOutput);
+		JSOptimizer::optimize($jsOutput);
 		$pathToCompiledJs = DEFAULT_PATH.$fileName;
 		if ($this->configProvider->isAdvancedMode()) {		
 			FileManager::createFile('temp.js', $jsOutput);
@@ -956,9 +958,14 @@ class JSCompiler
 		}
 	}
 
-	private function addUtils($utilsFiles) {
-		foreach ($utilsFiles as $utilsFile) {
-			$this->jsOutput[] = "\n".$utilsFile['content'];
+	private function addUtils() {
+		$utils = $this->utilsCompiler->getFunctions();
+		foreach ($utils as $funcName => $funcData) {
+			$code = $funcData['code'];
+			TextParser::encode($code, 'utilfunc');
+			$code = $this->removeExtraSpaces($code);
+			TextParser::decode($code, 'utilfunc');
+			$this->jsOutput[] = 'function '.$funcName.'('.$funcData['args'].'){'.rtrim($code, ';').'}';
 		}
 	}
 
@@ -1135,24 +1142,34 @@ class JSCompiler
 		if ($type == 'corrector') {
 			$isSingleton = ',1';
 		}
-		$content .= $fnc2.",'".$className."'".$isSingleton.");";
+		$content = rtrim($content, ';').$fnc2.",'".$className."'".$isSingleton.");";
 		$output[] = $content;
 	}
 
-	private function addPrototypeFunction($className, $method, $args = '', $code = '') {
+	private function addPrototypeFunction($className, $method, $args = '', $code = '', $toEncode = false) {
 		if (empty($this->currentRoute)) {
 			$output = &$this->jsOutput;
 		} else {
 			$output = &$this->jsOutputByViews[$this->currentRoute['name']];
 		}
-		$func = $this->removeExtraSpaces(CONST_PROTO.'.'.$method.'=function('.$args.'){'.trim($code).'};');
+		if ($toEncode) {
+			TextParser::encode($code, 'tmpfunc');
+			$code = $this->removeExtraSpaces($code);
+			TextParser::decode($code, 'tmpfunc');
+		} else {
+			$code = $this->removeExtraSpaces($code);
+		}
+		$func = CONST_PROTO.'.'.$method.'=function('.$args.'){'.rtrim($code, ';').'};';
 		$output[] = $func;
 	}
 
 	private function removeExtraSpaces($text) {
-		// $text = preg_replace('/([^\w])\s+/i', "$1", $text);
-		// $text = preg_replace('/\s+([^\w])/i', "$1", $text);
-		// $text = preg_replace('/;(?=\})/i', '', $text);
+		$text = preg_replace('/([\{\[\(;])\s+/i', "$1", $text);
+		$text = preg_replace('/([^\w\$\'"])[ \t]+/i', "$1", $text);
+		$text = preg_replace('/[ \t]+([^\w\$])/i', "$1", $text);
+		$text = preg_replace('/([^\w\$])\s+([^\w\$])/i', "$1$2", $text);
+		$text = preg_replace('/\s+(?=[^\w\$])/i', '', $text);
+		$text = preg_replace('/;(?=\})/', '', $text);
 		return trim($text);
 	}
 
@@ -1183,7 +1200,7 @@ class JSCompiler
 			} else {
 				$content = $let."\n";
 			}
-			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content);
+			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content, true);
 		}
 		if (!empty($tmpids)) {
 			foreach ($tmpids as $k => &$v) $v = '<nq>'.CONST_PROTO.'.getTemplate'.ucfirst($v).'<nq>';
@@ -1196,8 +1213,11 @@ class JSCompiler
 		$templateFunctions = TemplateParser::parse($templateContent, $file);
 		foreach ($templateFunctions as $templateFunction) {
 			$this->includesTemplateIndex[$templateFunction['name']] = $idx;
-			$this->jsOutput[] = CONST_GLOBAL.'.set(function(_,$){';
-			$this->jsOutput[] = "\n\treturn ".$templateFunction['content']."\n},'i_".$idx."');";
+			$code = $templateFunction['content'];
+			TextParser::encode($code, 'tmpfunc');
+			$code = $this->removeExtraSpaces($code);
+			TextParser::decode($code, 'tmpfunc');
+			$this->jsOutput[] = CONST_GLOBAL.'.set(function(_,$){return '.$code."},'i_".$idx."');";
 			$idx++;
 		}
 	}
