@@ -141,9 +141,7 @@ class JSOptimizer
 			if ($a == 0 && $b == 0 && $c == 0 && $d) {
 				if (empty($item)) continue;
 				$ps = preg_split('/[=\s]/', $item);
-				if (empty($ps[0])) {
-					die($item);
-				}
+				if (!preg_match('/^[a-zA-Z_\$]/', $ps[0])) continue;
 				self::$varsByLevels[self::$level][] = trim($ps[0]);
 			}
 			if (isset($delimiters[$i])) {
