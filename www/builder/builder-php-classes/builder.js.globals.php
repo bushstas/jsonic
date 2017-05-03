@@ -92,7 +92,7 @@ class JSGlobals
 
 	private static function add($key, $content) {
 		if (!in_array($key, self::$excluded)) {
-			self::$globals[] = self::normJsonStr($key." = ".$content);
+			self::$globals[] = self::normJsonStr($key."=".$content);
 			return true;
 		}
 	}

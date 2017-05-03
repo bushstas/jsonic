@@ -70,7 +70,9 @@ class Constants
 		'COMPONENT' => 'c',
 		'PROTO'     => 'p',
 		'LESS'      => '_#_LESS_#_',
-		'MORE'      => '_#_MORE_#_'
+		'MORE'      => '_#_MORE_#_',
+		'THIS'      => '$',
+		'PROPS'     => '_'
 	);
 
 	public static function init() {

@@ -737,7 +737,7 @@ class JSCompiler
 		
 		$pathToCompiledJs = DEFAULT_PATH.$fileName;
 		if ($this->configProvider->isAdvancedMode()) {
-			$jsOutput = JSOptimizer::optimize($jsOutput);
+			JSOptimizer::optimize($jsOutput);
 		}
 			// FileManager::createFile('temp.js', $jsOutput);
 			// exec('java -jar compiler.jar --js temp.js --compilation_level ADVANCED_OPTIMIZATIONS --js_output_file temp2.js 2>&1', $output);	

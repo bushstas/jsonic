@@ -3,11 +3,11 @@
 class JSOptimizer
 {
 	private static $regexp = '/function[\sa-zA-Z_]*\([^\)]*\)\s*\{|\{|\}/';
-	private static $tmpMark = '_&&&TMPMARK&&&_';
+	private static $tmpMark = '&&&TMPMARK&&&';
+	private static $funcArgsMark = '&&&FNCARGMARK&&&';
 	private static $content;
 	private static $letters = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
 	private static $numbers = '1234567890';
-	private static $openVarStatements;
 	private static $varMaps;
 	private static $varMapCouns;
 	private static $varNames = array();
@@ -36,101 +36,165 @@ class JSOptimizer
 			array(), array(), array(), array(), array(),
 			array(), array(), array(), array(), array()
 		);
-		self::$openVarStatements = array();
-		self::$content = '';
 	}
 
-	public static function optimize($content) {
+	public static function optimize(&$content) {
 		self::init();
-		TextParser::encode($content, 'js');
-		$a = explode('=_=&&&&=_=', $content);
-		Printer::log(count($a));
-		$functions = array();
+		TextParser::encode($content, 'js');		
+		$content = self::process($content, array());				
+		TextParser::decode($content, 'js');
+	}
+
+	private static function process($content, $vars) {
 		$data = Splitter::split(self::$regexp, $content);
-		extract($data);
-		$openBrackets = array(0);
-		$contents = array();
-		
-		$currentArgs = '';		
-		
+		if (!empty($data)) {
+			extract($data);
+		} else {
+			$items = array($content);
+			$delimiters = array();
+		}
+		$parts = array(
+			array('content' => '')
+		);
+		$currentPart = &$parts[count($parts) - 1];
+		$openBrackets = array();
+
+		$level = 0;
 		foreach ($items as $i => $item) {
 			if (!empty($item)) {
-				if (!isset($contents[self::$level])) {
-					$contents[self::$level] = '';
-				}
-				$contents[self::$level] .= $item;
+				$currentPart['content'] .= $item;
 			}
 			if (isset($delimiters[$i])) {
 				$d = $delimiters[$i];
 				if ($d[0] == 'f') {
-					self::processCode($contents[self::$level]);
-					self::$level++;
-					if (!isset($openBrackets[self::$level])) {
-						$openBrackets[self::$level] = 0;
+					$level++;
+					if ($level == 1) {
+						$funcsArgs = '';
+						preg_match_all('/^function\s*(\w*)\s*\(([^\)]*)/', $d, $matches);
+						if (!empty($matches[1][0]) && !isset($vars[$matches[1][0]])) {
+							self::addVar($matches[1][0], $vars, array_values($vars));
+						}
+						if (!empty($matches[2][0])) {
+							$funcsArgs = $matches[2][0];
+						}
+						$currentPart['content'] .= 'function'.(!empty($matches[1][0]) ? ' '.$matches[1][0]: '').'('.self::$funcArgsMark.'){';
+						$parts[] = array(
+							'isChild' => true,
+							'args' => $funcsArgs,
+							'content' => ''
+						);
+						$currentPart = &$parts[count($parts) - 1];
+					} else {
+						$currentPart['content'] .= $d;
 					}
-					$openBrackets[self::$level]++;
-					preg_match('/function[\sa-zA-Z_]*\(([^\)]*)/', $d, $match);
-					$contents[self::$level] .= $d;
-					$currentArgs = $match[1];
-					
+					if (!isset($openBrackets[$level])) {
+		 				$openBrackets[$level] = 0;
+		 			}
+		 			$openBrackets[$level]++;
 				} elseif ($d == '{') {
-					$contents[self::$level] .= '{';
-					$openBrackets[self::$level]++;
+					$openBrackets[$level]++;
+					$currentPart['content'] .= $d;
 				} else {
-					$openBrackets[self::$level]--;
-					$contents[self::$level] .= '}';
-					if ($openBrackets[self::$level] == 0) {
-						self::processCode($contents[self::$level], true);
-						self::$level--;
+					$openBrackets[$level]--;
+					if ($openBrackets[$level] == 0) {
+		 				if ($level == 1) {
+			 				$parts[] = array(
+								'content' => $d
+							);
+							$currentPart = &$parts[count($parts) - 1];
+						} else {
+							$currentPart['content'] .= $d;
+						}
+						if ($level > 0) {
+							$level--;
+						}
+		 			} else {
+						$currentPart['content'] .= $d;
 					}
 				}
 			}
-			
 		}
-		$a = explode('=_=&&&&=_=', self::$content);
-		Printer::log(count($a));
-		TextParser::decode(self::$content, 'js');
-		return self::$content;
+		$code = '';
+		foreach ($parts as $part) {
+			if (empty($part['isChild'])) {
+				$code .= $part['content'];
+			}
+		}
+		self::processCode($code, $vars);
+		$content = '';
+		$funcArgs = array();
+		$argsList = array();
+		$usedNames = array_values($vars);
+		foreach ($parts as $part) {
+			if (!empty($part['isChild'])) {
+				$args = $vars;
+				if (!empty($part['args'])) {
+					$argsList[] = $part['args'];
+					self::parseArgs($part['args'], $args, $usedNames, $funcArgs);
+				} else {
+					$argsList[] = '';
+				}
+				Printer::log($args);
+				Printer::log($part['content']);
+				$content .= self::process($part['content'], $args);
+			} else {
+				$content .= self::obfuscate($part['content'], $vars);
+			}
+		}
+		if (!empty($funcArgs)) {
+			$allArgs = implode('|', $argsList);
+			foreach ($funcArgs as $k => $v) {
+				$allArgs = preg_replace('/\b'.$k.'\b/', $v, $allArgs);
+			}
+			$argsList = explode('|', $allArgs);
+			$parts = explode(self::$funcArgsMark, $content);
+			$content = '';			
+			foreach ($parts as $i => $part) {
+				$content .= $part;
+				if (isset($argsList[$i])) {
+					$content .= $argsList[$i];
+				}
+			}
+		} else {
+			$content = str_replace(self::$funcArgsMark, '', $content);
+		}
+		return $content;
 	}
 
-	private static function processCode(&$content, $cleanVars = false) {
-		$isOpenStatement = !!self::$openVarStatements[self::$level];
-		if ($isOpenStatement) {
-			self::$openVarStatements[self::$level] = false;
-		}
-		$cnt = trim(preg_replace('/\s+,|,\s+/', ',', $content));
-		if (strlen($cnt) > 2) {
-			if ($isOpenStatement && $cnt[0] == ',') {
-				$cnt = 'var '.ltrim($cnt, ',');
+	private static function parseArgs($argsCode, &$vars, &$usedNames, &$funcArgs) {
+		$parts = explode(',', $argsCode);
+		foreach ($parts as $part) {
+			$part = trim($part);
+			$ps = explode('=', $part);
+			if (isset($ps[1])) {
+				$part = trim($ps[0]);
 			}
-			$parts = preg_split('/\b(let|var|const)\b/', $cnt);
+			if ($part == CONST_THIS || $part == CONST_PROPS) continue;
+			if (!isset($funcArgs[$part])) {
+				$obfuscatedName = self::addVar($part, $vars, $usedNames);
+				$funcArgs[$part] = $obfuscatedName;
+			}
+		}		
+	}
+
+	private static function processCode($code, &$vars) {
+		$code = trim(preg_replace('/\s+,|,\s+/', ',', $code));
+		if (strlen($code) > 2) {
+			$parts = preg_split('/\b(let|var|const)\b/', $code);
 			if (count($parts) > 1) {
 				for ($i = 1; $i < count($parts); $i++) {
 					$ps = preg_split('/;|[\r\n]/', $parts[$i]);
 					$p = trim($ps[0]);
-					self::addVars($p);
-					if ($p[strlen($p) - 1] == '=') {
-						self::$openVarStatements[self::$level] = true;
-					}
+					self::addVars($p, $vars);
 				}
 			}
-			self::obfuscate($content);
 		}
-		self::$content .= $content;
-		if ($cleanVars) {
-			self::$varsByLevels[self::$level] = array();
-			foreach (self::$varMaps[self::$level] as $k => $v) {
-				self::$allVars[$k] = false;
-			}
-		}
-		$content = '';
 	}
 
-	private static function addVars($code) {
+	private static function addVars($code, &$vars) {
+		$usedNames = array_values($vars);
 		$a = 0;
-		$b = 0;
-		$c = 0;
-		$d = true;
+		$prevDelimiter = ',';
 		$data = Splitter::split('/[,\[\]\{\}\(\)]/', $code);
 		if (empty($data)) {
 			$items = array($code);
@@ -138,73 +202,58 @@ class JSOptimizer
 			extract($data);
 		}
 		foreach ($items as $i => $item) {
-			if ($a == 0 && $b == 0 && $c == 0 && $d) {
+			if ($a == 0 && $prevDelimiter == ',') {
 				if (empty($item)) continue;
 				$ps = preg_split('/[=\s]/', $item);
 				if (!preg_match('/^[a-zA-Z_\$]/', $ps[0])) continue;
-				self::$varsByLevels[self::$level][] = trim($ps[0]);
+				self::addVar(trim($ps[0]), $vars, $usedNames);
 			}
 			if (isset($delimiters[$i])) {
-				$d = false;
 				switch ($delimiters[$i]) {
 					case '{':
+					case '[':
+					case '(':
 						$a++;
 					break;
 
 					case '}':
-						$a--;
-					break;
-
-					case '[':
-						$b++;
-					break;
-
 					case ']':
-						$b--;
-					break;
-
-					case '(':
-						$c++;
-					break;
-
 					case ')':
-						$c--;
-					break;
-
-					case ',':
-						$d = true;
+						if ($a > 0) {
+							$a--;
+						}
 					break;
 				}
+				$prevDelimiter = $delimiters[$i];
 			}
 		}
 	}
 
-	private static function obfuscate(&$code) {
-		for ($i = self::$level; $i >= 0; $i--) {
-			foreach (self::$varsByLevels[$i] as $var) {
-				$ov = self::getVarName($i, $var);
-				$code = preg_replace('/\.'.$var.'\b/',self::$tmpMark, $code);
-				$code = preg_replace('/\b'.$var.'\b/', $ov, $code);
-				$code = str_replace(self::$tmpMark, '.'.$var, $code);
-			}
+	private static function addVar($varName, &$vars, &$usedNames) {
+		if (!isset($vars[$varName])) {
+			$name = self::getVarName($usedNames);
+			$vars[$varName] = $name;
+			$usedNames[] = $name;
+			return $name;
 		}
+		return $vars[$varName];
 	}
 
-	private static function getVarName($level, $key) {
-		if (!isset(self::$varMaps[$level][$key])) {
-			self::$varMaps[$level][$key] = self::getNextVarName(self::$varMapCouns[$level]);
-			self::$varMapCouns[$level]++;
-			self::$allVars[self::$varMaps[$level][$key]] = true;
-		}
-		return self::$varMaps[$level][$key];
-	}
-
-	private static function getNextVarName($index) {
+	private static function getVarName($usedNames) {
 		for ($i = 0; $i < count(self::$varNames); $i++) {
-			if (!isset(self::$allVars[self::$varNames[$i]])) {
+			if (!in_array(self::$varNames[$i], $usedNames)) {
 				return self::$varNames[$i];
 			}
+		}		
+	}
+
+	private static function obfuscate($code, $vars) {		
+		foreach ($vars as $realName => $obfuscatedName) {
+			$code = preg_replace('/\.'.$realName.'\b/',self::$tmpMark, $code);
+			$code = preg_replace('/\b'.$realName.'\b/', $obfuscatedName, $code);
+			$code = str_replace(self::$tmpMark, '.'.$realName, $code);
 		}
+		return $code;
 	}
 
 	private static function generateNames() {
@@ -223,7 +272,7 @@ class JSOptimizer
 			}
 			foreach ($letters as $a) {
 				$name = $l.$a;
-				if ($name != 'in') {
+				if ($name != 'in' && $name != 'if') {
 					$combined[] = $name;
 				}
 			}

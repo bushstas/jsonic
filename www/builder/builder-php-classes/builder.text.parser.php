@@ -4,7 +4,7 @@ class TextParser
 {
 	private static $texts = array();
 	private static $dictionary = array();
-	private static $mark = '=_=&&&&=_=';
+	private static $mark = '=%=&&&&=%=';
 	private static $regexp = '/[\'"\/]/';
 
 	public static function addToDictionary($keywords) {
@@ -31,7 +31,13 @@ class TextParser
 		$content = '';
 		$isText = false;
 		$currentText = '';
+		$regexpFlags = false;
 		foreach ($parts as $i => $part) {
+			if ($regexpFlags) {
+				$part = preg_replace('/^[a-z]+/', '', $part);
+				$regexpFlags = false;
+			}
+			$aaaa = false;
 			if (!$isText) {
 				$content .= $part;
 				if (isset($matches[$i])) {
@@ -54,6 +60,13 @@ class TextParser
 					if ($matches[$i] == $currentQuote) {
 						$isText = false;
 						$currentText .= $currentQuote;
+						if ($currentQuote == '/' && isset($parts[$i + 1])) {
+							preg_match('/^[a-z]+/', $parts[$i + 1], $match);
+							if (!empty($match[0])) {
+								$currentText .= $match[0];
+								$regexpFlags = true;
+							}
+						}
 						if (is_array(self::$texts[$key])) {
 							self::$texts[$key][] = $currentText;
 							$content .= $mark;
