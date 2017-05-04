@@ -134,8 +134,6 @@ class JSOptimizer
 				} else {
 					$argsList[] = '';
 				}
-				Printer::log($args);
-				Printer::log($part['content']);
 				$content .= self::process($part['content'], $args);
 			} else {
 				$content .= self::obfuscate($part['content'], $vars);
@@ -173,11 +171,15 @@ class JSOptimizer
 			if (!isset($funcArgs[$part])) {
 				$obfuscatedName = self::addVar($part, $vars, $usedNames);
 				$funcArgs[$part] = $obfuscatedName;
+			} else {
+				$vars[$part] = $funcArgs[$part];
+				$usedNames[] = $funcArgs[$part];
 			}
 		}		
 	}
 
 	private static function processCode($code, &$vars) {
+		Printer::log($vars);
 		$code = trim(preg_replace('/\s+,|,\s+/', ',', $code));
 		if (strlen($code) > 2) {
 			$parts = preg_split('/\b(let|var|const)\b/', $code);
