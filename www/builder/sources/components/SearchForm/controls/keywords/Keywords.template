@@ -17,7 +17,7 @@
 <Tabs as="tabs" items="{$tabs}" activeTab="{$activeTab}" onSelect="onSelectTab" onRemove="removeRequest"/>
 
 <div as="area" class="@area {$keywordsCount>1?'->>multi'}">
-	{foreach $keywords as &item}
+	{foreach $keywords as &i => &item}		
 		<KeywordsControl name="tags" items="{&item}" onEdit="onTagEdit" onChange="onChange"/>
 	{/foreach}
 </div>

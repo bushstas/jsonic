@@ -404,7 +404,7 @@
 			'disposeOperator' => array(
 				'body' => "
 					".CONST_CORE.".disposeLinks.call(this);
-					".CONST_CORE.".disposeLevels();
+					".CONST_CORE.".disposeLevels.call(this);
 					this.levels = null;
 					this.parentElement = null;
 					this.parentLevel = null;

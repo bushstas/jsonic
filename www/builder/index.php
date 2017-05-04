@@ -86,7 +86,7 @@
 		<input type="hidden" name="istest" value="1"/>
 		<input name="submit" type="submit" value="Запустить тест" style="padding: 5px 10px;">
 	</form>
-	<form metod="GET" target="iframe" action="build.php">
+	<form metod="POST" target="iframe" action="build.php">
 		<div class="top">
 			<input name="submit" type="submit" value="Скомпилировать" style="padding: 5px 10px;">
 		</div>

@@ -1202,7 +1202,7 @@ class JSCompiler
 			} else {
 				$content = $let."\n";
 			}
-			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), '_,$', $content, true);
+			$this->addPrototypeFunction($className, 'getTemplate'.ucfirst($templateFunction['name']), CONST_PROPS.','.CONST_THIS, $content, true);
 		}
 		if (!empty($tmpids)) {
 			foreach ($tmpids as $k => &$v) $v = '<nq>'.CONST_PROTO.'.getTemplate'.ucfirst($v).'<nq>';
@@ -1219,7 +1219,7 @@ class JSCompiler
 			TextParser::encode($code, 'tmpfunc');
 			$code = $this->removeExtraSpaces($code);
 			TextParser::decode($code, 'tmpfunc');
-			$this->jsOutput[] = CONST_GLOBAL.'.set(function(_,$){return '.$code."},'i_".$idx."');";
+			$this->jsOutput[] = CONST_GLOBAL.'.set(function('.CONST_PROPS.','.CONST_THIS.'){return '.$code."},'i_".$idx."');";
 			$idx++;
 		}
 	}

@@ -213,27 +213,27 @@ class Config
 	}
 
 	public function needCssObfuscation() {
-		return !empty($_GET['obfuscate']);
+		return !empty($_REQUEST['obfuscate']);
 	}
 
 	public function needJsObfuscation() {
-		return !empty($_GET['js_obfuscate']);
+		return !empty($_REQUEST['js_obfuscate']);
 	}
 
 	public function isSplitMode() {
-		return !empty($_GET['split']);
+		return !empty($_REQUEST['split']);
 	}
 
 	public function needToCreateEnvironment() {
-		return !empty($_GET['create']);
+		return !empty($_REQUEST['create']);
 	}
 
 	public function isAdvancedMode() {
-		return !empty($_GET['advanced']);
+		return !empty($_REQUEST['advanced']);
 	}
 
 	public function isTest() {
-		return !empty($_GET['istest']);
+		return !empty($_REQUEST['istest']);
 	}
 
 	public function getConfigJson() {

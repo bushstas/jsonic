@@ -4,48 +4,25 @@ class JSOptimizer
 {
 	private static $regexp = '/function[\sa-zA-Z_]*\([^\)]*\)\s*\{|\{|\}/';
 	private static $tmpMark = '&&&TMPMARK&&&';
+	private static $mark = '_vAr___';
 	private static $funcArgsMark = '&&&FNCARGMARK&&&';
-	private static $content;
 	private static $letters = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
 	private static $numbers = '1234567890';
-	private static $varMaps;
-	private static $varMapCouns;
 	private static $varNames = array();
-	private static $varsByLevels;
-	private static $allVars;
-	private static $level;
+	private static $topLevelVars = array();
 
-	private static function init() {
+
+	public static function optimize(&$content) {
 		if (empty(self::$varNames)) {
 			self::generateNames();
 		}
-		self::$varsByLevels = array(
-			array(), array(), array(), array(), array(),
-			array(), array(), array(), array(), array(),
-			array(), array(), array(), array(), array()
-		);
-		self::$allVars = array();
-		self::$level = 0;
-		self::$varMapCouns = array(
-			0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0
-		);
-		self::$varMaps = array(
-			array(), array(), array(), array(), array(),
-			array(), array(), array(), array(), array(),
-			array(), array(), array(), array(), array()
-		);
-	}
-
-	public static function optimize(&$content) {
-		self::init();
 		TextParser::encode($content, 'js');		
-		$content = self::process($content, array());				
+		$content = self::process($content, self::$topLevelVars, true);
+		self::obfuscateProperties($content);
 		TextParser::decode($content, 'js');
 	}
 
-	private static function process($content, $vars) {
+	private static function process($content, $vars, $isTopLevel = false) {
 		$data = Splitter::split(self::$regexp, $content);
 		if (!empty($data)) {
 			extract($data);
@@ -156,7 +133,16 @@ class JSOptimizer
 		} else {
 			$content = str_replace(self::$funcArgsMark, '', $content);
 		}
+		if ($isTopLevel) {
+			self::rememberTopLevelVars($vars);
+		}
 		return $content;
+	}
+	
+	private static function rememberTopLevelVars($vars) {
+		foreach ($vars as $k => $v) {
+			self::$topLevelVars[$k] = $v;
+		}
 	}
 
 	private static function parseArgs($argsCode, &$vars, &$usedNames, &$funcArgs) {
@@ -179,8 +165,8 @@ class JSOptimizer
 	}
 
 	private static function processCode($code, &$vars) {
-		Printer::log($vars);
 		$code = trim(preg_replace('/\s+,|,\s+/', ',', $code));
+		$code = preg_replace('/\bcatch\s*\(/', 'catch(var ', $code);
 		if (strlen($code) > 2) {
 			$parts = preg_split('/\b(let|var|const)\b/', $code);
 			if (count($parts) > 1) {
@@ -252,10 +238,11 @@ class JSOptimizer
 	private static function obfuscate($code, $vars) {		
 		foreach ($vars as $realName => $obfuscatedName) {
 			$code = preg_replace('/\.'.$realName.'\b/',self::$tmpMark, $code);
-			$code = preg_replace('/\b'.$realName.'\b/', $obfuscatedName, $code);
+			$code = preg_replace('/\b'.$realName.'\b/', $obfuscatedName.self::$mark, $code);
 			$code = str_replace(self::$tmpMark, '.'.$realName, $code);
 		}
-		return $code;
+		//return $code;
+		return str_replace(self::$mark, '', $code);
 	}
 
 	private static function generateNames() {
@@ -281,5 +268,12 @@ class JSOptimizer
 		}
 		shuffle($combined);
 		self::$varNames = array_merge(self::$varNames, $combined);
+	}
+
+	private static function obfuscateProperties(&$content) {
+		$content = preg_replace('/\bwindow\./', '', $content);
+		//preg_match_all('/'.self::$mark.'\.(\w+)'.'/', $content, $matches);
+		//Printer::log($matches[1]);
+
 	}
 }
