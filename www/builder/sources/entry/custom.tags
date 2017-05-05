@@ -1,4 +1,5 @@
 @scope: <div scope="1">
 @table: <table cellpadding="0px" cellspacing="0px">
 @standartLink: <a target="_blank" class="standart-button">
+@standartButton: <div class="standart-button">
 @greenButton: <div class="standart-button green-button">

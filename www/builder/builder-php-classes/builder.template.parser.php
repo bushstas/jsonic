@@ -451,13 +451,21 @@ class TemplateParser
 			if (!isset($attributes[$name])) {
 				$attributes[$name] = $value;
 			} else {
+				$a = trim($attributes[$name]);
+				$quote = '';
+				if ($name == 'class' || $name == 'style') {
+					if ($a[0] == '<' && preg_match('/^<nq><quote>/', $a)) {
+						$quote = '<nq><quote>';
+						$a = preg_replace('/^<nq><quote>/', '', $a);
+					}
+				}
 				switch ($name) {
-					case 'class':
-						$attributes[$name] = $value.' '.trim($attributes[$name]);
+					case 'class':						
+						$attributes[$name] = $quote.$value.' '.$a;
 					break;
 					
 					case 'style':
-						$attributes[$name] = preg_replace('/;{2,}/', ';', $value.';'.trim($attributes[$name]));
+						$attributes[$name] = $quote.preg_replace('/;{2,}/', ';', $value.';'.$a);
 					break;
 				}
 			}

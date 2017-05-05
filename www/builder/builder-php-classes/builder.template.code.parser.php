@@ -263,6 +263,7 @@ class TemplateCodeParser
 						}
 					} elseif (self::$open['text']) {
 						self::$parsedCode = rtrim(self::$parsedCode, '@').CONST_CONSTANTS.'.'.$part;
+						TextsConstantsParser::addTemplateConstant($part, self::$templateName, self::$className);
 					} elseif (self::$open['data']) {
 						self::$parsedCode = rtrim(self::$parsedCode, '#').'<data>'.$part;
 					} else {

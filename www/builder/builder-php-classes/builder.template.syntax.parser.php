@@ -52,7 +52,6 @@ class TemplateSyntaxParser
 		'{' => 'открывающаяся фигурная скобка',
 		'}' => 'закрывающаяся фигурная скобка',
 		';' => 'точка с запятой',
-		'end' => 'конец выражения',
 		'0' => 'число',
 		'1' => 'цифра'
 	);
@@ -116,7 +115,7 @@ class TemplateSyntaxParser
 						self::addCode($part);
 					}
 					self::setPrevSign('a');
-				} elseif (is_numeric($part[0])) {
+				} elseif (is_numeric($part[0]) && !self::$isQuoted) {
 					self::throwIncorrectNameError($part);
 				} else {
 					for ($i = 0; $i < strlen($part); $i++) {
@@ -147,18 +146,25 @@ class TemplateSyntaxParser
 	}
 
 	private static function addName($name) {
-		if (self::$prevSign == ':') {
-			self::$code = rtrim(self::$code, ':').".a('".$name."')";
-		} elseif (self::$prevSign == '$') {
-			self::$code = self::$code.".g('".$name."')";
-		} elseif (self::$prevSign == '~') {
-			self::$code = rtrim(self::$code, '~')."_['".$name."']";
-		} elseif (self::$prevSign == '&') {
-			self::$code = rtrim(self::$code, '&').$name;
-		} elseif (self::$prevSign == '.' && !self::isField()) {
-			self::$code = rtrim(self::$code, '.').'$.'.$name;
-		} else {
+		if (self::$isQuoted) {
 			self::$code .= $name;
+		} else {
+			if (self::$prevSign == ':') {
+				self::$code = rtrim(self::$code, ':').".a('".$name."')";
+			} elseif (self::$prevSign == '$') {
+				self::$code = self::$code.".g('".$name."')";
+			} elseif (self::$prevSign == '~') {
+				self::$code = rtrim(self::$code, '~')."_['".$name."']";
+			} elseif (self::$prevSign == '&') {
+				self::$code = rtrim(self::$code, '&').$name;
+			} elseif (self::$prevSign == '.' && !self::isField()) {
+				self::$code = rtrim(self::$code, '.').'$.'.$name;
+			} elseif (self::$prevSign == '@') {
+				self::$code = rtrim(self::$code, '@').CONST_CONST_CONSTANTS.'.'.$name;
+				TextsConstantsParser::addTemplateConstant($name, self::$templateName, self::$className);
+			} else {
+				self::$code .= $name;
+			}
 		}
 		self::$fullCode .= $name;
 	}

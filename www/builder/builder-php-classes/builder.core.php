@@ -21,7 +21,7 @@ $includes = array(
 	'template.callback.validator', 'state.parser', 'class.analyzer', 'js.obfuscator',
 	'dialogs.parser', 'template.validator', 'template.syntax.parser', 'file.manager', 'js.core.renderer',
 	'operator.parser', 'foreach.code.parser', 'from.code.parser', 'switch.code.parser',
-	'constants', 'custom.tags.parser', 'js.optimizer'
+	'constants', 'custom.tags.parser', 'js.optimizer', 'texts.constants.parser', 'initials.syntax.parser'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	

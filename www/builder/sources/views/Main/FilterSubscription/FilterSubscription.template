@@ -29,7 +29,7 @@
 						<Select name="freqSubs" options="{#subscrFreqOptions}" value="{&filter.freqSubs <<-}" onChange="onFreqChange"/>
 					</td>
 					<td>
-						<div class="@button {&filter.isSubs <<- ==1?@greenButton+' ->>subscribed':@whiteButton}"></div>
+						<standartButton class="@button {&filter.isSubs <<- ==1 ? '->> green-button ->> subscribed' : '->> white-button'}"/>
 					</td>
 					<td>
 						Delete

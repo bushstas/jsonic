@@ -57,7 +57,7 @@ class JSParser
 				$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
 				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
 				JSInterpreter::parse($code, $class['name']);
-				$code = preg_replace("/@(\w+)/", CONST_CONSTANTS.".$1", $code);	
+				TextsConstantsParser::parse($code, $functionName, $class['name']);
 				$functions[] = array(
 					'name' => $functionName, 
 					'args' => $arguments,

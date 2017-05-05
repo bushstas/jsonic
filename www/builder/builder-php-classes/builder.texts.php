@@ -35,6 +35,7 @@ class TextsCompiler
 					}
 				}
 			}
+			TextsConstantsParser::setIndex($this->textsConstants);
 			$this->textsIndex = array_keys($this->textsConstants);
 			$this->textsConstants = array_values($this->textsConstants);
 		}

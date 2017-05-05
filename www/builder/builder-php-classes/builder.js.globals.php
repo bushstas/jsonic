@@ -12,8 +12,6 @@ class JSGlobals
 
 	private static $errors = array(
 		'invalidApiConfig' => "Файл конфигурации путей к api <b>config.js</b> не корректен. Содержимое должно иметь вид <xmp>var {?} = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>",
-		'textConstNotFound' => 'Текстовая константа {??} используемая в шаблоне {??} класса {??} не найдена',
-		'textConstNotFound2' => 'Текстовая константа {??} используемая в методе {??} класса {??} не найдена',
 		'dataConstNotFound' => 'Константа данных {??} не найдена',
 		'noApiConfigPath' => 'Параметр <b>{?}.{?}.{?}</b> не найден в файле конфигурации <b>config.js</b>',
 		'noDeclFilesFound' => "Обнаружено использование утилины <b>Decliner</b>, но не найден ни один файл с расширением <b>decl</b><br><br>Пример содержимого такого файла:<xmp>@item: штука,штуки,штук\n@ball: мяч,мяча,мячей</xmp>"
@@ -129,8 +127,7 @@ class JSGlobals
 
 	public static function parseTextConstants(&$jsOutput, $data) {
 		if (is_array($data['index'])) {
-			$varName = CONST_CONSTANTS;
-			$regexp = '/\b'.$varName.'\.\w+\b/';
+			$regexp = '/\b'.CONST_CONSTANTS.'\.\w+\b/';
 			$output = $jsOutput;
 			preg_match_all($regexp, $jsOutput, $matches);
 			$codes = $matches[0];
@@ -141,19 +138,7 @@ class JSGlobals
 				if (isset($codes[$i])) {
 					$parts2 = explode('.', $codes[$i]);
 					$index = array_search($parts2[1], $data['index']);
-					if (is_bool($index)) {
-						$p = preg_split('/\b'.$varName.'\.'.$parts2[1].'\b/', $output);
-						preg_match_all('/(\w+)\.prototype\.(\w+)\s*=\s*function/', $p[0], $mtchs);
-						$cnt = count($mtchs[0]);
-						$cln = $mtchs[1][$cnt - 1];
-						$fnn = $mtchs[2][$cnt - 1];
-						preg_match('/^getTemplate([A-Z]\w*)$/', $fnn, $mtch);
-						if (isset($mtch[1])) {
-							new Error(self::$errors['textConstNotFound'], array($parts2[1], strtolower($mtch[1]), $cln));
-						}
-						new Error(self::$errors['textConstNotFound2'], array($parts2[1], $fnn, $cln));
-					}
-					$jsOutput .= $varName.'['.$index.']';
+					$jsOutput .= CONST_CONSTANTS.'['.$index.']';
 				}
 			}
 		}
