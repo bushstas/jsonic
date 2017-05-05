@@ -398,7 +398,7 @@ class TemplateSyntaxParser
 
 	private static function handleRightBracket() {
 		self::tryToCloseTernary();
-		array_pop(self::$queue);			
+		array_pop(self::$queue);
 		self::$openBrackets--;
 		self::$expected = array('.', '[', '&', '|', '?', '-', '+', '/', '*', '%', '>', '<', '!', '=', self::$space);			
 		self::handleStandartSituation();

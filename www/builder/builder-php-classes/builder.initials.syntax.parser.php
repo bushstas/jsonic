@@ -1,32 +1,50 @@
 <?php
 
+
+
+
+ ÑÄÅËÀÒÜ ÐÅÊÓÐÑÈÂÍÎ
+
 class InitialsSyntaxParser
 {
-	private static $space = 'Â¦';
+	private static $space = '¦';
 	private static $code;
 	private static $openObjects, $openArrays;
 	private static $isQuoted;
 	private static $currentQuote;
 	private static $expected;
+	private static $keyExpected;
+	private static $valueExpected;
+	private static $data, $queue;
+	private static $currentObjects;
 
 	private static $keywords = array(
 		'false', 'true', 'null', 'undefined', 'NaN', 'Infinity'
 	);
 
 	public static function init() {
+		self::$data = array(
+			'object' => array()
+		);
 		self::$code = '';
 		self::$openObjects = 0;
 		self::$openArrays = 0;
 		self::$isQuoted = false;
 		self::$currentQuote = '';
 		self::$expected = array('{', '[');
+		self::$keyExpected = false;
+		self::$valueExpected = false;
+		self::$queue = array();
+		self::$currentObjects = array(
+			&self::$data['object']
+		);
 	}
 
 	public static function parse($code) {
 		self::init();
-		$data = array();
-		
+	
 		$code = preg_replace('/\s+/', self::$space, trim($code));
+		Printer::log($code);
 		self::validate($code);
 		$parts = preg_split('/\b/', $code);
 		foreach ($parts as $i => $part) {
@@ -53,8 +71,8 @@ class InitialsSyntaxParser
 			}			
 		}
 
-		$data['code'] = self::$code;
-		return $data;
+		self::$data['code'] = self::$code;
+		return self::$data;
 	}
 
 	private static function addCode($code) {
@@ -70,7 +88,13 @@ class InitialsSyntaxParser
 	}
 
 	private static function handleName($name) {
-
+		if (self::$isQuoted) return;
+		if (!self::isExpected('a')) {
+			self::throwUnexpectedSignError($name);
+		}
+		if (empty($keyExpected)) {
+			
+		}
 	}
 
 	private static function handleKeyword($keyword) {
@@ -83,47 +107,91 @@ class InitialsSyntaxParser
 			self::throwUnexpectedSignError($symbol);
 		}	
 		switch ($symbol) {
-			case self::$space  : self::handleSpace();           break;
-			case '{'           : self::handleLeftBrace();       break;
-			case '}'           : self::handleRightBrace();      break;
-			case '|'           : self::handleVerticalBar();     break;
-			case ':'           : self::handleColon();           break;
-			case '='           : self::handleEqual();           break;
-			case '$'           : self::handleDollar();          break;
-			case ','           : self::handleComma();           break;
-			case '.'           : self::handleDot();             break;
-			case '?'           : self::handleQuestion();        break;
-			case '!'           : self::handleExclamation();     break;
-			case '['           : self::handleLeftBracket();     break;
-			case ']'           : self::handleRightBracket();    break;
-			case '+'           : self::handleMathSign($symbol); break;
-			case '-'           : self::handleMathSign($symbol); break;
-			case '*'           : self::handleMathSign($symbol); break;
-			case '%'           : self::handleMathSign($symbol); break;
-			case '/'           : self::handleMathSign($symbol); break;
-			case "'"           : self::handleQuote();           break;
-			case '"'           : self::handleDoubleQuote();     break;
-			case '~'           : self::handleTilde();           break;
-			case '@'           : self::handleAtSign();          break;
-			case '#'           : self::handleNumberSign();      break;
-			case '&'           : self::handleAmpersand();       break;
-			case '('           : self::handleLeftParens();      break;
-			case ')'           : self::handleRightParens();     break;
-			case '>'           : self::handleGreaterSign();     break;
-			case '<'           : self::handleGreaterSign();     break;
-			default            : self::handleDefaultSign();
+			case '{': self::handleLeftBrace();       break;
+			case '}': self::handleRightBrace();      break;
+			case ':': self::handleColon();           break;
+			case ',': self::handleComma();           break;
+			case '.': self::handleDot();             break;
+			case '[': self::handleLeftBracket();     break;
+			case ']': self::handleRightBracket();    break;
+			case '-': self::handleMathSign($symbol); break;
+			case "'": self::handleQuote();           break;
+			case '"': self::handleDoubleQuote();     break;
+			case '@': self::handleAtSign();          break;
+			case '#': self::handleNumberSign();      break;
 		}
-		self::setPrevSign($symbol);
+	}
+
+	private static function handleQuote() {
+		if (self::$isQuoted && self::$currentQuote == "'") {
+			self::handleQuoteClosing();
+		} elseif (!self::$isQuoted) {
+			self::$isQuoted = true;
+			self::$currentQuote = "'";
+		}
+	}
+
+	private static function handleDoubleQuote() {
+		if (self::$isQuoted && self::$currentQuote == '"') {			
+			self::handleQuoteClosing();
+		} elseif (!self::$isQuoted) {
+			self::$isQuoted = true;
+			self::$currentQuote = '"';
+		}
+	}
+
+	private static function handleQuoteClosing() {
+		self::$isQuoted = false;
+		self::$expected = array(self::$space);		
+		self::handleStandartSituation();
+	}
+
+	private static function handleStandartSituation() {
+		$lastInQueue = self::$queue[count(self::$queue) - 1];
+		if (!empty(self::$openObjects) && $lastInQueue == 'o') {
+			self::$expected[] = '}';
+			if (self::$valueExpected) {
+				self::$valueExpected = false;
+				self::$expected[] = ',';
+			}
+		}
+		if (!empty(self::$openArrays) && $lastInQueue == 'a') {
+			array_push(self::$expected, ']', ',');
+		}
 	}
 
 	private static function handleLeftBrace() {
 		self::$openObjects++;
-		self::$expected = array('a', '0', '"', "'", '{', '}', '[');
+		self::$keyExpected = true;
+		self::$expected = array('a', '0', '"', "'", '{', '}', '[', self::$space);
+		
+		$c = count(self::$currentObjects);
+		$o = &self::$currentObjects[$c - 1];
+		$o[] = array();
+		self::$queue[] = 'o';
 	}
 
 	private static function handleRightBrace() {
 		self::$openObjects--;
-		self::$expected = array(',', '}', ']');
+		self::$keyExpected = false;
+		self::$valueExpected = false;
+		self::$expected = array(self::$space);
+		array_pop(self::$queue);
+		self::handleStandartSituation();
+	}
+
+	private static function handleLeftBracket() {
+		self::$openArrays++;
+		self::$expected = array('a', '0', '"', "'", '{', '[', ']', self::$space);
+		//self::$currentObject
+		self::$queue[] = 'a';
+	}
+
+	private static function handleRightBracket() {
+		self::$openArrays--;
+		self::$expected = array(self::$space);
+		array_pop(self::$queue);
+		self::handleStandartSituation();
 	}
 
 	private static function isExpected($sign) {
@@ -134,16 +202,16 @@ class InitialsSyntaxParser
 		$a = array('{', '[');
 		$b = array('}', ']');
 		if (!in_array($code[0], $a) || !in_array($code[strlen($code) - 1], $b)) {
-			die('InitialsSyntaxParser error');
+			die('InitialsSyntaxParser error: validate');
 		}
 	}
 
 	private static function throwIncorrectNameError($word) {
-		die('InitialsSyntaxParser error');
+		die('InitialsSyntaxParser error: throwIncorrectNameError');
 	}
 
 	private static function throwUnexpectedSignError($word) {
-		die('InitialsSyntaxParser error');
+		die('InitialsSyntaxParser error: throwUnexpectedSignError '.$word);
 	}
 }
 
