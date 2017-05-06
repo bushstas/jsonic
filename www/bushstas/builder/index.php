@@ -16,7 +16,7 @@
 	}
 	select {
 		font-family: Segoe UI, Georgia, Arial;
-		padding: 4px 6px;
+		padding: 5px 6px;
 	}
 	input[type="checkbox"] {
 		float: left;
@@ -58,25 +58,25 @@
 </head>
 <body>
 	<form class="hint-form" method="GET" target="iframe" action="builder-php-classes/hint.php">
-		<input type="submit" value="Подсказка по" style="padding: 5px 10px;">
 		<select class="topic-select" name="topic">
-			<option value="config">конфигу приложения</option>
-			<option value="user">авторизации пользователя</option>
-			<option value="chain">жизненному циклу</option>
-			<option value="shortcut">сокращениям</option>
-			<option value="initials">initial параметрам</option>
-			<option value="tmp">шаблонам</option>
-			<option value="tmpcode">коду в шаблонах</option>
+			<option value="config">конфиг. приложения</option>
+			<option value="user">авторизация пользователя</option>
+			<option value="chain">жизненный цикл</option>
+			<option value="shortcut">сокращения</option>
+			<option value="initials">initial параметры</option>
+			<option value="tmp">шаблоны</option>
+			<option value="tmpcode">код в шаблонах</option>
 			<option value="attr">зарезерв. атрибуты тегов</option>
-			<option value="globals">глобальному состоянию</option>
-			<option value="events">событиям</option>
-			<option value="dialogs">диалоговым окнам</option>
-			<option value="helper">классам хелперам</option>
-			<option value="corrector">классам корректорам</option>
-			<option value="css">css файлам</option>
-			<option value="jsobfus">js обфускации</option>
-			<option value="cssobfus">css обфускации</option>
+			<option value="globals">глобальное состояние</option>
+			<option value="events">события</option>
+			<option value="dialogs">диалоговые окна</option>
+			<option value="helper">классы хелперы</option>
+			<option value="corrector">классы корректоры</option>
+			<option value="css">css файлы</option>
+			<option value="jsobfus">js обфускация</option>
+			<option value="cssobfus">css обфускация</option>
 		</select>
+		<input type="submit" value="?" style="padding: 5px 10px;">
 	</form>
 	<form class="searchform" metod="GET" target="iframe" action="search.php">
 		<input type="text" name="search"/>

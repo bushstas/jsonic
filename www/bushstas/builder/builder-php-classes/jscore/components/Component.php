@@ -207,7 +207,7 @@
 					}
 				"
 			),
-			'plusTo' => array(
+			'change' => array(
 				'args' => array('propName', 'add', 'sign'),
 				'body' => "
 					var prop = this.get(propName);

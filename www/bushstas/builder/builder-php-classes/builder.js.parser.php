@@ -142,9 +142,9 @@ class JSParser
 				$code = preg_replace($regexp, "$1=", $code);	
 			}
 			$code = preg_replace('/\$(\w+)\!\s*;*/', "this.toggle('$1');", $code);
-			$code = preg_replace('/\$(\w+)\s*([\+\-\*\/\%])=\s*(\w+)/', "this.plusTo('$1',$3,'$2')", $code);
-			$code = preg_replace('/\$(\w+)\s*\+\+/', "this.plusTo('$1',1)", $code);
-			$code = preg_replace('/\$(\w+)\s*--/', "this.plusTo('$1',-1)", $code);
+			$code = preg_replace('/\$(\w+)\s*([\+\-\*\/\%])=\s*(\w+)/', "this.change('$1',$3,'$2')", $code);
+			$code = preg_replace('/\$(\w+)\s*\+\+/', "this.change('$1',1)", $code);
+			$code = preg_replace('/\$(\w+)\s*--/', "this.change('$1',-1)", $code);
 			$code = preg_replace('/\$(\w+)\.removeAt\(/', "this.removeByIndexFrom('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.remove\(/', "this.removeValueFrom('$1', ", $code);
 			$code = preg_replace('/\$(\w+)\.each\(/', "this.each('$1', ", $code);

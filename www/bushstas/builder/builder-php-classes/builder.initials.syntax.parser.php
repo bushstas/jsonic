@@ -1,14 +1,9 @@
 <?php
 
-
-
-
- ÑÄÅËÀÒÜ ÐÅÊÓÐÑÈÂÍÎ
-
 class InitialsSyntaxParser
 {
 	private static $space = '¦';
-	private static $code;
+	private static $code, $fullCode, $prevSign;
 	private static $openObjects, $openArrays;
 	private static $isQuoted;
 	private static $currentQuote;
@@ -16,17 +11,16 @@ class InitialsSyntaxParser
 	private static $keyExpected;
 	private static $valueExpected;
 	private static $data, $queue;
-	private static $currentObjects;
+	private static $object, $quotedText, $key;
 
 	private static $keywords = array(
 		'false', 'true', 'null', 'undefined', 'NaN', 'Infinity'
 	);
 
 	public static function init() {
-		self::$data = array(
-			'object' => array()
-		);
+		self::$data = array();
 		self::$code = '';
+		self::$fullCode = '';
 		self::$openObjects = 0;
 		self::$openArrays = 0;
 		self::$isQuoted = false;
@@ -35,12 +29,12 @@ class InitialsSyntaxParser
 		self::$keyExpected = false;
 		self::$valueExpected = false;
 		self::$queue = array();
-		self::$currentObjects = array(
-			&self::$data['object']
-		);
+		self::$object = '';
+		self::$prevSign = '';
 	}
 
 	public static function parse($code) {
+		return array();
 		self::init();
 	
 		$code = preg_replace('/\s+/', self::$space, trim($code));
@@ -76,11 +70,36 @@ class InitialsSyntaxParser
 	}
 
 	private static function addCode($code) {
+		if ($code == self::$space) {
+			if (!$isQuoted) {
+				self::$fullCode .= ' ';
+				return;
+			}
+			$code = ' ';
+		}
+		self::$fullCode .= $code;
 		self::$code .= $code;
+		if (self::$isQuoted) {
+			self::$quotedText .= $code;
+		}
 	}
 
 	private static function addName($name) {
-		self::$code .= $name;
+		if (self::$isQuoted) {
+			self::$code .= $name;
+			self::$quotedText .= $name;
+		} else {			
+			if (self::$prevSign == '@') {
+				self::$code = rtrim(self::$code, '@').CONST_CONST_CONSTANTS.'.'.$name;
+				TextsConstantsParser::addTemplateConstant($name, self::$templateName, self::$className);
+			} elseif (self::$prevSign == '#') {
+				
+				
+			} else {
+				self::$code .= $name;
+			}
+		}
+		self::$fullCode .= $name;
 	}
 
 	private static function handleNumber($number) {
@@ -92,8 +111,8 @@ class InitialsSyntaxParser
 		if (!self::isExpected('a')) {
 			self::throwUnexpectedSignError($name);
 		}
-		if (empty($keyExpected)) {
-			
+		if (!empty(self::$keyExpected)) {
+			self::$key .= $name;
 		}
 	}
 
@@ -125,18 +144,24 @@ class InitialsSyntaxParser
 	private static function handleQuote() {
 		if (self::$isQuoted && self::$currentQuote == "'") {
 			self::handleQuoteClosing();
+			Printer::log(self::$quotedText);
 		} elseif (!self::$isQuoted) {
 			self::$isQuoted = true;
 			self::$currentQuote = "'";
+			self::$quotedText = '';
+			self::$object .= '"';
 		}
 	}
 
 	private static function handleDoubleQuote() {
-		if (self::$isQuoted && self::$currentQuote == '"') {			
+		if (self::$isQuoted && self::$currentQuote == '"') {
 			self::handleQuoteClosing();
+			Printer::log(self::$quotedText);
 		} elseif (!self::$isQuoted) {
 			self::$isQuoted = true;
 			self::$currentQuote = '"';
+			self::$quotedText = '';
+			self::$object .= '"';
 		}
 	}
 
@@ -163,12 +188,9 @@ class InitialsSyntaxParser
 	private static function handleLeftBrace() {
 		self::$openObjects++;
 		self::$keyExpected = true;
-		self::$expected = array('a', '0', '"', "'", '{', '}', '[', self::$space);
-		
-		$c = count(self::$currentObjects);
-		$o = &self::$currentObjects[$c - 1];
-		$o[] = array();
+		self::$expected = array('a', '0', '"', "'", '{', '}', '[', self::$space);	
 		self::$queue[] = 'o';
+		self::$object .= '{';
 	}
 
 	private static function handleRightBrace() {
@@ -178,13 +200,14 @@ class InitialsSyntaxParser
 		self::$expected = array(self::$space);
 		array_pop(self::$queue);
 		self::handleStandartSituation();
+		self::$object .= '}';
 	}
 
 	private static function handleLeftBracket() {
 		self::$openArrays++;
 		self::$expected = array('a', '0', '"', "'", '{', '[', ']', self::$space);
-		//self::$currentObject
 		self::$queue[] = 'a';
+		self::$object .= '[';
 	}
 
 	private static function handleRightBracket() {
@@ -192,6 +215,7 @@ class InitialsSyntaxParser
 		self::$expected = array(self::$space);
 		array_pop(self::$queue);
 		self::handleStandartSituation();
+		self::$object .= ']';
 	}
 
 	private static function isExpected($sign) {

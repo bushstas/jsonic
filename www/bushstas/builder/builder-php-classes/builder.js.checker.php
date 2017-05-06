@@ -14,7 +14,7 @@ class JSChecker
 		'addListener' => '',
 		'removeValueFrom' => '',
 		'removeByIndexFrom' => '',
-		'plusTo' => '',		
+		'change' => '',		
 		'addOneTo' => '',
 		'addTo' => '',
 		'get' => '',
