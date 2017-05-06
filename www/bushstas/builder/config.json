@@ -15,7 +15,7 @@
 	"tests"       : "tests",
 	"scripts"     : "scripts",
 	"views"       : "views",	
-	"pathToApi"   : "../bushstas-api",
+	"pathToApi"   : "/bushstas-api",
 	"singleLoad"  : true,
 	"loadData"    : true,
 	

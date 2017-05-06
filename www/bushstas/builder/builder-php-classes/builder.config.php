@@ -6,22 +6,22 @@ class Config
 	private $config, $pathToApiDir, $builder, $configJson, $isUser;
 	private $LOAD_APP = 'loadApp';
 	private $errors = array(
-		'noConfig' => 'Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅ. Р”Р°РЅРЅС‹Р№ С„Р°Р№Р» РґРѕР»Р¶РµРЅ СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РІ РґРёСЂРµРєС‚РѕСЂРёРё <b>builder</b>',
-		'incorrectConfig' => 'Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РєРѕСЂСЂРµРєС‚РµРЅ',
-		'noIndexBlank' => 'РЁР°Р±Р»РѕРЅ РёРЅРґРµРєСЃРЅРѕРіРѕ С„Р°Р№Р»Р° <b>index.html</b> РІ РґРёСЂРµРєС‚РѕСЂРёРё {??} РЅРµ РЅР°Р№РґРµРЅ',
-		'invalidPathToApi' => 'РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>pathToApi</b> СЃСѓС‰РµСЃС‚РІСѓРµС‚, РЅРѕ РїСѓСЃС‚ РёР»Рё РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃС‚СЂРѕРєРѕР№',
-		'noApiDir' => 'Р”РёСЂРµРєС‚РѕСЂРёСЏ {??}, СѓРєР°Р·Р°РЅРЅР°СЏ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>pathToApi</b>, РЅРµ РЅР°Р№РґРµРЅР° РІ РєРѕСЂРЅРµРІРѕРј РєР°С‚Р°Р»РѕРіРµ',
-		'userLoginNotString' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['login']</b> РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРєРѕР№",
-		'userLogoutNotString' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['logout']</b> РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРєРѕР№",
-		'userSaveNotString' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['save']</b> РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРєРѕР№",
-		'userLoginEmpty1' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['login']</b> РЅРµ РЅР°Р№РґРµРЅ, С‚РѕРіРґР° РєР°Рє <b>user['logout']</b> Р·Р°РґР°РЅ",
-		'userLoginEmpty2' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>user['login']</b> РЅРµ РЅР°Р№РґРµРЅ, С‚РѕРіРґР° РєР°Рє <b>user['save']</b> Р·Р°РґР°РЅ",
-		'coreNotFound' => "Р”РёСЂРµРєС‚РѕСЂРёСЏ {??} РЅРµ РЅР°Р№РґРµРЅР° РІ РїР°РїРєРµ <b>builder</b>",
-		'incorrectValue' => "РќРµРєРѕСЂСЂРµРєС‚РѕРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??}<br><br> РўРµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ: {??}<br><br>РљРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ РёРјСЏ РґРёСЂРµРєС‚РѕСЂРёРё Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ РїР°С‚С‚РµСЂРЅСѓ <b>^[\w-]+$</b>",
-		'folderNotFound' => "Р”РёСЂРµРєС‚РѕСЂРёСЏ {??}, СѓРєР°Р·Р°РЅРЅР°СЏ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅР°<br><br>РћРЅР° РґРѕР»Р¶РЅР° СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ РїР°РїРєРµ <b>builder</b>",
-		'folderNotFound2' => "Р”РёСЂРµРєС‚РѕСЂРёСЏ {??}, СѓРєР°Р·Р°РЅРЅР°СЏ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ РЅР°Р№РґРµРЅР°<br><br>РћРЅР° РґРѕР»Р¶РЅР° СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ РєРѕСЂРЅРµРІРѕРј РєР°С‚Р°Р»РѕРіРµ",
-		'defaultFolderNotFound' => "РџР°СЂР°РјРµС‚СЂ РєРѕРЅС„РёРіСѓСЂР°С†РёРё {??} РЅРµ Р·Р°РїРѕР»РЅРµРЅ, РґРёСЂРµРєС‚РѕСЂРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ {??} С‚Р°РєР¶Рµ РЅРµ РЅР°Р№РґРµРЅР°",
-		'noDictionaryApi' => "Р¤Р°Р№Р» РґР»СЏ Р·Р°РіСЂСѓР·РєРё СЃР»РѕРІР°СЂРµР№ {??}, СѓРєР°Р·Р°РЅРЅС‹Р№ РІ РїР°СЂР°РјРµС‚СЂРµ РєРѕРЅС„РёРіСѓСЂР°С†РёРё <b>pathToDictionary</b> РЅРµ РЅР°Р№РґРµРЅ"
+		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
+		'incorrectConfig' => 'Файл конфигурации {??} не корректен',
+		'noIndexBlank' => 'Шаблон индексного файла <b>index.html</b> в директории {??} не найден',
+		'invalidPathToApi' => 'Параметр конфигурации <b>pathToApi</b> существует, но пуст или не является строкой',
+		'noApiDir' => 'Директория {??}, указанная в параметре конфигурации <b>pathToApi</b>, не найдена',
+		'userLoginNotString' => "Параметр конфигурации <b>user['login']</b> должен быть строкой",
+		'userLogoutNotString' => "Параметр конфигурации <b>user['logout']</b> должен быть строкой",
+		'userSaveNotString' => "Параметр конфигурации <b>user['save']</b> должен быть строкой",
+		'userLoginEmpty1' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['logout']</b> задан",
+		'userLoginEmpty2' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['save']</b> задан",
+		'coreNotFound' => "Директория {??} не найдена в папке <b>builder</b>",
+		'incorrectValue' => "Некорректоное значение параметра конфигурации {??}<br><br> Текущее значение: {??}<br><br>Корректное значение должно содержать имя директории и соответствовать паттерну <b>^[\w-]+$</b>",
+		'folderNotFound' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в папке <b>builder</b>",
+		'folderNotFound2' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в корневом каталоге",
+		'defaultFolderNotFound' => "Параметр конфигурации {??} не заполнен, директория по умолчанию {??} также не найдена",
+		'noDictionaryApi' => "Файл для загрузки словарей {??}, указанный в параметре конфигурации <b>pathToDictionary</b> не найден"
 	);
 
 	public function init($builder) {
@@ -39,13 +39,13 @@ class Config
 			if (empty($this->pathToApiDir) || !is_string($this->pathToApiDir)) {
 				new Error($this->errors['invalidPathToApi']);
 			}
-			$this->pathToApiDir = '../'.$this->pathToApiDir;
-			if (!is_dir($this->pathToApiDir)) {
+			$pathToApi = $_SERVER['DOCUMENT_ROOT'].'/'.trim($this->pathToApiDir, '/');
+			if (!is_dir($pathToApi)) {
 				new Error($this->errors['noApiDir'], array($this->pathToApiDir));
 			}
 		}
 		if (!empty($this->config['pathToDictionary'])) {
-			$this->pathToDictionary = $this->pathToApiDir.'/'.$this->config['pathToDictionary'];
+			$this->pathToDictionary = $pathToApi.'/'.$this->config['pathToDictionary'];
 			if (!file_exists($this->pathToDictionary)) {
 				new Error($this->errors['noDictionaryApi'], array($this->pathToDictionary));	
 			}
@@ -329,7 +329,8 @@ class Config
 			$params[] = '"textsConstants":'.json_encode($texts);
 		}
 		$content .= implode(', ', $params)."}'); ?>";
-		file_put_contents($this->pathToApiDir.'/'.$this->LOAD_APP.'.php', $content);
+		$pathToApi = $_SERVER['DOCUMENT_ROOT'].'/'.trim($this->pathToApiDir, '/');
+		file_put_contents($pathToApi.'/'.$this->LOAD_APP.'.php', $content);
 	}
 
 	public function isUsingDataLoader() {

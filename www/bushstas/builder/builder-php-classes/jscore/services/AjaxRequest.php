@@ -17,7 +17,7 @@
 					u = u.replace(/^[\.\/]+/, '');
 					if (isString(".CONST_APIDIR.")) {
 						var regExp = new RegExp('^' + ".CONST_APIDIR." + \"\/\");
-						u = ".CONST_APIDIR." + '/' + u.replace(regExp, '');
+						u = '/' + ".CONST_APIDIR." + '/' + u.replace(regExp, '');
 					}
 					return '/' + u;
 				"
