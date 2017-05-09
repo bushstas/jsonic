@@ -2,12 +2,12 @@ controller Favorites
 
 initial actions = {
 	'load': {
-		'url': CONFIG.favorites.get
+		'url': Api.favorites.get
 	},
 	'add': {
-		'url': CONFIG.favorites.add
+		'url': Api.favorites.add
 	},
 	'put': {
-		'url': CONFIG.favorites.remove
+		'url': Api.favorites.remove
 	}
 }

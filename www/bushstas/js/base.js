@@ -9,7 +9,7 @@ this.set=function(c,k,i) {if(cs[k])return;cs[k]=c;if(i){this.create(k)}}
 }).call(__G=this);
 (function(){var __A,c,p;var __,__T,__DU;
 var CONFIG={'user':{'get':'user/get.php'},'filters':{'load':'filters/get.php','save':'filters/add.php','set':'filters/set.php','subscribe':'filters/subscribe.php'},'support':{'send':'support/send.php'},'orderCall':{'send':'orderCall/send.php'},'favorites':{'get':'favorites/get.php','add':'favorites/add.php','remove':'favorites/remove.php'},'filterStat':{'load':'filters/count.php'},'settings':{'subscr':'settings/get.php','set':'settings/set.php'},'keywords':{'get':'keywords/get.php','recommendations':'keywords/getRecommendations.php'}},
-__LU='/bushstas-api/loadApp.php',
+__LU='loadApp.php',
 __V=function(){return [[{'value':'0','title':__[14],'tooltip':'morph'},{'value':'1','title':__[15],'tooltip':'nonmorph'}],{'text':__[18]},{'text':__[19]},{'text':__[20]},{'url':CONFIG.keywords.get},[{'value':'1','title':__[32]},{'value':'2','title':__[33]}],[{'value':'1','title':__[34]},{'value':'2','title':__[35]},{'value':'3','title':__[36]},{'value':'4','title':__[37]},{'value':'5','title':__[38]},{'value':'6','title':__[39]},{'value':'7','title':__[40]}],[{'value':'1','title':__[42]},{'value':'2','title':__[43]}],{'caption':__[55],'class':'half-width','controlClass':'Input','controlProps':{'type':'text','name':'name'}},{'caption':__[57],'class':'half-width','controlClass':'Input','controlProps':{'type':'text','name':'email'}},{'caption':__[56],'class':'half-width','controlClass':'Input','controlProps':{'type':'text','name':'phone'}},[{'title':__[112],'value':84},{'title':__[113],'value':7},{'title':__[114],'value':3}],{'tabs':[{'title':__[95],'active':true},{'title':__[96]},{'title':__[97]}],'rest':{'showCount':true},'containerClass':'tab-content'},{'title':__[98],'extended':true,'className':'main-page-filter-stat'},{'key':'calendar','className':'float-right'},{'aaa':'Привет'}]},
 __TG=['div','span','table','tbody','thead','tr','td','th','ul','ol','li','p','a','form','input','img','video','audio','aside','article','b','big','blockquote','button','canvas','caption','code','col','colgroup','footer','h1','h2','h3','h4','h5','h6','header','hr','i','iframe','label','menu','pre','s','section','select','strong','textarea','small','nav','abbr','address','area','map','source','basefont','cite','datalist','dt','dl','dd','del','details','dfn','em','embed','fieldset','figcaption','figure','ins','kbd','keygen','main','mark','meter','optgroup','option','output','param','progress','q','samp','sub','summary','sup','tfoot','time','var','wbr'],
 __AT={'c':'class','i':'id','v':'value','t':'title','p':'placeholder','tp':'type','h':'href','s':'src','tr':'target','m':'method','st':'style','w':'width','ht':'height','sz':'size','mx':'maxlength','a':'action','n':'name','sc':'scope','r':'role','cp':'cellpadding','cs':'cellspacing'},
@@ -24,7 +24,7 @@ __VC='app-view-container',
 __PV='parental-view-container',
 __TC='TooltipPopup',
 __TA='',
-__AD='/bushstas-api',
+__AD='bushstas-api',
 __PT='Page title',
 __UO={'login':'user/login.php','logout':'user/logout.php','save':'user/save.php','fullAccess':11,'adminAccess':100},
 __CT=['Favorites','Filters','FiltersStat','RecommendationsLoader','Subscription','UserInfoLoader'],
@@ -449,7 +449,7 @@ p.toArray=function(delimiter){delimiter=delimiter||',';var ar=[];var parts=this.
 })();
 __G.set((c=function(url,callback,params,thisObj){
 if(!this||this==window){
-var correctUrl=function(u){u=u.replace(/^[\.\/]+/,'');if(isString(__AD)){var regExp=new RegExp('^'+__AD+"\/");u='/'+__AD+'/'+u.replace(regExp,'')}return'/'+u};
+var correctUrl=function(u){return'/'+__AD+'/'+u};
 var createRequest=function(){this.request=new XMLHttpRequest();this.request.onreadystatechange=onReadyStateChange.bind(this)};
 var getRequestContent=function(method,pars){if(Objects.empty(pars))return'';if(!isObject(pars)){return pars.toString()}else if(pars instanceof FormData){return pars}else if(method=='GET'){var content=[];for(var k in pars){content.push(k+'='+(!!pars[k]||pars[k]==0?pars[k]:'').toString())}return'?'+content.join('&')}return JSON.stringify(pars||'')};
 var onReadyStateChange=function(e){var req=e.target;if(this.active&&req.readyState==4){this.active=false;var response=req.response;var data;try{data=JSON.parse(response)}catch(e){data=response}if(isFunction(this.callback)){this.callback.call(this.thisObj||null,data)}}};
@@ -806,7 +806,7 @@ p.onSelectTab=function(index){index=this.get('keywordsCount')-index-1;this.getEl
 p.onTagEdit=function(tag){this.getChild('editor').edit(tag);Popuper.skipAll(true)};
 p.onTagEdited=function(){Popuper.skipAll(false)};
 p.onRemoveRequestClick=function(target){var block=target.getAncestor('.keywords_block');var blocks=this.findElements('.keywords_block');this.removeRequest(blocks.indexOf(block),true)};
-p.getTemplateMain=function(_,$){return[{'p':{'c':'keywords_options'},'t':0,'c':[{'p':{'c':'bold'},'t':1,'c':__[16]},{'p':{'p':{'options':__V[0],'className':'aua','tooltip':true}},'cmp':'Select','nm':'nonmorph'},{'p':{'c':'bold'},'t':1,'c':__[17]},{'p':{'p':__V[1]},'cmp':'Checkbox','nm':'searchInDocumentation'},{'p':{'p':__V[2]},'cmp':'Checkbox','nm':'registryContracts'},{'p':{'p':__V[3]},'cmp':'Checkbox','nm':'registryProducts'},{'p':{'c':'keywords_add-request'},'t':0,'c':[{'t':1,'c':__[21]},{'p':{'className':'auf','key':'keywordsNewReq'},'tmp':3}]},{'p':{'c':'tooltip keywords-hint'},'t':0}]},{'p':function(){return{'p':{'items':$.g('tabs'),'activeTab':$.g('activeTab')},'i':'tabs'}},'cmp':'Tabs','e':[22,$.onSelectTab,'remove',$.removeRequest],'n':{'items':'tabs','activeTab':'activeTab'}},{'p':function(){return{'as':'area','c':'keywords_area '+($.g('keywordsCount')>1?'multi':'')}},'t':0,'n':{'c':'keywordsCount'},'c':{'h':function(item,i){return{'p':{'p':{'items':item}},'cmp':'KeywordsControl','e':['edit',$.onTagEdit,14,$.onChange],'nm':'tags'}},'n':'keywords','p':function(){return{'p':$.g('keywords')}}}},{'p':{'i':'editor'},'cmp':'KeywordTagEditor','e':['hide',$.onTagEdited]}]};
+p.getTemplateMain=function(_,$){return[{'p':{'c':'keywords_options'},'t':0,'c':[{'p':{'c':'bold'},'t':1,'c':__[16]},{'p':{'p':{'options':__V[0],'className':'i9i','tooltip':true}},'cmp':'Select','nm':'nonmorph'},{'p':{'c':'bold'},'t':1,'c':__[17]},{'p':{'p':__V[1]},'cmp':'Checkbox','nm':'searchInDocumentation'},{'p':{'p':__V[2]},'cmp':'Checkbox','nm':'registryContracts'},{'p':{'p':__V[3]},'cmp':'Checkbox','nm':'registryProducts'},{'p':{'c':'keywords_add-request'},'t':0,'c':[{'t':1,'c':__[21]},{'p':{'className':'i9y','key':'keywordsNewReq'},'tmp':3}]},{'p':{'c':'tooltip keywords-hint'},'t':0}]},{'p':function(){return{'p':{'items':$.g('tabs'),'activeTab':$.g('activeTab')},'i':'tabs'}},'cmp':'Tabs','e':[22,$.onSelectTab,'remove',$.removeRequest],'n':{'items':'tabs','activeTab':'activeTab'}},{'p':function(){return{'as':'area','c':'keywords_area '+($.g('keywordsCount')>1?'multi':'')}},'t':0,'n':{'c':'keywordsCount'},'c':{'h':function(item,i){return{'p':{'p':{'items':item}},'cmp':'KeywordsControl','e':['edit',$.onTagEdit,14,$.onChange],'nm':'tags'}},'n':'keywords','p':function(){return{'p':$.g('keywords')}}}},{'p':{'i':'editor'},'cmp':'KeywordTagEditor','e':['hide',$.onTagEdited]}]};
 p.getInitials=function(){return{'events':{'click':{'keywords_add-request':this.addRequest,'keywords_remove-request':this.onRemoveRequestClick}},'followers':{'keywords':this.onKeywordsChange}}};
 __G.set(c=__F(),'KeywordsButton');
 p=c.prototype;
@@ -851,7 +851,7 @@ p.getTemplateMain=function(_,$){return{'p':{'c':'search-form-filters ','sc':1},'
 p.getInitials=function(){return{'controllers':[{'controller':__C.get(1),'on':{'load':this.onLoadFilters}}],'props':{'filterName':'Master'}}};
 __G.set(c=__F(),'Favorites');
 p=c.prototype;
-p.getInitials=function(){return{'actions':{'load':{'url':CONFIG.favorites.get},'add':{'url':CONFIG.favorites.add},'put':{'url':CONFIG.favorites.remove}}}};
+p.getInitials=function(){return{'actions':{'load':{'url':Api.favorites.get},'add':{'url':Api.favorites.add},'put':{'url':Api.favorites.remove}}}};
 __G.set(c=__F(),'Filters');
 p=c.prototype;
 p.onLoadFilters=function(data){};
@@ -898,7 +898,7 @@ p.setProperValue=function(value){this.selectByValue(value)};
 p.getControlValue=function(){return this.findElement('input').value};
 p.onClick=function(){this.toggle('active');Popuper.watch(this)};
 p.hide=function(){this.set('active',false)};
-p.getTemplateMain=function(_,$){return{'p':function(){return{'c':'select '+(_['className']?_['className']:'')+' '+($.g('active')?'active':''),'sc':1}},'t':0,'n':{'c':'active'},'c':[{'p':{'c':'select_value'},'t':0,'e':[0,$.onClick],'c':[{'v':$.g('title'),'n':'title'},_['tooltip']?{'p':{'className':'auf','key':$.g('tooltip')},'tmp':3}:'']},{'p':{'c':'select_options'},'t':0,'e':[0,$.onOptionsClick],'c':{'h':function(option){return{'p':{'c':'select_option','_value':option.value},'t':0,'c':[option.title,option.tooltip?{'p':{'className':'auf','key':option.tooltip},'tmp':3}:'']}},'n':'options','p':function(){return{'p':$.g('options')}}}},{'p':function(){return{'tp':'hidden','n':$.g('name'),'v':$.g('value')}},'t':14,'n':{'n':'name','v':'value'}}]}};
+p.getTemplateMain=function(_,$){return{'p':function(){return{'c':'select '+(_['className']?_['className']:'')+' '+($.g('active')?'active':''),'sc':1}},'t':0,'n':{'c':'active'},'c':[{'p':{'c':'select_value'},'t':0,'e':[0,$.onClick],'c':[{'v':$.g('title'),'n':'title'},_['tooltip']?{'p':{'className':'i9y','key':$.g('tooltip')},'tmp':3}:'']},{'p':{'c':'select_options'},'t':0,'e':[0,$.onOptionsClick],'c':{'h':function(option){return{'p':{'c':'select_option','_value':option.value},'t':0,'c':[option.title,option.tooltip?{'p':{'className':'i9y','key':option.tooltip},'tmp':3}:'']}},'n':'options','p':function(){return{'p':$.g('options')}}}},{'p':function(){return{'tp':'hidden','n':$.g('name'),'v':$.g('value')}},'t':14,'n':{'n':'name','v':'value'}}]}};
 __G.set(c=__F(),'ContainKeywordTags');
 p=c.prototype;
 p.onRendered=function(){this.resetOptions()};
@@ -1001,10 +1001,10 @@ dayInWeek=Dictionary.get('dayNames')[dayInWeek];txt=count>1||(!!prev&&prev!=d-1)
 date=day+' '+monthNames[month];return dates};
 p.validateTime=function(){var dateSelect=this.getControl('date');var timeSelect=this.getControl('time');var dateValue=dateSelect.getValue();var isToday=(new RegExp(__[62])).test(dateValue);if(isToday){var d=new Date();var hours=[11,13,15];var minutes=[0,0,30];var moscowTime=d.getUTCHours()+3;var minute=d.getMinutes();var disabledIndexes=[];for(var i=0;i<hours.length;i++){if(moscowTime>hours[i]||(moscowTime==hours[i]&&minute>=minutes[i])){disabledIndexes.push(i)}}
 if(disabledIndexes.length==hours.length){dateSelect.enableOption(0,false)}else{for(i=0;i<disabledIndexes.length;i++){timeSelect.enableOption(disabledIndexes[i],false)}}}else{timeSelect.enableOption(0,true);timeSelect.enableOption(1,true);timeSelect.enableOption(2,true)}};
-p.getInitials=function(){return{'props':{'action':CONFIG.orderCall.send,'method':'POST','className':'app-order-call','controls':[__V[8],__V[9],__V[10],{'caption':__[58],'class':'half-width','controlClass':'Select','controlProps':{'name':'topic','options':Dictionary.get('orderCallTopics')}},{'caption':__[59],'class':'half-width','controlClass':'Select','controlProps':{'name':'date','options':this.getDateOptions()}},{'caption':__[60],'class':'half-width','controlClass':'Select','controlProps':{'name':'time','options':Dictionary.get('timeOptions')}},{'caption':__[61],'controlClass':'Textarea','controlProps':{'name':'comment'}}],'submit':{'value':__[93],'class':__[0]+'send-button'}}}};
+p.getInitials=function(){return{'props':{'action':CONFIG.orderCall.send,'method':'POST','className':'app-order-call','controls':[__V[8],__V[9],__V[10],{'caption':__[58],'class':'half-width','controlClass':'Select','controlProps':{'name':'topic','options':Dictionary.get('orderCallTopics')}},{'caption':__[59],'class':'half-width','controlClass':'Select','controlProps':{'name':'date','options':this.getDateOptions()}},{'caption':__[60],'class':'half-width','controlClass':'Select','controlProps':{'name':'time','options':Dictionary.get('timeOptions')}},{'caption':__[61],'controlClass':'Textarea','controlProps':{'name':'comment'}}],'submit':{'value':__[93],'class':__[]+'send-button'}}}};
 __G.set(c=__F(),'SupportForm');
 p=c.prototype;
-p.getInitials=function(){return{'props':{'action':CONFIG.support.send,'className':'app-order-call','controls':[__V[8],__V[9],__V[10],{'caption':__[64],'controlClass':'Textarea','controlProps':{'name':'comment'}},{'caption':__[65],'controlClass':'Input','controlProps':{'name':'screenshot','type':'file','accept':'image/*'}}],'submit':{'value':__[66],'class':__[0]+'send-button'}}}};
+p.getInitials=function(){return{'props':{'action':CONFIG.support.send,'className':'app-order-call','controls':[__V[8],__V[9],__V[10],{'caption':__[64],'controlClass':'Textarea','controlProps':{'name':'comment'}},{'caption':__[65],'controlClass':'Input','controlProps':{'name':'screenshot','type':'file','accept':'image/*'}}],'submit':{'value':__[66],'class':__[]+'send-button'}}}};
 __G.set(c=function(){
 Router.addMenu(this);
 this.isRouteMenu=true}

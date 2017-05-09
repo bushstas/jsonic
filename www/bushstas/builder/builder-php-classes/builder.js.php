@@ -2,7 +2,7 @@
 
 class JSCompiler 
 {
-	private $configProvider, $config, $apiConfig;
+	private $configProvider, $config;
 
 	private $errors = array(
 		'entryNotFound' => 'Параметр конфигурации <b>entry</b>, обозначающий класс точку входа, не найден',
@@ -16,7 +16,6 @@ class JSCompiler
 		'jsFilesNotFound' => 'JS файлы для компиляции приложения, находящиеся внутри директории указанной в параметре конфигурации <b>scope</b>, не найдены',
 		'coreFilesNotFound' => 'JS файлы ядра приложения, находящиеся внутри директории указанной в параметре конфигурации <b>so</b>, не найдены',
 		'incorrectConfig' => "Файл конфигурации путей к api <b>config.js</b> должен иметь вид <xmp>var CONFIG = {\n\t'items': {\n\t\t'get': 'items/get.php',\n\t\t'add': 'items/add.php',\n\t\t'remove': 'items/remove.php'\n\t}\n}</xmp>",
-		'configExists' => 'Обнаружено несколько файлов <b>config.js</b>',
 		'emptyFile' => 'Файл {??} пуст',
 		'cyrSymbols' => 'Недопустимые кириллические символы в первой строке файла {??}',
 		'incorrectKeyword' => 'Недопустимые символы в ключевом слове {??} определяющем тип класса в файле {??}',
@@ -368,19 +367,9 @@ class JSCompiler
 
 	private function processJSFile(&$jsFile) {
 		$content = &$jsFile['content'];
-		if ($jsFile['name'] == 'config') {
-			if (is_string($this->apiConfig)) {
-				new Error($this->errors['configExists']);
-			}
-			if (!preg_match('/^\s*var +CONFIG *= *\{/', $content)) {
-				new Error($this->errors['incorrectConfig']);
-			}
-			$this->apiConfig = preg_replace('/^\s*var +CONFIG *= *|[;\r\n\t]/', '', $content);
-		} else {
-			$this->jsCode .= $content;
-			$this->defineJsClass($content, $jsFile);
-			$this->JSFileNames[] = $jsFile['name'];
-		}
+		$this->jsCode .= $content;
+		$this->defineJsClass($content, $jsFile);
+		$this->JSFileNames[] = $jsFile['name'];
 	}
 
 	private function defineJsClass(&$content, &$jsFile) {
@@ -617,7 +606,7 @@ class JSCompiler
 		$this->jsOutput = implode("\n", $this->jsOutput);
 		$data = array(
 			'texts'            => $this->textsCompiler->get(),
-			'config'           => $this->apiConfig,
+			'config'           => $this->configProvider->getApiConfig(),
 			'data'             => $this->dataCompiler->get(),
 			'pathToDictionary' => $this->config['pathToDictionary'],
 			'tags'             => Tags::getList(),

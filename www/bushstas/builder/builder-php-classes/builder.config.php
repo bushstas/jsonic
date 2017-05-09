@@ -3,7 +3,7 @@
 class Config 
 {
 
-	private $config, $pathToApiDir, $builder, $configJson, $isUser;
+	private $config, $pathToApiDir, $builder, $configJson, $isUser, $apiConfig;
 	private $LOAD_APP = 'loadApp';
 	private $errors = array(
 		'noConfig' => 'Файл конфигурации {??} не найден. Данный файл должен располагаться в директории <b>builder</b>',
@@ -17,11 +17,16 @@ class Config
 		'userLoginEmpty1' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['logout']</b> задан",
 		'userLoginEmpty2' => "Параметр конфигурации <b>user['login']</b> не найден, тогда как <b>user['save']</b> задан",
 		'coreNotFound' => "Директория {??} не найдена в папке <b>builder</b>",
-		'incorrectValue' => "Некорректоное значение параметра конфигурации {??}<br><br> Текущее значение: {??}<br><br>Корректное значение должно содержать имя директории и соответствовать паттерну <b>^[\w-]+$</b>",
+		'incorrectValue' => "Некорректное значение параметра конфигурации {??}<br><br> Текущее значение: {??}<br><br>Корректное значение должно содержать имя директории и соответствовать паттерну <b>^[\w-]+$</b>",
 		'folderNotFound' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в папке <b>builder</b>",
 		'folderNotFound2' => "Директория {??}, указанная в параметре конфигурации {??} не найдена<br><br>Она должна располагаться непосредственно в корневом каталоге",
 		'defaultFolderNotFound' => "Параметр конфигурации {??} не заполнен, директория по умолчанию {??} также не найдена",
-		'noDictionaryApi' => "Файл для загрузки словарей {??}, указанный в параметре конфигурации <b>pathToDictionary</b> не найден"
+		'noDictionaryApi' => "Файл для загрузки словарей {??}, указанный в параметре конфигурации <b>pathToDictionary</b> не найден",
+		'noApiPath' => "Параметр конфигурации <b>pathToApi</b> не найден. Добавьте в файл config.json данный параметр, указывающий путь к директории, где располагаются серверные скрипты, относительно корня сайта",
+		'noApiConfig' => "Параметр конфигурации <b>apiConfig</b> не найден. Добавьте в файл config.json данный параметр, содержащий пути к различным серверным скриптам<br>Для более точной информации смотрите подсказку по конфигурации api",
+		'incorrectApiConfig' => "Некорректный парамтр конфигурации <b>apiConfig</b>{?}",
+		'incorrectApiConfigKey' => "Параметр конфигурации <b>apiConfig</b> содержит некорректное поле {??}{?}{?}",
+		'incorrectApiConfigValue' => "Параметр конфигурации <b>apiConfig</b> содержит поле {??} с некорректным значением{?}{?}"
 	);
 
 	public function init($builder) {
@@ -34,16 +39,39 @@ class Config
 		if (!is_array($this->config)) {
 			new Error($this->errors['incorrectConfig'], array(CONFIG_FILENAME));
 		}
-		if (isset($this->config['pathToApi'])) {
-			$this->pathToApiDir = $this->config['pathToApi'];
-			if (empty($this->pathToApiDir) || !is_string($this->pathToApiDir)) {
-				new Error($this->errors['invalidPathToApi']);
+		if (!isset($this->config['pathToApi'])) {
+			new Error($this->errors['noApiPath']);
+		}
+		$this->pathToApiDir = $this->config['pathToApi'];
+		if (empty($this->pathToApiDir) || !is_string($this->pathToApiDir)) {
+			new Error($this->errors['invalidPathToApi']);
+		}
+		$pathToApi = $_SERVER['DOCUMENT_ROOT'].'/'.trim($this->pathToApiDir, '/');
+		if (!is_dir($pathToApi)) {
+			new Error($this->errors['noApiDir'], array($this->pathToApiDir));
+		}
+		if (!isset($this->config['apiConfig'])) {
+			new Error($this->errors['noApiConfig']);
+		}
+		$this->apiConfig = $this->config['apiConfig'];
+		if (!is_array($this->apiConfig)) {
+			new Error($this->errors['incorrectApiConfig'], $this->getApiPathError());
+		}
+		foreach ($this->apiConfig as $key => $value) {
+			if (!is_string($key) || is_numeric($key) || !preg_match('/^[a-zA-Z][a-zA-Z_\-]*$/', $key)) {
+				$error = Transformer::transform(array(
+					$key.' ' => $value
+				));
+				new Error($this->errors['incorrectApiConfigKey'], array($key, $error, $this->getApiPathError()));
 			}
-			$pathToApi = $_SERVER['DOCUMENT_ROOT'].'/'.trim($this->pathToApiDir, '/');
-			if (!is_dir($pathToApi)) {
-				new Error($this->errors['noApiDir'], array($this->pathToApiDir));
+			if (!is_array($value)) {
+				$error = Transformer::transform(array(
+					$key.' ' => $value
+				));
+				new Error($this->errors['incorrectApiConfigValue'], array($key, $error, $this->getApiPathError()));
 			}
 		}
+
 		if (!empty($this->config['pathToDictionary'])) {
 			$this->pathToDictionary = $pathToApi.'/'.$this->config['pathToDictionary'];
 			if (!file_exists($this->pathToDictionary)) {
@@ -54,6 +82,17 @@ class Config
 		$this->validateUserConfig();
 
 		define('CONST_JSBASE', $this->config['compiledJs']);
+	}
+
+	private function getApiPathError() {
+		$ar = array(
+			'services' => array(
+				'get' => 'services/get.php',
+				'save' => 'services/update.php',
+				'delete' => 'services/remove.php'
+			)
+		);
+		return '<br>Параметр должен иметь вид:'.Transformer::transform($ar).'Для более точной информации смотрите подсказку по конфигурации api';
 	}
 
 	public function createAppLoader() {
@@ -240,6 +279,10 @@ class Config
 		return $this->configJson;
 	}
 
+	public function getApiConfig() {
+		return $this->apiConfig;
+	}
+
 	public function hasUser() {
 		return $this->isUser;
 	}
@@ -340,6 +383,6 @@ class Config
 	}
 
 	public function getPathToLoadAppApi() {
-		return $this->pathToApiDir.'/'.$this->LOAD_APP.'.php';
+		return $this->LOAD_APP.'.php';
 	}
 } 

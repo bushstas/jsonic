@@ -60,6 +60,7 @@
 	<form class="hint-form" method="GET" target="iframe" action="builder-php-classes/hint.php">
 		<select class="topic-select" name="topic">
 			<option value="config">конфиг. приложени€</option>
+			<option value="api">конфигураци€ API</option>
 			<option value="user">авторизаци€ пользовател€</option>
 			<option value="chain">жизненный цикл</option>
 			<option value="shortcut">сокращени€</option>

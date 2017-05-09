@@ -1,1 +1,0 @@
-Function.prototype.b = Function.prototype.bind;

@@ -1,6 +1,6 @@
 __G.set((c=function(url,callback,params,thisObj){
 if(!this||this==window){
-var correctUrl=function(u){u=u.replace(/^[\.\/]+/,'');if(isString(__AD)){var regExp=new RegExp('^'+__AD+"\/");u='/'+__AD+'/'+u.replace(regExp,'')}return'/'+u};
+var correctUrl=function(u){return'/'+__AD+'/'+u};
 var createRequest=function(){this.request=new XMLHttpRequest();this.request.onreadystatechange=onReadyStateChange.bind(this)};
 var getRequestContent=function(method,pars){if(Objects.empty(pars))return'';if(!isObject(pars)){return pars.toString()}else if(pars instanceof FormData){return pars}else if(method=='GET'){var content=[];for(var k in pars){content.push(k+'='+(!!pars[k]||pars[k]==0?pars[k]:'').toString())}return'?'+content.join('&')}return JSON.stringify(pars||'')};
 var onReadyStateChange=function(e){var req=e.target;if(this.active&&req.readyState==4){this.active=false;var response=req.response;var data;try{data=JSON.parse(response)}catch(e){data=response}if(isFunction(this.callback)){this.callback.call(this.thisObj||null,data)}}};

@@ -168,17 +168,6 @@ class JSGlobals
 
 	private static function addApiConfig($apiConfig, $jsOutput) {
 		$cfg = CONST_CONFIG;
-		TextParser::transformIntoValidJson($apiConfig);
-		$apiConfigObject = json_decode($apiConfig, true);
-		if ($apiConfigObject === null) {
-			new Error(self::$errors['invalidApiConfig'], $cfg);
-		}
-		preg_match_all('/'.$cfg.'\.(\w+)\.(\w+)/', $jsOutput, $matches);
-		foreach ($matches[1] as $i => $match) {
-			if (empty($apiConfigObject[$match][$matches[2][$i]])) {
-				new Error(self::$errors['noApiConfigPath'], array($cfg, $match, $matches[2][$i]));
-			}
-		}
 		TextParser::createObjectString($apiConfig, array('/\\\/', ''));
 		self::add($cfg, $apiConfig);
 		self::addGlobalAddingCall($cfg);
@@ -268,7 +257,7 @@ class JSGlobals
 	}
 
 	private static function addPathToApi($pathToApi) {
-		self::add(CONST_APIDIR, "'".$pathToApi."'");
+		self::add(CONST_APIDIR, "'".trim($pathToApi, '/')."'");
 	}
 
 	private static function addPagetitle($pagetitle) {
