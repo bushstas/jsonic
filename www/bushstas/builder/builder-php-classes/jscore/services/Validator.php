@@ -2,6 +2,7 @@
 
 	$data = array(
 		'name' => 'Validator',
+		'isToCheckUsing' => true,
 		'mode' => 3,
 		'thisMethods' => array(
 			'assert' => array(

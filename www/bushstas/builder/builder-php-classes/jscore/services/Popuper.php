@@ -4,6 +4,7 @@
 		'name' => 'Popuper',
 		'var' => 'Popuper',
 		'define' => true,
+		'isToCheckUsing' => true,
 		'mode' => 2,
 		'before' => "
 			var components, elements, skippedAll;

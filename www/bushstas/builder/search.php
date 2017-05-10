@@ -73,4 +73,9 @@ foreach ($files as $file) {
 if (empty($found)) {
     die('Ничего не найдено');
 }
-Printer::log($found, true);
+$found = array_unique($found);
+print('<ul>');
+foreach ($found as $item) {
+    print('<li style="padding: 5px 0;">'.$item.'</li>');
+}
+print('</ul>');

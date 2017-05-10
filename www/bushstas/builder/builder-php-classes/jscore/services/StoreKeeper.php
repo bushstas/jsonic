@@ -3,6 +3,7 @@
 	$data = array(
 		'name' => CONST_STORE,
 		'var' => CONST_STORE,
+		'isToCheckUsing' => true,
 		'define' => true,
 		'mode' => 2,
 		'before' => "

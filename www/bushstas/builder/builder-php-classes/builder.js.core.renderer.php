@@ -35,13 +35,19 @@ class JSCoreRenderer
 	}
 
 	private function handleFile($path, $outputPath) {
+		$isHelper = false;
+		$isToCheckUsing = false;
 		include $path;
 		if (is_array($data)) {
 			extract($data);
 		}
 		if (empty($name) && empty($prototypeOf) && empty($functions)) return;
-
-		
+		if ($isHelper === true) {
+			Helpers::register($name);
+		}
+		if ($isToCheckUsing === true || $isHelper === true) {
+			Helpers::registerForChecking($name);
+		}
 		if (!empty($name) || !empty($prototypeOf)) {
 			$this->classes[!empty($name) ? $name : $prototypeOf] = array();
 			$class = &$this->classes[!empty($name) ? $name : $prototypeOf];

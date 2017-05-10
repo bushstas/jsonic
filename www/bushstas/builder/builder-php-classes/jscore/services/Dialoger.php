@@ -3,6 +3,7 @@
 	$data = array(
 		'name' => 'Dialoger',
 		'var' => 'Dialoger',
+		'isToCheckUsing' => true,
 		'define' => true,
 		'mode' => 2,
 		'before' => "

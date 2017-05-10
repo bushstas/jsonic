@@ -1,6 +1,7 @@
 <?php
 
 	$data = array(
+		'isHelper' => true,
 		'name' => 'CheckboxHandler',
 		'mode' => 2,
 		'before' => "

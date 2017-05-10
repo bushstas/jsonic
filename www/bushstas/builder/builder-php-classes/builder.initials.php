@@ -68,16 +68,18 @@ class InitialsParser
 	}
 
 	public function run(&$classes) {
+		InitialsSyntaxParser::initClassNames(array_keys($classes));
 		foreach ($classes as $className => $data) {
 			if ($data['type'] != 'controller') {
 				$this->classNames[] = $className;
 			}
 		}
 		foreach ($this->initials as $className => &$initials) {
+			InitialsSyntaxParser::initClassName($className);
 			if (!isset($classes[$className])) continue;
 			$this->defineForClass($classes[$className]);
 			foreach ($initials as $type => &$value) {
-				$this->validateInitialValue($type, $value);
+				$this->validateInitialValue($type, $value, $classNames);
 				if ($this->currentClass['type'] == 'controller') {
 					$this->validateControllerInitials($this->currentClass['initials']);
 				}
@@ -169,9 +171,8 @@ class InitialsParser
 	}
 
 	private	function parseInitialsObject($value, $type) {
-		$data = InitialsSyntaxParser::parse($value);
+		$data = InitialsSyntaxParser::parse($value, $type);
 		//Printer::log($data);
-
 
 		$this->currentObject = array();
 		$this->currentBindings = array();

@@ -3,6 +3,7 @@
 	$data = array(
 		'name' => CONST_DECLINER,
 		'var' => CONST_DECLINER,
+		'isToCheckUsing' => true,
 		'define' => true,
 		'mode' => 2,
 		'privateMethods' => array(

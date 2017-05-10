@@ -3,6 +3,7 @@
 	$data = array(
 		'name' => 'Logger',
 		'var' => CONST_LOGGER,
+		'isToCheckUsing' => true,
 		'define' => true,
 		'mode' => 2,
 		'thisMethods' => array(

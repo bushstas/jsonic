@@ -1,6 +1,7 @@
 <?php
 
 	$data = array(
+		'isHelper' => true,
 		'name' => 'ResizeHandler',
 		'mode' => 2,
 		'before' => "

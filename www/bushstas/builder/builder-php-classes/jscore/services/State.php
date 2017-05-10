@@ -5,6 +5,7 @@
 		'var' => 'State',
 		'define' => true,
 		'mode' => 2,
+		'isToCheckUsing' => true,
 		'before' => "
 			var listeners = {},
 				subscribers = {},

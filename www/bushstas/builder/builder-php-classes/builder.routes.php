@@ -25,7 +25,7 @@ class RoutesCompiler
 		'noPatternView' => "Параметр view = '{??}' у маршрута с именем {??} не соответствует паттерну <b>[A-Z]\w+</b>",
 		'titleIsNotString' => "Параметр <b>title</b> у маршрута с именем {??} не является строкой",
 		'noPatternTitle' => "Значение title = '{??}' у маршрута с именем {??} содержащее символ $ не соответствует паттерну <b>^\\$[a-z]\w+$</b>",
-		'accessLevelNotNumber' => "Параметр <b>accessLevel</b> у маршрута с именем {??} не является числом",
+		'accessLevelNotNumber' => "Параметр <b>accessLevel</b> у маршрута с именем {??} не является целым положительным числом",
 		'paramsAreNotAnArray' => "Параметр <b>params</b> у маршрута с именем {??} не является ассоциативным массивом",
 		'paramKeyNotString' => "Ключ <b>params['{?}']</b> у маршрута с именем {??} не является строкой",
 		'paramKeyHasForbiddenSymbols' => "Ключ <b>params['{?}']</b> у маршрута с именем {??} содержит запрещенные символы",
@@ -159,7 +159,7 @@ class RoutesCompiler
 				}				
 			}
 			if (isset($route['accessLevel'])) {
-				if (!is_int($route['accessLevel'])) {
+				if (!is_numeric($route['accessLevel'])) {
 					new Error($this->errors['accessLevelNotNumber'], array($route['name']));
 				}
 			}

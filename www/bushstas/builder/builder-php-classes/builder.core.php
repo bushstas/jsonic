@@ -22,7 +22,7 @@ $includes = array(
 	'dialogs.parser', 'template.validator', 'template.syntax.parser', 'file.manager', 'js.core.renderer',
 	'operator.parser', 'foreach.code.parser', 'from.code.parser', 'switch.code.parser',
 	'constants', 'custom.tags.parser', 'js.optimizer', 'texts.constants.parser', 'initials.syntax.parser',
-	'transformer'
+	'transformer', 'helpers'
 );
 foreach ($includes as $inc) {
 	include_once __DIR__.'/builder.'.$inc.'.php';	

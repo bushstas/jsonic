@@ -1,6 +1,7 @@
 <?php
 
 	$data = array(
+		'isHelper' => true,
 		'name' => 'InputHandler',
 		'mode' => 2,
 		'before' => "

@@ -1,6 +1,7 @@
 <?php
 
 	$data = array(
+		'isHelper' => true,
 		'name' => 'MouseHandler',
 		'condition' => CONST_ENTERCOND,
 		'afterCondition' => "

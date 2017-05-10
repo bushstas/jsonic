@@ -297,10 +297,6 @@ class JSCompiler
 			new Error($this->errors['coreFilesNotFound']);
 		}
 		foreach ($coreFiles as $coreFile) {
-			if (preg_match('/\bhelpers\//', $coreFile['path'])) {
-				$this->helpers[] = $coreFile['name'];
-				$coreFile['isHelper'] = true;
-			}
 			if (preg_match('/[A-Z]\w*/', $coreFile['name'])) {
 				$this->reservedNames[] = $coreFile['name'];
 			}
@@ -311,8 +307,9 @@ class JSCompiler
 	}
 
 	private function checkHelpersUse() {
+		$helpers = Helpers::getListToCheckUsing();
 		$missingHelpers = array();
-		foreach ($this->helpers as $helper) {
+		foreach ($helpers as $helper) {
 			$isMissing = false;
 			if (!preg_match('/\b'.$helper.'\b/', $this->jsCode)) {
 				$isMissing = true;
@@ -329,7 +326,7 @@ class JSCompiler
 			if ($isMissing) $missingHelpers[] = $helper;
 		}
 		foreach ($missingHelpers as $missingHelper) {
-			if (isset($this->sources[$missingHelper]) && $this->sources[$missingHelper]['isHelper']) {
+			if (isset($this->sources[$missingHelper])) {
 				unset($this->sources[$missingHelper]);
 			}
 		}

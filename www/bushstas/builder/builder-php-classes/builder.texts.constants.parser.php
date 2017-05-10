@@ -5,11 +5,13 @@ class TextsConstantsParser
 	private static $regexp = '/@(\w+)/';
 	private static $jsList = array();
 	private static $tmpList = array();
+	private static $intList = array();
 	private static $index;
 
 	private static $errors = array(
 		'textConstNotFound' => 'Текстовая константа {??} используемая в шаблоне {??} класса {??} не найдена',
-		'textConstNotFound2' => 'Текстовая константа {??} используемая в методе {??} класса {??} не найдена'
+		'textConstNotFound2' => 'Текстовая константа {??} используемая в методе {??} класса {??} не найдена',
+		'textConstNotFound3' => 'Текстовая константа {??} используемая в initial параметре {??} класса {??} не найдена'
 	);
 
 	public static function parse(&$code, $method, $className) {
@@ -28,8 +30,14 @@ class TextsConstantsParser
 	public static function getList() {
 		return array(
 			'js'  => self::$jsList,
-			'tmp' => self::$tmpList
+			'tmp' => self::$tmpList,
+			'int' => self::$intList
 		);
+	}
+
+	public static function addInitialConstant($name, $initialName, $className) {
+		self::check($name, $initialName, $className, 3);
+		self::add(self::$intList, $name, $initialName, $className);
 	}
 
 	public static function addTemplateConstant($name, $templateName, $className) {
@@ -61,6 +69,8 @@ class TextsConstantsParser
 				new Error(self::$errors['textConstNotFound2'], array($name, $place, $class));
 			} else if ($type == 2) {
 				new Error(self::$errors['textConstNotFound'], array($name, $place, $class));
+			} else if ($type == 3) {
+				new Error(self::$errors['textConstNotFound3'], array($name, $place, $class));
 			}
 		}
 	}
