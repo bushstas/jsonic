@@ -1,7 +1,7 @@
 form OrderCallForm
 
 initial props = {
-	'action': CONFIG.orderCall.send,
+	'action': Api.orderCall.send,
 	'method': 'POST',
 	'className': '->> app-order-call',
 	'controls': [
@@ -14,7 +14,7 @@ initial props = {
 			'controlClass': Select,
 			'controlProps': {
 				'name': 'topic',
-				'options': Dictionary.get('orderCallTopics')
+				'options': Dictionary.orderCallTopics
 			}			
 		},
 		{
@@ -32,7 +32,7 @@ initial props = {
 			'controlClass': Select,
 			'controlProps': {
 				'name': 'time',
-				'options': Dictionary.get('timeOptions')
+				'options': Dictionary.timeOptions
 			}
 		},
 		{

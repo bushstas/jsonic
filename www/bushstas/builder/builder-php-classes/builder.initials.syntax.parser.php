@@ -9,9 +9,9 @@ class InitialsSyntaxParser
 	private static $openObjects, $openArrays;
 	private static $isQuoted;
 	private static $currentQuote;
-	private static $expected, $secondFieldExpected;
+	private static $expected, $secondFieldExpected, $dictFieldExpected;
 	private static $keyExpected, $valueExpected, $methodExpected, $varNameExpected;
-	private static $data, $queue, $classNames, $className, $initialName;
+	private static $queue, $classNames, $className, $initialName;
 	private static $object, $quotedText, $key, $numberExpected, $fieldExpected;
 
 	private static $keywords = array(
@@ -20,6 +20,7 @@ class InitialsSyntaxParser
 
 	private static $errors = array(
 		'unexpectedSign' => "Неожиданный символ: {?}{??}{?}<br><br>Ожидается:<xmp>{?}</xmp>",
+		'unknownName' => "Неизвестное ключевое слово/переменная {??} в initial параметре {??} класса {??}<br>{?}{??}{?}<br><br>Примеры допустимых ключевых слов/переменных:<xmp>{?}</xmp>"
 	);
 
 	private static $signs = array(
@@ -39,7 +40,6 @@ class InitialsSyntaxParser
 	);
 
 	public static function init() {
-		self::$data = array();
 		self::$code = '';
 		self::$fullCode = '';
 		self::$openObjects = 0;
@@ -57,6 +57,7 @@ class InitialsSyntaxParser
 		self::$numberExpected = false;
 		self::$fieldExpected = false;
 		self::$secondFieldExpected = false;
+		self::$dictFieldExpected = false;
 	}
 
 	public static function initClassNames($classNames) {
@@ -71,8 +72,6 @@ class InitialsSyntaxParser
 		self::init();
 		self::$initialName = $initialName;
 
-		Printer::log($code);
-	
 		$code = preg_replace('/ +/', self::$space, trim($code));
 		$code = preg_replace('/\t/', self::$tab, $code);
 		$code = preg_replace('/\r\n|\n/', self::$newline, $code);
@@ -102,15 +101,16 @@ class InitialsSyntaxParser
 				}
 			}			
 		}
-		$object = self::getObject();
-		Printer::log($object);
-		self::$data['code'] = self::$code;
-		return self::$data;
+		return array(
+			'data' => self::getObject(),
+			'code' => self::$object
+		);
 	}
 
 	private static function getObject() {
 		$o = str_replace('<nq>this.', '', self::$object);
 		$o = str_replace('<nq>', '', $o);
+		$o = preg_replace('/'.CONST_DICTIONARY.'\.([a-z]\w*)/', CONST_DICTIONARY_SHORT.".get('$1')", $o);
 		return json_decode($o, true);
 	}
 
@@ -191,7 +191,11 @@ class InitialsSyntaxParser
 				return;
 			}
 			self::$expected = array(self::$space, self::$tab, self::$newline);
-			if (!empty(self::$secondFieldExpected)) {
+			
+			if (!empty(self::$dictFieldExpected)) {
+				self::$dictFieldExpected = false;
+				self::$object .= $name.'<nq>"';
+			} elseif (!empty(self::$secondFieldExpected)) {
 				self::$secondFieldExpected = false;
 				self::$object .= $name.'<nq>"';
 			} elseif (!empty(self::$fieldExpected)) {
@@ -206,7 +210,12 @@ class InitialsSyntaxParser
 			} elseif (!empty(self::$varNameExpected)) {
 				self::$varNameExpected = false;				
 			} else {
-				if ($name == CONST_API) {
+				if ($name == CONST_DICTIONARY) {
+					self::$object .= '"<nq>'.$name;
+					self::$expected = array('.');
+					self::$dictFieldExpected = true;
+					return;
+				} elseif ($name == CONST_API) {
 					self::$object .= '"<nq>'.CONST_CONFIG;
 					self::$expected = array('.');
 					self::$fieldExpected = true;
@@ -268,7 +277,7 @@ class InitialsSyntaxParser
 	}
 
 	private static function handleComma() {
-		self::$expected = array('a', '0', '"', "'", self::$space, self::$tab, self::$newline);
+		self::$expected = array('a', '0', '"', "'", '@', '#', self::$space, self::$tab, self::$newline);
 		$lastInQueue = self::$queue[count(self::$queue) - 1];
 		if (!empty(self::$openObjects) && $lastInQueue == 'o') {
 			self::$valueExpected = false;
@@ -358,7 +367,7 @@ class InitialsSyntaxParser
 
 	private static function handleLeftBracket() {
 		self::$openArrays++;
-		self::$expected = array('a', '0', '"', "'", '{', '[', ']', self::$space, self::$tab, self::$newline);
+		self::$expected = array('a', '0', '"', "'", '{', '[', ']', '@', '#', self::$space, self::$tab, self::$newline);
 		self::$queue[] = 'a';
 		self::$object .= '[';
 	}
@@ -395,24 +404,39 @@ class InitialsSyntaxParser
 		} elseif ($sign == self::$newline) {
 			$sign = "&nbsp;";
 		}
+		new Error(self::$errors['unexpectedSign'], array(self::getErrorCode(), $sign, self::getErrorCodeEnding(), self::getExpected()));
+	}
+
+	private static function getErrorCode() {
 		self::$fullCode = preg_replace('/\t/', "&nbsp; &nbsp; &nbsp;", self::$fullCode);
 		self::$fullCode = preg_replace('/\r\n/', "<br>", self::$fullCode);
-		$error = '';
+		return self::$fullCode;
+	}
+
+	private static function getErrorCodeEnding() {
+		$ending = '';
 		if (!empty(self::$queue)) {
-			$error = '<br>&nbsp; &nbsp; &nbsp;...<br>';
-			foreach ($queue as $item) {
+			$ending = '<br>&nbsp; &nbsp; &nbsp;...<br>';
+			foreach (self::$queue as $item) {
 				if ($item == 'o') {
-					$error .= '}';
+					$ending .= '}';
 				} else {
-					$error .= ']';
+					$ending .= ']';
 				}
 			}
 		}
-		new Error(self::$errors['unexpectedSign'], array(self::$fullCode, $sign, $error, self::getExpected()));
+		return $ending;
 	}
 
 	private static function throwUnknownNameError($name) {
-		die('InitialsSyntaxParser error: throwUnknownNameError '.$name);
+		$accessible = array(
+			'Название метода класса',
+			'Имя класса',
+			'Переменная '.CONST_API,
+			'Переменная '.CONST_DICTIONARY
+		);
+		$accessible = implode("\n", $accessible);
+		new Error(self::$errors['unknownName'], array($name, self::$initialName, self::$className, self::getErrorCode(), $name, self::getErrorCodeEnding(), $accessible));
 	}
 
 	private static function getExpected() {

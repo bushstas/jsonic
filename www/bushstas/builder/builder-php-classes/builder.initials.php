@@ -172,7 +172,7 @@ class InitialsParser
 
 	private	function parseInitialsObject($value, $type) {
 		$data = InitialsSyntaxParser::parse($value, $type);
-		//Printer::log($data);
+		Printer::log($data);
 
 		$this->currentObject = array();
 		$this->currentBindings = array();

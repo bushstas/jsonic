@@ -2,14 +2,14 @@ controller Subscription
 
 initial actions = {
 	'load': {
-		'url': CONFIG.settings.subscr,
+		'url': Api.settings.subscr,
 		'method': 'GET',
 		'autoset': {
 			'options': 'opts'
 		}
 	},
 	'save': {
-		'url': CONFIG.settings.set,
+		'url': Api.settings.set,
 		'method': 'GET'
 	}
 };

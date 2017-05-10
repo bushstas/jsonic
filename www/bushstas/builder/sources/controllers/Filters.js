@@ -10,21 +10,21 @@ initial options = {
 
 initial actions = {
 	'load': {
-		'url'     : CONFIG.filters.load,
+		'url'     : Api.filters.load,
 		'method'  : 'GET',
 		'callback': this.onLoad
 	},
 	'save': {
-		'url'     : CONFIG.filters.save,
+		'url'     : Api.filters.save,
 		'method'  : 'POST',
 		'callback': this.onAdd
 	},
 	'set': {
-		'url'   : CONFIG.filters.set,
+		'url'   : Api.filters.set,
 		'method': 'POST'
 	},
 	'subscribe': {
-		'url'   : CONFIG.filters.subscribe,
+		'url'   : Api.filters.subscribe,
 		'method': 'POST',
 		'callback': this.onSubscribe
 	}

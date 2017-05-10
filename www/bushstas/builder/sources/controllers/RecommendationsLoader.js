@@ -2,7 +2,7 @@ controller RecommendationsLoader
 
 initial actions = {
 	'load': {
-		'url': CONFIG.keywords.recommendations,
+		'url': Api.keywords.recommendations,
 		'method': 'POST',
 		'autoset': {
 			'data': 'items'

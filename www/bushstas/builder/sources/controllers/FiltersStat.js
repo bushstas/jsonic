@@ -9,7 +9,7 @@ initial options = {
 
 initial actions = {
 	'load': {
-		'url': CONFIG.filterStat.load,
+		'url': Api.filterStat.load,
 		'method': 'GET'
 	}
 }

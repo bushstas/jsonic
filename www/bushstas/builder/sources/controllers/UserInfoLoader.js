@@ -2,7 +2,7 @@ controller UserInfoLoader
 
 initial actions = {
 	'load': {
-		'url'     : CONFIG.user.get,
+		'url'     : Api.user.get,
 		'method'  : 'GET'
 	}
 };
