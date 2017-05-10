@@ -9,10 +9,10 @@ class InitialsSyntaxParser
 	private static $openObjects, $openArrays;
 	private static $isQuoted;
 	private static $currentQuote;
-	private static $expected;
+	private static $expected, $secondFieldExpected;
 	private static $keyExpected, $valueExpected, $methodExpected, $varNameExpected;
 	private static $data, $queue, $classNames, $className, $initialName;
-	private static $object, $quotedText, $key, $numberExpected;
+	private static $object, $quotedText, $key, $numberExpected, $fieldExpected;
 
 	private static $keywords = array(
 		'false', 'true', 'null', 'undefined', 'NaN', 'Infinity'
@@ -55,6 +55,8 @@ class InitialsSyntaxParser
 		self::$methodExpected = false;
 		self::$varNameExpected = false;
 		self::$numberExpected = false;
+		self::$fieldExpected = false;
+		self::$secondFieldExpected = false;
 	}
 
 	public static function initClassNames($classNames) {
@@ -182,13 +184,27 @@ class InitialsSyntaxParser
 				return;
 			}
 			self::$expected = array(self::$space, self::$tab, self::$newline);
-			if (!empty(self::$methodExpected)) {
+			if (!empty(self::$secondFieldExpected)) {
+				self::$secondFieldExpected = false;
+				self::$object .= $name.'<nq>"';
+			} elseif (!empty(self::$fieldExpected)) {
+				self::$fieldExpected = false;
+				self::$object .= $name;
+				self::$secondFieldExpected = true;
+				self::$expected = array('.');
+				return;
+			} elseif (!empty(self::$methodExpected)) {
 				self::$methodExpected = false;
 				self::$object .= $name.'<nq>"';
 			} elseif (!empty(self::$varNameExpected)) {
 				self::$varNameExpected = false;				
 			} else {
-				if (!in_array($name, self::$classNames)) {
+				if ($name == CONST_API) {
+					self::$object .= '"<nq>'.CONST_CONFIG;
+					self::$expected = array('.');
+					self::$fieldExpected = true;
+					return;
+				} elseif (!in_array($name, self::$classNames)) {
 					self::throwUnknownNameError($name);
 				}
 				self::$object .= '"<nq>'.$name.'<nq>"';
@@ -389,7 +405,15 @@ class InitialsSyntaxParser
 		foreach (self::$expected as $exp) {
 			if ($exp == self::$space || $exp == self::$tab || $exp == self::$newline) continue;
 			if ($exp == 'a') {
-				$items[] = 'Ключевое слово / Название класса';
+				if (!empty(self::$fieldExpected) || !empty(self::$secondFieldExpected)) {
+					$items[] = 'Название поля объекта';
+				} elseif (!empty(self::$methodExpected)) {
+					$items[] = 'Название метода класса';
+				} else {
+					$items[] = 'Ключевое слово this';
+					$items[] = 'Название класса';
+					$items[] = 'Переменная '.CONST_API;
+				}
 			} else {
 				$items[] = self::$signs[$exp];
 			}

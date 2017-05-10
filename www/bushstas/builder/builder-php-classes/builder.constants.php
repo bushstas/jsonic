@@ -4,7 +4,8 @@ class Constants
 {
 	private static $privateVarList = array(
 		'GLOBAL'          => '__G',
-		'FUNCS'           => '__B',		
+		'FUNCS'           => '__B',
+		'CONFIG'          => '__AC',
 		'ATTRIBUTES'      => '__AT',
 		'EVENTTYPES'      => '__ET',
 		'TAGS'            => '__TG',
@@ -50,7 +51,6 @@ class Constants
 	);
 
 	private static $publicVarList = array(
-		'CONFIG'     => 'CONFIG',
 		'LOGGER'     => 'Logger',
 		'ROUTER'     => 'Router',
 		'USER'       => 'User',
@@ -61,7 +61,8 @@ class Constants
 		'DICTIONARY' => 'Dictionary',
 		'STATE'      => 'State',
 		'DIALOGER'   => 'Dialoger',
-		'STORE'      => 'StoreKeeper'
+		'STORE'      => 'StoreKeeper',
+		'API'        => 'Api'
 	);
 
 	private static $definitionsList = array(
