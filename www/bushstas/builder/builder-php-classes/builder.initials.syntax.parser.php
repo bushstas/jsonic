@@ -19,7 +19,7 @@ class InitialsSyntaxParser
 	);
 
 	private static $errors = array(
-		'unexpectedSign' => "Неожиданный символ: {{?}{??}<br>&nbsp; &nbsp; &nbsp;...<br>}<br><br>Ожидается:<xmp>{?}</xmp>",
+		'unexpectedSign' => "Неожиданный символ: {?}{??}{?}<br><br>Ожидается:<xmp>{?}</xmp>",
 	);
 
 	private static $signs = array(
@@ -102,9 +102,16 @@ class InitialsSyntaxParser
 				}
 			}			
 		}
-		Printer::log(self::$object);
+		$object = self::getObject();
+		Printer::log($object);
 		self::$data['code'] = self::$code;
 		return self::$data;
+	}
+
+	private static function getObject() {
+		$o = str_replace('<nq>this.', '', self::$object);
+		$o = str_replace('<nq>', '', $o);
+		return json_decode($o, true);
 	}
 
 	private static function addCode($code) {
@@ -326,6 +333,8 @@ class InitialsSyntaxParser
 		}
 		if (!empty(self::$openObjects) || !empty(self::$openArrays)) {
 			self::$expected[] = ',';
+		} else {
+			self::$expected = array('end');
 		}
 	}
 
@@ -388,7 +397,18 @@ class InitialsSyntaxParser
 		}
 		self::$fullCode = preg_replace('/\t/', "&nbsp; &nbsp; &nbsp;", self::$fullCode);
 		self::$fullCode = preg_replace('/\r\n/', "<br>", self::$fullCode);
-		new Error(self::$errors['unexpectedSign'], array(self::$fullCode, $sign, self::getExpected()));
+		$error = '';
+		if (!empty(self::$queue)) {
+			$error = '<br>&nbsp; &nbsp; &nbsp;...<br>';
+			foreach ($queue as $item) {
+				if ($item == 'o') {
+					$error .= '}';
+				} else {
+					$error .= ']';
+				}
+			}
+		}
+		new Error(self::$errors['unexpectedSign'], array(self::$fullCode, $sign, $error, self::getExpected()));
 	}
 
 	private static function throwUnknownNameError($name) {
@@ -404,7 +424,9 @@ class InitialsSyntaxParser
 		}
 		foreach (self::$expected as $exp) {
 			if ($exp == self::$space || $exp == self::$tab || $exp == self::$newline) continue;
-			if ($exp == 'a') {
+			if ($exp == 'end') {
+				$items[] = 'Конец выражения';
+			} elseif ($exp == 'a') {
 				if (!empty(self::$fieldExpected) || !empty(self::$secondFieldExpected)) {
 					$items[] = 'Название поля объекта';
 				} elseif (!empty(self::$methodExpected)) {
