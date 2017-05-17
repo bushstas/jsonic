@@ -45,7 +45,7 @@ initial props = {
 	],
 	'submit': {
 		'value': @orderCall,
-		'class': @greenButton + ' ->> send-button'
+		'class': '->> standart-button ->> green-button ->> send-button'
 	}
 };
 

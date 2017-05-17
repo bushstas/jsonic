@@ -984,7 +984,7 @@ __G.set(c=__F(),'AuthForm');
 p=c.prototype;
 p.onSuccess=function(){Router.reload()};
 p.getTemplateContent=function(_,$){return{'p':{'c':'app-authform-logo'},'t':0,'c':'LOGO'}};
-p.getInitials=function(){return{'props':{'action':'user/login.php','className':'app-authform-inputs','controls':[{'caption':__[51],'controlClass':'Input','controlProps':{'type':'text','name':'login','placeholder':__[50]}},{'caption':__[53],'controlClass':'Input','controlProps':{'type':'password','name':'password','placeholder':__[52]}}],'submit':{'value':__[54],'class':'app-submit'}}}};
+p.getInitials=function(){return{'props':{'action':'user/login.php','className':'app-authform-inputs','controls':[{'caption':__[51],           'controlClass':'Input','controlProps':{'type':'text','name':'login','placeholder':__[50]}},{'caption':__[53],'controlClass':'Input','controlProps':{'type':'password','name':'password','placeholder':__[52]}}],'submit':{'value':__[54],'class':'app-submit'}}}};
 __G.set(c=__F(),'OrderCallForm');
 p=c.prototype;
 p.onRendered=function(){this.setControlValue('name',User.getAttribute('name'));this.setControlValue('phone',User.getAttribute('phone'));var email=User.getAttribute('email');if(email){this.setControlValue('email',email);this.enableControl('email',false)}};

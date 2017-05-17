@@ -4,6 +4,33 @@
 	$topic = $_GET['topic'];
 	$items = array();
 	switch ($topic) {
+		case 'start':
+			$items[] = true;
+			$items[] = 'Конфигурация приложения';
+			$items[] = false;
+			$items[] = "Заполните файл конфигурации приложения <b>config.json</b>, который располагается в папке <b>builder</b>";
+			$items[] = "Для подробной справки по этому файлу, изучите документацию по конфигурации приложения";
+			$items[] = true;
+			$items[] = 'Создание инфраструктуры';
+			$items[] = false;
+			$items[] = "Создайте папку, где будут располагаться все ваши исходные коды, например <b>sources</b>, которая должна располагаться непосредственно в папке <b>builder</b>";
+			$items[] = "В данной папке создайте директорию, например <b>entry</b>, где будет располагаться класс точка входа с типом <b>application</b>";
+			$items[] = true;
+			$items[] = 'Создание точки входа';
+			$items[] = false;
+			$items[] = "Создайте класс точку входа, имя которого нужно будет указать в файле конфигурации, например <b>MyApp</b>";
+			
+			$items[] = true;
+			$items[] = 'Создание классов контроллеров';
+			$items[] = false;
+
+			$items[] = true;
+			$items[] = 'Создание классов для представления страниц';
+			$items[] = false;
+			
+			
+		break;
+
 		case 'config':
 			$items[] = true;
 			$items[] = 'Приложение';
@@ -439,14 +466,38 @@
 
 		case 'initials':
 			$items[] = "Initial параметры помогают описать начальное состояние класса и настроить его";
+			$items[] = "Для удобства располагайте данные параметры в самом верху кода класса, до описания методов";
+			$items[] = "Расположение между методами или в самом низу кода не будет ошибкой, но привнесет неразберихи в ваш код";
 			$items[] = "Далее приводится список всех возможных параметров";
-			$items[] = "<b>props</b> - содержит объект параметров класса props<xmp>initial props = {\n\t'width': 1000\n}</xmp>";
-			$items[] = "<b>loader</b> - контроллер, который будет загружать компонент и, при необходимости, вызывать указанный callback.<br>Данный контроллер обязательно должен иметь в параметре initial actions поле <b>load</b><xmp>initial loader = {\n\t'controller': CustomLoader,\n\t'callback': this.onLoad,\n\t'async': true,\n\t'options': {...}\n}</xmp>";
+			$items[] = true;
+			$items[] = 'Параметр Props';
+			$items[] = false;
+			$items[] = "содержит объект параметров класса props<xmp>initial props = {\n\t'width': 1000\n}</xmp>";
+			$items[] = true;
+			$items[] = 'Параметр Loader';
+			$items[] = false;
+			$items[] = "контроллер, который будет загружать компонент и, при необходимости, вызывать указанный callback.<br>Данный контроллер обязательно должен иметь в параметре initial actions поле <b>load</b><xmp>initial loader = {\n\t'controller': CustomLoader,\n\t'callback': this.onLoad,\n\t'async': true,\n\t'options': {...}\n}</xmp>";
 			$items[] = "controller - Имя класса контроллера";
 			$items[] = "callback - Имя метода, который будет вызван сразу после загрузки с загруженными данными в качестве аргумента.<br>Необязательное поле, вместо него можно описать все действия в методе <b>onLoaded</b>, который наследуется от класса Component";
 			$items[] = "async - Если true, компонент рендерится не дожидаясь загрузки, иначе ждет пока не загрузятся данные";
 			$items[] = "options - объект параметров, которые будут использованы в качестве GET параметров";
-			$items[] = "<b>controllers</b> - список контроллеров, на которые следует подписаться<xmp>initial controllers = [\n\t{\n\t\t'controller': ItemLoader,\n\t\t'on': {\n\t\t\t'load': this.handleItemsLoad,\n\t\t\t'remove': this.handleItemRemove\n\t\t},\n\t\t'private': true,\n\t\t'options': {\n\t\t\t'load': {...},\n\t\t\t'remove': {...}\n\t\t}\n\t}\n]</xmp>";
+			$items[] = true;
+			$items[] = 'Параметр Controllers';
+			$items[] = false;
+			$items[] = "список контроллеров, на которые следует подписаться<xmp>initial controllers = [\n\t{\n\t\t'controller': ItemLoader,\n\t\t'on': {\n\t\t\t'load': this.handleItemsLoad,\n\t\t\t'remove': this.handleItemRemove\n\t\t},\n\t\t'private': true,\n\t\t'options': {\n\t\t\t'load': {...},\n\t\t\t'remove': {...}\n\t\t}\n\t}\n]</xmp>";
+			$items[] = true;
+			$items[] = 'Валидация';
+			$items[] = false;
+			$items[] = "В описании initial параметров запрещено использовать любые логические операции, кроме вызовов методов класса без передачи аргументов";
+			$items[] = "В описании initial параметров возможно использовать следующие объекты:";
+			$items[] = "<b>CustomControl</b> - имена классов для динамического рендера в шаблонах<xmp>initial props = {\n\t'control': CustomControl\n}</xmp><xmp><Control class=\"{~control}\"/></xmp>";
+			$items[] = "<b>Dictionary.regions</b> - содержимое словарей<xmp>initial props = {\n\t'selectOptions': Dictionary.regions\n}</xmp>";
+			$items[] = "<b>Api.catalog.get</b> - пути к api<xmp>initial actions = {\n\t'load': {\n\t\t'url': Api.catalog.get\n\t}\n}</xmp>";
+			$items[] = "<b>this.methodName</b> - ссылки на функции обработчики<xmp>initial actions = {\n\t'save': {\n\t\t'url': Api.catalog.put,\n\t\t'callback': this.handleSave\n\t}\n}</xmp>";
+			$items[] = "<b>this.methodName()</b> - вызовы методов класса (без передачи аргументов)<xmp>initial props = {\n\t'sum': this.calculateSum()\n}</xmp>";
+			$items[] = "<b>getStandartItems()</b> - вызовы пользовательских функций утилит (без передачи аргументов)<xmp>initial props = {\n\t'items': getStandartItems()\n}</xmp>";
+			$items[] = "<b>#standartOptions</b> - константы данных (объекты описанные в файлах .data)<xmp>initial props = {\n\t'options': #standartOptions\n}</xmp>";
+			$items[] = "<b>@someText</b> - текстовые константы (описанные в файлах .texts)<xmp>initial props = {\n\t'text': @someText\n}</xmp>";
 		break;
 
 

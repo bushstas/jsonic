@@ -36,6 +36,8 @@ class InitialsSyntaxParser
 		'-' => 'знак -',
 		'{' => 'открывающаяся фигурная скобка',
 		'}' => 'закрывающаяся фигурная скобка',
+		'(' => 'открывающаяся круглая скобка',
+		')' => 'закрывающаяся круглая скобка',
 		'0' => 'число'
 	);
 
@@ -101,6 +103,7 @@ class InitialsSyntaxParser
 				}
 			}			
 		}
+		Printer::log(self::getObject());
 		return array(
 			'data' => self::getObject(),
 			'code' => self::$object
@@ -108,10 +111,9 @@ class InitialsSyntaxParser
 	}
 
 	private static function getObject() {
-		$o = str_replace('<nq>this.', '', self::$object);
-		$o = str_replace('<nq>', '', $o);
-		$o = preg_replace('/'.CONST_DICTIONARY.'\.([a-z]\w*)/', CONST_DICTIONARY_SHORT.".get('$1')", $o);
-		return json_decode($o, true);
+		$object = preg_replace('/'.CONST_DICTIONARY.'\.([a-z]\w*)/', CONST_DICTIONARY_SHORT.".get('$1')", self::$object);
+		$object = json_decode($object, true);		
+		return $object;
 	}
 
 	private static function addCode($code) {
@@ -207,6 +209,7 @@ class InitialsSyntaxParser
 			} elseif (!empty(self::$methodExpected)) {
 				self::$methodExpected = false;
 				self::$object .= $name.'<nq>"';
+				self::$expected[] = '(';
 			} elseif (!empty(self::$varNameExpected)) {
 				self::$varNameExpected = false;				
 			} else {
@@ -237,8 +240,6 @@ class InitialsSyntaxParser
 	private static function handleSymbol($symbol) {
 		if (self::$isQuoted && self::$currentQuote != $symbol) return;
 		if (!self::isExpected($symbol)) {
-			Printer::log(self::$object);
-			Printer::log($symbol);
 			self::throwUnexpectedSignError($symbol);
 		}
 		switch ($symbol) {
@@ -254,8 +255,21 @@ class InitialsSyntaxParser
 			case '"': self::handleDoubleQuote();     break;
 			case '@': self::handleAtSign();          break;
 			case '#': self::handleNumberSign();      break;
+			case '(': self::handleLeftParen();       break;
+			case ')': self::handleRightParen();      break;
 		}
 		self::$prevSign = $symbol;
+	}
+	
+	private static function handleLeftParen() {
+		self::$expected = array(')');
+		self::$object .= '(';
+	}
+
+	private static function handleRightParen() {
+		self::$expected = array(self::$space, self::$tab, self::$newline);
+		self::handleStandartSituation();
+		self::$object .= ')';
 	}
 
 	private static function handleNumberSign() {

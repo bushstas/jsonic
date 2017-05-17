@@ -59,6 +59,7 @@
 <body>
 	<form class="hint-form" method="GET" target="iframe" action="builder-php-classes/hint.php">
 		<select class="topic-select" name="topic">
+			<option value="start">быстрый старт</option>
 			<option value="config">конфиг. приложения</option>
 			<option value="api">конфигурация API</option>
 			<option value="user">авторизация пользователя</option>

@@ -2,7 +2,7 @@
 
 class InitialsParser 
 {	
-	private $currentClass, $currentClassName, $currentObject, $currentBindings;
+	private $currentClass, $currentClassName, $currentObject;
 	private $errors = array(
 		'incorrectInitial' => 'Ошибка в парсинге кода initial параметра в классе {??}<xmp>initial {?}</xmp>Описание должно иметь вид <b>initial props = {...}</b> или <b>initial controllers = [...]</b>',
 		'unknownInitial' => 'Неизвестный initial параметр {??} в классе {??}',
@@ -112,7 +112,9 @@ class InitialsParser
 	}
 
 	private function validateInitialValue($type, &$value) {
-		$this->parseInitialsObject($value, $type);
+		$data = InitialsSyntaxParser::parse($value, $type);
+		$this->currentObject = $data['data'];
+		
 		switch ($type) {
 			case 'options':
 			case 'props':
@@ -156,6 +158,7 @@ class InitialsParser
 				$this->validateCorrectorsInitials($value, $type);
 			break;
 		}
+		$value = $data['code'];
 	}
 
 	public function get() {
@@ -168,30 +171,6 @@ class InitialsParser
 
 	public function getControllerActions($ctr) {
 		return $this->actionsCache[$ctr];
-	}
-
-	private	function parseInitialsObject($value, $type) {
-		$data = InitialsSyntaxParser::parse($value, $type);
-		Printer::log($data);
-
-		$this->currentObject = array();
-		$this->currentBindings = array();
-		$originalValue = $value;
-		$value = trim(preg_replace('/[\r\n\t]/', '', $value));
-		if ($value == '{}' || $value == '[]') {
-			return;
-		}
-		$value = preg_replace('/:\s+/', ':', $value);
-		$regexp = '/\.bind\(([^\)]+)\)/';		
-		preg_match_all($regexp, $value, $binds);
-		$this->currentBindings = $binds[1];
-		
-		$text = preg_replace($regexp, '__BIND__', $value);
-		TextParser::transformIntoValidJson($text);
-		$this->currentObject = json_decode($text, true);
-		if ($this->currentObject === null) {
-			new Error($this->errors['parseError'], array($type, $this->currentClassName, $type, $originalValue, $this->getInitialParamExample($type)));
-		}
 	}
 
 	private	function getInitialParamExample($type) {
@@ -262,7 +241,7 @@ class InitialsParser
 	private function validateCallback($callback, $value, $type, $field, $name = '', $val = '') {
 		if (empty($callback)) return;
 		if ($callback !== null && $callback !== false && $callback !== '') {
-			$callback = str_replace('__BIND__', '', $callback);
+			$callback = str_replace('<nq>', '', $callback);
 			if (!preg_match('/^this\.[a-z]\w*$/i', $callback)) {
 				if (!empty($name)) {
 					new Error($this->errors['incorrectValue'], array($type, $this->currentClassName, $field, $name, $callback, $type, $value, $this->getInitialParamExample($type)));
@@ -286,7 +265,7 @@ class InitialsParser
 				}
 			}
 		}
-		$callback = str_replace('__BIND__', '', str_replace('this.', '', $callback));
+		$callback = str_replace('this.', '', $callback);
 		if (!is_array($this->currentClass['initialCallbacks'])) {
 			$this->currentClass['initialCallbacks'] = array();
 		}
@@ -460,7 +439,6 @@ class InitialsParser
 			$this->validateObjectFields($val, $value, $type);
 			if (!$this->isAssocArray($val)) {
 				new Error($this->errors['itemNotAssocArray'], array($type, $this->currentClassName, $i, $type, $value, $this->getInitialParamExample($type)));
-
 			}
 			if (empty($val['controller'])) {
 				new Error($this->errors['itemNoParam'], array($type, $this->currentClassName, $i, 'controller', $type, $value, $this->getInitialParamExample($type)));
