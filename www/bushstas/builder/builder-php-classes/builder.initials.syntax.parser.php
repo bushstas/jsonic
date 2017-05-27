@@ -20,7 +20,8 @@ class InitialsSyntaxParser
 
 	private static $errors = array(
 		'unexpectedSign' => "Неожиданный символ: {?}{??}{?}<br><br>Ожидается:<xmp>{?}</xmp>",
-		'unknownName' => "Неизвестное ключевое слово/переменная {??} в initial параметре {??} класса {??}<br>{?}{??}{?}<br><br>Примеры допустимых ключевых слов/переменных:<xmp>{?}</xmp>"
+		'unknownName' => "Неизвестное ключевое слово/переменная {??} в initial параметре {??} класса {??}<br>{?}{??}{?}<br><br>Примеры допустимых ключевых слов/переменных:<xmp>{?}</xmp>",
+		'incorrectObject' => 'Ошибка при парсинге initial параметра {??} класса {??}'
 	);
 
 	private static $signs = array(
@@ -103,7 +104,6 @@ class InitialsSyntaxParser
 				}
 			}			
 		}
-		Printer::log(self::getObject());
 		return array(
 			'data' => self::getObject(),
 			'code' => self::$object
@@ -112,7 +112,10 @@ class InitialsSyntaxParser
 
 	private static function getObject() {
 		$object = preg_replace('/'.CONST_DICTIONARY.'\.([a-z]\w*)/', CONST_DICTIONARY_SHORT.".get('$1')", self::$object);
-		$object = json_decode($object, true);		
+		$object = json_decode($object, true);
+		if (!is_array($object)) {
+			new Error(self::$errors['incorrectObject'], array(self::$initialName, self::$className));
+		}
 		return $object;
 	}
 
@@ -152,8 +155,7 @@ class InitialsSyntaxParser
 				TextsConstantsParser::addInitialConstant($name, self::$initialName, self::$className);
 				self::$object .= '"<nq>'.CONST_CONSTANTS.'.'.$name.'<nq>"';
 			} elseif (self::$prevSign == '#') {
-				
-				
+				self::$object .= '"<nq>'.CONST_DATA.'.'.$name.'<nq>"';				
 			} else {
 				self::$code .= $name;
 			}
@@ -263,13 +265,13 @@ class InitialsSyntaxParser
 	
 	private static function handleLeftParen() {
 		self::$expected = array(')');
-		self::$object .= '(';
+		self::$object = preg_replace('/<nq>"$/', '', self::$object).'(';
 	}
 
 	private static function handleRightParen() {
 		self::$expected = array(self::$space, self::$tab, self::$newline);
 		self::handleStandartSituation();
-		self::$object .= ')';
+		self::$object .= ')<nq>"';
 	}
 
 	private static function handleNumberSign() {

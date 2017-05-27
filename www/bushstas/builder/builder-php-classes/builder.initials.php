@@ -240,16 +240,16 @@ class InitialsParser
 
 	private function validateCallback($callback, $value, $type, $field, $name = '', $val = '') {
 		if (empty($callback)) return;
-		if ($callback !== null && $callback !== false && $callback !== '') {
-			$callback = str_replace('<nq>', '', $callback);
-			if (!preg_match('/^this\.[a-z]\w*$/i', $callback)) {
-				if (!empty($name)) {
-					new Error($this->errors['incorrectValue'], array($type, $this->currentClassName, $field, $name, $callback, $type, $value, $this->getInitialParamExample($type)));
-				} else {
-					new Error($this->errors['incorrectValue2'], array($type, $this->currentClassName, $field, $val, $type, $value, $type == 'globals' ? 'onChangeGlobalVar' : 'onChangeSomeProp', $this->getInitialParamExample($type)));
-				}
+
+		$callback = str_replace('<nq>', '', $callback);
+		if (!preg_match('/^this\.[a-z]\w*$/i', $callback)) {
+			if (!empty($name)) {
+				new Error($this->errors['incorrectValue'], array($type, $this->currentClassName, $field, $name, $callback, $type, $value, $this->getInitialParamExample($type)));
+			} else {
+				new Error($this->errors['incorrectValue2'], array($type, $this->currentClassName, $field, $val, $type, $value, $type == 'globals' ? 'onChangeGlobalVar' : 'onChangeSomeProp', $this->getInitialParamExample($type)));
 			}
 		}
+
 		$binds = $this->currentBindings;
 		if (is_array($binds)) {
 			foreach ($binds as $bind) {
@@ -328,17 +328,6 @@ class InitialsParser
 		}
 		$this->validateCallback($initials['callback'], $value, $type, 'callback');
 		$this->addControllerToClass($initials['controller']);
-	}
-
-	private function validatePropsInitials($value, $type) {
-		$initials = $this->currentObject;
-		if (!in_array($this->currentClass['type'], $this->componentLikeClassTypes)) {
-			$this->initialError('props');
-		}
-		if (!$this->isAssocArray($initials, $value)) {
-			$this->initialAssocArrayTypeError($value, $type);
-		}
-		$this->validateObjectFields($initials, $value, $type);
 	}
 
 	private function validateGlobalsInitials($value, $type) {

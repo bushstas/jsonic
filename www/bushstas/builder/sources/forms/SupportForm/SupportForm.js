@@ -1,7 +1,7 @@
 form SupportForm extends OrderCallForm
 
 initial props = {
-	'action': CONFIG.support.send,
+	'action': Api.support.send,
 	'className': '->> app-order-call',
 	'controls': [
 		#nameInput,
@@ -26,6 +26,6 @@ initial props = {
 	],
 	'submit': {
 		'value': @send,
-		'class': @greenButton + ' ->> send-button'
+		'class': '->> standart-button ->> green-button ->> send-button'
 	}
 };
