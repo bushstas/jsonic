@@ -84,16 +84,6 @@ class InitialsParser
 					$this->validateControllerInitials($this->currentClass['initials']);
 				}
 			}
-			$this->parseClassNames($initials, $classes);
-		}
-	}
-
-	private function parseClassNames(&$initials) {
-		$regexp = '/([^\'"\.\w])('.implode('|', $this->classNames).')(?![\'"\w])/';
-		foreach ($initials as &$value) {
-			if (is_string($value)) {
-				$value = preg_replace($regexp, "$1'$2'", $value); 
-			}
 		}
 	}
 
@@ -327,7 +317,8 @@ class InitialsParser
 			new Error($this->errors['incorrectOptions'], array($type, $this->currentClassName, $type, $value, $this->getInitialParamExample($type)));
 		}
 		$this->validateCallback($initials['callback'], $value, $type, 'callback');
-		$this->addControllerToClass($initials['controller']);
+		$controller = str_replace('<nq>', '', $initials['controller']);
+		$this->addControllerToClass($controller);
 	}
 
 	private function validateGlobalsInitials($value, $type) {
@@ -425,6 +416,7 @@ class InitialsParser
 		}
 		$this->currentClass['onActions'] = array();
 		foreach ($initials as $i => $val) {
+			$controller = str_replace('<nq>', '', $val['controller']);
 			$this->validateObjectFields($val, $value, $type);
 			if (!$this->isAssocArray($val)) {
 				new Error($this->errors['itemNotAssocArray'], array($type, $this->currentClassName, $i, $type, $value, $this->getInitialParamExample($type)));
@@ -439,7 +431,7 @@ class InitialsParser
 				$this->validateObjectFields($val['on'], $value, $type);
 				foreach ($val['on'] as $action => $callback) {
 					$this->validateCallback($callback, $value, $type, $i, 'callback');
-					$this->currentClass['onActions'][] = array('controller' => $val['controller'], 'action' => $action);
+					$this->currentClass['onActions'][] = array('controller' => $controller, 'action' => $action);
 				}
 			}
 			if (isset($val['private']) && !is_bool($val['private'])) {
@@ -455,10 +447,10 @@ class InitialsParser
 				$this->validateObjectFields($val['options'], $value, $type);
 				foreach ($val['on'] as $action => $callback) {
 					$this->validateCallback($callback, $value, $type, $i, 'callback');
-					$this->currentClass['onActions'][] = array('controller' => $val['controller'], 'action' => $action);
+					$this->currentClass['onActions'][] = array('controller' => $controller, 'action' => $action);
 				}
-			}
-			$this->addControllerToClass($val['controller']);
+			}			
+			$this->addControllerToClass($controller);
 		}
 	}
 

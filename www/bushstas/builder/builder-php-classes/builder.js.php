@@ -588,6 +588,7 @@ class JSCompiler
 						$actions = array();
 					}
 					if (!isset($actions[$action['action']])) {
+						Printer::log($action);
 						new Error($this->errors['actionNotFound'], array($action['action'], $class['name'], $action['controller']));
 					}
 				}
@@ -1220,10 +1221,9 @@ class JSCompiler
 		foreach ($initials as $name => $code) {
 			if (!empty($code)) {
 				TagClassNameParser::parseTexts($code, $className, true);
-				$code = preg_replace('/(:\s*)@(\w+)/', "$1__.$2", $code);
-				$code = preg_replace('/\#([a-z]\w*)/i', "<data>$1", $code);
-				$code = preg_replace("/[\t\r\n]/", '', $code);
-				$code = preg_replace("/ {2,}/", ' ', $code);				
+				$code = preg_replace("/[\"']<nq>/", '', $code);
+				$code = preg_replace("/<nq>[\"']/", '', $code);
+				$code = preg_replace("/<nq>/", '', $code);
 				$spacelessCode = preg_replace('/\s/', '', $code);
 				if ($spacelessCode != '{}' && $spacelessCode != '[]') {
 					$objCode[] = "\n\t\t'".$name."':".$code;

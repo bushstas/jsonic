@@ -24,7 +24,7 @@
 }
 
 #keywordsAutoCompleteOptions = {
-	'url': CONFIG.keywords.get
+	'url': Api.keywords.get
 }
 
 #wordOrderOptions = [
