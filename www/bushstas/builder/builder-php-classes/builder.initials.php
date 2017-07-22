@@ -68,7 +68,7 @@ class InitialsParser
 	}
 
 	public function run(&$classes) {
-		InitialsSyntaxParser::initClassNames(array_keys($classes));
+		InitialsSyntaxParser::initClassNames($classes);
 		foreach ($classes as $className => $data) {
 			if ($data['type'] != 'controller') {
 				$this->classNames[] = $className;
@@ -103,6 +103,7 @@ class InitialsParser
 
 	private function validateInitialValue($type, &$value) {
 		$data = InitialsSyntaxParser::parse($value, $type);
+		//Printer::log($data);
 		$this->currentObject = $data['data'];
 		
 		switch ($type) {

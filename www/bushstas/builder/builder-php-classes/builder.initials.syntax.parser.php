@@ -11,7 +11,7 @@ class InitialsSyntaxParser
 	private static $currentQuote;
 	private static $expected, $secondFieldExpected, $dictFieldExpected;
 	private static $keyExpected, $valueExpected, $methodExpected, $varNameExpected;
-	private static $queue, $classNames, $className, $initialName;
+	private static $queue, $classes, $className, $initialName, $helpers;
 	private static $object, $quotedText, $key, $numberExpected, $fieldExpected;
 
 	private static $keywords = array(
@@ -63,8 +63,9 @@ class InitialsSyntaxParser
 		self::$dictFieldExpected = false;
 	}
 
-	public static function initClassNames($classNames) {
-		self::$classNames = array_merge($classNames, Helpers::getList());
+	public static function initClassNames($classes) {
+		self::$classes = $classes;
+		self::$helpers = Helpers::getList();
 	}
 
 	public static function initClassName($className) {
@@ -225,10 +226,14 @@ class InitialsSyntaxParser
 					self::$expected = array('.');
 					self::$fieldExpected = true;
 					return;
-				} elseif (!in_array($name, self::$classNames)) {
+				} elseif (!in_array($name, self::$helpers) && !isset(self::$classes[$name])) {
 					self::throwUnknownNameError($name);
 				}
-				self::$object .= '"<nq>'.$name.'<nq>"';
+				if (isset(self::$classes[$name]) && self::$classes[$name]['type'] == 'controller') {
+					self::$object .= '"<nq>'.$name.'<nq>"';	
+				} else {
+					self::$object .= '"'.$name.'"';
+				}
 			}
 		}
 		self::handleStandartSituation();
@@ -446,8 +451,8 @@ class InitialsSyntaxParser
 
 	private static function throwUnknownNameError($name) {
 		$accessible = array(
-			'Название метода класса',
-			'Имя класса',
+			'Название метода класса (вида this.methodName)',
+			'Имя класса (вида MyClassName)',
 			'Переменная '.CONST_API,
 			'Переменная '.CONST_DICTIONARY
 		);

@@ -1307,6 +1307,7 @@ class JSCompiler
 			}
 			JSParser::init($this->correctors);
 			JSParser::parse($class);
+			Printer::log($class);
 			JSChecker::check($class);
 			ControllersParser::parse($class);
 			DialogsParser::parse($class);

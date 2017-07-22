@@ -1,6 +1,7 @@
 component DataTable
 
 initial props = {
+	a: Input
 }
 
 function handleClick() {

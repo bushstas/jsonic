@@ -54,24 +54,25 @@ class JSParser
 						new Error(self::$errors['symbolsAfterFuncs'], array($class['name']));
 					}
 				}
-				$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
+				$code = $d['inner'];
+				//$code = self::parseFunctionCode($d['inner'], $functionName, $class['name']);
 				self::parseArgsForCorrectors($arguments, $code, $class['name'], $functionName);
-				JSInterpreter::parse($code, $class['name']);
-				TextsConstantsParser::parse($code, $functionName, $class['name']);
+				//JSInterpreter::parse($code, $class['name']);
+				//TextsConstantsParser::parse($code, $functionName, $class['name']);
 				$functions[] = array(
 					'name' => $functionName, 
 					'args' => $arguments,
 					'code' => $code
 				);
-				preg_match_all('/\bthis\.(\w+)\(/', $code, $matches);
-				$matches = $matches[1];
-				if (!empty($matches)) {
-					foreach ($matches as $match) {
-						if (!isset($class['calledMethods'][$match])) {
-							$class['calledMethods'][$match] = $functionName;
-						}
-					}						
-				}
+				// preg_match_all('/\bthis\.(\w+)\(/', $code, $matches);
+				// $matches = $matches[1];
+				// if (!empty($matches)) {
+				// 	foreach ($matches as $match) {
+				// 		if (!isset($class['calledMethods'][$match])) {
+				// 			$class['calledMethods'][$match] = $functionName;
+				// 		}
+				// 	}
+				// }
 				if ($functionName != '__constructor') {
 					$functionList[] = $functionName;
 				}
