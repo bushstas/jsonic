@@ -2,23 +2,28 @@
 
 class ArgumentsParser {
 	function parse($args) {
-		$s = Iterator::next();
+		$s = Iteration::next();
 		if ($s != '[') {
 			Error::unexpected($s, array('[', ' '));
 		} else {
 			$parser = new ArrayItemParser();
-			return Iterator::current(true).$parser->parse($args);
+			return Iteration::current(true).$parser->parse($args);
 		}
 	}
 }
 
-class VarParser {
-	function parse(&$args) {
-		$s = Iterator::isSpace(1);
-		if (!$s) {
-			Error::unexpected(Iterator::next(), array(' ', "\n"));
-		} else {
+class VarParser extends Parser {
 
+	function beforeParse() {
+		if (!Iteration::isSpace(1)) {
+			Error::unexpected(Iteration::next(), array(' ', "\n"));
+		}		
+	}
+
+	function handleName($a) {
+		if (in_array($a, $this->args)) {
+			Error::show('var_ovr', $a);
 		}
+		$this->args[] = $a;
 	}
 }

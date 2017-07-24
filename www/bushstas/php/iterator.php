@@ -1,34 +1,42 @@
 <?php
 
-class Iterator {
+class Iteration {
+
 	private static $i, $parts;
 
-	static function init($parts) {
-		self::$i = 0;
+
+	public static function init($parts) {
+		self::$i = -1;
 		self::$parts = $parts;
 	}
 
-	static function current($add = false) {
+	public static function current($add = false) {
 		$a = self::$parts[self::$i];
 		if ($add === true) self::add();
 		return $a;
 	}
 
-	static function add($n = 1) {
+	public static function add($n = 1) {
 		self::$i += $n;
 	}
 
-	static function next($add = false) {
+	public static function next($add = false) {
 		$a = self::$parts[self::$i + 1];
 		if ($add === true) self::add();
 		return $a;
 	}
 
-	static function prev($n = 1) {
+	public static function prev($n = 1) {
 		return self::$parts[self::$i - $n];
 	}
 
-	static function has() {
+	public static function has() {
 		return isset(self::$parts[self::$i + 1]);
+	}
+
+
+	public static function isSpace($shift = 0) {
+		$s = self::$parts[self::$i + $shift];
+		return $s == ' ' || $s == "\r\n" || $s == "\r" || $s == "\r\n" || $s == "\t";
 	}
 }

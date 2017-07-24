@@ -16,13 +16,15 @@ class Parser {
 
 	public function parse($args) {
 		$this->args = $args;
-		while (Iterator::has()) {
-			$part = Iterator::current();
+		$this->beforeParse();
+		Iteration::add();
+		while (Iteration::has()) {
+			$part = Iteration::current();
 			if ($part !== '') {
 				if (is_numeric($part)) {
 					$this->handleNumber($part);
 				} elseif (preg_match('/[a-z]/i', $part[0])) {
-					if (isset($this->keywords[$part])) {
+					if (!isset($this->keywords[$part])) {
 						$this->handleName($part);
 					} else {
 						$this->handleKeyword($part);
@@ -30,12 +32,10 @@ class Parser {
 				} elseif (is_numeric($part[0]) && !$this->isQuoted) {
 					$this->throwIncorrectNameError($part);
 				} else {
-					for ($i = 0; $i < strlen($part); $i++) {
-						$this->handleSymbol($part[$i]);
-					}
+					$this->handleSymbol($part);
 				}
 			}
-			Iterator::add();
+			Iteration::add();
 		}
 		return $this->code;
 	}
@@ -49,10 +49,15 @@ class Parser {
 	}
 
 	protected function handleKeyword($a) {
-		$parser = $this->keywords[$a];
-		if (!empty($parser) && class_exists($parser)) {
-			$parser = new $parser();
+		$parserName = $this->keywords[$a];
+		if (!empty($parserName) && class_exists($parserName)) {
+			$parser = new $parserName();
 			$this->addCode($parser->parse($this->args));
+			switch ($parserName) {
+				case 'VarParser':
+					$this->args = $parser->getArgs();
+				break;
+			}
 		}
 	}
 
@@ -67,4 +72,10 @@ class Parser {
 	protected function addCode($code) {
 		$this->code .= $code;
 	}
+
+	protected function getArgs() {
+		return $this->args;
+	}
+
+	protected function beforeParse() {}
 }
