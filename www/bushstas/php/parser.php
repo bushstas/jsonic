@@ -4,6 +4,7 @@ class Parser {
 	protected $isQuoted = false;
 	protected $code = '';
 	protected $args;
+	protected $expected = array();
 	protected $keywords = array(
 		'abstract' => '', 'arguments' => 'ArgumentsParser', 'await' => '', 'boolean' => '', 'break' => '', 'byte' => '', 'case' => '', 'catch' => '', 'char' => '', 'class' => '', 'const' => '', 'continue' => '',
 		'debugger' => '', 'default' => '', 'delete' => '', 'do' => '', 'double' => '', 'else' => '', 'enum' => '', 'eval' => '', 'export' => '', 'extends' => '', 'false' => '', 'final' => '',
@@ -45,7 +46,7 @@ class Parser {
 	}
 
 	protected function handleName($a) {
-
+		$this->addCode($a);
 	}
 
 	protected function handleKeyword($a) {

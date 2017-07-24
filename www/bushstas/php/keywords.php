@@ -14,6 +14,10 @@ class ArgumentsParser {
 
 class VarParser extends Parser {
 
+	function __construct() {
+		$this->expected = array('space');
+	}
+
 	function beforeParse() {
 		if (!Iteration::isSpace(1)) {
 			Error::unexpected(Iteration::next(), array(' ', "\n"));
@@ -25,5 +29,6 @@ class VarParser extends Parser {
 			Error::show('var_ovr', $a);
 		}
 		$this->args[] = $a;
+		parent::handleName($a);
 	}
 }
