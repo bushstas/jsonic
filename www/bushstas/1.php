@@ -10,7 +10,7 @@ include 'php/keywords.php';
 
 
 $args = array();
-$code = 'var a = 55;var b = fff';
+$code = 'arguments var a = 55;var b = fff';
 
 $code = preg_replace('/ {2,}/', ' ', trim($code));
 $code = preg_replace('/\t{2,}/', "\t", $code);

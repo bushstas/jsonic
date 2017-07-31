@@ -4,6 +4,7 @@ class Parser {
 	protected $isQuoted = false;
 	protected $code = '';
 	protected $args;
+	protected $done = false;
 	protected $expected = array();
 	protected $keywords = array(
 		'abstract' => '', 'arguments' => 'ArgumentsParser', 'await' => '', 'boolean' => '', 'break' => '', 'byte' => '', 'case' => '', 'catch' => '', 'char' => '', 'class' => '', 'const' => '', 'continue' => '',
@@ -36,7 +37,11 @@ class Parser {
 					$this->handleSymbol($part);
 				}
 			}
-			Iteration::add();
+			if ($this->done) {
+				break;
+			} else {
+				Iteration::add();
+			}
 		}
 		return $this->code;
 	}
@@ -76,6 +81,10 @@ class Parser {
 
 	protected function getArgs() {
 		return $this->args;
+	}
+
+	protected function setDone() {
+		$this->done = true;
 	}
 
 	protected function beforeParse() {}
